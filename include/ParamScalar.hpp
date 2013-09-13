@@ -7,6 +7,9 @@
 
 #include <AmplRecordParser.hpp>
 
+#ifndef PARAMSCALAR
+#define PARAMSCALAR
+
 namespace pelib
 {
 	template <class Value>
@@ -51,3 +54,5 @@ namespace pelib
 		}
 	};
 }
+
+#endif

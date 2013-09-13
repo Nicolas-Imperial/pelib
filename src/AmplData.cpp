@@ -51,16 +51,31 @@ namespace pelib
 	void
 	AmplData::parse(std::istream &ampl_data, std::vector<AmplRecordParser*> parsers)
 	{
-		std::string line, output, &out=output;
+		std::string line;
 		std::string first_only = "\\1";
 		std::string nothing = "";
 
-		while(!getline(ampl_data, line, ';').fail())
+		// Remove all comments from input before starting to parse it
+		std::stringstream noComment;
+		while(!getline(ampl_data, line).fail())
+		{
+			boost::regex comment("(.*?)#.*?$");
+                        line = boost::regex_replace(line, comment, first_only, boost::match_default | boost::format_all);
+			boost::regex surrounding_space("^[\n\\s]*(.*?)[\\s\n]*$");
+			line = boost::regex_replace(line, surrounding_space, first_only, boost::match_default | boost::format_all);
+
+			if(line.compare("") != 0)
+			{
+				noComment << line << std::endl;
+			}
+		}
+
+		// Parse input
+		while(!getline(noComment, line, ';').fail())
 		{
 			boost::regex surrounding_space("^[\n\\s]*(.*?)[\\s\n]*$");
-			boost::regex comment("(.*?)#.*?(\n|$)");
-			line = boost::regex_replace(line, comment, first_only, boost::match_default | boost::format_all);
 			line = boost::regex_replace(line, surrounding_space, first_only, boost::match_default | boost::format_all);
+
 			if(line.length() == 0)
 			{
 				continue;

@@ -30,6 +30,17 @@ namespace pelib
 			std::istringstream converter(element);
 			converter >> out;
 
+			/*
+			if(typeid(out).compare("f") == 0 || typeid(out).compare("d") == 0) // We want to parse a floating-point value
+			{
+				int ref = convert<int>(element);
+				if(out == ref) // We asked for a floating point unit where an integer could have done it
+				{
+					throw ParseException("Requested a floating point container, but a integer container would fit");
+				}
+			}
+			*/
+
 			if(converter.fail())
 			{
 				throw ParseException("Couln't convert literal into desired type");

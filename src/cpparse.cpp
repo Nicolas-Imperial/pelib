@@ -9,6 +9,7 @@
 #include <ParamScalar.hpp>
 #include <ParamVector.hpp>
 #include <ParamMatrix.hpp>
+#include <OutputScalar.hpp>
 #include <OutputVector.hpp>
 
 using namespace pelib;
@@ -37,11 +38,17 @@ main(int argc, char **argv)
 
 	std::cout << data << std::endl;
 
-	std::cout << data.find<ParamMatrix<int, int, float> >("e")->getColSize() << std::endl;
+	std::cout << data.find<ParamScalar<int> >("b")->getValue() << std::endl;
+	std::cout << data.find<ParamVector<int, int> >("Wi")->getSize() << std::endl;
+	std::cout << data.find<ParamMatrix<int, int, float> >("e")->getRowSize() << std::endl;
 
-	OutputVector<int, int> vector(data.find<ParamVector<int, int> >("Wi"));
-	vector.setName("yy");
-	std::cout << vector << std::endl;
+	OutputScalar<int> outputScalar(data.find<ParamScalar<int> >("n"));
+	outputScalar.setName("nn");
+	std::cout << outputScalar << std::endl;
+
+	OutputVector<int, int> outputVector(data.find<ParamVector<int, int> >("Wi"));
+	outputVector.setName("yy");
+	std::cout << outputVector << std::endl;
 	
 	return EXIT_SUCCESS;
 }
