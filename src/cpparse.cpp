@@ -40,6 +40,7 @@ main(int argc, char **argv)
 	std::cout << data.find<ParamMatrix<int, int, float> >("e")->getColSize() << std::endl;
 
 	OutputVector<int, int> vector(data.find<ParamVector<int, int> >("Wi"));
+	vector.setName("yy");
 	std::cout << vector << std::endl;
 	
 	return EXIT_SUCCESS;

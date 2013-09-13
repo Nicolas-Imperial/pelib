@@ -63,6 +63,12 @@ namespace pelib
 			return new OutputVector(this);
 		}
 
+		void
+		setName(std::string name)
+		{
+			this->name = name;
+		}
+
 		protected:
 		output_vector_map_t values;
 
