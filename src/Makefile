@@ -17,7 +17,7 @@ bin_cpparse_deps = libcppelib.a
 ## static library packages and their sources
 lib_package = cppelib
 
-lib_cppelib_src = AmplParse.cpp AmplRecord.cpp ParseException.cpp
+lib_cppelib_src = ParseException.cpp AmplRecord.cpp AmplRecordParser.cpp AmplData.cpp
 lib_cppelib_export = $(lib_cppelib_src)
 lib_cppelib_deps = ## Include some support to get dependency to object files
 

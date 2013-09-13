@@ -8,25 +8,25 @@
 #ifndef AMPLPARSE
 #define AMPLPARSE
 
-#include <AmplRecord.hpp>
+#include <AmplRecordParser.hpp>
 
 namespace pelib
 {
 	class AmplData
 	{
 		protected:
-		std::map<std::string, AmplRecord*> records;
-		std::vector<AmplRecord*> default_parsers;
+		std::map<std::string, AmplRecordParser*> records;
+		std::vector<AmplRecordParser*> default_parsers;
 
 		public:
 		AmplData();
 
-		AmplData(std::vector<AmplRecord*> parsers);
+		AmplData(std::vector<AmplRecordParser*> parsers);
 
 		virtual
 		~AmplData();		
 
-		std::map<std::string, AmplRecord*>
+		std::map<std::string, AmplRecordParser*>
 		getAllRecords();
 
 		template<class Record>
@@ -37,7 +37,7 @@ namespace pelib
 	//		cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << "Hello world" << endl;
 			std::map<std::string, Record*> record;
 
-			for (std::map<std::string, AmplRecord*>::iterator i = records.begin(); i != records.end(); i++)
+			for (std::map<std::string, AmplRecordParser*>::iterator i = records.begin(); i != records.end(); i++)
 			{
 				try
 				{
@@ -64,7 +64,7 @@ namespace pelib
 		parse(std::istream &ampl_data);
 
 		void
-		parse(std::istream &ampl_data, std::vector<AmplRecord*> parsers);
+		parse(std::istream &ampl_data, std::vector<AmplRecordParser*> parsers);
 
 		virtual std::ostream&
 		dump(std::ostream& o) const;

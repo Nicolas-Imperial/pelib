@@ -5,10 +5,11 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <AmplParse.hpp>
+#include <AmplData.hpp>
 #include <ParamScalar.hpp>
 #include <ParamVector.hpp>
 #include <ParamMatrix.hpp>
+#include <OutputVector.hpp>
 
 using namespace pelib;
 
@@ -37,6 +38,9 @@ main(int argc, char **argv)
 	std::cout << data << std::endl;
 
 	std::cout << data.find<ParamMatrix<int, int, float> >("e")->getColSize() << std::endl;
+
+	OutputVector<int, int> vector(data.find<ParamVector<int, int> >("Wi"));
+	std::cout << vector << std::endl;
 	
 	return EXIT_SUCCESS;
 }

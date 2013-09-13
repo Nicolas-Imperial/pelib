@@ -9,22 +9,7 @@
 
 namespace pelib
 {
-	boost::cmatch
-	AmplRecord::match(std::string regex, std::string str)
-	{
-		boost::cmatch match;
-		boost::regex param_scalar(regex);
-
-		if(boost::regex_match(str.c_str(), match, param_scalar))
-		{
-			return match;
-		}
-		else
-		{
-			throw ParseException("Text doesn't match regex");
-		}
-	}
-
+	AmplRecord::~AmplRecord() {}
 	std::string
 	AmplRecord::getName() const
 	{

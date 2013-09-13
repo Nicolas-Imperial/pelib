@@ -5,13 +5,13 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <AmplRecord.hpp>
+#include <AmplRecordParser.hpp>
 
 namespace pelib
 {
 	template <class Value>
 	class
-	ParamScalar: public AmplRecord
+	ParamScalar: public AmplRecordParser
 	{
 		protected:
 		Value value;
@@ -24,10 +24,10 @@ namespace pelib
 		parse(std::istream &in)
 		{	
 			std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-			boost::cmatch match = AmplRecord::match("^param\\s+([^\\s\n]*?)\\s*:=\\s*([^\\s\n]*?)\\s*$", str);
+			boost::cmatch match = AmplRecordParser::match("^param\\s+([^\\s\n]*?)\\s*:=\\s*([^\\s\n]*?)\\s*$", str);
 
 			this->name = match[1];
-			this->value = AmplRecord::convert<Value>(match[2]);
+			this->value = AmplRecordParser::convert<Value>(match[2]);
 		}
 
 		Value

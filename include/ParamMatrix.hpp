@@ -5,13 +5,13 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <AmplRecord.hpp>
+#include <AmplRecordParser.hpp>
 
 namespace pelib
 {
 	template <class Row, class Col, class Value>
 	class
-	ParamMatrix: public AmplRecord
+	ParamMatrix: public AmplRecordParser
 	{
 		typedef std::map<Col, Value> RowType;
 		typedef std::map<Row, RowType> MatrixType;
@@ -27,7 +27,7 @@ namespace pelib
 		parse(std::istream &in)
 		{
 			std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-			boost::cmatch match = AmplRecord::match("param\\s+([^\\s:]*):\\s+(.*?)\\s*:=(.*)", str);
+			boost::cmatch match = AmplRecordParser::match("param\\s+([^\\s:]*):\\s+(.*?)\\s*:=(.*)", str);
 			this->name = match[1];
 			std::string indexes = match[2];
 			std::string remain = match[3];
@@ -41,7 +41,7 @@ namespace pelib
 			std::vector<Col> cols;
 			for(; iter != end; ++iter)
 			{
-				cols.push_back(AmplRecord::convert<Col>(*iter));
+				cols.push_back(AmplRecordParser::convert<Col>(*iter));
 			}
 			int s = cols.size();
 
@@ -56,11 +56,11 @@ namespace pelib
 			{
 				std::map<Col, Value> vector;
 
-				row = AmplRecord::convert<Row>(*iter);
+				row = AmplRecordParser::convert<Row>(*iter);
 				iter++;
 				for(int i = 0; i < s; i++)
 				{
-					val = AmplRecord::convert<Value>(*iter);
+					val = AmplRecordParser::convert<Value>(*iter);
 					col = cols[i];
 					vector.insert(std::pair<Col, Value>(col, val));
 					iter++;	

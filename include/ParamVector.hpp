@@ -5,13 +5,16 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <AmplRecord.hpp>
+#include <AmplRecordParser.hpp>
+
+#ifndef PARAMVECTOR
+#define PARAMVECTOR
 
 namespace pelib
 {
 	template <class Key, class Value>
 	class
-	ParamVector: public AmplRecord
+	ParamVector: public AmplRecordParser
 	{
 		protected:
 		std::map<Key, Value> values;
@@ -24,7 +27,7 @@ namespace pelib
 		parse(std::istream &in)
 		{
 			std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-			boost::cmatch match=AmplRecord::match("^param\\s*:\\s*([^\\s\\n]+)\\s*:=(.*)$", str);
+			boost::cmatch match=AmplRecordParser::match("^param\\s*:\\s*([^\\s\\n]+)\\s*:=(.*)$", str);
 			this->name = match[1];
 
 			boost::regex param_vector("(?:\\s*([^\\s]+)\\s+([^\\s]+))");
@@ -38,8 +41,8 @@ namespace pelib
 				Key key;
 				Value value;
 
-				key = AmplRecord::convert<Value>(*iter++);
-				value = AmplRecord::convert<Value>(*iter);
+				key = AmplRecordParser::convert<Value>(*iter++);
+				value = AmplRecordParser::convert<Value>(*iter);
 
 				values.insert(std::pair<Key, Value>(key, value));
 			}
@@ -86,3 +89,5 @@ namespace pelib
 		}
 	};
 }
+
+#endif

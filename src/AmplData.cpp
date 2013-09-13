@@ -5,7 +5,7 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <AmplParse.hpp>
+#include <AmplData.hpp>
 #include <ParamScalar.hpp>
 #include <ParamVector.hpp>
 #include <ParamMatrix.hpp>
@@ -19,24 +19,24 @@ namespace pelib
 		default_parsers.push_back(new ParamMatrix<int, int, float>());
 	}
 
-	AmplData::AmplData(std::vector<AmplRecord*> parsers)
+	AmplData::AmplData(std::vector<AmplRecordParser*> parsers)
 	{
 		default_parsers = parsers;
 	}	
 
 	AmplData::~AmplData()
 	{
-		for(std::vector<AmplRecord*>::iterator i = default_parsers.begin(); i != default_parsers.end(); i++)
+		for(std::vector<AmplRecordParser*>::iterator i = default_parsers.begin(); i != default_parsers.end(); i++)
 		{
 			delete *i;
 		}
-			for (std::map<std::string, AmplRecord*>::iterator i = records.begin(); i != records.end(); i++)
+			for (std::map<std::string, AmplRecordParser*>::iterator i = records.begin(); i != records.end(); i++)
 		{
 			delete i->second;
 		}
 	}		
 
-	std::map<std::string, AmplRecord*>
+	std::map<std::string, AmplRecordParser*>
 	AmplData::getAllRecords()
 	{
 		return records;
@@ -49,7 +49,7 @@ namespace pelib
 	}
 
 	void
-	AmplData::parse(std::istream &ampl_data, std::vector<AmplRecord*> parsers)
+	AmplData::parse(std::istream &ampl_data, std::vector<AmplRecordParser*> parsers)
 	{
 		std::string line, output, &out=output;
 		std::string first_only = "\\1";
@@ -66,18 +66,18 @@ namespace pelib
 				continue;
 			}
 
-			std::vector<AmplRecord*>::iterator iter;
+			std::vector<AmplRecordParser*>::iterator iter;
 			for(iter = parsers.begin(); iter != parsers.end(); iter++)
 			{
-				AmplRecord *parser = *iter;
-				AmplRecord *record;
+				AmplRecordParser *parser = *iter;
+				AmplRecordParser *record;
 				try {
 //					cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << line << endl;
 					record = parser->clone();
 					std::istringstream istr(line);
 					std::istream &str = istr;
 					record->parse(str);
-					records.insert(std::pair<std::string, AmplRecord*>(record->getName(), record));
+					records.insert(std::pair<std::string, AmplRecordParser*>(record->getName(), record));
 
 					// No need to try another parser; proceed with the next token
 					break;
@@ -98,7 +98,7 @@ namespace pelib
 	std::ostream&
 	AmplData::dump(std::ostream& o) const
 	{
-		for (std::map<std::string, AmplRecord*>::const_iterator i = records.begin(); i != records.end(); i++)
+		for (std::map<std::string, AmplRecordParser*>::const_iterator i = records.begin(); i != records.end(); i++)
 		{
 			o << *(i->second) << std::endl;
 		}
