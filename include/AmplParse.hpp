@@ -8,7 +8,7 @@
 #ifndef AMPLPARSE
 #define AMPLPARSE
 
-#include <amplrecord.hpp>
+#include <AmplRecord.hpp>
 
 namespace pelib
 {

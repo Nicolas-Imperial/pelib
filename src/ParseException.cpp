@@ -5,7 +5,7 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <amplparse.hpp>
+#include <AmplParse.hpp>
 
 namespace pelib
 {

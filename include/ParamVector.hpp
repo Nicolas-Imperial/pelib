@@ -5,6 +5,8 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
+#include <AmplRecord.hpp>
+
 namespace pelib
 {
 	template <class Key, class Value>

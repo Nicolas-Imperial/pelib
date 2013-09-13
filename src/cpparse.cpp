@@ -5,10 +5,10 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <amplparse.hpp>
-#include <paramscalar.hpp>
-#include <paramvector.hpp>
-#include <parammatrix.hpp>
+#include <AmplParse.hpp>
+#include <ParamScalar.hpp>
+#include <ParamVector.hpp>
+#include <ParamMatrix.hpp>
 
 using namespace pelib;
 

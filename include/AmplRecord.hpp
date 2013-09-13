@@ -6,7 +6,7 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <parseexception.hpp>
+#include <ParseException.hpp>
 
 #ifndef AMPLRECORD
 #define AMPLRECORD
