@@ -1,6 +1,6 @@
 sources = 
 tests = 
-attach = ParseException.hpp AmplRecord.hpp AmplRecordParser.hpp ParamMatrix.hpp ParamScalar.hpp ParamVector.hpp AmplRecordOutput.hpp OutputVector.hpp
+attach = ParseException.hpp AmplRecord.hpp AmplRecordParser.hpp ParamMatrix.hpp ParamScalar.hpp ParamVector.hpp AmplRecordOutput.hpp OutputScalar.hpp OutputVector.hpp OutputMatrix.hpp AmplData.hpp
 
 subdirs =
 

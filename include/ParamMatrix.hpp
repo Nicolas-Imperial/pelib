@@ -7,6 +7,9 @@
 
 #include <AmplRecordParser.hpp>
 
+#ifndef PARAMMATRIX
+#define PARAMMATRIX
+
 namespace pelib
 {
 	template <class Row, class Col, class Value>
@@ -101,7 +104,8 @@ namespace pelib
 				o << row_iter->first << " ";
 				for(typename std::map<Col, Value>::const_iterator col_iter = row_iter->second.begin(); col_iter != row_iter->second.end(); col_iter++)
 				{
-					o << std::fixed << std::setprecision(6) << col_iter->second << " ";
+//					o << std::fixed << std::setprecision(6) << col_iter->second << " ";
+					o << col_iter->second << " ";
 				}
 				o << std::endl;
 			}
@@ -131,3 +135,4 @@ namespace pelib
 	};
 }
 
+#endif

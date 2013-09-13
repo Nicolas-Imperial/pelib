@@ -71,12 +71,15 @@ clean:
 check: $(test_package)
 	$(shell echo for i in "$(foreach var,$(test_package),$(var))"\; do ./\$$i\; done)
         
-install: $(lib_target)
+install: $(bin_package) $(lib_target)
 	install -d $(DESTDIR)$(libdir)
 	install -m 644 $(lib_target) $(DESTDIR)$(libdir)
+	install -d $(DESTDIR)$(bindir)
+	install -m 755 $(bin_package) $(DESTDIR)$(bindir)
 
 uninstall:
-	-rm $(DESTDIR)$(libdir)/$(lib_package:%=lib%.a)
+	$(RM) $(DESTDIR)$(libdir)/$(lib_target)
+	$(RM) $(DESTDIR)$(bindir)/$(bin_package)
 	
 FORCE:
 .PHONY: all clean check install uninstall dist FORCE

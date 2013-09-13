@@ -11,6 +11,7 @@
 #include <ParamMatrix.hpp>
 #include <OutputScalar.hpp>
 #include <OutputVector.hpp>
+#include <OutputMatrix.hpp>
 
 using namespace pelib;
 
@@ -49,6 +50,10 @@ main(int argc, char **argv)
 	OutputVector<int, int> outputVector(data.find<ParamVector<int, int> >("Wi"));
 	outputVector.setName("yy");
 	std::cout << outputVector << std::endl;
+	
+	OutputMatrix<int, int, float> outputMatrix(data.find<ParamMatrix<int, int, float> >("e"));
+	outputMatrix.setName("ee");
+	std::cout << outputMatrix << std::endl;
 	
 	return EXIT_SUCCESS;
 }
