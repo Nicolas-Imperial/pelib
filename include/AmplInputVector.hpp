@@ -50,7 +50,7 @@ namespace pelib
 			}
 
 			virtual
-			std::ostream&
+			void
 			dump(std::ostream &o, const Data *data) const
 			{
 				const Vector<Key, Value> *vector = dynamic_cast<const Vector<Key, Value>*>(data);
@@ -64,7 +64,7 @@ namespace pelib
 					o << iter->first << " " << iter->second << std::endl;
 				}
 			
-				return o << ";" << std::endl;				
+				o << ";" << std::endl;				
 			}
 
 			virtual

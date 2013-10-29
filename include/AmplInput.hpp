@@ -19,6 +19,8 @@ namespace pelib
 	class AmplInput: public RecordParser, public RecordOutput
 	{
 		public:
+			AmplInput(std::vector<AmplInputData*> parsers,
+			std::vector<AmplInputData*> outputs);
 			AmplInput();
 
 			virtual
@@ -29,8 +31,12 @@ namespace pelib
 			parse(std::istream &ampl_data, bool strict = 0);
 
 			virtual
-			std::ostream&
+			void
 			dump(std::ostream& o, const Record &record) const;
+
+			virtual
+			void
+			dump(std::ostream& o, const Data *data) const;
 
 			virtual
 			AmplInput&
@@ -47,6 +53,12 @@ namespace pelib
 
 			void
 			deleteOutputs();
+
+			void
+			addParsers();
+
+			void
+			addOutputs();
 			
 		private:
 	};

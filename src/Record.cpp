@@ -25,9 +25,9 @@ namespace pelib
 	}
 
 	void
-	Record::insert(pelib::Data *data)
+	Record::insert(const pelib::Data *data)
 	{
-		records.insert(std::pair<std::string, pelib::Data*>(data->getName(), data));
+		records.insert(std::pair<std::string, pelib::Data*>(data->getName(), data->clone()));
 	}
 
 	Record&

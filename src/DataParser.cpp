@@ -21,7 +21,7 @@ namespace pelib
 		}
 		else
 		{
-			throw ParseException(std::string("String \"").append(str).append("\" doesn't match regex \"").append(regex).append("\"."));
+			throw ParseException(std::string("String \"").append(str).append("\" doesn't match regex \"").append(regex).append("\". "));
 		}
 	}
 }

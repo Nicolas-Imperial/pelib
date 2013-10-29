@@ -79,7 +79,7 @@ namespace pelib
 			}
 
 			virtual
-			std::ostream&
+			void
 			dump(std::ostream &o, const Data *data) const
 			{			
 				const Matrix<Col, Row, Value> *matrix = dynamic_cast<const Matrix<Col, Row, Value>*>(data);
@@ -104,7 +104,8 @@ namespace pelib
 					}
 					o << std::endl;
 				}
-				return o << ";" << std::endl;
+
+				o << ";" << std::endl;
 			}
 	
 		protected:

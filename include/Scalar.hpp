@@ -17,19 +17,19 @@ namespace pelib
 	class Scalar: public Data
 	{
 		public:
-			Scalar(std::string name, Value value) : Data(name)
+			Scalar(const std::string name, const Value value) : Data(name)
 			{
 				this->value = value;
 			}
 
-			Scalar(Scalar<Value>* scalar): Data(scalar->getName()), value(scalar->getValue())
+			Scalar(const Scalar<Value>* scalar): Data(scalar->getName()), value(scalar->getValue())
 			{
 				// Do nothing
 			}
 
 			virtual
 			Scalar*
-			clone()
+			clone() const
 			{
 				return new Scalar<Value>(name, value);
 			}

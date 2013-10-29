@@ -8,8 +8,8 @@ namespace pelib
 	class Data
 	{
 		public:
-			Data(std::string);
-			Data(Data*);
+			Data(const std::string);
+			Data(const Data*);
 			virtual
 			~Data() = 0;
 			
@@ -23,7 +23,7 @@ namespace pelib
 
 			virtual
 			Data*
-			clone() = 0;
+			clone() const = 0;
 			
 		protected:
 			std::string name;

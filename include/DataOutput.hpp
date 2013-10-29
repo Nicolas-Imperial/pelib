@@ -17,7 +17,7 @@ namespace pelib
 	{
 		public:	
 			virtual
-			std::ostream&
+			void
 			dump(std::ostream& o, const Data *data) const = 0;
 
 			virtual

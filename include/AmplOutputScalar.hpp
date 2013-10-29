@@ -40,13 +40,13 @@ namespace pelib
 			}
 
 			virtual
-			std::ostream&
+			void
 			dump(std::ostream &stream, const Data *data) const
 			{
 				const Scalar<Value> *scalar = dynamic_cast<const Scalar<Value>* >(data);
 				if(scalar == NULL) throw CastException("parameter \"data\" was not of type \"Scalar<Value>\".");
 
-				return stream << scalar->getName() << " = " << scalar->getValue() << std::endl;
+				stream << scalar->getName() << " = " << scalar->getValue() << std::endl;
 			}
 	
 		protected:

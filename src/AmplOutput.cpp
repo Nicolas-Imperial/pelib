@@ -8,6 +8,7 @@
 #include <AmplOutput.hpp>
 #include <AmplOutputScalar.hpp>
 #include <AmplOutputVector.hpp>
+#include <AmplOutputSet.hpp>
 #include <AmplOutputMatrix.hpp>
 #include <AmplDataParser.hpp>
 
@@ -19,14 +20,17 @@ namespace pelib
 	AmplOutput::AmplOutput()
 	{
 		// Add parsers
-		parsers.push_back(new AmplOutputScalar<int>());
-		parsers.push_back(new AmplOutputVector<int, int>());
-		parsers.push_back(new AmplOutputMatrix<int, int, float>());
+		addParsers();
 				
 		// Add interpreters
-		outputs.push_back(new AmplOutputScalar<int>());
-		outputs.push_back(new AmplOutputVector<int, int>());
-		outputs.push_back(new AmplOutputMatrix<int, int, float>());
+		addOutputs();
+	}
+
+	AmplOutput::AmplOutput(std::vector<AmplOutputData*> parsers,
+			std::vector<AmplOutputData*> outputs)
+	{
+		this->parsers = parsers;
+		this->outputs = outputs;
 	}
 
 	AmplOutput::~AmplOutput()
@@ -127,26 +131,50 @@ namespace pelib
 		return record;
 	}
 
-	std::ostream&
+	void
 	AmplOutput::dump(std::ostream& o, const Record &record) const
 	{
 		std::map<std::string, Data*> records = record.getAllRecords();
 		for (std::map<std::string, Data*>::iterator rec = records.begin(); rec != records.end(); rec++)
 		{
-			Data *record = rec->second;
-			for (std::vector<AmplOutputData*>::const_iterator out = outputs.begin(); out != outputs.end(); out++)
+			dump(o, rec->second);
+		}
+	}
+
+	void
+	AmplOutput::dump(std::ostream& o, const Data *data) const
+	{
+		for (std::vector<AmplOutputData*>::const_iterator out = outputs.begin(); out != outputs.end(); out++)
+		{
+			const DataOutput *output = *out;
+			try
 			{
-				const DataOutput *output = *out;
-				try
-				{
-					output->dump(o, record);
-					break;
-				} catch(CastException &e)
-				{
-					// No suitable element to output
-					// Couldn't cast the element to record: just let that go and try again with next element
-				}
+				output->dump(o, data);
+				break;
+			} catch(CastException &e)
+			{
+				// No suitable element to output
+				// Couldn't cast the element to record: just let that go and try again with next element
 			}
 		}
+	}
+
+	// Protected
+	void
+	AmplOutput::addParsers()
+	{		
+		parsers.push_back(new AmplOutputScalar<int>());
+		parsers.push_back(new AmplOutputVector<int, int>());
+		parsers.push_back(new AmplOutputSet<int>());
+		parsers.push_back(new AmplOutputMatrix<int, int, float>());
+	}
+
+	void			
+	AmplOutput::addOutputs()
+	{		
+		outputs.push_back(new AmplOutputScalar<int>());
+		outputs.push_back(new AmplOutputVector<int, int>());
+		outputs.push_back(new AmplOutputSet<int>());
+		outputs.push_back(new AmplOutputMatrix<int, int, float>());
 	}
 }

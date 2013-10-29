@@ -8,6 +8,7 @@
 #include <AmplInput.hpp>
 #include <AmplInputScalar.hpp>
 #include <AmplInputVector.hpp>
+#include <AmplInputSet.hpp>
 #include <AmplInputMatrix.hpp>
 #include <AmplDataParser.hpp>
 
@@ -19,14 +20,17 @@ namespace pelib
 	AmplInput::AmplInput()
 	{
 		// Add parsers
-		parsers.push_back(new AmplInputScalar<int>());
-		parsers.push_back(new AmplInputVector<int, int>());
-		parsers.push_back(new AmplInputMatrix<int, int, float>());
+		addParsers();
 				
 		// Add interpreters
-		outputs.push_back(new AmplInputScalar<int>());
-		outputs.push_back(new AmplInputVector<int, int>());
-		outputs.push_back(new AmplInputMatrix<int, int, float>());
+		addOutputs();
+	}
+
+	AmplInput::AmplInput(std::vector<AmplInputData*> parsers,
+			std::vector<AmplInputData*> outputs)
+	{
+		this->parsers = parsers;
+		this->outputs = outputs;
 	}
 
 	AmplInput::~AmplInput()
@@ -90,7 +94,7 @@ namespace pelib
 
 			if(line.compare("") != 0)
 			{
-				//std::cerr << line << std::endl;
+				//std::cout << line << std::endl;
 				noComment << line << std::endl;
 			}
 		}
@@ -121,40 +125,63 @@ namespace pelib
 					break;
 				} catch (ParseException &e)
 				{
-					// Try next parser
+					//std::cerr << e.what() << "Trying next parser." << std::endl;
 				}
 			}
 
 			if(iter == parsers.end())
 			{
-				// No vector
-				throw ParseException(std::string("No parser was suitable to the token \"").append(line).append("\"."));
+				//throw ParseException(std::string("No parser was suitable to the token \"").append(line).append("\"."));
 			}
 		}
 		
 		return record;
 	}
 
-	std::ostream&
+	void
 	AmplInput::dump(std::ostream& o, const Record &record) const
 	{
 		std::map<std::string, Data*> records = record.getAllRecords();
 		for (std::map<std::string, Data*>::iterator rec = records.begin(); rec != records.end(); rec++)
 		{
-			Data *record = rec->second;
-			for (std::vector<AmplInputData*>::const_iterator out = outputs.begin(); out != outputs.end(); out++)
+			dump(o, rec->second);
+		}
+	}
+
+	void
+	AmplInput::dump(std::ostream& o, const Data *data) const
+	{
+		for (std::vector<AmplInputData*>::const_iterator out = outputs.begin(); out != outputs.end(); out++)
+		{
+			const DataOutput *output = *out;
+			try
 			{
-				const DataOutput *output = *out;
-				try
-				{
-					output->dump(o, record);
-					break;
-				} catch(CastException &e)
-				{
-					// No suitable element to output
-					// Couldn't cast the element to record: just let that go and try again with next element
-				}
+				output->dump(o, data);
+				break;
+			} catch(CastException &e)
+			{
+				// No suitable element to output
+				// Couldn't cast the element to record: just let that go and try again with next element
 			}
 		}
+	}
+
+	// Protected
+	void
+	AmplInput::addParsers()
+	{		
+		parsers.push_back(new AmplInputScalar<int>());
+		parsers.push_back(new AmplInputVector<int, int>());
+		parsers.push_back(new AmplInputSet<int>());
+		parsers.push_back(new AmplInputMatrix<int, int, float>());
+	}
+
+	void			
+	AmplInput::addOutputs()
+	{		
+		outputs.push_back(new AmplInputScalar<int>());
+		outputs.push_back(new AmplInputVector<int, int>());
+		outputs.push_back(new AmplInputSet<int>());
+		outputs.push_back(new AmplInputMatrix<int, int, float>());
 	}
 }
