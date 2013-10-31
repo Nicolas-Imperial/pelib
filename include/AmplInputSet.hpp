@@ -14,7 +14,12 @@ namespace pelib
 	{
 		typedef std::set<Value, std::less<Value>, std::allocator<Value> > SetType;
 		
-		public:			
+		public:
+			AmplInputSet(bool strict = false) : AmplInputData(strict)
+			{
+				// Do nothing
+			}
+			
 			virtual
 			AmplInputSet*
 			clone() const
@@ -24,7 +29,7 @@ namespace pelib
 			
 			virtual
 			Data*
-			parse(std::istream &in, bool strict = 0)
+			parse(std::istream &in)
 			{
 				SetType values;
 				

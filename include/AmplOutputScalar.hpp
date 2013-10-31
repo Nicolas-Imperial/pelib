@@ -13,7 +13,12 @@ namespace pelib
 	class
 	AmplOutputScalar: public AmplOutputData
 	{
-		public:			
+		public:
+			AmplOutputScalar(bool strict = false) : AmplOutputData(strict)
+			{
+				// Do nothing
+			}
+			
 			virtual
 			AmplOutputScalar*
 			clone() const
@@ -30,7 +35,7 @@ namespace pelib
 
 			virtual
 			Data*
-			parse(std::istream &in, bool strict = 0)
+			parse(std::istream &in)
 			{
 				std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
 				boost::cmatch match = DataParser::match(std::string("(?:.*?)").append(getPattern()), str);

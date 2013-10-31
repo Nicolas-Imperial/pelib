@@ -28,7 +28,7 @@ namespace pelib
 			
 			virtual
 			Record
-			parse(std::istream &ampl_data, bool strict = 0);
+			parse(std::istream &ampl_data);
 
 			virtual
 			void

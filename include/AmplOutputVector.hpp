@@ -13,7 +13,11 @@ namespace pelib
 	{
 		typedef std::map<Key, Value> VectorType;
 		
-		public:			
+		public:
+			AmplOutputVector(bool strict = false) : AmplOutputData(strict)
+			{
+				// Do nothing
+			}
 			virtual
 			AmplOutputVector*
 			clone() const
@@ -30,7 +34,7 @@ namespace pelib
 
 			virtual
 			Data*
-			parse(std::istream &in, bool strict = 0)
+			parse(std::istream &in)
 			{
 				VectorType values;
 				

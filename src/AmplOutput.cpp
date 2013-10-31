@@ -75,7 +75,7 @@ namespace pelib
 	}
 
 	Record
-	AmplOutput::parse(std::istream &ampl_data, bool strict)
+	AmplOutput::parse(std::istream &ampl_data)
 	{
 		Record record;
 		std::string line;
@@ -98,7 +98,7 @@ namespace pelib
 						std::stringstream token;
 						token.str(match[1]);
 
-						Data *data = parser->parse(token, strict);
+						Data *data = parser->parse(token);
 						record.insert(data);
 
 						// Remove matched tokens with last parser from input line
@@ -163,18 +163,18 @@ namespace pelib
 	void
 	AmplOutput::addParsers()
 	{		
-		parsers.push_back(new AmplOutputScalar<int>());
-		parsers.push_back(new AmplOutputVector<int, int>());
-		parsers.push_back(new AmplOutputSet<int>());
-		parsers.push_back(new AmplOutputMatrix<int, int, float>());
+		parsers.push_back(new AmplOutputScalar<int>(true));
+		parsers.push_back(new AmplOutputVector<int, int>(true));
+		parsers.push_back(new AmplOutputSet<int>(true));
+		parsers.push_back(new AmplOutputMatrix<int, int, float>(true));
 	}
 
 	void			
 	AmplOutput::addOutputs()
 	{		
-		outputs.push_back(new AmplOutputScalar<int>());
-		outputs.push_back(new AmplOutputVector<int, int>());
-		outputs.push_back(new AmplOutputSet<int>());
-		outputs.push_back(new AmplOutputMatrix<int, int, float>());
+		outputs.push_back(new AmplOutputScalar<int>(true));
+		outputs.push_back(new AmplOutputVector<int, int>(true));
+		outputs.push_back(new AmplOutputSet<int>(true));
+		outputs.push_back(new AmplOutputMatrix<int, int, float>(true));
 	}
 }

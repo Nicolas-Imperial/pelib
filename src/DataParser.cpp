@@ -8,7 +8,12 @@
 #include <DataParser.hpp>
 
 namespace pelib
-{	
+{
+	DataParser::DataParser(bool strict)
+	{
+		this->strict = strict;
+	}
+	
 	boost::cmatch
 	DataParser::match(std::string regex, std::string str)
 	{

@@ -9,6 +9,8 @@ namespace pelib
 	class AmplOutputData: public AmplDataOutput, public AmplDataParser
 	{
 		public:
+			AmplOutputData(bool strict) : AmplDataParser(strict) {}
+			
 			virtual
 			AmplOutputData*
 			clone() const = 0;

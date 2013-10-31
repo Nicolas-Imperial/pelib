@@ -13,7 +13,12 @@ namespace pelib
 		typedef std::map<Col, Value> RowType;
 		typedef std::map<Row, RowType> MatrixType;
 		
-		public:			
+		public:
+			AmplOutputMatrix(bool strict = false) : AmplOutputData(strict)
+			{
+				// Do nothing
+			}
+			
 			virtual
 			AmplOutputMatrix*
 			clone() const
@@ -30,7 +35,7 @@ namespace pelib
 
 			virtual
 			Data*
-			parse(std::istream &in, bool strict = 0)
+			parse(std::istream &in)
 			{
 				MatrixType values;
 				

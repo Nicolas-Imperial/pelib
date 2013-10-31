@@ -76,7 +76,7 @@ namespace pelib
 	}
 
 	Record
-	AmplInput::parse(std::istream &ampl_data, bool strict)
+	AmplInput::parse(std::istream &ampl_data)
 	{
 		Record record;
 		std::string line;
@@ -118,7 +118,7 @@ namespace pelib
 				try {
 					std::istringstream istr(line);
 					std::istream &str = istr;
-					Data *data = parser->parse(str, strict);
+					Data *data = parser->parse(str);
 					record.insert(data);
 
 					// No need to try another parser; proceed with the next token
@@ -170,18 +170,20 @@ namespace pelib
 	void
 	AmplInput::addParsers()
 	{		
-		parsers.push_back(new AmplInputScalar<int>());
-		parsers.push_back(new AmplInputVector<int, int>());
-		parsers.push_back(new AmplInputSet<int>());
-		parsers.push_back(new AmplInputMatrix<int, int, float>());
+		parsers.push_back(new AmplInputScalar<int>(true));
+		parsers.push_back(new AmplInputScalar<float>(true));
+		parsers.push_back(new AmplInputVector<int, int>(true));
+		parsers.push_back(new AmplInputSet<int>(true));
+		parsers.push_back(new AmplInputMatrix<int, int, float>(true));
 	}
 
 	void			
 	AmplInput::addOutputs()
 	{		
-		outputs.push_back(new AmplInputScalar<int>());
-		outputs.push_back(new AmplInputVector<int, int>());
-		outputs.push_back(new AmplInputSet<int>());
-		outputs.push_back(new AmplInputMatrix<int, int, float>());
+		outputs.push_back(new AmplInputScalar<int>(true));
+		outputs.push_back(new AmplInputScalar<float>(true));
+		outputs.push_back(new AmplInputVector<int, int>(true));
+		outputs.push_back(new AmplInputSet<int>(true));
+		outputs.push_back(new AmplInputMatrix<int, int, float>(true));
 	}
 }
