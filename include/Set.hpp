@@ -31,7 +31,7 @@ namespace pelib
 			}
 
 			virtual
-			Data*
+			Set*
 			clone() const
 			{
 				return new Set<Value>(name, values);

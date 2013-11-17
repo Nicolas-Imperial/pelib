@@ -55,6 +55,9 @@ namespace pelib
 			void
 			insert(const pelib::Data *data);
 
+			void
+			remove(const std::string name);
+
 			virtual
 			Record&
 			operator=(const Record &rhs);

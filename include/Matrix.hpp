@@ -31,7 +31,7 @@ namespace pelib
 			}
 
 			virtual
-			Data*
+			Matrix*
 			clone() const
 			{
 				return new Matrix<Col, Row, Value>(name, values);

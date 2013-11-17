@@ -12,7 +12,7 @@
 
 #ifndef PELIB_DATAPARSER
 #define PELIB_DATAPARSER
-
+#define DEBUG 0
 namespace pelib
 {
 	class DataParser
@@ -33,24 +33,32 @@ namespace pelib
 				{
 					throw ParseException(std::string("Couln't convert literal \"").append(element).append("\" into type \"").append(typeid(out).name()).append("\"."));
 				}
-				
-				//std::cerr << element << std::endl;
-				//std::cerr << strict << std::endl;
 
-				//std::cerr << "Let us proceed with optional checking" << std::endl;
+#if DEBUG
+				std::cerr << element << std::endl;
+				std::cerr << strict << std::endl;
+
+				std::cerr << "Let us proceed with optional checking" << std::endl;
+#endif
 				
 				if(strict)
 				{
-					//std::cerr << "OK so we have to check" << std::endl;
+#if DEBUG
+					std::cerr << "OK so we have to check" << std::endl;
+#endif
 					// We asked a floating-point conversion, but provided a integer
 					if(strcmp(typeid(out).name(), "f") == 0 || strcmp(typeid(out).name(), "d") == 0)
 					{
-						//std::cerr << "So we are asking for a decimal conversion" << std::endl;
+#if DEBUG
+						std::cerr << "So we are asking for a decimal conversion" << std::endl;
+#endif
 						try
 						{
 							// let's try to parse against a fixed-point value
 							match("\\d+.\\d+", element);
-							//std::cerr << element << "Passed the fixed-point format matching" << std::endl;
+#if DEBUG
+							std::cerr << element << "Passed the fixed-point format matching" << std::endl;
+#endif
 						} catch(ParseException &e)
 						{
 							// OK so it doesn't parse a fixed-point notation; let's try scientific notation
@@ -64,22 +72,30 @@ namespace pelib
 								// Integer-converted and floating-point were equal, then it was an integer, you fool
 								throw ParseException(std::string("Asked a decimal conversion, but \"").append(element).append("\" is integer."));
 							}
-							//std::cerr << "Passed the scientific format matching" << std::endl;
+#if DEBUG
+							std::cerr << "Passed the scientific format matching" << std::endl;
+#endif
 						}
-						//std::cerr << "OK I valid this conversion" << std::endl;
+#if DEBUG
+						std::cerr << "OK I valid this conversion" << std::endl;
+#endif
 					}
 						
 					// We asked an integer conversion, but provided a float
 					if(strcmp(typeid(out).name(), "f") != 0 && strcmp(typeid(out).name(), "d") != 0)
 					{
-						//std::cerr << "So we are asking for a integer conversion" << std::endl;
+#if DEBUG
+						std::cerr << "So we are asking for a integer conversion" << std::endl;
+#endif
 						try
 						{
 							// let's try to parse against a fixed-point value
 							match("\\d+.\\d+", element);
 						} catch(ParseException &e)
 						{
-							//std::cerr << "It is not fixed-point format, good" << std::endl;
+#if DEBUG
+							std::cerr << "It is not fixed-point format, good" << std::endl;
+#endif
 							// Then I suppose it was a scientific notation; let's see if it indeed denotes an integer digit
 							double int_test;
 							std::istringstream converter(element);
@@ -87,15 +103,20 @@ namespace pelib
 
 							if(int_test != out)
 							{
-								//std::cerr << "But this is not an integer anyway" << std::endl;
+#if DEBUG
+								std::cerr << "But this is not an integer anyway" << std::endl;
+#endif
 								// Integer-converted and floating-point were equal, then it was an integer, you fool
 								throw ParseException(std::string("Asked an integer conversion, but \"").append(element).append("\" is decimal."));
 							}
-
-							//std::cerr << "OK I valid this conversion" << std::endl;
+#if DEBUG
+							std::cerr << "OK I valid this conversion" << std::endl;
+#endif
 							return out;
 						}
-						//std::cerr << "But element was fixed-point format" << std::endl;
+#if DEBUG
+						std::cerr << "But element was fixed-point format" << std::endl;
+#endif
 						throw ParseException(std::string("Asked an integer conversion, but \"").append(element).append("\" is decimal."));
 
 						/*

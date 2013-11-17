@@ -30,7 +30,7 @@ namespace pelib
 			}
 
 			virtual
-			Data*
+			Vector*
 			clone() const
 			{
 				return new Vector<Key, Value>(name, values);

@@ -165,9 +165,9 @@ namespace pelib
 	{		
 		parsers.push_back(new AmplOutputScalar<int>(true));
 		parsers.push_back(new AmplOutputScalar<float>(true));
-		parsers.push_back(new AmplOutputVector<int, int>(true));
-		parsers.push_back(new AmplOutputSet<int>(true));
-		parsers.push_back(new AmplOutputMatrix<int, int, float>(true));
+		parsers.push_back(new AmplOutputVector<int, int>());
+		parsers.push_back(new AmplOutputSet<int>());
+		parsers.push_back(new AmplOutputMatrix<int, int, float>());
 	}
 
 	void			
@@ -175,8 +175,8 @@ namespace pelib
 	{		
 		outputs.push_back(new AmplOutputScalar<int>(true));
 		outputs.push_back(new AmplOutputScalar<float>(true));
-		outputs.push_back(new AmplOutputVector<int, int>(true));
-		outputs.push_back(new AmplOutputSet<int>(true));
-		outputs.push_back(new AmplOutputMatrix<int, int, float>(true));
+		outputs.push_back(new AmplOutputVector<int, int>());
+		outputs.push_back(new AmplOutputSet<int>());
+		outputs.push_back(new AmplOutputMatrix<int, int, float>());
 	}
 }

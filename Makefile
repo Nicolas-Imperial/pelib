@@ -5,7 +5,7 @@ version = 1.0
 tarname = $(package)
 distdir = $(tarname)-$(version)
 
-export DEBUG=1
+#export DEBUG=1
 export prefix = /usr/local
 export exec_prefix = $(prefix)
 export bindir = $(exec_prefix)/bin

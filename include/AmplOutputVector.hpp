@@ -52,8 +52,11 @@ namespace pelib
 					Key key;
 					Value value;
 
-					key = DataParser::convert<Value>(*iter++, strict);
-					value = DataParser::convert<Value>(*iter, strict);
+					std::string key_str = *iter++;
+					std::string val_str = *iter;
+
+					key = DataParser::convert<Value>(key_str, strict);
+					value = DataParser::convert<Value>(val_str, strict);
 
 					values.insert(std::pair<Key, Value>(key, value));
 				}

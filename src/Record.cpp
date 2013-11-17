@@ -30,6 +30,18 @@ namespace pelib
 		records.insert(std::pair<std::string, pelib::Data*>(data->getName(), data->clone()));
 	}
 
+	void
+	Record::remove(const std::string name)
+	{
+		std::map<std::string, Data*>::iterator ptr = records.find(name);
+
+		if(ptr != records.end())
+		{
+			delete ptr->second;
+			records.erase(name);
+		}
+	}
+
 	Record&
 	Record::operator=(const Record &rhs)
 	{

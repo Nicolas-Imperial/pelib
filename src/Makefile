@@ -1,4 +1,4 @@
-CXXFLAGS = -isystem ../include
+CXXFLAGS = -O3 -isystem ../include
 CXXFLAGS_DBG = -g -O0
 
 # TODO: implement bin_mystuff_dep = ... that lists the objects on which this linking or packaging need to be complete, and $(MAKE) -C $(shell dirname $(dep)) $(shell basename $(dep)) them

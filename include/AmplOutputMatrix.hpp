@@ -30,7 +30,7 @@ namespace pelib
 			std::string
 			getPattern()
 			{
-				return "(\\w+?[\\w\\d_]*?)\\s*\\[\\*,\\*\\]\\s*:\\s*((?:[\\w\\d]+\\s*?)*)\\s*:=\\s*((?:[\\w\\d]+\\s*(?:[\\w\\d_\\.]*[\\s\\n]+\\s*?)*[\\s\\n]*)*)";
+				return "(\\w+?[\\w\\d_]*?)\\s*\\[\\*,\\*\\]\\s*:\\s*((?:[\\w\\d]+\\s*?)*)\\s*:=\\s*((?:[\\w\\d]+\\s*(?:[\\w\\d_\\.+-]*[\\s\\n]+\\s*?)*[\\s\\n]*)*)";
 			}
 
 			virtual
@@ -64,6 +64,7 @@ namespace pelib
 				Row row;
 				Col col;
 				Value val;
+				
 				while(iter != end)
 				{
 					std::map<Col, Value> vector;
@@ -75,7 +76,7 @@ namespace pelib
 						val = DataParser::convert<Value>(*iter, strict);
 						col = cols[i];
 						vector.insert(std::pair<Col, Value>(col, val));
-						iter++;	
+						iter++;
 					}
 					values.insert(std::pair<Row, RowType>(row, vector));
 				}
