@@ -38,7 +38,7 @@ namespace pelib
 			}
 
 			virtual
-			const MatrixType
+			const MatrixType&
 			getValues() const
 			{
 				return values;

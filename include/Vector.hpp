@@ -37,7 +37,7 @@ namespace pelib
 			}
 
 			virtual
-			const std::map<Key, Value>
+			const std::map<Key, Value>&
 			getValues() const
 			{
 				return values;
