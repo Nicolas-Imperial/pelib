@@ -13,7 +13,12 @@ namespace pelib
 	class
 	AmplInputScalar: public AmplInputData
 	{
-		public:			
+		public:
+			AmplInputScalar(bool strict = false) : AmplInputData(strict)
+			{
+				// Do nothing
+			}
+			
 			virtual
 			AmplInputScalar*
 			clone() const
@@ -23,7 +28,7 @@ namespace pelib
 			
 			virtual
 			Data*
-			parse(std::istream &in, bool strict = 0)
+			parse(std::istream &in)
 			{
 				std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
 				boost::cmatch match = DataParser::match(getPattern(), str);
@@ -32,13 +37,13 @@ namespace pelib
 			}
 
 			virtual
-			std::ostream&
+			void
 			dump(std::ostream &stream, const Data *data) const
 			{
 				const Scalar<Value> *scalar = dynamic_cast<const Scalar<Value>* >(data);
 				if(scalar == NULL) throw CastException("parameter \"data\" was not of type \"Scalar<Value>\".");
 
-				return stream << "param " << scalar->getName() << " := " << scalar->getValue() << ";" << std::endl;
+				stream << "param " << scalar->getName() << " := " << scalar->getValue() << ";" << std::endl;
 			}
 
 			virtual

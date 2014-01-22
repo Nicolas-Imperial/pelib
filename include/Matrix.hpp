@@ -20,19 +20,19 @@ namespace pelib
 		typedef std::map<Row, RowType> MatrixType;
 		
 		public:
-			Matrix(std::string name, MatrixType values) : Data(name)
+			Matrix(const std::string name, const MatrixType values) : Data(name)
 			{
 				this->values = values;
 			}
 
-			Matrix(Matrix<Col, Row, Value>* matrix): Data(matrix->getName()), values(matrix->getValues())
+			Matrix(const Matrix<Col, Row, Value>* matrix): Data(matrix->getName()), values(matrix->getValues())
 			{
 				// Do nothing
 			}
 
 			virtual
-			Data*
-			clone()
+			Matrix*
+			clone() const
 			{
 				return new Matrix<Col, Row, Value>(name, values);
 			}

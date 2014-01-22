@@ -10,6 +10,8 @@ namespace pelib
 	class AmplDataParser: public DataParser
 	{
 		public:
+			AmplDataParser(bool strict) : DataParser(strict) {}
+			
 			virtual
 			AmplDataParser*
 			clone() const = 0;

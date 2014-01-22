@@ -19,19 +19,19 @@ namespace pelib
 		typedef std::map<Key, Value> VectorType;
 		
 		public:
-			Vector(std::string name, VectorType values) : Data(name), values(values)
+			Vector(const std::string name, const VectorType values) : Data(name), values(values)
 			{
 				//this->values = values;
 			}
 
-			Vector(Vector<Key, Value>* vector): Data(vector->getName()), values(vector->getValues())
+			Vector(const Vector<Key, Value>* vector): Data(vector->getName()), values(vector->getValues())
 			{
 				// Do nothing
 			}
 
 			virtual
-			Data*
-			clone()
+			Vector*
+			clone() const
 			{
 				return new Vector<Key, Value>(name, values);
 			}

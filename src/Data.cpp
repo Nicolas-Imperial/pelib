@@ -6,12 +6,12 @@ namespace pelib
 {
 	Data::~Data(){}
 	
-	Data::Data(std::string name)
+	Data::Data(const std::string name)
 	{
 		this->name = name;
 	}
 
-	Data::Data(Data* data) : name(data->getName())
+	Data::Data(const Data* data) : name(data->getName())
 	{
 		// Do nothing else
 	}

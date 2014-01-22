@@ -13,7 +13,12 @@ namespace pelib
 		typedef std::map<Col, Value> RowType;
 		typedef std::map<Row, RowType> MatrixType;
 		
-		public:			
+		public:
+			AmplInputMatrix(bool strict = false) : AmplInputData(strict)
+			{
+				// Do nothing
+			}
+			
 			virtual
 			AmplInputMatrix*
 			clone() const
@@ -30,7 +35,7 @@ namespace pelib
 
 			virtual
 			Data*
-			parse(std::istream &in, bool strict = 0)
+			parse(std::istream &in)
 			{
 				MatrixType values;
 				
@@ -79,7 +84,7 @@ namespace pelib
 			}
 
 			virtual
-			std::ostream&
+			void
 			dump(std::ostream &o, const Data *data) const
 			{			
 				const Matrix<Col, Row, Value> *matrix = dynamic_cast<const Matrix<Col, Row, Value>*>(data);
@@ -104,7 +109,8 @@ namespace pelib
 					}
 					o << std::endl;
 				}
-				return o << ";" << std::endl;
+
+				o << ";" << std::endl;
 			}
 	
 		protected:

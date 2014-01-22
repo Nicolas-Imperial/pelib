@@ -17,8 +17,12 @@ namespace pelib
 			~RecordOutput();
 
 			virtual
-			std::ostream&
+			void
 			dump(std::ostream& o, const Record &record) const = 0;
+
+			virtual
+			void
+			dump(std::ostream& o, const Data *data) const = 0;
 			
 		protected:
 		private:

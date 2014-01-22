@@ -15,7 +15,7 @@ namespace pelib
 {
 	class Record
 	{
-		public:
+		public:				
 			virtual
 			~Record();
 			
@@ -53,7 +53,10 @@ namespace pelib
 			}
 
 			void
-			insert(pelib::Data *data);
+			insert(const pelib::Data *data);
+
+			void
+			remove(const std::string name);
 
 			virtual
 			Record&

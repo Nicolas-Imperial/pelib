@@ -12,7 +12,12 @@ namespace pelib
 	{
 		typedef std::map<Key, Value> VectorType;
 		
-		public:			
+		public:
+			AmplInputVector(bool strict = false) : AmplInputData(strict)
+			{
+				// Do nothing
+			}
+			
 			virtual
 			AmplInputVector*
 			clone() const
@@ -22,7 +27,7 @@ namespace pelib
 			
 			virtual
 			Data*
-			parse(std::istream &in, bool strict = 0)
+			parse(std::istream &in)
 			{
 				VectorType values;
 				
@@ -50,7 +55,7 @@ namespace pelib
 			}
 
 			virtual
-			std::ostream&
+			void
 			dump(std::ostream &o, const Data *data) const
 			{
 				const Vector<Key, Value> *vector = dynamic_cast<const Vector<Key, Value>*>(data);
@@ -64,7 +69,7 @@ namespace pelib
 					o << iter->first << " " << iter->second << std::endl;
 				}
 			
-				return o << ";" << std::endl;				
+				o << ";" << std::endl;				
 			}
 
 			virtual

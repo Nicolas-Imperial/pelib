@@ -1,4 +1,4 @@
-CXXFLAGS = -isystem ../include
+CXXFLAGS = -O3 -isystem ../include
 CXXFLAGS_DBG = -g -O0
 
 # TODO: implement bin_mystuff_dep = ... that lists the objects on which this linking or packaging need to be complete, and $(MAKE) -C $(shell dirname $(dep)) $(shell basename $(dep)) them
@@ -8,11 +8,27 @@ LDFLAGS_TEST =
 LDFLAGS = -lboost_regex
 
 ## static library packages and their sources
-bin_package = cpparse
+bin_package = demo ampl_i2i ampl_i2o ampl_o2i ampl_o2o
 
-bin_cpparse_src = cpparse.cpp
-bin_cpparse_export = $(bin_cpparse_src) 
-bin_cpparse_deps = libcppelib.a
+bin_demo_src = demo.cpp
+bin_demo_export = $(bin_demo_src) 
+bin_demo_deps = libcppelib.a
+
+bin_ampl_i2i_src = ampl_i2i.cpp
+bin_ampl_i2i_export = $(bin_ampl_i2i_src) 
+bin_ampl_i2i_deps = libcppelib.a
+
+bin_ampl_i2o_src = ampl_i2o.cpp
+bin_ampl_i2o_export = $(bin_ampl_i2o_src) 
+bin_ampl_i2o_deps = libcppelib.a
+
+bin_ampl_o2i_src = ampl_o2i.cpp
+bin_ampl_o2i_export = $(bin_ampl_o2i_src) 
+bin_ampl_o2i_deps = libcppelib.a
+
+bin_ampl_o2o_src = ampl_o2o.cpp
+bin_ampl_o2o_export = $(bin_ampl_o2o_src) 
+bin_ampl_o2o_deps = libcppelib.a
 
 ## static library packages and their sources
 lib_package = cppelib
@@ -20,8 +36,8 @@ lib_package = cppelib
 lib_cppelib_src = ParseException.cpp \
 CastException.cpp RecordParser.cpp RecordOutput.cpp AmplInput.cpp AmplOutput.cpp \
 Data.cpp Record.cpp Scalar.cpp Vector.cpp Matrix.cpp DataParser.cpp DataOutput.cpp \
-AmplInputData.cpp AmplOutputData.cpp AmplInputScalar.cpp AmplInputVector.cpp \
-AmplInputMatrix.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputMatrix.cpp \
+AmplInputData.cpp AmplOutputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp \
+AmplInputMatrix.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
 AmplDataOutput.cpp AmplDataParser.cpp
 lib_cppelib_export = $(lib_cppelib_src)
 lib_cppelib_deps = ## Include some support to get dependency to object files
