@@ -49,7 +49,7 @@ namespace pelib
 
 					try
 					{
-						key = DataParser::convert<Key>(*iter++, true);
+						key = DataParser::convert<Key>(*iter++, strict);
 					} catch(NoDecimalFloatException &e)
 					{
 						std::ostringstream ss;

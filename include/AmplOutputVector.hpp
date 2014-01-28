@@ -58,7 +58,7 @@ namespace pelib
 
 					try
 					{
-						key = DataParser::convert<Value>(key_str, strict);
+						key = DataParser::convert<Key>(key_str, strict);
 					} catch(NoDecimalFloatException &e)
 					{
 						std::ostringstream ss;

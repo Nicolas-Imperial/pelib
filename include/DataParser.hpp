@@ -21,7 +21,7 @@ namespace pelib
 		public:
 			DataParser(bool strict);
 
-			// TODO: Make it convert to any class from string 
+			// TODO: Make it convert to any class from string
 			template <class Target>
 			static
 			Target
