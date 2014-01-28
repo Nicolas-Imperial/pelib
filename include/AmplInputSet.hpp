@@ -15,7 +15,7 @@ namespace pelib
 		typedef std::set<Value, std::less<Value>, std::allocator<Value> > SetType;
 		
 		public:
-			AmplInputSet(bool strict = false) : AmplInputData(strict)
+			AmplInputSet(bool strict = true) : AmplInputData(strict)
 			{
 				// Do nothing
 			}
@@ -42,13 +42,28 @@ namespace pelib
 				boost::sregex_token_iterator iter = make_regex_token_iterator(remain, param_set, subs, boost::regex_constants::match_default);
 				boost::sregex_token_iterator end;
 
+				int integer_values = 0, total_values = 0;
 				for(; iter != end; ++iter )
 				{
 					Value value;
 					
-					value = DataParser::convert<Value>(*iter, strict);
+					try
+					{
+						value = DataParser::convert<Value>(*iter, strict);
+					} catch(NoDecimalFloatException &e)
+					{
+						value = e.getValue();
+						integer_values++;
+					}
 
 					values.insert(value);
+					total_values++;
+				}
+
+				// If all values could have been parsed as integer, then this is obviously an integer vector rather to a float one
+				if(integer_values == total_values)
+				{
+					throw NoDecimalFloatException(std::string("Set only composed of integer-parsable values."), 0);
 				}
 
 				return new Set<Value>(match[1], values);

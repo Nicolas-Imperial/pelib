@@ -1,6 +1,7 @@
 #include <AmplInputData.hpp>
 #include <Vector.hpp>
 #include <CastException.hpp>
+#include <NoDecimalFloatException.hpp>
 
 #ifndef PELIB_AMPLINPUTVECTOR
 #define PELIB_AMPLINPUTVECTOR
@@ -13,7 +14,7 @@ namespace pelib
 		typedef std::map<Key, Value> VectorType;
 		
 		public:
-			AmplInputVector(bool strict = false) : AmplInputData(strict)
+			AmplInputVector(bool strict = true) : AmplInputData(strict)
 			{
 				// Do nothing
 			}
@@ -40,15 +41,39 @@ namespace pelib
 				boost::sregex_token_iterator iter = make_regex_token_iterator(remain, param_vector, subs, boost::regex_constants::match_default);
 				boost::sregex_token_iterator end;
 
+				int integer_values = 0, total_values = 0;
 				for(; iter != end; ++iter )
 				{
 					Key key;
 					Value value;
 
-					key = DataParser::convert<Value>(*iter++, strict);
-					value = DataParser::convert<Value>(*iter, strict);
+					try
+					{
+						key = DataParser::convert<Key>(*iter++, true);
+					} catch(NoDecimalFloatException &e)
+					{
+						std::ostringstream ss;
+						ss << e.getValue();
+						throw ParseException(std::string("Asked a decimal conversion, but \"").append(ss.str()).append("\" is integer."));		
+					}
+					
+					try
+					{
+						value = DataParser::convert<Value>(*iter, strict);
+					} catch(NoDecimalFloatException &e)
+					{
+						value = e.getValue();
+						integer_values++;
+					}
 
 					values.insert(std::pair<Key, Value>(key, value));
+					total_values++;
+				}
+
+				// If all values could have been parsed as integer, then this is obviously an integer vector rather to a float one
+				if(integer_values == total_values)
+				{
+					throw NoDecimalFloatException(std::string("Vector only composed of integer-parsable values."), 0);
 				}
 
 				return new Vector<Key, Value>(match[1], values);

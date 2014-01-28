@@ -5,7 +5,6 @@ version = 1.0
 tarname = $(package)
 distdir = $(tarname)-$(version)
 
-#export DEBUG=1
 export prefix = /usr/local
 export exec_prefix = $(prefix)
 export bindir = $(exec_prefix)/bin
@@ -40,7 +39,7 @@ distcheck: checkdist clean-dist
 checkdist: $(abspath $(distdir)).tar.gz
 	gzip -cd $+ | tar xvf -
 	$(MAKE) -C $(abspath $(distdir)) check
-	$(MAKE) -C $(abspath $(distdir)) DESTDIR=$(abspath $(distdir))/_inst install uninstall
+	$(MAKE) -C $(abspath $(distdir)) DESTDIR=$(abspath $(distdir))/_inst install uninstall DEBUG=$(DEBUG)
 	$(MAKE) -C $(abspath $(distdir)) clean
 
 FORCE:

@@ -14,7 +14,7 @@ namespace pelib
 	AmplOutputScalar: public AmplOutputData
 	{
 		public:
-			AmplOutputScalar(bool strict = false) : AmplOutputData(strict)
+			AmplOutputScalar(bool strict = true) : AmplOutputData(strict)
 			{
 				// Do nothing
 			}

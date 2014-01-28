@@ -54,19 +54,26 @@ main(int argc, char **argv)
 	myfile.open (argv[1], std::ios::in);
 
 	// Load input file
+	std::cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "]" << std::endl;
 	rec = parse(input, myfile);
+	std::cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "]" << std::endl;
 
 	// Close input file
 	myfile.close();
 
 	out.dump(std::cout, rec);
 
-#if 0
+#if 1
 	// Output one raw value in parameters b, Wi and e
-	std::cout << rec.find<Scalar<int> >("b")->getValue() << std::endl;
+	std::cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "]" << std::endl;
+	std::cout << rec.find<Scalar<int> >("n")->getValue() << std::endl;
+	std::cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "]" << std::endl;
 	std::cout << rec.find<Vector<int, int> >("Wi")->getSize() << std::endl;
+	std::cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "]" << std::endl;
 	std::cout << rec.find<Matrix<int, int, float> >("e")->getRowSize() << std::endl;
-
+	std::cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "]" << std::endl;
+#endif
+#if 0
 	// Extract, rename and output a few parameters
 	Scalar<int> nn(rec.find<Scalar<int> >("n"));
 	nn.setName("nn");

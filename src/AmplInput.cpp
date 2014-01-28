@@ -172,9 +172,11 @@ namespace pelib
 	{		
 		parsers.push_back(new AmplInputScalar<int>(true));
 		parsers.push_back(new AmplInputScalar<float>(true));
-		parsers.push_back(new AmplInputVector<int, int>());
-		parsers.push_back(new AmplInputSet<int>());
-		parsers.push_back(new AmplInputMatrix<int, int, float>());
+		parsers.push_back(new AmplInputVector<int, int>(true));
+		parsers.push_back(new AmplInputVector<int, float>(true));
+		parsers.push_back(new AmplInputSet<int>(true));
+		parsers.push_back(new AmplInputSet<float>(false));
+		parsers.push_back(new AmplInputMatrix<int, int, float>(true));
 	}
 
 	void			
@@ -182,8 +184,10 @@ namespace pelib
 	{		
 		outputs.push_back(new AmplInputScalar<int>(true));
 		outputs.push_back(new AmplInputScalar<float>(true));
-		outputs.push_back(new AmplInputVector<int, int>());
-		outputs.push_back(new AmplInputSet<int>());
-		outputs.push_back(new AmplInputMatrix<int, int, float>());
+		outputs.push_back(new AmplInputVector<int, int>(true));
+		outputs.push_back(new AmplInputVector<int, float>(true));
+		outputs.push_back(new AmplInputSet<int>(true));
+		outputs.push_back(new AmplInputSet<float>(true));
+		outputs.push_back(new AmplInputMatrix<int, int, float>(true));
 	}
 }

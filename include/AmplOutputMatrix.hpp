@@ -14,7 +14,7 @@ namespace pelib
 		typedef std::map<Row, RowType> MatrixType;
 		
 		public:
-			AmplOutputMatrix(bool strict = false) : AmplOutputData(strict)
+			AmplOutputMatrix(bool strict = true) : AmplOutputData(strict)
 			{
 				// Do nothing
 			}
@@ -53,7 +53,15 @@ namespace pelib
 				std::vector<Col> cols;
 				for(; iter != end; ++iter)
 				{
-					cols.push_back(DataParser::convert<Col>(*iter, strict));
+					try
+					{
+						cols.push_back(DataParser::convert<Col>(*iter, strict));
+					} catch(NoDecimalFloatException &e)
+					{
+						std::ostringstream ss;
+						ss << e.getValue();
+						throw ParseException(std::string("Asked a decimal conversion, but \"").append(ss.str()).append("\" is integer."));		
+					}
 				}
 				int s = cols.size();
 
@@ -64,21 +72,45 @@ namespace pelib
 				Row row;
 				Col col;
 				Value val;
-				
+
+				int integer_values = 0, total_values = 0;
 				while(iter != end)
 				{
 					std::map<Col, Value> vector;
 
-					row = DataParser::convert<Row>(*iter, strict);
+					try
+					{
+						row = DataParser::convert<Row>(*iter, strict);
+					} catch(NoDecimalFloatException &e)
+					{
+						std::ostringstream ss;
+						ss << e.getValue();
+						throw ParseException(std::string("Asked a decimal conversion, but \"").append(ss.str()).append("\" is integer."));		
+					}
 					iter++;
 					for(int i = 0; i < s; i++)
 					{
-						val = DataParser::convert<Value>(*iter, strict);
+						try
+						{
+							val = DataParser::convert<Value>(*iter, strict);
+						} catch(NoDecimalFloatException &e)
+						{
+							val = e.getValue();
+							integer_values++;
+						}
 						col = cols[i];
 						vector.insert(std::pair<Col, Value>(col, val));
+						
 						iter++;
+						total_values++;
 					}
 					values.insert(std::pair<Row, RowType>(row, vector));
+				}
+
+				// If all values could have been parsed as integer, then this is obviously an integer vector rather to a float one
+				if(integer_values == total_values)
+				{
+					throw NoDecimalFloatException(std::string("Matrix only composed of integer-parsable values."), 0);
 				}
 				
 				return new Matrix<Col, Row, Value>(match[1], values);

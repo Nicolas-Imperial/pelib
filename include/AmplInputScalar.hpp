@@ -14,7 +14,7 @@ namespace pelib
 	AmplInputScalar: public AmplInputData
 	{
 		public:
-			AmplInputScalar(bool strict = false) : AmplInputData(strict)
+			AmplInputScalar(bool strict = true) : AmplInputData(strict)
 			{
 				// Do nothing
 			}
@@ -33,7 +33,11 @@ namespace pelib
 				std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
 				boost::cmatch match = DataParser::match(getPattern(), str);
 
-				return new Scalar<Value>(match[1], DataParser::convert<Value>(match[2], strict));
+				std::string match1 = match[1];
+				std::string match2 = match[2];
+				Value val = DataParser::convert<Value>(match2, strict);
+				Scalar<Value> *scalar = new Scalar<Value>(match1, val);
+				return scalar;
 			}
 
 			virtual
