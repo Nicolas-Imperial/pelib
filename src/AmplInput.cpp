@@ -87,14 +87,13 @@ namespace pelib
 		std::stringstream noComment;
 		while(!getline(ampl_data, line).fail())
 		{
-			boost::regex comment("(.*?)#.*?$");
+			boost::regex comment("([^#]*)#[^$]*$");
             line = boost::regex_replace(line, comment, first_only, boost::match_default | boost::format_all);
-			boost::regex surrounding_space("^[\n\\s]*(.*?)[\\s\n]*$");
+			boost::regex surrounding_space("^[\\n\\s]*([^\\s\n]*)[\\s\n]*$");
 			line = boost::regex_replace(line, surrounding_space, first_only, boost::match_default | boost::format_all);
 
 			if(line.compare("") != 0)
 			{
-				//std::cout << line << std::endl;
 				noComment << line << std::endl;
 			}
 		}
@@ -102,7 +101,7 @@ namespace pelib
 		// Parse input
 		while(!getline(noComment, line, ';').fail())
 		{
-			boost::regex surrounding_space("^[\n\\s]*(.*?)[\\s\n]*$");
+			boost::regex surrounding_space("^[\\n\\s]*([^\\s\\n].*?)[\\s\\n]*$");
 			line = boost::regex_replace(line, surrounding_space, first_only, boost::match_default | boost::format_all);
 
 			if(line.length() == 0)
@@ -111,7 +110,6 @@ namespace pelib
 			}
 
 			std::vector<AmplInputData*>::iterator iter;
-			
 			for(iter = parsers.begin(); iter != parsers.end(); iter++)
 			{
 				AmplInputData *parser = *iter;
@@ -175,7 +173,8 @@ namespace pelib
 		parsers.push_back(new AmplInputVector<int, int>(true));
 		parsers.push_back(new AmplInputVector<int, float>(true));
 		parsers.push_back(new AmplInputSet<int>(true));
-		parsers.push_back(new AmplInputSet<float>(false));
+		parsers.push_back(new AmplInputSet<float>(true));
+		parsers.push_back(new AmplInputMatrix<int, int, int>(true));
 		parsers.push_back(new AmplInputMatrix<int, int, float>(true));
 	}
 
@@ -188,6 +187,7 @@ namespace pelib
 		outputs.push_back(new AmplInputVector<int, float>(true));
 		outputs.push_back(new AmplInputSet<int>(true));
 		outputs.push_back(new AmplInputSet<float>(true));
+		outputs.push_back(new AmplInputMatrix<int, int, int>(true));
 		outputs.push_back(new AmplInputMatrix<int, int, float>(true));
 	}
 }

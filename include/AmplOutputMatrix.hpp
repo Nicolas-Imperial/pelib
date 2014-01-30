@@ -28,9 +28,16 @@ namespace pelib
 			
 			virtual
 			std::string
-			getPattern()
+			getDetailedPattern()
 			{
-				return "(\\w+?[\\w\\d_]*?)\\s*\\[\\*,\\*\\]\\s*:\\s*((?:[\\w\\d]+\\s*?)*)\\s*:=\\s*((?:[\\w\\d]+\\s*(?:[\\w\\d_\\.+-]*[\\s\\n]+\\s*?)*[\\s\\n]*)*)";
+				return "(\\w[\\w\\d_]*)\\s*\\[\\*,\\*\\]\\s*:\\s*(.+?)\\s*:=\\s*(.+?)\\s*";
+			}
+
+			virtual
+			std::string
+			getGlobalPattern()
+			{
+				return "\\w[\\w\\d_]*\\s*\\[\\*,\\*\\]\\s*:\\s*(?:[\\w\\d]+\\s*)+\\s*:=.+";
 			}
 
 			virtual
@@ -40,7 +47,8 @@ namespace pelib
 				MatrixType values;
 				
 				std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-				boost::cmatch match = DataParser::match(getPattern(), str);
+				//std::cerr << str << std::endl;
+				boost::cmatch match = DataParser::match(getDetailedPattern(), str);
 				std::string indexes = match[2];
 				std::string remain = match[3];
 
@@ -110,7 +118,8 @@ namespace pelib
 				// If all values could have been parsed as integer, then this is obviously an integer vector rather to a float one
 				if(integer_values == total_values)
 				{
-					throw NoDecimalFloatException(std::string("Matrix only composed of integer-parsable values."), 0);
+					//throw NoDecimalFloatException(std::string("Matrix only composed of integer-parsable values."), 0);
+					throw ParseException(std::string("Matrix only composed of integer-parsable values."));
 				}
 				
 				return new Matrix<Col, Row, Value>(match[1], values);

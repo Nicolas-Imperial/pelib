@@ -69,12 +69,16 @@ namespace pelib
 							std::istringstream converter(element);
 							converter >> int_test;
 
-							std::cerr << "\"" << element << "\" is not at fixed-point format, my be scientific notation" << std::endl;
+#if DEBUG
+							std::cerr << "\"" << element << "\" is not at fixed-point format, may be scientific notation" << std::endl;
+#endif
 
 							if(int_test == out)
 							{
 								// Integer-converted and floating-point were equal, then it was an integer, you fool
+#if DEBUG
 								std::cerr << "The decimal part of \"" << element << "\" is nul, therefore we have an integer" << std::endl;
+#endif
 								throw NoDecimalFloatException(std::string("Asked a decimal conversion, but \"").append(element).append("\" is integer."), out);
 							}
 #if DEBUG
@@ -123,19 +127,6 @@ namespace pelib
 						std::cerr << "But element was fixed-point format" << std::endl;
 #endif
 						throw ParseException(std::string("Asked an integer conversion, but \"").append(element).append("\" is decimal."));
-
-						/*
-						int ref = convert<int>(element);
-						if(out == ref) // We asked for a floating point unit where an integer could have done it
-						{
-							throw ParseException(std::string("Requested a floating point container, but a integer container would fit \"").append(element).append("\"."));
-						}
-					*/
-
-					// OK now I know this element matches a decimal value
-					
-						// It was not asked to parse agasint any decimal-capable type (float or double)
-						// Throw an exception
 					}
 				}
 
@@ -156,7 +147,11 @@ namespace pelib
 
 			virtual
 			std::string
-			getPattern() = 0;
+			getDetailedPattern() = 0;
+
+			virtual
+			std::string
+			getGlobalPattern() = 0;
 
 		protected:
 			bool strict;

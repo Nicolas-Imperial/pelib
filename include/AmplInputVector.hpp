@@ -33,7 +33,7 @@ namespace pelib
 				VectorType values;
 				
 				std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-				boost::cmatch match=DataParser::match(getPattern(), str);
+				boost::cmatch match=DataParser::match(getDetailedPattern(), str);
 				
 				boost::regex param_vector("(?:\\s*([^\\s]+)\\s+([^\\s]+))");
 				std::string remain = match[2];
@@ -73,7 +73,8 @@ namespace pelib
 				// If all values could have been parsed as integer, then this is obviously an integer vector rather to a float one
 				if(integer_values == total_values)
 				{
-					throw NoDecimalFloatException(std::string("Vector only composed of integer-parsable values."), 0);
+					//throw NoDecimalFloatException(std::string("Vector only composed of integer-parsable values."), 0);
+					throw ParseException(std::string("Vector only composed of integer-parsable values."));
 				}
 
 				return new Vector<Key, Value>(match[1], values);
@@ -99,9 +100,16 @@ namespace pelib
 
 			virtual
 			std::string
-			getPattern()
+			getDetailedPattern()
 			{
-				return "param\\s*:\\s*([^\\s\\n]+)\\s*:=(.*)";
+				return "param\\s*:\\s*([^\\s\\n]+)\\s*:=(.+)";
+			}
+
+			virtual
+			std::string
+			getGlobalPattern()
+			{
+				return "param\\s*:\\s*[^\\s\\n]+\\s*:=.+";
 			}
 
 		protected:
