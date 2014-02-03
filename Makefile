@@ -4,7 +4,10 @@ include Makefile.in
 tarname = $(package)
 distdir = $(tarname)-$(version)
 
-all check install uninstall:
+# Check make version
+VERSION = $(shell make --version|head -1|cut -f 1-2 -d ' ')
+
+all check install uninstall: version
 	$(shell echo for i in "$(foreach var,$(subdirs),$(var))"\; do $(MAKE) -C \$$i $@ \; done)
 	
 $(abspath $(distdir)).tar.gz: FORCE $(abspath $(distdir))
@@ -34,6 +37,10 @@ checkdist: $(abspath $(distdir)).tar.gz
 	$(MAKE) -C $(abspath $(distdir)) DESTDIR=$(abspath $(distdir))/_inst install uninstall
 	$(MAKE) -C $(abspath $(distdir)) clean
 
+version:
+	$(if $(findstring GNU Make,echo $(VERSION)),,@echo This Makefile requires GNU make)
+	$(if $(findstring GNU Make,echo $(VERSION)),,@/bin/false) 
+
 FORCE:
-.PHONY: FORCE all clean dist distcheck copy clean-dist clean-tree
+.PHONY: FORCE all version clean dist distcheck copy clean-dist clean-tree
 .PHONY: install uninstall

@@ -1,3 +1,6 @@
+# Enable GNU make secondary expansion feature
+.SECONDEXPANSION:
+
 ## Make sure the first target is "all"
 all:
 
@@ -18,7 +21,7 @@ subdirs =
 
 lib_target = $(lib_package:%=lib%.a)
 
-all: $(bin_package) $(lib_target) $(test_package)
+all: $(bin_package) $(lib_target)
 
 %.o: %.cpp 
 	$(CXX) -c $(CXXFLAGS_) $(CPPFLAGS) -o $@ $<
@@ -30,15 +33,14 @@ all: $(bin_package) $(lib_target) $(test_package)
 	@sed -e 's/.*://' -e 's/\\$$//' < $(patsubst %.o,%.d,$@).tmp | fmt -1 | sed -e 's/^ *//' -e 's/$$/:/' >> $(patsubst %.o,%.d,$@)
 	@rm -f $(patsubst %.o,%.d,$@).tmp
 
-$(bin_package): $(foreach var,$(bin_package:%=bin_%_src),$(patsubst %.cpp,%.o,$(call $(var)))) $(foreach var,$(bin_package:%=bin_%_deps),$(call $(var)))
-	$(CXX) -o $@ $(LDFLAGS) $(bin_$@_ldflags) $(bin_$@_src:.cpp=.o) $(call $(@:%=bin_%_deps)) $(LIBS) $(bin_$@_libs)
+$(bin_package): $$(patsubst %.cpp,%.o,$$(call $$(patsubst %,bin_%_src,$$@))) $$(call $$(patsubst %,bin_%_deps,$$@))
+	$(CXX) -o $@ $(LDFLAGS) $(bin_$@_ldflags) $(bin_$@_src:.cpp=.o) $(call $(@:%=bin_$@_deps)) $(LIBS) $(bin_$@_libs)
 
-$(lib_target): $(foreach var,$(lib_package:%=lib_%_src),$(patsubst %.cpp, %.o, $(call $(var))))
-	ar rs $@ $(foreach var,$(lib_package:%=lib_%_src),$(patsubst %.cpp, %.o, $(call $(var)))) 2>&1
-	
-$(test_package): $(foreach var,$(test_package:%=test_%_src),$(patsubst %.cpp, %.o, $(call $(var))))
-	@if [ "$(strip $(call $(@:%=test_%_deps)))" != "" ]; then $(MAKE) -C $(dir $(call $(@:%=test_%_deps))) $(notdir $(call $(@:%=test_%_deps))); fi
-	$(CXX) -o $@ $(LDFLAGS_TEST) $(test_$@_ldflags) $(test_$@_src:.cpp=.o) $(call $(@:%=test_%_deps)) $(LIBS_TEST) $(bin_$@_libs_test)
+$(lib_target): $$(patsubst %.cpp,%.o,$$(call $$(patsubst %,lib_%_src,$$(patsubst lib%.a,%,$$@))))
+	ar rs $@ $(lib_$(@:lib%.a=%)_src:%.cpp=%.o) 2>&1
+
+$(test_package): $$(patsubst %.cpp,%.o,$$(call $$(patsubst %,test_%_src,$$@))) $$(call $$(patsubst %,test_%_deps,$$@))
+	$(CXX) -o $@ $(LDFLAGS_TEST) $(test_$@_ldflags) $(test_$@_src:.cpp=.o) $(call $(@:%=test_$@_deps)) $(LIBS_TEST) $(test_$@_libs)
 	
 dist:
 	mkdir -p $(distdir)
