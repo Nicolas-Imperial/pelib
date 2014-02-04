@@ -20,6 +20,7 @@ CXXFLAGS_ = $(CXXFLAGS) $(if $(DEBUG:0=),$(DEBUG_CXXFLAGS),$(RELEASE_CXXFLAGS))
 subdirs = 
 
 lib_target = $(lib_package:%=lib%.a)
+test_target = $(test_package:%=test_%)
 
 all: $(bin_package) $(lib_target)
 
@@ -39,8 +40,8 @@ $(bin_package): $$(patsubst %.cpp,%.o,$$(call $$(patsubst %,bin_%_src,$$@))) $$(
 $(lib_target): $$(patsubst %.cpp,%.o,$$(call $$(patsubst %,lib_%_src,$$(patsubst lib%.a,%,$$@))))
 	ar rs $@ $(lib_$(@:lib%.a=%)_src:%.cpp=%.o) 2>&1
 
-$(test_package): $$(patsubst %.cpp,%.o,$$(call $$(patsubst %,test_%_src,$$@))) $$(call $$(patsubst %,test_%_deps,$$@))
-	$(CXX) -o $@ $(LDFLAGS_TEST) $(test_$@_ldflags) $(test_$@_src:.cpp=.o) $(call $(@:%=test_$@_deps)) $(LIBS_TEST) $(test_$@_libs)
+$(test_target): $$(patsubst %.cpp,%.o,$$(call $$(patsubst %,test_%_src,$$(patsubst test_%,%,$$@)))) $$(call $$(patsubst %,test_%_deps,$$(patsubst test_%,%,$$@)))
+	$(CXX) -o $@ $(LDFLAGS_TEST) $(call $(patsubst %,test_%_ldflags, $(patsubst test_%,%,$@))) $(patsubst %.cpp,%.o, $(call $(patsubst %,test_%_src, $(patsubst test_%,%,$@)))) $(call $(patsubst %,test_%_deps, $(patsubst test_%,%,$@))) $(LIBS_TEST) $(call $(patsubst %,test_%_libs, $(patsubst test_%,%,$@)))
 	
 dist:
 	mkdir -p $(distdir)
@@ -51,13 +52,13 @@ dist:
 	cp $(sort $(foreach var,$(test_package:%=test_%_export),$(call $(var)))) $(distdir)
         
 clean:
-	$(RM) $(test_package)
+	$(RM) $(test_package:%=test_%)
 	$(RM) $(bin_package)
 	$(RM) $(patsubst %,lib%.a, $(lib_package))
 	$(RM) $(clean)
 
-check: $(test_package)
-	$(shell echo for i in "$(foreach var,$(test_package),$(var))"\; do ./\$$i\; done)
+check: $(test_target)
+	$(shell echo for i in "$(foreach var,$(test_package),$(var))"\; do ./test_\$$i\; done)
         
 install: $(bin_package) $(lib_target)
 	install -d $(DESTDIR)$(libdir)

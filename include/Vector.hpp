@@ -21,7 +21,7 @@ namespace pelib
 		public:
 			Vector(const std::string name, const VectorType values) : Data(name), values(values)
 			{
-				//this->values = values;
+				// Do nothing
 			}
 
 			Vector(const Vector<Key, Value>* vector): Data(vector->getName()), values(vector->getValues())

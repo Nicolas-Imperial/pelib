@@ -19,22 +19,25 @@ namespace pelib
 			virtual
 			~Record();
 			
-			std::map<std::string, Data*>
+			const std::map<std::string, const Data * const>&
 			getAllRecords() const;
 
+			std::map<std::string, const int *>&
+			copyRecords(); 
+
 			template<class T>
-			std::map<std::string, T*>
+			std::map<std::string, const T* const>
 			getRecords() const
 			{
 				// Build a new map containing all elements from records that could be casted to Record
-				std::map<std::string, T*> record;
+				std::map<std::string, const T * const> record;
 
-				for (std::map<std::string, Data*>::const_iterator i = records.begin(); i != records.end(); i++)
+				for (std::map<std::string, const Data * const>::const_iterator i = records.begin(); i != records.end(); i++)
 				{
 					try
 					{
 						T* elem = dynamic_cast<T*>(i->second->clone());
-						record.insert(std::pair<std::string, T*>(i->first, elem));
+						record.insert(std::pair<std::string, const T * const>(i->first, elem));
 					} catch(std::exception &e)
 					{
 						// Couldn't cast the element to record: just let that go and try again with next element
@@ -45,10 +48,10 @@ namespace pelib
 			}
 
 			template<class T>
-			T*
+			const T * const
 			find(std::string key) const
 			{
-				std::map<std::string, T*> rec = this->getRecords<T>();
+				std::map<std::string, const T * const> rec = this->getRecords<T>();
 				return rec.find(key)->second;
 			}
 
@@ -60,10 +63,11 @@ namespace pelib
 
 			virtual
 			Record&
+
 			operator=(const Record &rhs);
 			
 		protected:
-			std::map<std::string, Data*> records;
+			std::map<std::string, const Data * const> records;
 
 			void
 			deleteRecords();

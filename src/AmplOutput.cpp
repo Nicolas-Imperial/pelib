@@ -137,8 +137,8 @@ namespace pelib
 	void
 	AmplOutput::dump(std::ostream& o, const Record &record) const
 	{
-		std::map<std::string, Data*> records = record.getAllRecords();
-		for (std::map<std::string, Data*>::iterator rec = records.begin(); rec != records.end(); rec++)
+		std::map<std::string, const Data * const> records = record.getAllRecords();
+		for (std::map<std::string, const Data * const>::const_iterator rec = records.begin(); rec != records.end(); rec++)
 		{
 			dump(o, rec->second);
 		}

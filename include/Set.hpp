@@ -48,8 +48,7 @@ namespace pelib
 			bool
 			find(Value elem) const
 			{
-				// TODO: implement
-				return false;
+				return getValues().find(elem) != getValues().end();
 			}
 
 			virtual
