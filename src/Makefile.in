@@ -59,14 +59,14 @@ lib_cppelib_export = $(lib_cppelib_src)
 lib_cppelib_deps =
 
 lib_unit_src = unit_test.cpp
-lib_unit_export = $(lib_unit_src) unit_test.dat
+lib_unit_export = $(lib_unit_src)
 lib_unit_deps =
 
 ## test packages and their sources
 test_package = parser 
 
 test_parser_src = test_parser.cpp 
-test_parser_export = $(test_parser_src) 
+test_parser_export = $(test_parser_src) uni_test.dat 
 test_parser_deps = libcppelib.a libunit.a $(CROWN_UTIL_SRC)/src/libcrown.a
 test_parser_libs = -lboost_regex -lrt
 test_parser_ldflags = 
