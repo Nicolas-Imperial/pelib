@@ -7,19 +7,21 @@
 #include <iomanip>
 
 #include <ParseException.hpp>
+#include <NoDecimalFloatException.hpp>
 #include <Record.hpp>
 #include <Data.hpp>
 
 #ifndef PELIB_DATAPARSER
 #define PELIB_DATAPARSER
-#define DEBUG 0
+
 namespace pelib
 {
 	class DataParser
 	{
 		public:
 			DataParser(bool strict);
-			
+
+			// TODO: Make it convert to any class from string
 			template <class Target>
 			static
 			Target
@@ -35,8 +37,8 @@ namespace pelib
 				}
 
 #if DEBUG
-				std::cerr << element << std::endl;
-				std::cerr << strict << std::endl;
+				std::cerr << "String element: \"" << element << "\"" << std::endl;
+				std::cerr << "Strict checking: \"" << strict << "\"" << std::endl;
 
 				std::cerr << "Let us proceed with optional checking" << std::endl;
 #endif
@@ -55,22 +57,29 @@ namespace pelib
 						try
 						{
 							// let's try to parse against a fixed-point value
-							match("\\d+.\\d+", element);
+							match("\\d+\\.\\d+", element);
 #if DEBUG
-							std::cerr << element << "Passed the fixed-point format matching" << std::endl;
+							std::cerr << "\"" << element << "\" passed the fixed-point format matching" << std::endl;
 #endif
 						} catch(ParseException &e)
 						{
-							// OK so it doesn't parse a fixed-point notation; let's try scientific notation
+							// OK so it doesn't parse a fixed-point notation
 							// Then I suppose it was a scientific notation; let's see if it indeed denotes a decimal digit
 							long long int int_test;
 							std::istringstream converter(element);
 							converter >> int_test;
 
+#if DEBUG
+							std::cerr << "\"" << element << "\" is not at fixed-point format, may be scientific notation" << std::endl;
+#endif
+
 							if(int_test == out)
 							{
 								// Integer-converted and floating-point were equal, then it was an integer, you fool
-								throw ParseException(std::string("Asked a decimal conversion, but \"").append(element).append("\" is integer."));
+#if DEBUG
+								std::cerr << "The decimal part of \"" << element << "\" is nul, therefore we have an integer" << std::endl;
+#endif
+								throw NoDecimalFloatException(std::string("Asked a decimal conversion, but \"").append(element).append("\" is integer."), out);
 							}
 #if DEBUG
 							std::cerr << "Passed the scientific format matching" << std::endl;
@@ -90,7 +99,7 @@ namespace pelib
 						try
 						{
 							// let's try to parse against a fixed-point value
-							match("\\d+.\\d+", element);
+							match("\\d+\\.\\d+", element);
 						} catch(ParseException &e)
 						{
 #if DEBUG
@@ -118,19 +127,6 @@ namespace pelib
 						std::cerr << "But element was fixed-point format" << std::endl;
 #endif
 						throw ParseException(std::string("Asked an integer conversion, but \"").append(element).append("\" is decimal."));
-
-						/*
-						int ref = convert<int>(element);
-						if(out == ref) // We asked for a floating point unit where an integer could have done it
-						{
-							throw ParseException(std::string("Requested a floating point container, but a integer container would fit \"").append(element).append("\"."));
-						}
-					*/
-
-					// OK now I know this element matches a decimal value
-					
-						// It was not asked to parse agasint any decimal-capable type (float or double)
-						// Throw an exception
 					}
 				}
 
@@ -151,7 +147,11 @@ namespace pelib
 
 			virtual
 			std::string
-			getPattern() = 0;
+			getDetailedPattern() = 0;
+
+			virtual
+			std::string
+			getGlobalPattern() = 0;
 
 		protected:
 			bool strict;

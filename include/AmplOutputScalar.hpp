@@ -3,6 +3,7 @@
 #include <Scalar.hpp>
 #include <CastException.hpp>
 #include <ParseException.hpp>
+#include <NoDecimalFloatException.hpp>
 
 #ifndef PELIB_AMPLOUTPUTSCALAR
 #define PELIB_AMPLOUTPUTSCALAR
@@ -14,7 +15,7 @@ namespace pelib
 	AmplOutputScalar: public AmplOutputData
 	{
 		public:
-			AmplOutputScalar(bool strict = false) : AmplOutputData(strict)
+			AmplOutputScalar(bool strict = true) : AmplOutputData(strict)
 			{
 				// Do nothing
 			}
@@ -28,9 +29,16 @@ namespace pelib
 
 			virtual
 			std::string
-			getPattern()
+			getDetailedPattern()
 			{
-				return "(\\w+?[\\w\\d_]*?)\\s*=\\s*([\\w\\d]+?[\\w\\d_\\.]*)";
+				return "(\\w[\\w\\d_]*)\\s*=\\s*([\\w\\d][\\w\\d_\\.]*)";
+			}
+
+			virtual
+			std::string
+			getGlobalPattern()
+			{
+				return "\\w[\\w\\d_]*\\s*=\\s*[\\w\\d][\\w\\d_\\.]*";
 			}
 
 			virtual
@@ -38,7 +46,17 @@ namespace pelib
 			parse(std::istream &in)
 			{
 				std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-				boost::cmatch match = DataParser::match(std::string("(?:.*?)").append(getPattern()), str);
+
+				boost::cmatch match;
+				try
+				{
+					match = DataParser::match(std::string("(?:.*?)").append(getDetailedPattern()), str);
+				} catch(NoDecimalFloatException &e)
+				{
+					std::ostringstream ss;
+					ss << e.getValue();
+					throw ParseException(std::string("Asked a decimal conversion, but \"").append(ss.str()).append("\" is integer."));
+				}
 
 				Scalar<Value> *scalar = new Scalar<Value>(match[1], DataParser::convert<Value>(match[2], strict));
 				return scalar;

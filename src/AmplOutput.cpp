@@ -93,17 +93,20 @@ namespace pelib
 				{
 					AmplOutputData *parser = *iter;
 					try {
-						boost::cmatch match = DataParser::match(std::string("(?:.*?)(").append(parser->getPattern()).append(")(?:.*)"), line);
+						std::string regex = std::string("(.*?)(")
+							.append(parser->getGlobalPattern())
+							.append(")(?:\\s*)");
+						
+						boost::cmatch match = DataParser::match(regex, line);
 
 						std::stringstream token;
-						token.str(match[1]);
+						token.str(match[2]);
 
 						Data *data = parser->parse(token);
 						record.insert(data);
 
-						// Remove matched tokens with last parser from input line
-						match = DataParser::match(std::string("(.*?)[\\s\n]*").append(parser->getPattern()).append("[\\s\n]*?(.*)"), line);
-						line = std::string(match[1]).append(match[match.size() - 1]);
+						// Keep only the part we have not parsed
+						line = match[1];
 						
 						// Feed the remaining input line to parsers input is more useful information are available
 						std::streamsize pos = section.tellp();
@@ -134,8 +137,8 @@ namespace pelib
 	void
 	AmplOutput::dump(std::ostream& o, const Record &record) const
 	{
-		std::map<std::string, Data*> records = record.getAllRecords();
-		for (std::map<std::string, Data*>::iterator rec = records.begin(); rec != records.end(); rec++)
+		std::map<std::string, const Data * const> records = record.getAllRecords();
+		for (std::map<std::string, const Data * const>::const_iterator rec = records.begin(); rec != records.end(); rec++)
 		{
 			dump(o, rec->second);
 		}
@@ -166,7 +169,10 @@ namespace pelib
 		parsers.push_back(new AmplOutputScalar<int>(true));
 		parsers.push_back(new AmplOutputScalar<float>(true));
 		parsers.push_back(new AmplOutputVector<int, int>());
+		parsers.push_back(new AmplOutputVector<int, float>());
 		parsers.push_back(new AmplOutputSet<int>());
+		parsers.push_back(new AmplOutputSet<float>());
+		parsers.push_back(new AmplOutputMatrix<int, int, int>());
 		parsers.push_back(new AmplOutputMatrix<int, int, float>());
 	}
 
@@ -176,7 +182,10 @@ namespace pelib
 		outputs.push_back(new AmplOutputScalar<int>(true));
 		outputs.push_back(new AmplOutputScalar<float>(true));
 		outputs.push_back(new AmplOutputVector<int, int>());
+		outputs.push_back(new AmplOutputVector<int, float>());
 		outputs.push_back(new AmplOutputSet<int>());
+		outputs.push_back(new AmplOutputSet<float>());
+		outputs.push_back(new AmplOutputMatrix<int, int, int>());
 		outputs.push_back(new AmplOutputMatrix<int, int, float>());
 	}
 }

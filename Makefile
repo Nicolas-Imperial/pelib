@@ -1,20 +1,13 @@
 # http://www.freesoftwaremagazine.com/articles/gnu_coding_standards_applied_to_autotools
 
-package = cppelib
-version = 1.0
+include Makefile.in
 tarname = $(package)
 distdir = $(tarname)-$(version)
 
-#export DEBUG=1
-export prefix = /usr/local
-export exec_prefix = $(prefix)
-export bindir = $(exec_prefix)/bin
-export libdir = $(exec_prefix)/lib
-export includedir = $(prefix)/include
+# Check make version
+VERSION = $(shell make --version|head -1|cut -f 1-2 -d ' ')
 
-subdirs = src include
-
-all check install uninstall:
+all check install uninstall: version
 	$(shell echo for i in "$(foreach var,$(subdirs),$(var))"\; do $(MAKE) -C \$$i $@ \; done)
 	
 $(abspath $(distdir)).tar.gz: FORCE $(abspath $(distdir))
@@ -23,6 +16,7 @@ $(abspath $(distdir)).tar.gz: FORCE $(abspath $(distdir))
 $(abspath $(distdir)): FORCE clean-dist
 	$(shell echo for i in "$(foreach var,$(subdirs),$(var))"\; do $(MAKE) -C \$$i dist distdir=$(abspath $(distdir))/\$$i\; done)
 	cp Makefile $(abspath $(distdir))
+	cp Makefile.in $(abspath $(distdir))
 	
 clean: clean-tree clean-dist
 
@@ -43,6 +37,10 @@ checkdist: $(abspath $(distdir)).tar.gz
 	$(MAKE) -C $(abspath $(distdir)) DESTDIR=$(abspath $(distdir))/_inst install uninstall
 	$(MAKE) -C $(abspath $(distdir)) clean
 
+version:
+	$(if $(findstring GNU Make,echo $(VERSION)),,@echo This Makefile requires GNU make)
+	$(if $(findstring GNU Make,echo $(VERSION)),,@/bin/false) 
+
 FORCE:
-.PHONY: FORCE all clean dist distcheck copy clean-dist clean-tree
+.PHONY: FORCE all version clean dist distcheck copy clean-dist clean-tree
 .PHONY: install uninstall

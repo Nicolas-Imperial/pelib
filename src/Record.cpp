@@ -11,6 +11,8 @@
 #include <Data.hpp>
 #include <DataOutput.hpp>
 
+#include <Scalar.hpp>
+
 namespace pelib
 {	
 	Record::~Record()
@@ -18,22 +20,29 @@ namespace pelib
 		deleteRecords();
 	}
 
-	std::map<std::string, Data*>
+	const std::map<std::string, const Data * const>&
 	Record::getAllRecords() const
 	{
-		return this->records;
+		return records;
 	}
 
 	void
 	Record::insert(const pelib::Data *data)
 	{
+		std::map<std::string, const Data * const>::iterator iter = records.find(data->getName());
+		if(iter != records.end())
+		{
+			const Data *element = iter->second;
+			records.erase(iter);
+			delete element;
+		}
 		records.insert(std::pair<std::string, pelib::Data*>(data->getName(), data->clone()));
 	}
 
 	void
 	Record::remove(const std::string name)
 	{
-		std::map<std::string, Data*>::iterator ptr = records.find(name);
+		std::map<std::string, const Data * const>::iterator ptr = records.find(name);
 
 		if(ptr != records.end())
 		{
@@ -49,11 +58,11 @@ namespace pelib
 		deleteRecords();
 		
 		// Clone every objects of the source's collection
-		std::map<std::string, Data*> rhrec = rhs.records; 
-		for (std::map<std::string, Data*>::iterator i = rhrec.begin(); i != rhrec.end(); i++)
+		std::map<std::string, const Data * const> rhrec = rhs.records; 
+		for (std::map<std::string, const Data * const>::iterator i = rhrec.begin(); i != rhrec.end(); i++)
 		{
 			Data *copy = i->second->clone();
-			this->records.insert(std::pair<std::string, Data*>(i->first, copy));
+			this->records.insert(std::pair<std::string, const Data * const>(i->first, copy));
 		}
 		
 		return *this;
@@ -62,10 +71,10 @@ namespace pelib
 	void
 	Record::deleteRecords()
 	{
-		for (std::map<std::string, Data*>::iterator i = records.begin(); i != records.end();)
+		for (std::map<std::string, const Data * const>::iterator i = records.begin(); i != records.end();)
 		{
 			delete i->second;
-			std::map<std::string, Data*>::iterator erase = i;
+			std::map<std::string, const Data * const>::iterator erase = i;
 			i++;
 			records.erase(erase);
 		}

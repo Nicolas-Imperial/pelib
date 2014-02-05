@@ -14,7 +14,7 @@ namespace pelib
 		typedef std::map<Key, Value> VectorType;
 		
 		public:
-			AmplOutputVector(bool strict = false) : AmplOutputData(strict)
+			AmplOutputVector(bool strict = true) : AmplOutputData(strict)
 			{
 				// Do nothing
 			}
@@ -27,9 +27,16 @@ namespace pelib
 
 			virtual
 			std::string
-			getPattern()
+			getDetailedPattern()
 			{
-				return "(\\w+?[\\w\\d_]*?)\\s*\\[\\*\\]\\s*:=\\s*((?:[\\w\\d]+[\\w\\d_]*\\s+[\\w\\d]+[\\w\\d_\\.]*[\\s\\n]+)*)";
+				return "(\\w[\\w\\d_]*)\\s*\\[\\*\\]\\s*:=\\s*((?:[\\w\\d][\\w\\d_]*\\s+[\\w\\d][\\w\\d_\\.]*[\\s\\n]+)+)";
+			}
+
+			virtual
+			std::string
+			getGlobalPattern()
+			{
+				return "\\w[\\w\\d_]*\\s*\\[\\*\\]\\s*:=.+";
 			}
 
 			virtual
@@ -39,7 +46,7 @@ namespace pelib
 				VectorType values;
 				
 				std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-				boost::cmatch match = DataParser::match(std::string("(?:.*?)").append(getPattern()), str);
+				boost::cmatch match = DataParser::match(std::string("(?:.*?)").append(getDetailedPattern()), str);
 				
 				boost::regex param_vector("(?:\\s*([^\\s]+)\\s+([^\\s]+))");
 				std::string remain = match[2];
@@ -47,6 +54,7 @@ namespace pelib
 				boost::sregex_token_iterator iter = make_regex_token_iterator(remain, param_vector, subs, boost::regex_constants::match_default);
 				boost::sregex_token_iterator end;
 
+				int integer_values = 0, total_values = 0;
 				for(; iter != end; ++iter )
 				{
 					Key key;
@@ -55,10 +63,34 @@ namespace pelib
 					std::string key_str = *iter++;
 					std::string val_str = *iter;
 
-					key = DataParser::convert<Value>(key_str, strict);
-					value = DataParser::convert<Value>(val_str, strict);
+					try
+					{
+						key = DataParser::convert<Key>(key_str, strict);
+					} catch(NoDecimalFloatException &e)
+					{
+						std::ostringstream ss;
+						ss << e.getValue();
+						throw ParseException(std::string("Asked a decimal conversion, but \"").append(ss.str()).append("\" is integer."));		
+					}
+					
+					try
+					{
+						value = DataParser::convert<Value>(val_str, strict);
+					} catch(NoDecimalFloatException &e)
+					{
+						value = e.getValue();
+						integer_values++;
+					}
 
 					values.insert(std::pair<Key, Value>(key, value));
+					total_values++;
+				}
+
+				// If all values could have been parsed as integer, then this is obviously an integer vector rather to a float one
+				if(integer_values == total_values)
+				{
+					//throw NoDecimalFloatException(std::string("Vector only composed of integer-parsable values."), 0);
+					throw ParseException(std::string("Vector only composed of integer-parsable values."));
 				}
 
 				return new Vector<Key, Value>(match[1], values);

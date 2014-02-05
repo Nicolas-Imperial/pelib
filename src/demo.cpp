@@ -61,9 +61,8 @@ main(int argc, char **argv)
 
 	out.dump(std::cout, rec);
 
-#if 0
-	// Output one raw value in parameters b, Wi and e
-	std::cout << rec.find<Scalar<int> >("b")->getValue() << std::endl;
+	// Output one raw value in parameters scalar n, in vector Wi and float matrix e
+	std::cout << rec.find<Scalar<int> >("n")->getValue() << std::endl;
 	std::cout << rec.find<Vector<int, int> >("Wi")->getSize() << std::endl;
 	std::cout << rec.find<Matrix<int, int, float> >("e")->getRowSize() << std::endl;
 
@@ -79,7 +78,6 @@ main(int argc, char **argv)
 	Matrix<int, int, float> ee(rec.find<Matrix<int, int, float> >("e"));
 	ee.setName("ee");
 	out.dump(std::cout, &ee);
-#endif
 
 	return EXIT_SUCCESS;
 }
