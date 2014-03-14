@@ -93,7 +93,8 @@ namespace pelib
 				{
 					AmplOutputData *parser = *iter;
 					try {
-						std::string regex = std::string("(.*?)(")
+						// If any non-blank prefix to be discarded, it must be separated by a new line
+						std::string regex = std::string("(.*?\\n|)\\s*(")
 							.append(parser->getGlobalPattern())
 							.append(")(?:\\s*)");
 						
@@ -102,6 +103,8 @@ namespace pelib
 						std::stringstream token;
 						token.str(match[2]);
 
+						//std::cerr << "Discarded =\"" << match[1] << "\"." << std::endl;
+						//std::cerr << "Token =\"" << match[2] << "\"." << std::endl;
 						Data *data = parser->parse(token);
 						record.insert(data);
 
