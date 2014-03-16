@@ -20,6 +20,16 @@ namespace pelib
 		deleteRecords();
 	}
 
+	Record::Record()
+	{
+		// Do nothing
+	}
+
+	Record::Record(const Record &rhs)
+	{
+		*this = rhs;
+	}
+
 	const std::map<std::string, const Data * const>&
 	Record::getAllRecords() const
 	{
@@ -54,15 +64,18 @@ namespace pelib
 	Record&
 	Record::operator=(const Record &rhs)
 	{
-		// Free all records
-		deleteRecords();
-		
-		// Clone every objects of the source's collection
-		std::map<std::string, const Data * const> rhrec = rhs.records; 
-		for (std::map<std::string, const Data * const>::iterator i = rhrec.begin(); i != rhrec.end(); i++)
+		if(this != &rhs)
 		{
-			Data *copy = i->second->clone();
-			this->records.insert(std::pair<std::string, const Data * const>(i->first, copy));
+			// Free all records
+			deleteRecords();
+			
+			// Clone every objects of the source's collection
+			std::map<std::string, const Data * const> rhrec = rhs.records; 
+			for (std::map<std::string, const Data * const>::iterator i = rhrec.begin(); i != rhrec.end(); i++)
+			{
+				Data *copy = i->second->clone();
+				this->records.insert(std::pair<std::string, const Data * const>(i->first, copy));
+			}
 		}
 		
 		return *this;

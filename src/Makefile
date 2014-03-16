@@ -58,7 +58,7 @@ clean:
 	$(RM) $(clean)
 
 check: $(test_target)
-	$(shell echo for i in "$(foreach var,$(test_package),$(var))"\; do ./test_\$$i\; done)
+	@$(shell echo for i in "$(foreach var,$(test_package),$(var))"\; do echo Running test_\$$i\; ./test_\$$i\; done)
         
 install: $(bin_package) $(lib_target)
 	install -d $(DESTDIR)$(libdir)

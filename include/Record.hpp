@@ -18,6 +18,8 @@ namespace pelib
 		public:				
 			virtual
 			~Record();
+			Record();
+			Record(const Record &rhs);
 			
 			const std::map<std::string, const Data * const>&
 			getAllRecords() const;
@@ -63,7 +65,6 @@ namespace pelib
 
 			virtual
 			Record&
-
 			operator=(const Record &rhs);
 			
 		protected:
