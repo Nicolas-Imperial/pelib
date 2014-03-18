@@ -9,9 +9,6 @@
 #include <Record.hpp>
 #include <AmplDataParser.hpp>
 #include <Data.hpp>
-#include <DataOutput.hpp>
-
-#include <Scalar.hpp>
 
 namespace pelib
 {	

@@ -7,6 +7,8 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
+#include <Scalar.hpp>
+
 #include <AmplInput.hpp>
 #include <AmplOutput.hpp>
 
@@ -19,6 +21,10 @@
 #include <AmplOutputVector.hpp>
 #include <AmplOutputMatrix.hpp>
 
+#include <allocation.h>
+#include <mapping.h>
+#include <frequency.h>
+
 #include <unit_test.h>
 
 using namespace pelib;
@@ -27,6 +33,9 @@ using namespace std;
 static AmplInput input;
 static AmplOutput output;
 static Record record;
+
+// Include cpp format input
+#include "make_record.cpp"
 
 void
 test_init()
@@ -61,8 +70,27 @@ record_copy_constructor()
 	return 1;
 }
 
+int
+record_find()
+{
+	Record schedule = make_record();
+
+	std::cout << std::setprecision(6)                                                                                                        
+ 	<< std::setiosflags(std::ios::fixed)                                                                                                     
+	<< std::setiosflags(std::ios::showpoint);
+	
+	AmplOutput().dump(std::cout, schedule);
+
+	//allocation_fastest(schedule);
+    //mapping(schedule);
+    //frequency(schedule);
+	
+	return 1;
+}
+
 void
 test_run()
 {
 	test(record_copy_constructor);
+	test(record_find);
 }

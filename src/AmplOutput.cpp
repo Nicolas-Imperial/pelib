@@ -72,6 +72,8 @@ namespace pelib
 		{
 			outputs.push_back((*i)->clone());
 		}
+
+		return *this;
 	}
 
 	Record
@@ -112,7 +114,6 @@ namespace pelib
 						line = match[1];
 						
 						// Feed the remaining input line to parsers input is more useful information are available
-						std::streamsize pos = section.tellp();
 	  					section.str(line);
 						section.seekp(std::ios_base::beg);
 						section.clear();

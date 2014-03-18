@@ -36,13 +36,13 @@ namespace pelib
 
 				for (std::map<std::string, const Data * const>::const_iterator i = records.begin(); i != records.end(); i++)
 				{
-					try
+					// Try to cast this type
+					Data *ptr = i->second;
+					T* elem = dynamic_cast<T*>(ptr);
+					
+					if(elem != NULL)
 					{
-						T* elem = dynamic_cast<T*>(i->second->clone());
 						record.insert(std::pair<std::string, const T * const>(i->first, elem));
-					} catch(std::exception &e)
-					{
-						// Couldn't cast the element to record: just let that go and try again with next element
 					}
 				}
 
@@ -53,8 +53,24 @@ namespace pelib
 			const T * const
 			find(std::string key) const
 			{
-				std::map<std::string, const T * const> rec = this->getRecords<T>();
-				return rec.find(key)->second;
+				typename std::map<std::string, const Data * const>::const_iterator iter = records.find(key);
+				if(iter != records.end())
+				{
+					const T * const elem = dynamic_cast<const T * const >(iter->second);
+
+					if(elem != NULL)
+					{
+						return elem;
+					}
+					else
+					{
+						return NULL;
+					}
+				}
+				else
+				{
+					return NULL;
+				}
 			}
 
 			void
