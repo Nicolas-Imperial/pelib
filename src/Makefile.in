@@ -59,7 +59,7 @@ bin_ampl_o2cpp_libs = -lboost_regex
 bin_ampl_o2cpp_ldflags = 
 
 bin_run_record_src = run_record.cpp
-bin_run_record_export = $(bin_run_record_src) 
+bin_run_record_export = $(bin_run_record_src) make_record.cpp
 bin_run_record_deps = libcppelib.a
 bin_run_record_libs = -lboost_regex
 bin_run_record_ldflags = 
