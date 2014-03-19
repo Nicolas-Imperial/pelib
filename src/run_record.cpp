@@ -19,7 +19,7 @@ main(int argc, char **argv)
  	<< std::setiosflags(std::ios::fixed)                                                                                                     
 	<< std::setiosflags(std::ios::showpoint);
 
-	input.dump(std::cout, make_record());
+	input.dump(std::cout, buildRecord());
 
 	return EXIT_SUCCESS;
 }

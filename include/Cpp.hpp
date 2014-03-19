@@ -19,10 +19,20 @@ namespace pelib
 	{
 		public:
 			Cpp(std::vector<CppData*> outputs);
+			Cpp(const Cpp &src);
 			Cpp();
+			Cpp(const std::string& name);
 
 			virtual
 			~Cpp();
+
+			virtual
+			void
+			setName(const std::string &name);
+
+			virtual
+			std::string
+			getName() const;
 			
 			virtual
 			void
@@ -39,6 +49,7 @@ namespace pelib
 		protected:
 			//std::vector<CppParser*> outputs;
 			std::vector<CppData*> outputs;
+			std::string name;
 
 			void
 			deleteOutputs();

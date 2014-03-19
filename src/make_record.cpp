@@ -1,8 +1,16 @@
 pelib::Record
-make_record()
+buildRecord()
 {
 pelib::Record new_record;
-pelib::Scalar<float> M("M", 33.176170);
+std::set<int> set_F;
+set_F.insert(1);
+set_F.insert(2);
+set_F.insert(3);
+set_F.insert(4);
+set_F.insert(5);
+pelib::Set<int> F("F", set_F);
+new_record.insert(&F);
+pelib::Scalar<float> M("M", 64.491661);
 new_record.insert(&M);
 std::map<int, int> map_Tau;
 map_Tau.insert(std::pair<int, int>(1, 27));
@@ -30,6 +38,10 @@ map_Wi.insert(std::pair<int, int>(9, 14));
 map_Wi.insert(std::pair<int, int>(10, 20));
 pelib::Vector<int, int> Wi("Wi", map_Wi);
 new_record.insert(&Wi);
+pelib::Scalar<float> alpha("alpha", 3.000000);
+new_record.insert(&alpha);
+pelib::Scalar<int> b("b", 2);
+new_record.insert(&b);
 std::map<int, std::map<int, float> > map_e;
 std::map<int, float> map_row;
 map_row.insert(std::pair<int, float>(1, 1.000000));
@@ -376,5 +388,9 @@ pelib::Matrix<int, int, float> e("e", map_e);
 new_record.insert(&e);
 pelib::Scalar<int> n("n", 10);
 new_record.insert(&n);
+pelib::Scalar<int> p("p", 2);
+new_record.insert(&p);
+pelib::Scalar<float> zeta("zeta", 0.100000);
+new_record.insert(&zeta);
 return new_record;
 }

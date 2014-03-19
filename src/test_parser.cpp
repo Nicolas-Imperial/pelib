@@ -21,9 +21,10 @@
 #include <AmplOutputVector.hpp>
 #include <AmplOutputMatrix.hpp>
 
-#include <allocation.h>
-#include <mapping.h>
-#include <frequency.h>
+#include <Scalar.hpp>
+#include <Set.hpp>
+#include <Vector.hpp>
+#include <Matrix.hpp>
 
 #include <unit_test.h>
 
@@ -35,13 +36,13 @@ static AmplOutput output;
 static Record record;
 
 // Include cpp format input
+// Import the buildRecord() function
 #include "make_record.cpp"
 
 void
 test_init()
 {
-	Scalar<int> p("p", 6);
-	record.insert(&p);
+	record = buildRecord();
 }
 
 void
@@ -70,27 +71,8 @@ record_copy_constructor()
 	return 1;
 }
 
-int
-record_find()
-{
-	Record schedule = make_record();
-
-	std::cout << std::setprecision(6)                                                                                                        
- 	<< std::setiosflags(std::ios::fixed)                                                                                                     
-	<< std::setiosflags(std::ios::showpoint);
-	
-	AmplOutput().dump(std::cout, schedule);
-
-	//allocation_fastest(schedule);
-    //mapping(schedule);
-    //frequency(schedule);
-	
-	return 1;
-}
-
 void
 test_run()
 {
 	test(record_copy_constructor);
-	test(record_find);
 }

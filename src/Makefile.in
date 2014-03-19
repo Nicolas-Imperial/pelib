@@ -100,6 +100,6 @@ test_package = parser
 
 test_parser_src = test_parser.cpp 
 test_parser_export = $(test_parser_src) uni_test.dat 
-test_parser_deps = libcppelib.a libunit.a $(CROWN_UTIL_SRC)/src/libcrown.a
+test_parser_deps = libcppelib.a libunit.a
 test_parser_libs = -lboost_regex -lrt
 test_parser_ldflags = 
