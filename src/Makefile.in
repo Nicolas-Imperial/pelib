@@ -14,13 +14,19 @@ LIBS =
 LIBS_TEST = 
 
 ## static library packages and their sources
-bin_package = demo ampl_i2i ampl_i2o ampl_o2i ampl_o2o ampl_i2cpp ampl_o2cpp run_record
+bin_package = demo demo_xmlformats ampl_i2i ampl_i2o ampl_o2i ampl_o2o ampl_i2cpp ampl_o2cpp run_record
 
 bin_demo_src = demo.cpp
 bin_demo_export = $(bin_demo_src) 
 bin_demo_deps = libcppelib.a
 bin_demo_libs = -lboost_regex
 bin_demo_ldflags =
+
+bin_demo_xmlformats_src = demo_xmlformats.cpp
+bin_demo_xmlformats_export = $(bin_demo_xmlformats_src) 
+bin_demo_xmlformats_deps = libcppelib.a
+bin_demo_xmlformats_libs = -lboost_regex
+bin_demo_xmlformats_ldflags =
 
 bin_ampl_i2i_src = ampl_i2i.cpp
 bin_ampl_i2i_export = $(bin_ampl_i2i_src) 
@@ -83,7 +89,7 @@ RecordParser.cpp DataParser.cpp \
 RecordOutput.cpp DataOutput.cpp \
 Scalar.cpp Vector.cpp Matrix.cpp Set.cpp \
 AmplDataParser.cpp AmplDataOutput.cpp \
-AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp Taskgraph.hpp Taskgraph.cpp\
+AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp Taskgraph.cpp\
 AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
 CppDataOutput.cpp \
 Cpp.cpp CppData.cpp CppScalar.cpp CppVector.cpp CppSet.cpp CppMatrix.cpp \

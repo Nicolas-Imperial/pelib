@@ -4,7 +4,7 @@ ParseException.hpp CastException.hpp NoDecimalFloatException.hpp Data.hpp Record
 RecordParser.hpp DataParser.hpp \
 RecordOutput.hpp DataOutput.hpp \
 Scalar.hpp Vector.hpp Matrix.hpp Set.hpp \
-AmplDataParser.hpp AmplDataOutput.hpp Taskgraph.hpp Taskgraph.cpp\
+AmplDataParser.hpp AmplDataOutput.hpp Taskgraph.hpp\
 AmplInput.hpp AmplInputData.hpp AmplInputScalar.hpp AmplInputVector.hpp AmplInputSet.hpp AmplInputMatrix.hpp \
 AmplOutput.hpp AmplOutputData.hpp AmplOutputScalar.hpp AmplOutputVector.hpp AmplOutputSet.hpp AmplOutputMatrix.hpp \
 CppDataOutput.hpp \
