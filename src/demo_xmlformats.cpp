@@ -40,10 +40,11 @@ main(int argc, char **argv)
 {
         Taskgraph input;
 	AmplOutput output;
+	AmplInput in;
 	Record rec;
 
 	// We use an AMPL output, output format
-	RecordOutput &out = input;
+	RecordOutput &out = in;
 
 	// Set floating point var output format to fixed at 7 digits
 	std::cout << std::setprecision(6)                                                                                                        
@@ -55,14 +56,15 @@ main(int argc, char **argv)
 	myfile.open (argv[1], std::ios::in);
 
 	// Load input file
-	rec = parse(input, myfile);
-
+	//rec = parse(input, myfile);
+	rec = input.parse(myfile,atoi(argv[2]));
 	// Close input file
 	myfile.close();
 
 	out.dump(std::cout, rec);
 
 	// Output one raw value in parameters scalar n, in vector Wi and float matrix e
+	
 	std::cout << rec.find<Scalar<int> >("n")->getValue() << std::endl;
 	std::cout << rec.find<Vector<int, int> >("Wi")->getSize() << std::endl;
 	std::cout << rec.find<Matrix<int, int, float> >("e")->getRowSize() << std::endl;

@@ -11,6 +11,7 @@ namespace pelib
     void dump(std::ostream&, const pelib::Data*) const {} //stub
 
     Record parse(std::istream&);
+    Record parse(std::istream& data, size_t processors);
   };
 }
 
