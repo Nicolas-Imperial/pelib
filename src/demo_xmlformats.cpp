@@ -17,6 +17,7 @@
 #include <AmplOutputVector.hpp>
 #include <AmplOutputMatrix.hpp>
 
+#include "Taskgraph.hpp"
 using namespace pelib;
 
 Record
@@ -37,7 +38,7 @@ parse(RecordParser &parser, std::istream &input)
 int
 main(int argc, char **argv)
 {
-	AmplInput input;
+        Taskgraph input;
 	AmplOutput output;
 	Record rec;
 

@@ -1,5 +1,5 @@
 CFLAGS=-isystem ../include $(CROWN_UTIL_SRC)/include -Wall
-CXXFLAGS=-isystem ../include -isystem $(CROWN_UTIL_SRC)/include -Wall
+CXXFLAGS=-isystem ../include -isystem $(CROWN_UTIL_SRC)/include -Wall -std=c++0x
 
 RELEASE_CFLAGS = -O3 -DNDEBUG
 DEBUG_CFLAGS = -g -O0 -DDEBUG=1
@@ -8,7 +8,7 @@ RELEASE_CXXFLAGS = -g -O0 -DDEBUG=1
 DEBUG_CXXFLAGS = -g -O0 -DDEBUG=1
 
 LDFLAGS_TEST =
-LDFLAGS =
+LDFLAGS = 
 
 LIBS =
 LIBS_TEST = 
@@ -19,55 +19,55 @@ bin_package = demo demo_xmlformats ampl_i2i ampl_i2o ampl_o2i ampl_o2o ampl_i2cp
 bin_demo_src = demo.cpp
 bin_demo_export = $(bin_demo_src) 
 bin_demo_deps = libcppelib.a
-bin_demo_libs = -lboost_regex
+bin_demo_libs = -lboost_regex -lboost_graph -lexpat
 bin_demo_ldflags =
 
 bin_demo_xmlformats_src = demo_xmlformats.cpp
 bin_demo_xmlformats_export = $(bin_demo_xmlformats_src) 
 bin_demo_xmlformats_deps = libcppelib.a
-bin_demo_xmlformats_libs = -lboost_regex
+bin_demo_xmlformats_libs = -lboost_regex -lboost_graph -lexpat
 bin_demo_xmlformats_ldflags =
 
 bin_ampl_i2i_src = ampl_i2i.cpp
 bin_ampl_i2i_export = $(bin_ampl_i2i_src) 
 bin_ampl_i2i_deps = libcppelib.a
-bin_ampl_i2i_libs = -lboost_regex
+bin_ampl_i2i_libs = -lboost_regex -lboost_graph -lexpat
 bin_ampl_i2i_ldflags =
 
 bin_ampl_i2o_src = ampl_i2o.cpp
 bin_ampl_i2o_export = $(bin_ampl_i2o_src) 
 bin_ampl_i2o_deps = libcppelib.a
-bin_ampl_i2o_libs = -lboost_regex
+bin_ampl_i2o_libs = -lboost_regex -lboost_graph -lexpat
 bin_ampl_i2o_ldflags =
 
 bin_ampl_o2i_src = ampl_o2i.cpp
 bin_ampl_o2i_export = $(bin_ampl_o2i_src) 
 bin_ampl_o2i_deps = libcppelib.a
-bin_ampl_o2i_libs = -lboost_regex
+bin_ampl_o2i_libs = -lboost_regex -lboost_graph -lexpat
 bin_ampl_o2i_ldflags =
 
 bin_ampl_o2o_src = ampl_o2o.cpp
 bin_ampl_o2o_export = $(bin_ampl_o2o_src) 
 bin_ampl_o2o_deps = libcppelib.a
-bin_ampl_o2o_libs = -lboost_regex
+bin_ampl_o2o_libs = -lboost_regex -lboost_graph -lexpat
 bin_ampl_o2o_ldflags = 
 
 bin_ampl_i2cpp_src = ampl_i2cpp.cpp
 bin_ampl_i2cpp_export = $(bin_ampl_i2cpp_src) 
 bin_ampl_i2cpp_deps = libcppelib.a
-bin_ampl_i2cpp_libs = -lboost_regex
+bin_ampl_i2cpp_libs = -lboost_regex -lboost_graph -lexpat
 bin_ampl_i2cpp_ldflags = 
 
 bin_ampl_o2cpp_src = ampl_o2cpp.cpp
 bin_ampl_o2cpp_export = $(bin_ampl_o2cpp_src) 
 bin_ampl_o2cpp_deps = libcppelib.a
-bin_ampl_o2cpp_libs = -lboost_regex
+bin_ampl_o2cpp_libs = -lboost_regex -lboost_graph -lexpat
 bin_ampl_o2cpp_ldflags = 
 
 bin_run_record_src = run_record.cpp
 bin_run_record_export = $(bin_run_record_src) make_record.cpp
 bin_run_record_deps = libcppelib.a
-bin_run_record_libs = -lboost_regex
+bin_run_record_libs = -lboost_regex -lboost_graph -lexpat
 bin_run_record_ldflags = 
 
 ## static library packages and their sources
