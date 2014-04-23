@@ -46,7 +46,7 @@ Record Taskgraph::parse(istream& data){
   read_graphml(data,graph,dp);
 
 
-
+  // Read all task information into vector
   auto *tasks = new vector<Vertex_info>();
   for(auto taski = vertices(graph); taski.first != taski.second; ++taski.first)
     {
@@ -68,24 +68,26 @@ Record Taskgraph::parse(istream& data){
     {
       auto s = source(*channeli.first,graph);
       auto d = target(*channeli.first,graph);
-      channels.push_back(pair<string,string>(get(&Vertex_info::taskid,graph,s),get(&Vertex_info::taskname,graph,d)));
+      channels.push_back(pair<string,string>(get(&Vertex_info::taskid,graph,s),get(&Vertex_info::taskid,graph,d)));
     }
   
-  //Sort on taskid
+  //Sort on taskid (string, unique)
   sort(tasks->begin(),tasks->end());
   //copy(tasks->begin(),tasks->end(),ostream_iterator<Vertex_info>(cout, " "));
   cout << "\nSorted: ";
   vector<int> ids;
   vector<vector<int> > efficiency_matrix;
   //vector<int> workloads;
+  map<int, float> workloads;
   map<int, int> max_width;
   //vector<int> max_width;
   int id = 1;
   // Build the vectors and matrices, in the correct order
-  for(auto i = tasks->begin(); i != tasks->end(); ++i)
+  for(auto i = tasks->begin(); i != tasks->end(); ++i, ++id)
     {
-      ids.push_back(id++);
-      workloads.push_back((*i).workload);
+      ids.push_back(id);
+      //workloads.push_back((*i).workload);
+      workloads.insert(pair<int,float>(id,(*i).workload));
       //max_width.push_back((*i).max_width);
       max_width.insert(pair<int,int>(id,(*i).max_width));
       stringstream stream((*i).efficiency_bool);
@@ -119,9 +121,11 @@ Record Taskgraph::parse(istream& data){
 									     
   //copy(ids.begin(),ids.end(),ostream_iterator<int>(cout, " "));
   pelib::Vector<int,int> Wi("Wi",max_width);
+  pelib::Vector<int,float> Tau("Tau",workloads);
   //record.add("tau",workload)
   //record.add("e",efficiency_matrix);
   record.insert(&Wi);
+  record.insert(&Tau);
   //record.add("taskgraph",tasks);
   //record.add("links",channels_id)
 
