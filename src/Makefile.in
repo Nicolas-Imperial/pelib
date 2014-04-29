@@ -14,7 +14,7 @@ LIBS =
 LIBS_TEST = 
 
 ## static library packages and their sources
-bin_package = demo demo_xmlformats taskgraph2ampl_i ampl_i2i ampl_i2o ampl_o2i ampl_o2o ampl_i2cpp ampl_o2cpp run_record
+bin_package = demo demo_xmlformats taskgraph2ampl_i duplicate_tasks ampl_i2i ampl_i2o ampl_o2i ampl_o2o ampl_i2cpp ampl_o2cpp run_record
 
 bin_demo_src = demo.cpp
 bin_demo_export = $(bin_demo_src) 
@@ -22,8 +22,14 @@ bin_demo_deps = libcppelib.a
 bin_demo_libs = -lboost_regex -lboost_graph -lexpat
 bin_demo_ldflags =
 
+bin_duplicate_tasks_src =  duplicate_tasks.cpp
+bin_duplicate_tasks_export =  $(duplicate_tasks_src) 
+bin_duplicate_tasks_deps = libcppelib.a
+bin_duplicate_tasks_libs = -lboost_regex -lboost_graph -lexpat
+bin_duplicate_tasks_ldflags =
+
 bin_taskgraph2ampl_i_src = taskgraph2ampl_i.cpp
-bin_taskgraph2ampl_i_export = $(bin_taskgraph2ampl_src) 
+bin_taskgraph2ampl_i_export =  $(bin_taskgraph2ampl_src) 
 bin_taskgraph2ampl_i_deps = libcppelib.a
 bin_taskgraph2ampl_i_libs = -lboost_regex -lboost_graph -lexpat
 bin_taskgraph2ampl_i_ldflags =
