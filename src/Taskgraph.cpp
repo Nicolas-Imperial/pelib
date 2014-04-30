@@ -57,9 +57,7 @@ Record Taskgraph::parse(istream& data, size_t processors){
   using namespace boost;
   Record record;
   std::ifstream f;
-  //  typedef adjacency_list<vecS, vecS, directedS,Vertex_info> BoostGraphType;
-  //  typedef dynamic_properties BoostDynamicProperties;
-  
+   
   BoostGraphType graph;
   BoostDynamicProperties dp = make_dp(graph);
   
@@ -67,16 +65,16 @@ Record Taskgraph::parse(istream& data, size_t processors){
 
 
   // Read all task information into vector
-  auto *tasks = new vector<Vertex_info>();
+  vector<Vertex_info> tasks;
   for(auto taski = vertices(graph); taski.first != taski.second; ++taski.first)
     {
-      Vertex_info *task = new Vertex_info();
-      task->taskname = get(&Vertex_info::taskname,graph,*taski.first);
-      task->taskid = get(&Vertex_info::taskid,graph,*taski.first);
-      task->workload = get(&Vertex_info::workload,graph,*taski.first);
-      task->max_width = get(&Vertex_info::max_width,graph,*taski.first);
-      task->efficiency_line = get(&Vertex_info::efficiency_line,graph,*taski.first);
-      tasks->push_back(*task);
+      Vertex_info task;
+      task.taskname = get(&Vertex_info::taskname,graph,*taski.first);
+      task.taskid = get(&Vertex_info::taskid,graph,*taski.first);
+      task.workload = get(&Vertex_info::workload,graph,*taski.first);
+      task.max_width = get(&Vertex_info::max_width,graph,*taski.first);
+      task.efficiency_line = get(&Vertex_info::efficiency_line,graph,*taski.first);
+      tasks.push_back(task);
       //cout << "taskname: " << get(&Vertex_info::taskname,graph,*taski.first)  << "\t";
       //cout << "taskid: " << get(&Vertex_info::taskid,graph,*taski.first)  << "\t";
       //cout << "workload: " << get(&Vertex_info::workload,graph,*taski.first) << "\n";
@@ -92,7 +90,7 @@ Record Taskgraph::parse(istream& data, size_t processors){
     }
   
   //Sort on taskid
-  sort(tasks->begin(),tasks->end());
+  sort(tasks.begin(),tasks.end());
 
 
 
@@ -104,7 +102,7 @@ Record Taskgraph::parse(istream& data, size_t processors){
 
   int id = 1;
   // Build the vectors and matrices, in the correct order
-  for(auto i = tasks->begin(); i != tasks->end(); ++i, ++id)
+  for(auto i = tasks.begin(); i != tasks.end(); ++i, ++id)
     {
       ids.push_back(id);
       workloads.insert(pair<int,float>(id,(*i).workload));
@@ -139,8 +137,8 @@ Record Taskgraph::parse(istream& data, size_t processors){
   vector< pair<int, int> > channels_id;
   for(auto channelsi = channels.begin(); channelsi != channels.end(); ++channelsi)
     {
-      int sourceid = (find(tasks->begin(), tasks->end(),(*channelsi).first) - tasks->begin()) + 1;
-      int destid = (find(tasks->begin(), tasks->end(),(*channelsi).second) - tasks->begin()) + 1;
+      int sourceid = (find(tasks.begin(), tasks.end(),(*channelsi).first) - tasks.begin()) + 1;
+      int destid = (find(tasks.begin(), tasks.end(),(*channelsi).second) - tasks.begin()) + 1;
       channels_id.push_back(pair<int,int>(sourceid,destid));
     }
 									     
@@ -148,9 +146,9 @@ Record Taskgraph::parse(istream& data, size_t processors){
   pelib::Vector<int,int> Wi("Wi",max_width);
   pelib::Vector<int,float> Tau("Tau",workloads);
   pelib::Matrix<int, int, float> e("e",efficiency_matrix);
-  pelib::Scalar<int> n("n",tasks->size());
-  pelib::Scalar<vector<Vertex_info> > r_tasks("tasks",*tasks);
-  // yes, this can be a pelib::Vector. But we do not want anyone else to dump this entry
+  pelib::Scalar<int> n("n",tasks.size());
+  pelib::Scalar<vector<Vertex_info> > r_tasks("tasks",tasks);
+  // yes, this could have been a pelib::Vector. But we do not want anyone else to dump this entry
   pelib::Scalar<vector< pair<int, int> > > r_channels("channels",channels_id); 
   pelib::Scalar<BoostGraphType> r_graph("graph",graph);
  
