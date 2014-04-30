@@ -9,6 +9,7 @@
 #include <string>
 #include <boost/graph/graphml.hpp>
 #include <boost/graph/adjacency_list.hpp>
+#include <muParser.h>
 #include <vector>
 #include <sstream>
 using namespace pelib;
@@ -93,7 +94,6 @@ Record Taskgraph::parse(istream& data, size_t processors){
   sort(tasks.begin(),tasks.end());
 
 
-
   vector<int> ids;
 
   map<int, map<int, float> > efficiency_matrix;
@@ -108,30 +108,53 @@ Record Taskgraph::parse(istream& data, size_t processors){
       workloads.insert(pair<int,float>(id,(*i).workload));
       max_width.insert(pair<int,int>(id,(*i).max_width));
 
-      stringstream stream((*i).efficiency_line);
+      // Calculate the efficiency table from formula if such exists
+      // The formula is kept in the graph
       map<int,float> row;
-      //vector<int> arr;
-      float num;
-      size_t count = 0;
-      size_t x = 1;
-      while(stream >>num)
+
+      if((*i).efficiency_line.substr(0,4) == "fml:")
 	{
-	  row.insert(pair<int,float>(x,num));
-	  //arr.push_back(num);
-	  ++count;
-	  ++x;
+	  using namespace mu;
+	  double p;
+	  string fml = (*i).efficiency_line.substr(4);
+
+	  Parser mathparser;
+	  mathparser.SetExpr(fml);
+	  // This is where you may define additional parameters
+	  // for the efficiency function.
+	  // It is allowed to define parameters not present in the
+	  // formula, it will just be ignored.
+	  mathparser.DefineVar("p",&p); 
+
+	  for(p = 1; p <= processors; p +=1)
+	    {
+	      row.insert(pair<int,float>((int)p,mathparser.Eval()));
+	      cout << p << mathparser.Eval() << endl;
+	    }
 	}
+      else{
+	stringstream stream((*i).efficiency_line);
+
+	//vector<int> arr;
+	float num;
+	size_t count = 0;
+	size_t x = 1;
+	while(stream >>num)
+	  {
+	    row.insert(pair<int,float>(x,num));
+	    //arr.push_back(num);
+	    ++count;
+	    ++x;
+	  }
 #define VERY_SMALL 1e-6
-      for(;count < processors; ++count, ++x)
-	{
-	  row.insert(pair<int,float>(x,VERY_SMALL));
-	}
-
+	for(;count < processors; ++count, ++x)
+	  {
+	    row.insert(pair<int,float>(x,VERY_SMALL));
+	  }
+      }
       efficiency_matrix.insert(pair<int, map<int, float> >(id,row));
-      //(i).edge_iterator();
-      
     }
-
+    
   // Build a channel tuple vector by correlating taskids with its assigned number.
   // Yes this is slow. This is the only O(n2) part in the parser.
   vector< pair<int, int> > channels_id;
@@ -142,7 +165,6 @@ Record Taskgraph::parse(istream& data, size_t processors){
       channels_id.push_back(pair<int,int>(sourceid,destid));
     }
 									     
-  //copy(ids.begin(),ids.end(),ostream_iterator<int>(cout, " "));
   pelib::Vector<int,int> Wi("Wi",max_width);
   pelib::Vector<int,float> Tau("Tau",workloads);
   pelib::Matrix<int, int, float> e("e",efficiency_matrix);
