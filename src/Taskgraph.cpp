@@ -20,6 +20,7 @@ using namespace std;
 #include <boost/math/special_functions/fpclassify.hpp> // isnan
 #include <cmath>
 #include <climits>
+#include <cstdio>
 
 struct Vertex_info {
   std::string taskname;
@@ -94,6 +95,7 @@ Record Taskgraph::parse(istream& data, size_t processors)
     }
   close(p[1]);
   igraph_read_graph_graphml(&the_graph,fake_fileptr,0);  
+  
   close(p[0]);
    
   //  cout << "Name: " <<   igraph_cattribute_GAS(&the_graph,"autname") << endl;
@@ -230,35 +232,20 @@ void Taskgraph::dump(ostream& o, const Record& record) const {
   auto r_graph = record.find<Scalar<igraph_t> >("graph");
   if(r_graph == nullptr)
     {
-      throw runtime_error("hello");
-      cerr << "Dump failure: Can not dump this type as taskgraph\n";
-      return;
+      throw runtime_error("Dump failure: Can not dump this type as taskgraph\n");
     }
-
   auto &the_graph = r_graph->getValue();
   igraph_write_graph_graphml(&the_graph,fake_fileptr,true); 
-  close(p[1]);
-  
-
 
   FILE *instream = fdopen (p[0], "r");
   char c;
   while ((c = fgetc (instream)) != EOF)
     {
-      cout << c;
+       cout << c;
     }
   fclose (instream);
   close(p[0]);
-  /*
-  auto r_graph =(record.find<Scalar<BoostGraphType> >("graph"));
-  if(r_graph == nullptr)
-    {
-      cerr << "Dump failure: Can not dump this type as taskgraph\n";
-      return;
-    }
-  auto graph = r_graph->getValue(); //what is the value of a autograph .. =)
-  write_graphml(o, graph, make_dp(graph),true);
-*/
+
 }; 
 
 void Taskgraph::duplicate_tasks(Record& record, const vector<int>& to_duplicate)
@@ -266,8 +253,7 @@ void Taskgraph::duplicate_tasks(Record& record, const vector<int>& to_duplicate)
   auto r_graph =(record.find<Scalar<BoostGraphType> >("graph"));
   if(r_graph == nullptr)
     {
-      cerr << "Error: Input is not a taskgraph\n";
-      return;
+      throw runtime_error("Error: Input is not a taskgraph\n");
     }
 
   // I am assuming the rest of the data exists. 
