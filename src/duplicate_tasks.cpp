@@ -8,7 +8,7 @@
 int main(int argc, char **argv)
 {
   if(argc == 1) return 0; //nothing to duplicate
-  
+  // usage: duplicate_tasks [id0 id1 ...]
   Taskgraph input;
   Record data = input.parse(cin);
   

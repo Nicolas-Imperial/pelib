@@ -10,7 +10,7 @@ namespace pelib
   {
   public:
     void dump(std::ostream&, const pelib::Record&) const;
-    void dump(std::ostream&, const pelib::Data*) const {} //stub
+    void dump(std::ostream&, const pelib::Data*) const { throw "NOPE";} //stub
 
     Record parse(std::istream&);
     Record parse(std::istream& data, size_t processors);
