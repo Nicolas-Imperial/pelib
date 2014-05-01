@@ -221,6 +221,35 @@ Record Taskgraph::parse(istream& data, size_t processors)
 }
 
 void Taskgraph::dump(ostream& o, const Record& record) const {
+
+  int p[2];
+  pipe(p);
+  
+  FILE *fake_fileptr = fdopen(p[1], "w"); 
+
+  auto r_graph = record.find<Scalar<igraph_t> >("graph");
+  if(r_graph == nullptr)
+    {
+      throw exception();
+      cerr << "Dump failure: Can not dump this type as taskgraph\n";
+      return;
+    }
+
+  auto &the_graph = r_graph->getValue();
+  igraph_write_graph_graphml(&the_graph,fake_fileptr,true); 
+  close(p[1]);
+  
+
+
+  FILE *instream = fdopen (p[0], "r");
+  char c;
+  while ((c = fgetc (instream)) != EOF)
+    {
+      cout << c;
+    }
+  fclose (instream);
+  close(p[0]);
+  /*
   auto r_graph =(record.find<Scalar<BoostGraphType> >("graph"));
   if(r_graph == nullptr)
     {
@@ -229,8 +258,8 @@ void Taskgraph::dump(ostream& o, const Record& record) const {
     }
   auto graph = r_graph->getValue(); //what is the value of a autograph .. =)
   write_graphml(o, graph, make_dp(graph),true);
-
-}; //stub
+*/
+}; 
 
 void Taskgraph::duplicate_tasks(Record& record, const vector<int>& to_duplicate)
 {
