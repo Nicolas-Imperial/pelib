@@ -230,7 +230,7 @@ void Taskgraph::dump(ostream& o, const Record& record) const {
   auto r_graph = record.find<Scalar<igraph_t> >("graph");
   if(r_graph == nullptr)
     {
-      throw exception();
+      throw runtime_error("hello");
       cerr << "Dump failure: Can not dump this type as taskgraph\n";
       return;
     }

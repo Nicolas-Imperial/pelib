@@ -18,7 +18,7 @@ LIBS = -lmuparser `pkg-config igraph --libs`  `pkg-config igraph --libs`
 LIBS_TEST = 
 
 ## static library packages and their sources
-bin_package = demo demo_xmlformats taskgraph2ampl_i duplicate_tasks ampl_i2i ampl_i2o ampl_o2i ampl_o2o ampl_i2cpp ampl_o2cpp run_record
+bin_package = demo demo_xmlformats taskgraph2ampl_i duplicate_tasks taskgraphfml2evaluated ampl_i2i ampl_i2o ampl_o2i ampl_o2o ampl_i2cpp ampl_o2cpp run_record
 
 bin_demo_src = demo.cpp
 bin_demo_export = $(bin_demo_src) 
@@ -37,6 +37,12 @@ bin_taskgraph2ampl_i_export =  $(bin_taskgraph2ampl_src)
 bin_taskgraph2ampl_i_deps = libcppelib.a
 bin_taskgraph2ampl_i_libs = -lboost_regex -lboost_graph -lexpat
 bin_taskgraph2ampl_i_ldflags =
+
+bin_taskgraphfml2evaluated_src = taskgraphfml2evaluated.cpp
+bin_taskgraphfml2evaluated_export =  $(bin_taskgraphfml2evaluated_src) 
+bin_taskgraphfml2evaluated_deps = libcppelib.a
+bin_taskgraphfml2evaluated__libs = -lboost_regex -lboost_graph -lexpat
+bin_taskgraphfml2evaluated_ldflags =
 
 bin_demo_xmlformats_src = demo_xmlformats.cpp
 bin_demo_xmlformats_export = $(bin_demo_xmlformats_src) 
