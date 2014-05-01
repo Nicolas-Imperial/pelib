@@ -32,7 +32,14 @@ struct Vertex_info {
   }
 };
 
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS,Vertex_info> BoostGraphType;
+struct Graph_info{
+  string autname;
+  float target_makespan;
+};
+
+struct Edge_info{}; //dummy
+
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS,Vertex_info,boost::no_property,Graph_info> BoostGraphType;
 typedef boost::dynamic_properties BoostDynamicProperties;
 
 Record Taskgraph::parse(istream& data)
@@ -42,7 +49,8 @@ Record Taskgraph::parse(istream& data)
 }
 
 
-BoostDynamicProperties make_dp(BoostGraphType& graph){
+BoostDynamicProperties make_dp(BoostGraphType& graph)
+{
   using namespace boost;
   BoostDynamicProperties dp;
   dp.property("taskname",get(&Vertex_info::taskname,graph));
@@ -50,11 +58,17 @@ BoostDynamicProperties make_dp(BoostGraphType& graph){
   dp.property("workload",get(&Vertex_info::workload,graph));
   dp.property("max_width",get(&Vertex_info::max_width,graph));
   dp.property("efficiency",get(&Vertex_info::efficiency_line,graph));
+
+  
+  //topology[boost::graph_bundle].myName = get(graphname_map,"graphname");
+
+  //dp.property("autname",get(&Graph_info::autname,graph));
+  //dp.property("target_makespan",get(&Graph_info::target_makespan,graph));
   return dp;
 }
 
-
-Record Taskgraph::parse(istream& data, size_t processors){
+Record Taskgraph::parse(istream& data, size_t processors)
+{
   using namespace boost;
   Record record;
   std::ifstream f;
@@ -62,9 +76,18 @@ Record Taskgraph::parse(istream& data, size_t processors){
   BoostGraphType graph;
   BoostDynamicProperties dp = make_dp(graph);
   
+  // convincing boost to load graph layer data is a pain...
+  std::map< std::string, std::string > attribute_name2name;
+  boost::associative_property_map< std::map< std::string, std::string > > graphname_map( attribute_name2name ); 
+  dp.property("autname", graphname_map );
+
   read_graphml(data,graph,dp);
-
-
+  cout << "Name: " << get(graphname_map,"autname") << endl;
+  //get_property(adjacency_matrix& g, GraphProperty)
+  //get_property(graph, graph_name(graph));
+  //(get(boost::graph_properties, graph))[graph].autname;
+//cout << "name: " << graph.m_property->autname << endl;
+    //get(graph,&Graph_info::autname);
   // Read all task information into vector
   vector<Vertex_info> tasks;
   for(auto taski = vertices(graph); taski.first != taski.second; ++taski.first)
@@ -76,10 +99,6 @@ Record Taskgraph::parse(istream& data, size_t processors){
       task.max_width = get(&Vertex_info::max_width,graph,*taski.first);
       task.efficiency_line = get(&Vertex_info::efficiency_line,graph,*taski.first);
       tasks.push_back(task);
-      //cout << "taskname: " << get(&Vertex_info::taskname,graph,*taski.first)  << "\t";
-      //cout << "taskid: " << get(&Vertex_info::taskid,graph,*taski.first)  << "\t";
-      //cout << "workload: " << get(&Vertex_info::workload,graph,*taski.first) << "\n";
-     
     }
   vector<pair<string,string> > channels;
   //compile a list all channels
@@ -129,7 +148,6 @@ Record Taskgraph::parse(istream& data, size_t processors){
 	  for(p = 1; p <= processors; p +=1)
 	    {
 	      row.insert(pair<int,float>((int)p,mathparser.Eval()));
-	      cout << p << mathparser.Eval() << endl;
 	    }
 	}
       else{
