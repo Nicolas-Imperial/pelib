@@ -18,6 +18,7 @@
 #include <AmplOutputMatrix.hpp>
 
 #include "Taskgraph.hpp"
+#include "TaskgraphRecord.hpp"
 using namespace pelib;
 
 Record
@@ -43,6 +44,7 @@ main(int argc, char **argv)
 	AmplInput in;
 	Record rec;
 
+
 	// We use an AMPL output, output format
 	RecordOutput &out = in;
 
@@ -57,7 +59,7 @@ main(int argc, char **argv)
 
 	// Load input file
 	//rec = parse(input, myfile);
-	rec = input.parse(myfile,atoi(argv[2]));
+	TaskgraphRecord tr = input.parse(myfile);
 	// Close input file
 	myfile.close();
 

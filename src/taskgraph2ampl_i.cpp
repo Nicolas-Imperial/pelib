@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 	    << std::setiosflags(std::ios::fixed)                                                                                                     
 	    << std::setiosflags(std::ios::showpoint);  
   
-  output.dump(cout,input.parse(cin,processors));
+  output.dump(cout,input.parse(cin));
 
   
 

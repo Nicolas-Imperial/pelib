@@ -10,6 +10,11 @@
 
 #ifndef PELIB_RECORD
 #define PELIB_RECORD
+namespace pelib
+{
+  class Record;
+}
+#include "TaskgraphRecord.hpp"
 
 namespace pelib
 {
@@ -20,7 +25,7 @@ namespace pelib
 			~Record();
 			Record();
 			Record(const Record &rhs);
-			
+Record(const TaskgraphRecord& tgr);
 			const std::map<std::string, const Data * const>&
 			getAllRecords() const;
 

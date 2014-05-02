@@ -1,21 +1,25 @@
-#include <vector>
-
-#include "RecordParser.hpp"
-#include "RecordOutput.hpp"
 #ifndef PELIB_TASKGRAPH
 #define PELIB_TASKGRAPH
+
+#include <vector>
+//#include <istream>
+#include <iostream>
 namespace pelib
 {
-  class Taskgraph: public RecordParser, public RecordOutput
+class Taskgraph;
+}
+#include "TaskgraphRecord.hpp"
+
+
+namespace pelib
+{
+  class Taskgraph
   {
   public:
-    void dump(std::ostream&, const pelib::Record&) const;
-    void dump(std::ostream&, const pelib::Data*) const { throw "NOPE";} //stub
+    void dump(std::ostream&, const pelib::TaskgraphRecord&) const;
+    TaskgraphRecord parse(std::istream&);
 
-    Record parse(std::istream&);
-    Record parse(std::istream& data, size_t processors);
-
-    void duplicate_tasks(Record& data, const std::vector<int> & to_duplicate);
+    void duplicate_tasks(TaskgraphRecord& data, const std::vector<int> & to_duplicate);
   };
 }
 
