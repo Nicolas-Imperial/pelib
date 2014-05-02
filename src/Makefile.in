@@ -8,13 +8,13 @@ CXXFLAGS=-isystem ../include -isystem $(CROWN_UTIL_SRC)/include -I $(muparser_di
 RELEASE_CFLAGS = -O3 -DNDEBUG
 DEBUG_CFLAGS = -g -O0 -DDEBUG=1
 
-RELEASE_CXXFLAGS = -g -O0 -DDEBUG=1 `pkg-config igraph --cflags`
-DEBUG_CXXFLAGS = -g -O0 -DDEBUG=1   `pkg-config igraph --cflags`
+RELEASE_CXXFLAGS = -g -O0 -DDEBUG=1 `pkg-config igraph --cflags` 
+DEBUG_CXXFLAGS = -g -O0 -DDEBUG=1   `pkg-config igraph --cflags` 
 
 LDFLAGS_TEST =
 LDFLAGS = -L $(muparser_dir)/lib 
 
-LIBS = -lmuparser `pkg-config igraph --libs`   -lstdc++ -lm
+LIBS = -lmuparser  `pkg-config igraph --libs` -lm
 LIBS_TEST = 
 
 ## static library packages and their sources
@@ -41,7 +41,7 @@ bin_taskgraph2ampl_i_ldflags =
 bin_taskgraphfml2evaluated_src = taskgraphfml2evaluated.cpp
 bin_taskgraphfml2evaluated_export =  $(bin_taskgraphfml2evaluated_src) 
 bin_taskgraphfml2evaluated_deps = libcppelib.a
-bin_taskgraphfml2evaluated__libs = -lboost_regex -lboost_graph -lexpat
+bin_taskgraphfml2evaluated_libs = -lboost_regex -lboost_graph -lexpat
 bin_taskgraphfml2evaluated_ldflags =
 
 bin_demo_xmlformats_src = demo_xmlformats.cpp
