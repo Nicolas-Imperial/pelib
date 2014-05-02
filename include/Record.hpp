@@ -37,7 +37,7 @@ namespace pelib
 				for (std::map<std::string, const Data * const>::const_iterator i = records.begin(); i != records.end(); i++)
 				{
 					// Try to cast this type
-					Data *ptr = i->second;
+					const Data *ptr = i->second;
 					T* elem = dynamic_cast<T*>(ptr);
 					
 					if(elem != NULL)

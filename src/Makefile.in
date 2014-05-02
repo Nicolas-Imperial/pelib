@@ -14,7 +14,7 @@ DEBUG_CXXFLAGS = -g -O0 -DDEBUG=1   `pkg-config igraph --cflags`
 LDFLAGS_TEST =
 LDFLAGS = -L $(muparser_dir)/lib 
 
-LIBS = -lmuparser `pkg-config igraph --libs`  `pkg-config igraph --libs`
+LIBS = -lmuparser `pkg-config igraph --libs`   -lstdc++ -lm
 LIBS_TEST = 
 
 ## static library packages and their sources
