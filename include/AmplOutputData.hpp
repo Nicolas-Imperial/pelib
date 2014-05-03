@@ -10,10 +10,11 @@ namespace pelib
 	{
 		public:
 			AmplOutputData(bool strict) : AmplDataParser(strict) {}
-			
+	  virtual ~AmplOutputData() {}
 			virtual
 			AmplOutputData*
 			clone() const = 0;
+	  
 		protected:
 		private:		
 	};

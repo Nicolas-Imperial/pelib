@@ -27,11 +27,16 @@ namespace pelib
     
     explicit TaskgraphRecord(const Record& record);
     
+    // The architecture information is used at toRecord.
+    // If no architecture has been set, Some default
+    // values are used.
+    void setArchitecture(const Record& architecture);
     Record toRecord() const;
     
     
   private:
     igraph_t *graph;
+    Record* architecture = nullptr;
   };
 }
 

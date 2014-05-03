@@ -41,7 +41,12 @@ namespace pelib
   
    
   TaskgraphRecord::TaskgraphRecord(igraph_t* graph) : graph(graph){}
-  TaskgraphRecord::~TaskgraphRecord() {delete graph;}
+
+  TaskgraphRecord::~TaskgraphRecord()
+  {
+    delete graph;
+    delete architecture;
+  }
 
   TaskgraphRecord::TaskgraphRecord(const TaskgraphRecord &rhs)
   {
@@ -58,9 +63,25 @@ namespace pelib
 
   Record  TaskgraphRecord::toRecord() const
   {
-    size_t processors = 128;
+
+    size_t processors = 1; // Default
+    if(architecture != nullptr)
+      {
+	auto p = architecture->find<Scalar<int> >("p");
+	if(p == nullptr)
+	  {
+	    cerr << "Waring: architecture exists but is missing information\n";
+	  }
+	else
+	  {
+	    processors = p->getValue();
+	  }
+      }
+
   // extract all task information to be able to sort it together
     vector<Vertex_info> tasks;
+
+
     for(int id=0; id < igraph_vcount(graph);id++)
       {
 	Vertex_info task;
@@ -74,7 +95,7 @@ namespace pelib
 	tasks.push_back(task);
       }
     
-    
+
     //Sort on taskid
     sort(tasks.begin(),tasks.end());
     
@@ -118,7 +139,7 @@ namespace pelib
 	  }
 	else{
 	  stringstream stream((*i).efficiency_line);
-	  
+
 	  //vector<int> arr;
 	  float num;
 	  size_t count = 0;
@@ -139,21 +160,26 @@ namespace pelib
 	efficiency_matrix.insert(pair<int, map<int, float> >(id,row));
       }
     
-    
+
     pelib::Vector<int,int> Wi("Wi",max_width);
     pelib::Vector<int,float> Tau("Tau",workloads);
     pelib::Matrix<int, int, float> e("e",efficiency_matrix);
     pelib::Scalar<int> n("n",tasks.size());
-    pelib::Scalar<vector<Vertex_info> > r_tasks("tasks",tasks);
+    //pelib::Scalar<vector<Vertex_info> > r_tasks("tasks",tasks);
     
     Record record;
     record.insert(&Wi);
     record.insert(&Tau);
     record.insert(&e);
     record.insert(&n);
-    record.insert(&r_tasks);
-    
+    //record.insert(&r_tasks);
+
     return record;
+  }
+
+  void TaskgraphRecord::setArchitecture(const Record& architecture)
+  {
+    this->architecture = new Record(architecture);
   }
   
 }

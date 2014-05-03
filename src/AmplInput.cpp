@@ -99,7 +99,7 @@ namespace pelib
 				noComment << line << std::endl;
 			}
 		}
-		
+
 		// Parse input
 		while(!getline(noComment, line, ';').fail())
 		{

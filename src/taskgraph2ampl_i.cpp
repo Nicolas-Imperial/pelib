@@ -4,29 +4,42 @@
 #include <string>
 #include <iomanip>
 
-
-#include <AmplOutput.hpp>
+#include <AmplInput.hpp>
 #include "Taskgraph.hpp"
 
 int main(int argc, char **argv)
 {
   using namespace std;
   using namespace pelib;
-  size_t processors = 128;
+
+  Record architecture;
+  Taskgraph input;
+
+  AmplInput output;
+  AmplInput ai;
   if(argc == 2)
     {
-      processors = atoi(argv[1]);
+      ifstream tmp(argv[1]);
+      architecture = ai.parse(tmp);
+      tmp.close();
     }
-  Taskgraph input;
-  AmplOutput output;
+  else
+    {
+      cerr << "Waring: No architecture information supplied. Using default values\n";
+    }
   
-  
+
   // Set floating point var output format to fixed at 7 digits
   std::cout << std::setprecision(6)                                                                                                        
 	    << std::setiosflags(std::ios::fixed)                                                                                                     
 	    << std::setiosflags(std::ios::showpoint);  
-  
-  output.dump(cout,input.parse(cin));
+
+
+  TaskgraphRecord tgr(input.parse(cin));
+
+  tgr.setArchitecture(architecture);
+
+  output.dump(cout,tgr);
 
   
 

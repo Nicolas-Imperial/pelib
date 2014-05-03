@@ -31,12 +31,14 @@ TaskgraphRecord Taskgraph::parse(istream& data)
   
   Record record;
   igraph_i_set_attribute_table(&igraph_cattribute_table); //do this to enable attribute fetching
+
   igraph_t *the_graph = new igraph_t();
 
   //create a FILE* from istream by building a posix pipe. This wont work in windows...
   int p[2];
+
   pipe(p);
-  
+
   FILE *fake_fileptr = fdopen(p[0], "r"); 
   std::string str;
   char c;
@@ -47,6 +49,7 @@ TaskgraphRecord Taskgraph::parse(istream& data)
       c = cin.get();
     }
   close(p[1]);
+
   igraph_read_graph_graphml(the_graph,fake_fileptr,0);  
   
   close(p[0]);
