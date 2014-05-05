@@ -246,6 +246,32 @@ namespace pelib
   {
     this->architecture = new Record(architecture);
   }
-  
+
+
+  std::vector<std::string> TaskgraphRecord::get_taskids() const
+  {
+    vector<string> taskids;
+    for(int i = 0; i < igraph_vcount(graph); i++)
+      {
+	string tid = VAS(graph,"taskid",i);
+	if(tid.compare("") == 0)
+	  {
+	    tid = "UNNAMED_TASKID"; //this is bad. failure?
+	  }
+	taskids.push_back(tid);
+      }
+    sort(taskids.begin(),taskids.end());
+    return taskids;
+  }
+  float TaskgraphRecord::get_target_makespan() const
+  {
+    float target_makespan = GAN(graph,"target_makespan");
+    return isnan(target_makespan) ? VERY_SMALL : target_makespan;
+  }
+  const char* TaskgraphRecord::get_autname() const
+  {
+    return GAS(graph,"autname");
+  }
+
 }
 

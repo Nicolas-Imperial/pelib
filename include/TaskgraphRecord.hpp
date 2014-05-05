@@ -36,7 +36,9 @@ namespace pelib
     void setArchitecture(const Record& architecture);
     Record toRecord() const;
     
-    
+    std::vector<std::string> get_taskids() const;
+    float get_target_makespan() const;
+    const char* get_autname() const;
   private:
     std::vector<Vertex_info> buildVertexVector(void) const;
     igraph_t *graph;

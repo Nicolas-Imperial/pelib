@@ -40,13 +40,12 @@ TaskgraphRecord Taskgraph::parse(istream& data)
   pipe(p);
 
   FILE *fake_fileptr = fdopen(p[0], "r"); 
-  std::string str;
   char c;
-  c = cin.get();
-  while(!cin.eof())
+  c = data.get();
+  while(!data.eof())
     {
       write(p[1],&c,1);
-      c = cin.get();
+      c = data.get();
     }
   close(p[1]);
 

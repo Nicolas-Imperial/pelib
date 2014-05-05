@@ -8,17 +8,17 @@ CXXFLAGS=-isystem ../include -isystem $(CROWN_UTIL_SRC)/include -I $(muparser_di
 RELEASE_CFLAGS = -O3 -DNDEBUG
 DEBUG_CFLAGS = -g -O0 -DDEBUG=1
 
-RELEASE_CXXFLAGS = -g -O0 -DDEBUG=1 `pkg-config igraph --cflags` 
-DEBUG_CXXFLAGS = -g -O0 -DDEBUG=1   `pkg-config igraph --cflags` 
+RELEASE_CXXFLAGS = -g -O0 -DDEBUG=1 `pkg-config igraph --cflags`  `pkg-config --cflags libxml++-2.6`
+DEBUG_CXXFLAGS = -g -O0 -DDEBUG=1   `pkg-config igraph --cflags`  `pkg-config --cflags libxml++-2.6`
 
 LDFLAGS_TEST =
 LDFLAGS = -L $(muparser_dir)/lib 
 
-LIBS = -lmuparser  `pkg-config igraph --libs` -lm
+LIBS = -lmuparser  `pkg-config igraph --libs` -lm `pkg-config --libs libxml++-2.6`
 LIBS_TEST = 
 
 ## static library packages and their sources
-bin_package = demo demo_xmlformats taskgraph2ampl_i duplicate_tasks taskgraphfml2evaluated ampl_i2i ampl_i2o ampl_o2i ampl_o2o ampl_i2cpp ampl_o2cpp run_record
+bin_package = demo demo_xmlformats taskgraph2ampl_i duplicate_tasks taskgraphfml2evaluated ampl_o2schedule ampl_i2i ampl_i2o ampl_o2i ampl_o2o ampl_i2cpp ampl_o2cpp run_record
 
 bin_demo_src = demo.cpp
 bin_demo_export = $(bin_demo_src) 
@@ -43,6 +43,12 @@ bin_taskgraphfml2evaluated_export =  $(bin_taskgraphfml2evaluated_src)
 bin_taskgraphfml2evaluated_deps = libcppelib.a
 bin_taskgraphfml2evaluated_libs = -lboost_regex -lboost_graph -lexpat
 bin_taskgraphfml2evaluated_ldflags =
+
+bin_ampl_o2schedule_src = ampl_o2schedule.cpp
+bin_ampl_o2schedule_export =  $(bin_taskgraphfml2evaluated_src) 
+bin_ampl_o2schedule_deps = libcppelib.a
+bin_ampl_o2schedule_libs = -lboost_regex -lboost_graph -lexpat
+bin_ampl_o2schedule_ldflags =
 
 bin_demo_xmlformats_src = demo_xmlformats.cpp
 bin_demo_xmlformats_export = $(bin_demo_xmlformats_src) 

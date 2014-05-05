@@ -25,7 +25,7 @@ int main(int argc, char **argv)
     }
   else
     {
-      cerr << "Waring: No architecture information supplied. Using default values\n";
+      cerr << "Warning: No architecture information supplied. Using default values\n";
     }
   
 
