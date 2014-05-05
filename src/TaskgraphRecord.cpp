@@ -18,7 +18,7 @@ extern "C"{
 #include <igraph.h>
 }
 using namespace std;
-
+#define VERY_SMALL 1e-6
 namespace pelib
 {	
 
@@ -29,6 +29,7 @@ namespace pelib
     double workload;
     int max_width; 
     std::string efficiency_line;
+    double target_makespan;
     bool operator <(const Vertex_info &other) const
     {
       return taskid < other.taskid;
@@ -44,8 +45,12 @@ namespace pelib
 
   TaskgraphRecord::~TaskgraphRecord()
   {
+    igraph_destroy(graph);
     delete graph;
-    delete architecture;
+    if(architecture != nullptr)
+      {
+	delete architecture;
+      }
   }
 
   TaskgraphRecord::TaskgraphRecord(const TaskgraphRecord &rhs)
@@ -60,28 +65,68 @@ namespace pelib
     graph = new igraph_t(*rhs.graph);
     return *this;
   }
-
-  Record  TaskgraphRecord::toRecord() const
+  
+  TaskgraphRecord::TaskgraphRecord(const Record& record)
   {
+// TODO, call TaskgraphRecord(const TaskgraphRecord& tgr, const Record& record);
+//  with emty graph
+     throw runtime_error("Not implemented");
+  }
+  TaskgraphRecord::TaskgraphRecord(const TaskgraphRecord& tgr, const Record& record)
+  {
+    architecture = new Record(*tgr.architecture);
+    graph = new igraph_t();
+    igraph_copy(graph,tgr.graph);
+    vector<Vertex_info> tasks = buildVertexVector();
 
-    size_t processors = 1; // Default
-    if(architecture != nullptr)
+    
+    auto e = record.find<Matrix<int, int, float> >("e");
+    if(e == nullptr)
       {
-	auto p = architecture->find<Scalar<int> >("p");
-	if(p == nullptr)
-	  {
-	    cerr << "Waring: architecture exists but is missing information\n";
-	  }
-	else
-	  {
-	    processors = p->getValue();
-	  }
+	throw runtime_error("Record does not have neccesary data!\n");
+      }
+    auto e_matrix = e->getValues();
+    if(e_matrix.size() != tasks.size())
+      {
+	throw runtime_error("Tasks size of record and taskgraph differ!\n");
       }
 
-  // extract all task information to be able to sort it together
+   
+
+    for(size_t i = 1; i <= e_matrix.size(); i++)
+      {
+    stringstream ss;
+    ss << std::setprecision(6)
+       << std::setiosflags(std::ios::fixed)
+       << std::setiosflags(std::ios::showpoint);
+ 
+	auto row = (*e_matrix.find(i)).second;
+	for(size_t j = 1; j <= row.size(); j++)
+	  {
+	    ss << (*row.find(j)).second << " ";
+	  }
+	tasks[i-1].efficiency_line = ss.str();
+	tasks[i-1].target_makespan = VERY_SMALL; // STUB
+      }
+
+    //TODO: set proper value for target makespan here;
+
+    string s1 = "efficiency";
+    string s2 = "target_makespan";
+    for(int i = 0; i < igraph_vcount(graph); i++)
+      {
+	SETVAS(graph,s1.c_str(),i,tasks[i].efficiency_line.c_str());
+	SETVAN(graph,s2.c_str(),i,tasks[i].target_makespan);
+      }
+  }
+
+
+
+  vector<Vertex_info> TaskgraphRecord::buildVertexVector() const
+  {
     vector<Vertex_info> tasks;
-
-
+    
+    
     for(int id=0; id < igraph_vcount(graph);id++)
       {
 	Vertex_info task;
@@ -99,7 +144,30 @@ namespace pelib
     //Sort on taskid
     sort(tasks.begin(),tasks.end());
     
-    
+
+
+    return tasks;
+  }
+  Record  TaskgraphRecord::toRecord() const
+  {
+
+    size_t processors = 1; // Default
+    if(architecture != nullptr)
+      {
+	auto p = architecture->find<Scalar<int> >("p");
+	if(p == nullptr)
+	  {
+	    cerr << "Warning: Architecture exists but is missing information\n";
+	  }
+	else
+	  {
+	    processors = p->getValue();
+	  }
+      }
+
+  // extract all task information to be able to sort it together
+
+    vector<Vertex_info> tasks = buildVertexVector();
     //vector<int> ids;
     
     map<int, map<int, float> > efficiency_matrix;
@@ -117,7 +185,6 @@ namespace pelib
 	// Calculate the efficiency table from formula if such exists
 	// The formula is kept in the graph
 	map<int,float> row;
-	
 	if((*i).efficiency_line.substr(0,4) == "fml:")
 	  {
 	    using namespace mu;
@@ -144,14 +211,12 @@ namespace pelib
 	  float num;
 	  size_t count = 0;
 	  size_t x = 1;
-	  while(stream >>num)
+	  while(stream >>num && count++ <= processors)
 	    {
 	      row.insert(pair<int,float>(x,num));
-	      //arr.push_back(num);
-	      ++count;
 	      ++x;
 	    }
-#define VERY_SMALL 1e-6
+
 	  for(;count < processors; ++count, ++x)
 	    {
 	      row.insert(pair<int,float>(x,VERY_SMALL));

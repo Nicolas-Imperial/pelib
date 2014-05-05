@@ -8,8 +8,8 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <boost/graph/graphml.hpp>
-#include <boost/graph/adjacency_list.hpp>
+//#include <boost/graph/graphml.hpp>
+//#include <boost/graph/adjacency_list.hpp>
 #include <muParser.h>
 #include <vector>
 #include <sstream>
@@ -58,15 +58,15 @@ TaskgraphRecord Taskgraph::parse(istream& data)
 }
 
 void Taskgraph::dump(ostream& o, const TaskgraphRecord& record) const {
-
   int p[2];
   pipe(p);
-  
+
   FILE *fake_fileptr = fdopen(p[1], "w"); 
   
   auto graph = record.graph; 
-
+  cout << 3 << endl; ;
   igraph_write_graph_graphml(graph,fake_fileptr,true); 
+  fclose(fake_fileptr);
 
   FILE *instream = fdopen (p[0], "r");
   char c;
@@ -74,10 +74,12 @@ void Taskgraph::dump(ostream& o, const TaskgraphRecord& record) const {
     {
       cout << c;
     }
+
   fclose (instream);
   close(p[0]);
-
+  close(p[1]);
 }; 
+
 
 void Taskgraph::duplicate_tasks(TaskgraphRecord& record, const vector<int>& to_duplicate)
 {
