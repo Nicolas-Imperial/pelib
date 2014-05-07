@@ -14,6 +14,8 @@
 #include "Matrix.hpp"
 #include "Scalar.hpp"
 #include "Set.hpp"
+#include "MakespanSelector.hpp"
+#include "MakespanCalculator.hpp"
 #include <muParser.h>
 extern "C"{
 #include <igraph.h>
@@ -30,7 +32,6 @@ namespace pelib
     double workload;
     int max_width; 
     std::string efficiency_line;
-    double target_makespan;
     bool operator <(const Vertex_info &other) const
     {
       return taskid < other.taskid;
@@ -107,18 +108,22 @@ namespace pelib
 	    ss << (*row.find(j)).second << " ";
 	  }
 	tasks[i-1].efficiency_line = ss.str();
-	tasks[i-1].target_makespan = VERY_SMALL; // STUB
       }
 
-    //TODO: set proper value for target makespan here;
-
+    float target_makespan = record.find<Scalar<float> >("M")->getValue();
     string s1 = "efficiency";
     string s2 = "target_makespan";
     for(int i = 0; i < igraph_vcount(graph); i++)
       {
 	SETVAS(graph,s1.c_str(),i,tasks[i].efficiency_line.c_str());
-	SETVAN(graph,s2.c_str(),i,tasks[i].target_makespan);
       }
+
+    char mstring[32];
+    sprintf(mstring,"%f",target_makespan);
+    SETGAS(graph,s2.c_str(),mstring);
+    cout << "MAKESPAN from the record: " << target_makespan << endl;
+    cout << " as cstring : " << mstring  << endl;
+
   }
 
 
@@ -172,7 +177,7 @@ namespace pelib
     //vector<int> ids;
     
     map<int, map<int, float> > efficiency_matrix;
-    map<int, float> workloads;
+    map<int, int> workloads;
     map<int, int> max_width;
     
     int id = 1;
@@ -180,7 +185,7 @@ namespace pelib
     for(auto i = tasks.begin(); i != tasks.end(); ++i, ++id)
       {
 	//ids.push_back(id);
-	workloads.insert(pair<int,float>(id,(*i).workload));
+	workloads.insert(pair<int,int>(id,(*i).workload));
 	max_width.insert(pair<int,int>(id,(*i).max_width));
 	
 	// Calculate the efficiency table from formula if such exists
@@ -228,7 +233,7 @@ namespace pelib
     
 
     pelib::Vector<int,int> Wi("Wi",max_width);
-    pelib::Vector<int,float> Tau("Tau",workloads);
+    pelib::Vector<int,int> Tau("Tau",workloads);
     pelib::Matrix<int, int, float> e("e",efficiency_matrix);
     pelib::Scalar<int> n("n",tasks.size());
     //pelib::Scalar<vector<Vertex_info> > r_tasks("tasks",tasks);
@@ -240,6 +245,13 @@ namespace pelib
     record.insert(&n);
     //record.insert(&r_tasks);
 
+    const MakespanCalculator*  msc = MakespanSelector::getMakespanCalculator("fml:random");
+    double target_makespan = msc->calculate(record,*architecture);
+
+    delete msc;
+
+    pelib::Scalar<float> M("M",(float)target_makespan);
+    record.insert(&M);
     return record;
   }
 
@@ -264,11 +276,12 @@ namespace pelib
     sort(taskids.begin(),taskids.end());
     return taskids;
   }
+  /*
   float TaskgraphRecord::get_target_makespan() const
   {
-    float target_makespan = GAN(graph,"target_makespan");
+    float target_makespan = GAS(graph,"target_makespan");
     return isnan(target_makespan) ? VERY_SMALL : target_makespan;
-  }
+    }*/
   const char* TaskgraphRecord::get_autname() const
   {
     return GAS(graph,"autname");
@@ -302,7 +315,7 @@ namespace pelib
     double max_freq = *architecture->find<Set<int> >("F")->getValues().end();
     
     double sum_pTw = 0;
-    for(Vertex_info& task : tasks)
+    for(const Vertex_info& task : tasks)
       {
 	int max_width = min(task.max_width,p);
 	double efficiency = get_efficiency(task.efficiency_line,max_width);

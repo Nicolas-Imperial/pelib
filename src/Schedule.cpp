@@ -5,7 +5,6 @@
 
 #include <exception>
 #include <vector>
-#include <libxml++/libxml++.h>
 #include <sstream>
 using namespace pelib;
 using namespace std;
