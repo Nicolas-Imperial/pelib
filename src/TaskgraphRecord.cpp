@@ -13,6 +13,7 @@
 #include "Vector.hpp"
 #include "Matrix.hpp"
 #include "Scalar.hpp"
+#include "Set.hpp"
 #include <muParser.h>
 extern "C"{
 #include <igraph.h>
@@ -273,5 +274,43 @@ namespace pelib
     return GAS(graph,"autname");
   }
 
+
+  double get_efficiency(const string& efficiency_line, int width)
+  {
+    using namespace mu;
+    if (efficiency_line.substr(0,4).compare("fml:") == 0)
+      {
+	Parser mathparser;
+	double p = width;
+	mathparser.SetExpr(efficiency_line.substr(4));
+	mathparser.DefineVar("p",&p);
+	return mathparser.Eval();
+      }
+    else
+      {
+	//todo, turn into an array, return width'th value
+	throw runtime_error("This should not happen. (Not an error, just not implemented yet");
+      }
+    return -1;
+  }
+
+  float TaskgraphRecord::makespan_random(const vector<Vertex_info>& tasks )
+  {
+    //int n = architecture->find<Scalar<int> >("n")->getValue();
+    int p = architecture->find<Scalar<int> >("p")->getValue();
+    double min_freq = *architecture->find<Set<int> >("F")->getValues().begin();
+    double max_freq = *architecture->find<Set<int> >("F")->getValues().end();
+    
+    double sum_pTw = 0;
+    for(Vertex_info task : tasks)
+      {
+	int max_width = min(task.max_width,p);
+	double efficiency = get_efficiency(task.efficiency_line,max_width);
+	
+	sum_pTw += task.workload / efficiency;
+      }
+    
+    return (sum_pTw/max_freq + sum_pTw/min_freq) / 2;
+  }
 }
 

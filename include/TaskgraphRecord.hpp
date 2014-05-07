@@ -41,6 +41,7 @@ namespace pelib
     const char* get_autname() const;
   private:
     std::vector<Vertex_info> buildVertexVector(void) const;
+    float makespan_random(const std::vector<Vertex_info>& tasks );
     igraph_t *graph;
     Record* architecture = nullptr;
   };

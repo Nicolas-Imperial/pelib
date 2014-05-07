@@ -57,7 +57,7 @@ void Schedule::dump(std::ostream& os,const TaskgraphRecord& tgr,const Record& am
       //cout << endl;
     }
   ss << "</schedule>\n";
-  cout << endl << ss.str() << endl;
+  os << endl << ss.str() << endl;
 
 
 }
