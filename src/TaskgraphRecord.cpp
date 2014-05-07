@@ -302,7 +302,7 @@ namespace pelib
     double max_freq = *architecture->find<Set<int> >("F")->getValues().end();
     
     double sum_pTw = 0;
-    for(Vertex_info task : tasks)
+    for(Vertex_info& task : tasks)
       {
 	int max_width = min(task.max_width,p);
 	double efficiency = get_efficiency(task.efficiency_line,max_width);
