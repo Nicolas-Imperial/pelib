@@ -1,5 +1,5 @@
-CFLAGS=-isystem ../include $(CROWN_UTIL_SRC)/include
-CXXFLAGS=-isystem ../include -isystem $(CROWN_UTIL_SRC)/include
+CFLAGS=-isystem ../include $(CROWN_UTIL_SRC)/include -Wall
+CXXFLAGS=-isystem ../include -isystem $(CROWN_UTIL_SRC)/include -Wall
 
 RELEASE_CFLAGS = -O3 -DNDEBUG
 DEBUG_CFLAGS = -g -O0 -DDEBUG=1
@@ -14,7 +14,7 @@ LIBS =
 LIBS_TEST = 
 
 ## static library packages and their sources
-bin_package = demo ampl_i2i ampl_i2o ampl_o2i ampl_o2o
+bin_package = demo ampl_i2i ampl_i2o ampl_o2i ampl_o2o ampl_i2cpp ampl_o2cpp run_record
 
 bin_demo_src = demo.cpp
 bin_demo_export = $(bin_demo_src) 
@@ -46,15 +46,48 @@ bin_ampl_o2o_deps = libcppelib.a
 bin_ampl_o2o_libs = -lboost_regex
 bin_ampl_o2o_ldflags = 
 
+bin_ampl_i2cpp_src = ampl_i2cpp.cpp
+bin_ampl_i2cpp_export = $(bin_ampl_i2cpp_src) 
+bin_ampl_i2cpp_deps = libcppelib.a
+bin_ampl_i2cpp_libs = -lboost_regex
+bin_ampl_i2cpp_ldflags = 
+
+bin_ampl_o2cpp_src = ampl_o2cpp.cpp
+bin_ampl_o2cpp_export = $(bin_ampl_o2cpp_src) 
+bin_ampl_o2cpp_deps = libcppelib.a
+bin_ampl_o2cpp_libs = -lboost_regex
+bin_ampl_o2cpp_ldflags = 
+
+bin_run_record_src = run_record.cpp
+bin_run_record_export = $(bin_run_record_src) make_record.cpp
+bin_run_record_deps = libcppelib.a
+bin_run_record_libs = -lboost_regex
+bin_run_record_ldflags = 
+
 ## static library packages and their sources
 lib_package = cppelib unit
 
-lib_cppelib_src = ParseException.cpp \
-CastException.cpp NoDecimalFloatException.cpp RecordParser.cpp RecordOutput.cpp AmplInput.cpp AmplOutput.cpp \
-Data.cpp Record.cpp Scalar.cpp Vector.cpp Matrix.cpp DataParser.cpp DataOutput.cpp \
-AmplInputData.cpp AmplOutputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp \
-AmplInputMatrix.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
-AmplDataOutput.cpp AmplDataParser.cpp
+## In order:
+## Internal classes: exception, data structures, structures and collection parsers and output base classes, container
+## Parser base classes: containers and data structures
+## Output base classes: containers and data structures
+## Data structure classes: Scalar, Vector, Matrix and Set
+## Ampl hierarchy base: data parsers and output
+## Ampl input format classes: base class, data structure base class, parser and output data structure classes
+## Ampl output format classes: base class, data structure base class, parser and output data structure classes
+## Cpp hierarchy base: data output only
+## Cpp format classes: base class, data structure base class, output data structure classes; no parser because of lack of cpp parser base class
+lib_cppelib_src = \
+ParseException.cpp CastException.cpp NoDecimalFloatException.cpp Data.cpp Record.cpp \
+RecordParser.cpp DataParser.cpp \
+RecordOutput.cpp DataOutput.cpp \
+Scalar.cpp Vector.cpp Matrix.cpp Set.cpp \
+AmplDataParser.cpp AmplDataOutput.cpp \
+AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp \
+AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
+CppDataOutput.cpp \
+Cpp.cpp CppData.cpp CppScalar.cpp CppVector.cpp CppSet.cpp CppMatrix.cpp \
+
 lib_cppelib_export = $(lib_cppelib_src)
 lib_cppelib_deps =
 
@@ -67,6 +100,6 @@ test_package = parser
 
 test_parser_src = test_parser.cpp 
 test_parser_export = $(test_parser_src) uni_test.dat 
-test_parser_deps = libcppelib.a libunit.a $(CROWN_UTIL_SRC)/src/libcrown.a
+test_parser_deps = libcppelib.a libunit.a
 test_parser_libs = -lboost_regex -lrt
 test_parser_ldflags = 

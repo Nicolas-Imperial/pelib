@@ -8,20 +8,20 @@ distdir = $(tarname)-$(version)
 VERSION = $(shell make --version|head -1|cut -f 1-2 -d ' ')
 
 all check install uninstall: version
-	$(shell echo for i in "$(foreach var,$(subdirs),$(var))"\; do $(MAKE) -C \$$i $@ \; done)
+	@$(shell echo for i in "$(foreach var,$(subdirs),$(var))"\; do $(MAKE) -C \$$i $@ \; done)
 	
 $(abspath $(distdir)).tar.gz: FORCE $(abspath $(distdir))
 	tar -ch -C $(abspath $(distdir)) -O .| gzip -9 -c > $(abspath $(distdir)).tar.gz
 	
 $(abspath $(distdir)): FORCE clean-dist
-	$(shell echo for i in "$(foreach var,$(subdirs),$(var))"\; do $(MAKE) -C \$$i dist distdir=$(abspath $(distdir))/\$$i\; done)
+	@$(shell echo for i in "$(foreach var,$(subdirs),$(var))"\; do $(MAKE) -C \$$i dist distdir=$(abspath $(distdir))/\$$i\; done)
 	cp Makefile $(abspath $(distdir))
 	cp Makefile.in $(abspath $(distdir))
 	
 clean: clean-tree clean-dist
 
 clean-tree:
-	$(shell echo for i in "$(foreach var,$(subdirs),$(var))"\; do $(MAKE) -C \$$i clean\; done)
+	@$(shell echo for i in "$(foreach var,$(subdirs),$(var))"\; do $(MAKE) -C \$$i clean\; done)
 	
 clean-dist:
 	$(RM) -r $(abspath $(distdir))

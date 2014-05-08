@@ -17,7 +17,8 @@ namespace pelib
 	template <class Value> 
 	class Set: public Data
 	{
-		typedef std::set<Value, std::less<Value>, std::allocator<Value> > SetType;
+		//typedef std::set<Value, std::less<Value>, std::allocator<Value> > SetType;
+		typedef std::set<Value> SetType;
 		
 		public:
 			Set(const std::string name, const SetType values) : Data(name), values(values)

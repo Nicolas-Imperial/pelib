@@ -72,6 +72,8 @@ namespace pelib
 		{
 			outputs.push_back((*i)->clone());
 		}
+
+		return *this;
 	}
 
 	Record
@@ -93,7 +95,8 @@ namespace pelib
 				{
 					AmplOutputData *parser = *iter;
 					try {
-						std::string regex = std::string("(.*?)(")
+						// If any non-blank prefix to be discarded, it must be separated by a new line
+						std::string regex = std::string("(.*?\\n|)\\s*(")
 							.append(parser->getGlobalPattern())
 							.append(")(?:\\s*)");
 						
@@ -102,6 +105,8 @@ namespace pelib
 						std::stringstream token;
 						token.str(match[2]);
 
+						//std::cerr << "Discarded =\"" << match[1] << "\"." << std::endl;
+						//std::cerr << "Token =\"" << match[2] << "\"." << std::endl;
 						Data *data = parser->parse(token);
 						record.insert(data);
 
@@ -109,7 +114,6 @@ namespace pelib
 						line = match[1];
 						
 						// Feed the remaining input line to parsers input is more useful information are available
-						std::streamsize pos = section.tellp();
 	  					section.str(line);
 						section.seekp(std::ios_base::beg);
 						section.clear();

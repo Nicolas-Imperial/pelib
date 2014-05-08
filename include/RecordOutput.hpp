@@ -3,6 +3,8 @@
 #include <Scalar.hpp>
 #include <Data.hpp>
 
+#include <Record.hpp>
+
 #ifndef PELIB_RECORDOUTPUT
 #define PELIB_RECORDOUTPUT
 

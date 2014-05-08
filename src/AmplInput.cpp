@@ -73,6 +73,8 @@ namespace pelib
 		{
 			outputs.push_back((*i)->clone());
 		}
+
+		return *this;
 	}
 
 	Record
