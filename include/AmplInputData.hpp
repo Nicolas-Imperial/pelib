@@ -10,7 +10,7 @@ namespace pelib
 	{
 		public:
 			AmplInputData(bool strict) : AmplDataParser(strict)	{}
-			
+	  virtual ~AmplInputData(){}
 			virtual
 			AmplInputData*
 			clone() const = 0;
