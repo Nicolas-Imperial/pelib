@@ -15,7 +15,8 @@ namespace pelib
   class Record;
 }
 #include "TaskgraphRecord.hpp"
-
+namespace pelib
+{
 	class Record
 	{
 		public:				
@@ -45,7 +46,7 @@ namespace pelib
 					// Try to cast this type
 
 
-					Data *ptr = i->second;
+					const Data *ptr = i->second;
 
 					T* elem = dynamic_cast<T*>(ptr);
 					
