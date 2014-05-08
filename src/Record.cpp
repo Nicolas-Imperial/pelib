@@ -26,10 +26,12 @@ namespace pelib
 	{
 		*this = rhs;
 	}
+
         Record::Record(const TaskgraphRecord& tgr)
         {
          *this = tgr.toRecord();
 	}
+
 	const std::map<std::string, const Data * const>&
 	Record::getAllRecords() const
 	{

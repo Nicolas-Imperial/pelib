@@ -15,6 +15,10 @@ namespace pelib
 			AmplOutputData*
 			clone() const = 0;
 	  
+			
+			virtual
+			AmplOutputData*
+			clone() const = 0;
 		protected:
 		private:		
 	};

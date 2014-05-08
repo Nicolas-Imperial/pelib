@@ -16,8 +16,6 @@ namespace pelib
 }
 #include "TaskgraphRecord.hpp"
 
-namespace pelib
-{
 	class Record
 	{
 		public:				
@@ -25,7 +23,10 @@ namespace pelib
 			~Record();
 			Record();
 			Record(const Record &rhs);
-Record(const TaskgraphRecord& tgr);
+
+	  Record(const TaskgraphRecord& tgr);
+
+
 			const std::map<std::string, const Data * const>&
 			getAllRecords() const;
 
@@ -42,7 +43,10 @@ Record(const TaskgraphRecord& tgr);
 				for (std::map<std::string, const Data * const>::const_iterator i = records.begin(); i != records.end(); i++)
 				{
 					// Try to cast this type
-					const Data *ptr = i->second;
+
+
+					Data *ptr = i->second;
+
 					T* elem = dynamic_cast<T*>(ptr);
 					
 					if(elem != NULL)

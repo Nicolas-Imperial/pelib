@@ -14,6 +14,7 @@ namespace pelib
 			CppData*
 			clone() const = 0;
 	  virtual ~CppData(){}
+
 		protected:
 			const std::string
 			type_name(const std::type_info &type) const;
