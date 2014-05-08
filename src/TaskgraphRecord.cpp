@@ -236,16 +236,15 @@ namespace pelib
     pelib::Vector<int,int> Tau("Tau",workloads);
     pelib::Matrix<int, int, float> e("e",efficiency_matrix);
     pelib::Scalar<int> n("n",tasks.size());
-    //pelib::Scalar<vector<Vertex_info> > r_tasks("tasks",tasks);
+
     
     Record record;
     record.insert(&Wi);
     record.insert(&Tau);
     record.insert(&e);
     record.insert(&n);
-    //record.insert(&r_tasks);
 
-    const MakespanCalculator*  msc = MakespanSelector::getMakespanCalculator("fml:random");
+    const MakespanCalculator*  msc = MakespanSelector::getMakespanCalculator(GAS(graph,"target_makespan"));
     double target_makespan = msc->calculate(record,*architecture);
 
     delete msc;
