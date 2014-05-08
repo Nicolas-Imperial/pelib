@@ -64,8 +64,5 @@ namespace pelib
 	};
 }
 
-<<<<<<< HEAD
 #endif
-=======
-#endif
->>>>>>> nicmebr
+
