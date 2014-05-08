@@ -8,7 +8,7 @@ CXXFLAGS=-isystem ../include -isystem $(CROWN_UTIL_SRC)/include -I $(muparser_di
 RELEASE_CFLAGS = -O3 -DNDEBUG
 DEBUG_CFLAGS = -g -O0 -DDEBUG=1
 #  `pkg-config --cflags libxml++-2.6` # not needed right now
-RELEASE_CXXFLAGS = -g -O3 -DNDEBUG `pkg-config igraph --cflags` 
+RELEASE_CXXFLAGS = -g -O3 -DNDEBUG `pkg-config igraph --cflags` `pkg-config --cflags muparser`
 DEBUG_CXXFLAGS = -g -O0 -DDEBUG=1   `pkg-config igraph --cflags` 
 
 LDFLAGS_TEST =
