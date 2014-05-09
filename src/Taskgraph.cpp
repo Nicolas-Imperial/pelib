@@ -63,7 +63,6 @@ void Taskgraph::dump(ostream& o, const TaskgraphRecord& record) const {
   FILE *fake_fileptr = fdopen(p[1], "w"); 
   
   auto graph = record.graph; 
-  cout << 3 << endl; ;
   igraph_write_graph_graphml(graph,fake_fileptr,true); 
   fclose(fake_fileptr);
 
