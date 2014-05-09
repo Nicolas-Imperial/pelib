@@ -7,23 +7,8 @@
 using namespace pelib;
 using namespace std;
 
-static
-int
-number_tasks_in_level(int task)
-{
-	/*
-	1 -> 1
-	2 -> 2
-	3 -> 2
-	4 -> 4
-	5 -> 4
-	6 -> 4
-	7 -> 4
-	8 -> 8
-	*/
-	return pow(2, floor(log(task) / log(2)));
-}
-double MakespanRandom::calculate(const Record& tasks,const Record& architecture) const
+double
+MakespanRandom::calculate(const Record& tasks,const Record& architecture) const
 {
 
   //int n = tasks.find<Scalar<int> >("n")->getValue();

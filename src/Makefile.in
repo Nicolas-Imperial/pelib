@@ -1,21 +1,16 @@
-#muparser_dir=../../muparser_v2_2_3
-
 CFLAGS=-isystem ../include $(CROWN_UTIL_SRC)/include -Wall
-CXXFLAGS=-isystem ../include -isystem $(CROWN_UTIL_SRC)/include -I $(muparser_dir)/include  -Wall -std=c++0x
-
-
+CXXFLAGS=-isystem ../include -isystem $(CROWN_UTIL_SRC)/include -Wall -std=c++0x
 
 RELEASE_CFLAGS = -O3 -DNDEBUG
 DEBUG_CFLAGS = -g -O0 -DDEBUG=1
-#  `pkg-config --cflags libxml++-2.6` # not needed right now
-RELEASE_CXXFLAGS = -g -O3 -DNDEBUG `pkg-config igraph --cflags` `pkg-config --cflags muparser`
-DEBUG_CXXFLAGS = -g -O0 -DDEBUG=1   `pkg-config igraph --cflags` 
+RELEASE_CXXFLAGS = -g -O3 -DNDEBUG
+DEBUG_CXXFLAGS = -g -O0 -DDEBUG=1
 
 LDFLAGS_TEST =
 LDFLAGS =
 #$(muparser_dir)/lib 
 
-LIBS = -lmuparser  `pkg-config igraph --libs` -lm 
+LIBS = -lmuparser -ligraph -lm 
 LIBS_TEST = 
 
 #ampl_o2achedule

@@ -6,9 +6,10 @@
 
 using namespace pelib;
 using namespace std;
-double MakespanFft::calculate(const Record& tasks,const Record& architecture) const
+
+double
+MakespanFft::calculate(const Record& tasks,const Record& architecture) const
 {
-  	int n = tasks.find<Scalar<int> >("n")->getValue();
 	int p = architecture.find<Scalar<int> >("p")->getValue();
 	int min_freq = *architecture.find<Set<int> >("F")->getValues().begin();
 	int max_freq = *architecture.find<Set<int> >("F")->getValues().end();
