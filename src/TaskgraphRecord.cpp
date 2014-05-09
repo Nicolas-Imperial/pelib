@@ -181,14 +181,6 @@ namespace pelib
 	SETVAN(graph,"max_width",i,tasks[i].max_width);
       }
 	
-
-
-    /*
-	pelib::Vector<int,int> Wi("Wi",max_width);
-	pelib::Vector<int,int> Tau("Tau",workloads);
-	pelib::Matrix<int, int, float> e("e",efficiency_matrix);
-	pelib::Scalar<int> n("n",tasks.size());
-    */
   }
   
 
