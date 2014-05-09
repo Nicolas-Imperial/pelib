@@ -70,7 +70,7 @@ void Taskgraph::dump(ostream& o, const TaskgraphRecord& record) const {
   char c;
   while ((c = fgetc (instream)) != EOF)
     {
-      cout << c;
+      o << c;
     }
 
   fclose (instream);
