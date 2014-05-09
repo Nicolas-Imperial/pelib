@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+         http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+
+  <key id="g_autname" for="graph" attr.name="autname" attr.type="string">
+    <default>UNNAMED_AUT</default></key>
+  <key id="g_target_makespan" for="graph" attr.name="target_makespan" attr.type="string">
+    <default>0</default></key>
+  <key id="v_taskname" for="node" attr.name="taskname" attr.type="string">
+  <default>UNNAMED_TASKNAME</default></key>
+  <key id="v_workload" for="node" attr.name="workload" attr.type="double">
+  <default>1</default></key>
+  <key id="v_max_width" for="node" attr.name="max_width" attr.type="int">
+  <default>1</default></key>
+  <key id="v_efficiency" for="node" attr.name="efficiency" attr.type="string">
+  <default>fml:1</default></key>
+  <key id="v_taskid" for="node" attr.name="taskid" attr.type="string">
+  <default>UNNAMED_TASKID</default></key>
+
+
+  <graph id="G" edgedefault="directed">
+  </graph>
+</graphml>
