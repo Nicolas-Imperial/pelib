@@ -40,6 +40,7 @@ namespace pelib
     float get_target_makespan() const;
     const char* get_autname() const;
   private:
+    void merge_taskgraph_record(const Record& record);
     std::vector<Vertex_info> buildVertexVector(void) const;
     float makespan_random(const std::vector<Vertex_info>& tasks );
     igraph_t *graph;

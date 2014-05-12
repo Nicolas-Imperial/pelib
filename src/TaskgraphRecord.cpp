@@ -27,6 +27,7 @@ namespace pelib
 
   //used only as a temporary storage locally
   struct Vertex_info {
+    int id;
     std::string taskname;
     std::string taskid;
     double workload;
@@ -64,24 +65,64 @@ namespace pelib
   TaskgraphRecord&
   TaskgraphRecord::operator=(const TaskgraphRecord &rhs)
   {
-    graph = new igraph_t(*rhs.graph);
+    graph = new igraph_t();
+    igraph_copy(graph, rhs.graph);
     return *this;
   }
   
   TaskgraphRecord::TaskgraphRecord(const Record& record)
   {
-// TODO, call TaskgraphRecord(const TaskgraphRecord& tgr, const Record& record);
-//  with emty graph
-     throw runtime_error("Not implemented");
+    igraph_i_set_attribute_table(&igraph_cattribute_table); //do this to enable attribute fetching
+    graph = new igraph_t();
+    architecture = 0;
+    FILE* f = fopen("src/empty_taskgraph.graphml","r"); //TODO: include in ar? 
+    if(!f)
+      {
+	throw runtime_error("Error: can not find anempty taskgraph file to work from.");
+      }
+
+    if(igraph_read_graph_graphml(graph,f,0))
+      {
+	throw runtime_error("Error: Failed loading empty taskgraph\n");
+      }
+    fclose(f);
+    
+    
+    int n = record.find<Scalar<int> >("n")->getValue();
+    igraph_add_vertices(graph,n,0);
+    SETGAS(graph,"autname","GENERATED_FROM_RECORD");
+
+
+    int i;
+    for(i = 0; i < n; i++)
+      {
+	stringstream taskname;
+	stringstream taskid;
+	taskname << "task_" << (i+1) << "_name";
+	taskid << "task_" << (i+1) << "_id";
+	SETVAS(graph,"taskname",i,taskname.str().c_str());
+	SETVAS(graph,"taskid",i,taskid.str().c_str());
+      }
+    merge_taskgraph_record(record);
   }
+	
+    
+  
   TaskgraphRecord::TaskgraphRecord(const TaskgraphRecord& tgr, const Record& record)
   {
-    architecture = new Record(*tgr.architecture);
+    igraph_i_set_attribute_table(&igraph_cattribute_table); //do this to enable attribute fetching
+    architecture = new Record(*tgr.architecture); //TODO: call clone() ?
     graph = new igraph_t();
-    igraph_copy(graph,tgr.graph);
-    vector<Vertex_info> tasks = buildVertexVector();
+    igraph_copy(graph,tgr.graph);    
+    merge_taskgraph_record(record);
+  }
 
+  void TaskgraphRecord::merge_taskgraph_record(const Record& record)
+  {
+
+    vector<Vertex_info> tasks = buildVertexVector();
     
+
     auto e = record.find<Matrix<int, int, float> >("e");
     if(e == nullptr)
       {
@@ -92,16 +133,16 @@ namespace pelib
       {
 	throw runtime_error("Tasks size of record and taskgraph differ!\n");
       }
-
-   
-
+    
+    
+    //build efficiency lines
     for(size_t i = 1; i <= e_matrix.size(); i++)
       {
-    stringstream ss;
-    ss << std::setprecision(6)
-       << std::setiosflags(std::ios::fixed)
-       << std::setiosflags(std::ios::showpoint);
- 
+	stringstream ss;
+	ss << std::setprecision(6)
+	   << std::setiosflags(std::ios::fixed)
+	   << std::setiosflags(std::ios::showpoint);
+	
 	auto row = (*e_matrix.find(i)).second;
 	for(size_t j = 1; j <= row.size(); j++)
 	  {
@@ -110,22 +151,38 @@ namespace pelib
 	tasks[i-1].efficiency_line = ss.str();
       }
 
-    float target_makespan = record.find<Scalar<float> >("M")->getValue();
-    string s1 = "efficiency";
-    string s2 = "target_makespan";
-    for(int i = 0; i < igraph_vcount(graph); i++)
+    //get max width
+    auto wi = record.find<Vector<int,int> > ("Wi");
+    if(wi)
       {
-	SETVAS(graph,s1.c_str(),i,tasks[i].efficiency_line.c_str());
+	for(int i = 0; i < igraph_vcount(graph); i++)
+	  {
+	    tasks[i].max_width = wi->find(i+1);
+	  }
       }
 
-    char mstring[32];
-    sprintf(mstring,"%f",target_makespan);
-    SETGAS(graph,s2.c_str(),mstring);
-    cout << "MAKESPAN from the record: " << target_makespan << endl;
-    cout << " as cstring : " << mstring  << endl;
 
+    auto tm = record.find<Scalar<float> >("M");
+    if(tm)
+      {
+	float target_makespan = tm->getValue();
+	string s2 = "target_makespan";
+	char mstring[32];
+	sprintf(mstring,"%f",target_makespan);
+	SETGAS(graph,s2.c_str(),mstring);
+      }
+
+
+
+    for(int i = 0; i < igraph_vcount(graph); i++)
+      {
+	string s1 = "efficiency";
+	SETVAS(graph,s1.c_str(),i,tasks[i].efficiency_line.c_str());
+	SETVAN(graph,"max_width",i,tasks[i].max_width);
+      }
+	
   }
-
+  
 
 
   vector<Vertex_info> TaskgraphRecord::buildVertexVector() const
@@ -136,6 +193,7 @@ namespace pelib
     for(int id=0; id < igraph_vcount(graph);id++)
       {
 	Vertex_info task;
+	task.id = id;
 	//workaround, igraph does not read default values.
 	task.taskid = strcmp(VAS(graph,"taskid",id),"") != 0 ? VAS(graph,"taskid",id) : "UNNAMED_TASKID" ;
 	task.taskname = strcmp(VAS(graph,"taskname",id),"") != 0 ? VAS(graph,"taskname",id) : "UNNAMED_TASKNAME" ;
@@ -275,12 +333,8 @@ namespace pelib
     sort(taskids.begin(),taskids.end());
     return taskids;
   }
-  /*
-  float TaskgraphRecord::get_target_makespan() const
-  {
-    float target_makespan = GAS(graph,"target_makespan");
-    return isnan(target_makespan) ? VERY_SMALL : target_makespan;
-    }*/
+
+
   const char* TaskgraphRecord::get_autname() const
   {
     return GAS(graph,"autname");
