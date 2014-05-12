@@ -29,7 +29,7 @@ namespace pelib
 
         Record::Record(const TaskgraphRecord& tgr)
         {
-         *this = tgr.toRecord();
+		*this = tgr.toRecord();
 	}
 
 	const std::map<std::string, const Data * const>&

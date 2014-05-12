@@ -23,7 +23,6 @@ MakespanSynthetic::calculate(const Record& tasks,const Record& architecture) con
 	const Vector<int, int> *Wi = tasks.find<Vector<int, int> >("Wi");
 	map<int, int> width = Wi->getValues();
 
-
 	for(std::map<int, int>::const_iterator i = width.begin(); i != width.end(); i++)
 	{
 		task = i->first;
