@@ -1,12 +1,12 @@
-#ifndef MAKESPAN_RANDOM
-#define MAKESPAN_RANDOM
+#ifndef MAKESPAN_SYNTHETIC
+#define MAKESPAN_SYNTHETIC
 
 #include "MakespanCalculator.hpp"
 #include "Record.hpp"
 
 namespace pelib
 {
-  class MakespanRandom : public MakespanCalculator
+  class MakespanSynthetic : public MakespanCalculator
   {
   public:
 

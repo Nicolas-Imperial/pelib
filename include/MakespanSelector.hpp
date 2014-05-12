@@ -2,7 +2,7 @@
 #define MAKESPANSELECTOR
 
 #include "MakespanCalculator.hpp"
-#include "MakespanRandom.hpp"
+#include "MakespanSynthetic.hpp"
 #include "MakespanNumeric.hpp"
 #include "MakespanFft.hpp"
 #include "MakespanPreduce.hpp"
@@ -16,13 +16,13 @@ namespace pelib{
     MakespanSelector() = delete;
     static const MakespanCalculator* getMakespanCalculator(const std::string key)
     {
-      if(key.compare("fml:random") == 0)
-	return new MakespanRandom();
+      if(key.compare("fml:synthetic") == 0)
+	return new MakespanSynthetic();
       if(key.compare("fml:fft") == 0)
 	return new MakespanFft();
       if(key.compare("fml:preduce") == 0)
 	return new MakespanPreduce();
-      if(key.compare("fml.:mergesort") == 0)
+      if(key.compare("fml:mergesort") == 0)
 	return new MakespanMergesort();
       
       try{
