@@ -87,11 +87,10 @@ namespace pelib
       }
     fclose(f);
     
-    
     int n = record.find<Scalar<int> >("n")->getValue();
     igraph_add_vertices(graph,n,0);
     SETGAS(graph,"autname","GENERATED_FROM_RECORD");
-
+    SETGAS(graph,"target_makespan", "fml:synthetic");
 
     int i;
     for(i = 0; i < n; i++)
@@ -105,9 +104,7 @@ namespace pelib
       }
     merge_taskgraph_record(record);
   }
-	
-    
-  
+	 
   TaskgraphRecord::TaskgraphRecord(const TaskgraphRecord& tgr, const Record& record)
   {
     igraph_i_set_attribute_table(&igraph_cattribute_table); //do this to enable attribute fetching
@@ -189,7 +186,6 @@ namespace pelib
   {
     vector<Vertex_info> tasks;
     
-    
     for(int id=0; id < igraph_vcount(graph);id++)
       {
 	Vertex_info task;
@@ -199,20 +195,33 @@ namespace pelib
 	task.taskname = strcmp(VAS(graph,"taskname",id),"") != 0 ? VAS(graph,"taskname",id) : "UNNAMED_TASKNAME" ;
 	task.workload = !isnan((float)VAN(graph,"workload",id)) ? VAN(graph,"workload",id): 1.0;
 	task.max_width = (int)VAN(graph,"max_width",id) != INT_MIN ?  VAN(graph,"max_width",id) : 1;
-	task.efficiency_line = strcmp(VAS(graph,"efficiency",id),"") != 0 ? VAS(graph,"efficiency",id) : "fml:p == 1 ? 1 : 1e-6" ;
+
+
+	if (strcmp(VAS(graph, "efficiency", id), "") != 0)
+	{
+		task.efficiency_line = VAS(graph, "efficiency", id);
+	}
+	else
+	{
+		if(architecture != NULL)
+		{
+			stringstream ss;
+			ss << task.max_width;
+			task.efficiency_line = string("fml:p <= ") + ss.str() + "? 1 : 1e-6";
+		}
+	}
 	
 	tasks.push_back(task);
       }
-    
 
     //Sort on taskid
     sort(tasks.begin(),tasks.end());
-    
-
 
     return tasks;
   }
-  Record  TaskgraphRecord::toRecord() const
+
+  Record
+  TaskgraphRecord::toRecord() const
   {
 
     size_t processors = 1; // Default
@@ -229,8 +238,7 @@ namespace pelib
 	  }
       }
 
-  // extract all task information to be able to sort it together
-
+    // extract all task information to be able to sort it together
     vector<Vertex_info> tasks = buildVertexVector();
     //vector<int> ids;
     

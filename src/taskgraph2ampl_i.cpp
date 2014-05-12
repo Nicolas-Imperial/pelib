@@ -28,20 +28,14 @@ int main(int argc, char **argv)
       cerr << "Warning: No architecture information supplied. Using default values\n";
     }
   
-
   // Set floating point var output format to fixed at 7 digits
   std::cout << std::setprecision(6)                                                                                                        
 	    << std::setiosflags(std::ios::fixed)                                                                                                     
 	    << std::setiosflags(std::ios::showpoint);  
 
-
   TaskgraphRecord tgr(input.parse(cin));
-
   tgr.setArchitecture(architecture);
-
-  output.dump(cout,tgr);
-
-  
+  output.dump(cout,tgr);  
 
   return 0;
 }
