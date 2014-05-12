@@ -78,7 +78,7 @@ namespace pelib
     FILE* f = fopen("src/empty_taskgraph.graphml","r"); //TODO: include in ar? 
     if(!f)
       {
-	throw runtime_error("Error: can not find anempty taskgraph file to work from.");
+	throw runtime_error("Error: can not find an empty taskgraph file to work from.");
       }
 
     if(igraph_read_graph_graphml(graph,f,0))
