@@ -283,10 +283,11 @@ namespace pelib
 	  float num;
 	  size_t count = 0;
 	  size_t x = 1;
-	  while(stream >>num && count++ <= processors)
+	  while(stream >>num && count < processors)
 	    {
 	      row.insert(pair<int,float>(x,num));
 	      ++x;
+	      ++count;
 	    }
 
 	  for(;count < processors; ++count, ++x)

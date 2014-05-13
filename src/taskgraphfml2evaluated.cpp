@@ -26,7 +26,7 @@ int main(int argc, char **argv)
   Record record = taskgraph.toRecord();
 
   cout << std::setprecision(6) 
-       << std::setiosflags(std::ios::fixed)                                                         
+       << std::setiosflags(std::ios::fixed)
        << std::setiosflags(std::ios::showpoint);
 
   TaskgraphRecord tgr(taskgraph,record);
