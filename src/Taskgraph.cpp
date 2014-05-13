@@ -4,6 +4,7 @@
 #include "Vector.hpp"
 #include "Matrix.hpp"
 
+#include <thread>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -28,56 +29,73 @@ using namespace std;
 
 TaskgraphRecord Taskgraph::parse(istream& data)
 {
-  
-  Record record;
   igraph_i_set_attribute_table(&igraph_cattribute_table); //do this to enable attribute fetching
 
   igraph_t *the_graph = new igraph_t();
 
   //create a FILE* from istream by building a posix pipe. This wont work in windows...
   int p[2];
-
-  pipe(p);
-
-  FILE *fake_fileptr = fdopen(p[0], "r"); 
-  char c;
-  c = data.get();
-  while(!data.eof())
+  auto ans = pipe(p);
+  if(ans)
     {
-      write(p[1],&c,1);
-      c = data.get();
+      throw runtime_error("Error: no pipe :/");
     }
-  close(p[1]);
 
+  FILE *fake_fileptr = fdopen(p[0], "r");   
+  
+  auto t = std::thread([](int file_descr, istream* data){
+      char c = data->get();
+      while(!data->eof())
+	{
+	  auto ans = write(file_descr,&c,1);
+	  if(ans < 0)
+	    {
+	      throw runtime_error("Error: Pipe has been possessed X-(");
+	    }
+	  c = data->get();
+	}
+      close(file_descr);
+    },p[1],&data);
+  
+ 
   igraph_read_graph_graphml(the_graph,fake_fileptr,0);  
   
   close(p[0]);
-   
+  t.join();
   return TaskgraphRecord(the_graph);
 }
 
-void Taskgraph::dump(ostream& o, const TaskgraphRecord& record) const {
+void Taskgraph::dump(ostream& o, const TaskgraphRecord& record) const 
+{
   int p[2];
-  pipe(p);
-
-  FILE *fake_fileptr = fdopen(p[1], "w"); 
-  
-  auto graph = record.graph; 
-  igraph_write_graph_graphml(graph,fake_fileptr,true); 
-  fclose(fake_fileptr);
-
-  FILE *instream = fdopen (p[0], "r");
-  char c;
-  while ((c = fgetc (instream)) != EOF)
+  auto ans = pipe(p);
+  if(ans)
     {
-      o << c;
+      throw runtime_error("Error: no pipe :/");
     }
 
-  fclose (instream);
+  FILE *fake_fileptr = fdopen(p[1], "w"); 
+  FILE *instream = fdopen (p[0], "r");
+
+  // Spawn a thread that reads from the pipe as fast as it can.
+  // This is required if igraph indend to output massive amounts of data
+  auto t = std::thread([](FILE* instream, ostream* o){
+      char c;
+      while ((c = fgetc (instream)) != EOF)
+	{
+	  (*o) << c;
+	}
+      fclose (instream);
+    },instream,&o);
+
+
+  igraph_write_graph_graphml(record.graph,fake_fileptr,true); 
+  fclose(fake_fileptr);
+
+  t.join();
   close(p[0]);
   close(p[1]);
 }; 
-
 
 void Taskgraph::duplicate_tasks(TaskgraphRecord& record, const vector<int>& to_duplicate)
 {
