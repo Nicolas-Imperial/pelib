@@ -20,7 +20,7 @@ int main(int argc, char **argv)
   Record arch = archparser.parse(ifs);
 
   //cout << "this is the arch\n";
-  archparser.dump(cout,arch);
+  //archparser.dump(cout,arch);
     
 
   Taskgraph taskgparser;
@@ -32,17 +32,17 @@ int main(int argc, char **argv)
   taskgraph.setArchitecture(arch);
 
   //cout << "This is the taskgraph:\n";
-  taskgparser.dump(cout, taskgraph);
+  //taskgparser.dump(cout, taskgraph);
 
   //cout << "converting from taskgraph to record\n";
   Record record = taskgraph.toRecord();
 
   //cout << "the record: \n";
   cout << std::setprecision(6) 
-       << std::setiosflags(std::ios::fixed)                                                         
+       << std::setiosflags(std::ios::fixed)
        << std::setiosflags(std::ios::showpoint);
 
-  archparser.dump(cout,record);
+  //archparser.dump(cout,record);
 
 
 
