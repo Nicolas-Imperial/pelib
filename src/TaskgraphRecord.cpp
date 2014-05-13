@@ -7,6 +7,7 @@
 #include <string>
 #include <iomanip>
 
+#include <AmplOutput.hpp>
 #include <Record.hpp>
 #include <AmplDataParser.hpp>
 #include <Data.hpp>
@@ -44,7 +45,10 @@ namespace pelib
   };
   
    
-  TaskgraphRecord::TaskgraphRecord(igraph_t* graph) : graph(graph){}
+  TaskgraphRecord::TaskgraphRecord(igraph_t* graph) : graph(graph)
+  {
+	architecture = nullptr;
+  }
 
   TaskgraphRecord::~TaskgraphRecord()
   {
@@ -206,7 +210,7 @@ namespace pelib
 	}
 	else
 	{
-		if(architecture != NULL)
+		if(architecture != nullptr)
 		{
 			stringstream ss;
 			ss << task.max_width;
@@ -226,20 +230,31 @@ namespace pelib
   Record
   TaskgraphRecord::toRecord() const
   {
+	if(architecture != nullptr)
+	{
+		return this->toRecord(*this->architecture);
+	}
+	else
+	{
+	    cerr << "Error: no architecture information" << endl;
+	    abort();
+	}
+  }
 
-    size_t processors = 1; // Default
-    if(architecture != nullptr)
-      {
-	auto p = architecture->find<Scalar<int> >("p");
+  Record
+  TaskgraphRecord::toRecord(const Record &arch) const
+  {
+    size_t processors;
+	const Scalar<int> *p = arch.find<Scalar<int> >("p");
 	if(p == nullptr)
 	  {
-	    cerr << "Warning: Architecture exists but is missing information\n";
+	    cerr << "Error: Cannot find scalar \"p\" in architecture record" << endl;
+	    abort();
 	  }
 	else
 	  {
 	    processors = p->getValue();
 	  }
-      }
 
     // extract all task information to be able to sort it together
     vector<Vertex_info> tasks = buildVertexVector();
@@ -315,7 +330,7 @@ namespace pelib
     record.insert(&n);
 
     const MakespanCalculator*  msc = MakespanSelector::getMakespanCalculator(GAS(graph,"target_makespan"));
-    double target_makespan = msc->calculate(record,*architecture);
+    double target_makespan = msc->calculate(record, arch);
 
     delete msc;
 

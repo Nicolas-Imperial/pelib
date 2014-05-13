@@ -32,6 +32,15 @@ namespace pelib
 		*this = tgr.toRecord();
 	}
 
+	void
+	Record::merge(const Record& record)
+	{
+		for(auto iter = record.getAllRecords().begin(); iter != record.getAllRecords().end(); iter++)
+		{
+			records.insert(std::pair<std::string, pelib::Data*>(iter->second->getName(), iter->second->clone()));
+		}
+	}
+
 	const std::map<std::string, const Data * const>&
 	Record::getAllRecords() const
 	{

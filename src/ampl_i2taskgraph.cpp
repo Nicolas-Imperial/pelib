@@ -27,7 +27,13 @@ int main(int argc, char **argv)
 	    << std::setiosflags(std::ios::fixed)                                                                                                     
 	    << std::setiosflags(std::ios::showpoint);  
 
-  tg.dump(cout, TaskgraphRecord(ai.parse(cin)));
+  tg.dump(cout, TaskgraphRecord(ai.parse(cin))); /*
+  // Open input file
+  std::ifstream myfile;
+  myfile.open (argv[1], std::ios::in);
+  tg.dump(cout, TaskgraphRecord(ai.parse(myfile)));
+  myfile.close(); /**/
+
 
   return 0;
 }

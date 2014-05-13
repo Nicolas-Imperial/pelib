@@ -35,6 +35,7 @@ namespace pelib
     // values are used.
     void setArchitecture(const Record& architecture);
     Record toRecord() const;
+    Record toRecord(const Record& architecture) const;
     
     std::vector<std::string> get_taskids() const;
     float get_target_makespan() const;

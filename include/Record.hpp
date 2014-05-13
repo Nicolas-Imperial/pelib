@@ -32,7 +32,10 @@ namespace pelib
 			getAllRecords() const;
 
 			std::map<std::string, const int *>&
-			copyRecords(); 
+			copyRecords();
+
+			void
+			merge(const Record&); 
 
 			template<class T>
 			std::map<std::string, const T* const>
