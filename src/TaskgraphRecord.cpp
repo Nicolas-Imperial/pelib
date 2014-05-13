@@ -95,10 +95,13 @@ namespace pelib
     int i;
     for(i = 0; i < n; i++)
       {
+	//ensure correct sorting of numbers by inserting extra "_" which is sorted as larger than 0-9
+	const int num_pads = (int) log10(i+1) + 1;
+
 	stringstream taskname;
 	stringstream taskid;
-	taskname << "task_" << (i+1) << "_name";
-	taskid << "task_" << (i+1) << "_id";
+	taskname << "task" << string(num_pads,'_') << (i+1) << "_name";
+	taskid   << "task" << string(num_pads,'_') << (i+1) << "_id";
 	SETVAS(graph,"taskname",i,taskname.str().c_str());
 	SETVAS(graph,"taskid",i,taskid.str().c_str());
       }
