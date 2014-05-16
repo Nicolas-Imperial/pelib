@@ -58,7 +58,7 @@ void Schedule::dump(std::ostream& os,const TaskgraphRecord& tgr,const Record& am
 	    {
 	      break;
 	    }
-	  ss << "   <task taskid=\"" << taskids[id-1] << "\" ordering=\"" << i << "\" "
+	  ss << "   <task taskid=\"" << taskid << "\" ordering=\"" << i << "\" "
 	     << "frequency=\"" << frequencies.find(id)->second <<  "\" />\n";
 	  //cout << taskids[id - 1] << " ";
 
@@ -69,7 +69,7 @@ void Schedule::dump(std::ostream& os,const TaskgraphRecord& tgr,const Record& am
   ss << "</schedule>\n";
 
   // Final sanity check.
-  if(maxid < taskids.size())
+  if((unsigned)maxid < taskids.size())
     {
       cerr << "Warning: Not all tasks in task graph have been scheduled.\n"; //TODO: Warning or error?
     }
