@@ -9,7 +9,7 @@
 using namespace pelib;
 using namespace std;
 
-void Schedule::dump(std::ostream& os,const TaskgraphRecord& tgr,const Record& amploutput)
+void Schedule::dump(std::ostream& os, const TaskgraphRecord& tgr, const Record& amploutput)
 {
   
   vector<string> taskids = tgr.get_taskids();

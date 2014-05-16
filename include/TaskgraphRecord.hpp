@@ -38,7 +38,7 @@ namespace pelib
     Record toRecord(const Record& architecture) const;
     
     std::vector<std::string> get_taskids() const;
-    float get_target_makespan() const;
+    float getTargetMakespan() const;
     const char* get_autname() const;
   private:
     void merge_taskgraph_record(const Record& record);
