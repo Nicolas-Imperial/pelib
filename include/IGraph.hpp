@@ -6,14 +6,14 @@
 #include <iostream>
 namespace pelib
 {
-class Taskgraph;
+class IGraph;
 }
 #include "TaskgraphRecord.hpp"
 
 
 namespace pelib
 {
-  class Taskgraph
+  class IGraph
   {
   public:
     void dump(std::ostream&, const pelib::TaskgraphRecord&) const;

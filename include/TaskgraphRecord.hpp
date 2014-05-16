@@ -6,7 +6,7 @@ namespace pelib
 {
   class TaskgraphRecord;
 }
-#include "Taskgraph.hpp"
+#include "IGraph.hpp"
 #include "Record.hpp"
 #include <vector>
 
@@ -19,7 +19,7 @@ namespace pelib
   struct Vertex_info;
   class TaskgraphRecord
   {
-    friend class Taskgraph;
+    friend class IGraph;
   public:
     TaskgraphRecord() = delete;
     TaskgraphRecord(igraph_t *graph);

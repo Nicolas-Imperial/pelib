@@ -1,7 +1,7 @@
 #ifndef SCHEDULE_H
 #define SCHEDULE_H
 
-#include "Taskgraph.hpp"
+#include "IGraph.hpp"
 #include "Record.hpp"
 
 #include <iostream>
