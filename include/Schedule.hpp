@@ -7,20 +7,11 @@
 #include <iostream>
 
 namespace pelib{
-
-
-
-
   class Schedule // : public output..
   {
   public:
     void dump(std::ostream& os,const TaskgraphRecord& tgr,const Record& amploutput);
-
   };
-
-
-
-
 }
 
 #endif

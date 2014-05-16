@@ -63,8 +63,7 @@ namespace pelib
   TaskgraphRecord::TaskgraphRecord(const TaskgraphRecord &rhs)
   {
     *this = rhs;
-  }
-  
+  } 
   
   TaskgraphRecord&
   TaskgraphRecord::operator=(const TaskgraphRecord &rhs)
@@ -186,8 +185,6 @@ namespace pelib
       }
 	
   }
-  
-
 
   vector<Vertex_info> TaskgraphRecord::buildVertexVector() const
   {
@@ -404,6 +401,12 @@ namespace pelib
       }
     
     return (sum_pTw/max_freq + sum_pTw/min_freq) / 2;
+  }
+
+  float
+  TaskgraphRecord::getTargetMakespan() const
+  {
+	return this->toRecord().find<Scalar<float> >("M")->getValue();
   }
 }
 
