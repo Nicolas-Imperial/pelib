@@ -11,6 +11,7 @@ namespace pelib{
   {
   public:
     void dump(std::ostream& os,const TaskgraphRecord& tgr,const Record& amploutput);
+    void parse(std::istream &is);
   };
 }
 
