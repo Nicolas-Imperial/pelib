@@ -17,11 +17,7 @@ void Schedule::dump(std::ostream& os, const TaskgraphRecord& tgr, const Record& 
   int processors = amploutput.find<Scalar<int> >("p")->getValue();
   auto frequencies = amploutput.find<Vector<int, int> >("frequency")->getValues();
   auto full_schedule = amploutput.find<Matrix <int, int, int> >("schedule")->getValues();
-  if(taskids.size() != amploutput.find<Matrix <int, int, int> >("schedule")->getRowSize())
-    {
-      throw runtime_error("Data missmatch, different number of tasks\n");
-    }
-
+ 
   
   //TODO: where should schedule name come from?
   stringstream ss;
@@ -33,7 +29,7 @@ void Schedule::dump(std::ostream& os, const TaskgraphRecord& tgr, const Record& 
     
 
 
-
+  int maxid = 0; // for consistency check
   //assuming p should start from zero, even though ampl always start with one
   for(int p = 0; p < processors; p++)
     {
@@ -43,11 +39,26 @@ void Schedule::dump(std::ostream& os, const TaskgraphRecord& tgr, const Record& 
       for(int i = 0; (unsigned)i < procschedule.size(); i++)
 	{
 	  int id = procschedule.find(i)->second;
-	  if(id == 0) // 0 = no more tasks schuled on this core
+	  maxid = max(maxid,id);
+	  string taskid;
+	  
+	  // Bounds check. Will throw if there are more (higher numbered) tasks in amploutput schedule than in taskgraphrecord.
+	  try
+	    {
+	      //taskid = taskids[id-1];
+	      taskid = taskids.at(id-1); // With bounds check
+	    }
+	  catch (std::out_of_range e)
+	    {
+	      cerr << "Error: Missmatch, ampl_output task id " << id << " does not exist in the task graph\n";
+	      throw e;
+	    }
+
+	  if(id == 0) // 0 = no more tasks scheduled on this core
 	    {
 	      break;
 	    }
-	  ss << "   <task taskid=\"" << taskids[id-1] << "\" ordering=\"" << i << "\" "
+	  ss << "   <task taskid=\"" << taskid << "\" ordering=\"" << i << "\" "
 	     << "frequency=\"" << frequencies.find(id)->second <<  "\" />\n";
 	  //cout << taskids[id - 1] << " ";
 
@@ -56,7 +67,13 @@ void Schedule::dump(std::ostream& os, const TaskgraphRecord& tgr, const Record& 
       //cout << endl;
     }
   ss << "</schedule>\n";
-  os << endl << ss.str() << endl;
 
+  // Final sanity check.
+  if((unsigned)maxid < taskids.size())
+    {
+      cerr << "Warning: Not all tasks in task graph have been scheduled.\n"; //TODO: Warning or error?
+    }
+  os << endl << ss.str() << endl;
+  
 
 }
