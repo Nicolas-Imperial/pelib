@@ -19,8 +19,7 @@ void Schedule::dump(std::ostream& os, const TaskgraphRecord& tgr, const Record& 
   float target_makespan = amploutput.find<Scalar <float> >("M")->getValue();
   int processors = amploutput.find<Scalar<int> >("p")->getValue();
   auto frequencies = amploutput.find<Vector<int, int> >("frequency")->getValues();
-  auto full_schedule = amploutput.find<Matrix <int, int, int> >("schedule")->getValues();
- 
+  std::map<int, std::map<int, int> > full_schedule = amploutput.find<Matrix <int, int, int> >("schedule")->getValues(); 
   
   //TODO: where should schedule name come from?
   stringstream ss;
@@ -29,22 +28,22 @@ void Schedule::dump(std::ostream& os, const TaskgraphRecord& tgr, const Record& 
      << "cores=\"" << processors << "\" "
      << "tasks=\"" << taskids.size() << "\" "
      << "roundtime=\"" << target_makespan << "\">\n";
-    
-
 
   int maxid = 0; // for consistency check
   //assuming p should start from zero, even though ampl always start with one
   for(int p = 0; p < processors; p++)
     {
       ss << " <core coreid=\"" << p << "\">\n";
-      auto procschedule = full_schedule.find(p+1)->second;
+      std::map<int, int> procschedule = full_schedule.find(p+1)->second;
 
       for(int i = 0; (unsigned)i < procschedule.size(); i++)
 	{
 	  int id = procschedule.find(i)->second;
 	  maxid = max(maxid,id);
 	  string taskid;
-	  
+	 
+	if(id > 0)
+	{ 
 	  // Bounds check. Will throw if there are more (higher numbered) tasks in amploutput schedule than in taskgraphrecord.
 	  try
 	    {
@@ -64,7 +63,7 @@ void Schedule::dump(std::ostream& os, const TaskgraphRecord& tgr, const Record& 
 	  ss << "   <task taskid=\"" << taskid << "\" ordering=\"" << i << "\" "
 	     << "frequency=\"" << frequencies.find(id)->second <<  "\" />\n";
 	  //cout << taskids[id - 1] << " ";
-
+	}
 	}
       ss << " </core>\n";
       //cout << endl;
@@ -77,8 +76,6 @@ void Schedule::dump(std::ostream& os, const TaskgraphRecord& tgr, const Record& 
       cerr << "Warning: Not all tasks in task graph have been scheduled.\n"; //TODO: Warning or error?
     }
   os << ss.str() << endl;
-  
-
 }
 
 struct task_info

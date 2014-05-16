@@ -1,4 +1,4 @@
-#include "Taskgraph.hpp"
+#include "IGraph.hpp"
 #include "TaskgraphRecord.hpp"
 
 #include "Vector.hpp"
@@ -27,7 +27,7 @@ using namespace std;
 
 
 
-TaskgraphRecord Taskgraph::parse(istream& data)
+TaskgraphRecord IGraph::parse(istream& data)
 {
   igraph_i_set_attribute_table(&igraph_cattribute_table); //do this to enable attribute fetching
 
@@ -65,7 +65,7 @@ TaskgraphRecord Taskgraph::parse(istream& data)
   return TaskgraphRecord(the_graph);
 }
 
-void Taskgraph::dump(ostream& o, const TaskgraphRecord& record) const 
+void IGraph::dump(ostream& o, const TaskgraphRecord& record) const 
 {
   int p[2];
   auto ans = pipe(p);
@@ -97,7 +97,7 @@ void Taskgraph::dump(ostream& o, const TaskgraphRecord& record) const
   close(p[1]);
 }; 
 
-void Taskgraph::duplicate_tasks(TaskgraphRecord& record, const vector<int>& to_duplicate)
+void IGraph::duplicate_tasks(TaskgraphRecord& record, const vector<int>& to_duplicate)
 {
   //Implemented only for boost 
   throw runtime_error("Not implemented");
