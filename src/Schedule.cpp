@@ -13,7 +13,7 @@ void Schedule::dump(std::ostream& os,const TaskgraphRecord& tgr,const Record& am
 {
   
   vector<string> taskids = tgr.get_taskids();
-  float target_makespan = tgr.get_target_makespan();
+  float target_makespan = amploutput.find<Scalar <float> >("M")->getValue();
   int processors = amploutput.find<Scalar<int> >("p")->getValue();
   auto frequencies = amploutput.find<Vector<int, int> >("frequency")->getValues();
   auto full_schedule = amploutput.find<Matrix <int, int, int> >("schedule")->getValues();
@@ -77,3 +77,13 @@ void Schedule::dump(std::ostream& os,const TaskgraphRecord& tgr,const Record& am
   
 
 }
+/*
+Record Schedule::parse(istream& is)
+{
+  DomParser parser();
+  parser.parse_stream(is);
+  Element* schedule = parser.get_document()->get_root_node; //TODO: store this in a separate class, if we want things like taskname information saved ..
+
+  return Record();
+}
+*/

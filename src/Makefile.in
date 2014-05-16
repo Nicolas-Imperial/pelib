@@ -13,9 +13,9 @@ LDFLAGS =
 LIBS = -lmuparser -ligraph -lm 
 LIBS_TEST = 
 
-#ampl_o2achedule
+
 ## static library packages and their sources
-bin_package = demo demo_xmlformats taskgraph2ampl_i ampl_i2taskgraph duplicate_tasks taskgraphfml2evaluated ampl_i2i ampl_i2o ampl_o2i ampl_o2o ampl_i2cpp ampl_o2cpp run_record 
+bin_package = demo demo_xmlformats taskgraph2ampl_i ampl_i2taskgraph duplicate_tasks taskgraphfml2evaluated ampl_i2i ampl_i2o ampl_o2i ampl_o2o ampl_i2cpp ampl_o2cpp run_record ampl_o2schedule
 
 bin_demo_src = demo.cpp
 bin_demo_export = $(bin_demo_src) 
