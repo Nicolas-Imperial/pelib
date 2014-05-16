@@ -42,7 +42,7 @@ void Schedule::dump(std::ostream& os,const TaskgraphRecord& tgr,const Record& am
 	  maxid = max(maxid,id);
 	  string taskid;
 	  
-	  // Bounds check. Will throw if there are more tasks in amploutput than in taskgraphrecord.
+	  // Bounds check. Will throw if there are more (higher numbered) tasks in amploutput schedule than in taskgraphrecord.
 	  try
 	    {
 	      //taskid = taskids[id-1];
