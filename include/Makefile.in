@@ -7,7 +7,7 @@ Scalar.hpp Vector.hpp Matrix.hpp Set.hpp\
 MakespanSelector.hpp MakespanSynthetic.hpp MakespanNumeric.hpp MakespanFft.hpp MakespanPreduce.hpp MakespanMergesort.hpp MakespanCalculator.hpp\
 AmplDataParser.hpp AmplDataOutput.hpp IGraph.hpp TaskgraphRecord.hpp\
 AmplInput.hpp AmplInputData.hpp AmplInputScalar.hpp AmplInputVector.hpp AmplInputSet.hpp AmplInputMatrix.hpp \
-AmplOutput.hpp AmplOutputData.hpp AmplOutputScalar.hpp AmplOutputVector.hpp AmplOutputSet.hpp AmplOutputMatrix.hpp Schedule.hpp\
+AmplOutput.hpp AmplOutputData.hpp AmplOutputScalar.hpp AmplOutputVector.hpp AmplOutputSet.hpp AmplOutputMatrix.hpp Schedule.hpp ScheduleRecord.hpp\
 CppDataOutput.hpp \
 Cpp.hpp CppData.hpp CppScalar.hpp CppVector.hpp CppSet.hpp CppMatrix.hpp \
 

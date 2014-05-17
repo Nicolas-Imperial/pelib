@@ -32,7 +32,7 @@ int main(int argc, char **argv)
   std::ifstream myfile;
   myfile.open (argv[1], std::ios::in);
   tg.dump(cout, TaskgraphRecord(ai.parse(myfile)));
-  myfile.close(); /**/
+  myfile.close(); */
 
 
   return 0;
