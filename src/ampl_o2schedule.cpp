@@ -1,6 +1,9 @@
-#include "Taskgraph.hpp"
+#include "TaskgraphRecord.hpp"
 #include "AmplOutput.hpp"
+#include "IGraph.hpp"
 #include "Schedule.hpp"
+//#include "ScheduleRecord.hpp"
+
 #include <fstream>
 
 
@@ -15,7 +18,7 @@ int main(int argc, char* argv[])
       return 1;
     }
 
-  Taskgraph tg;
+  IGraph tg;
   AmplOutput ao;
   Schedule sch;
 

@@ -5,14 +5,14 @@
 #include <iomanip>
 
 #include <AmplInput.hpp>
-#include "Taskgraph.hpp"
+#include "IGraph.hpp"
 
 int main(int argc, char **argv)
 {
   using namespace std;
   using namespace pelib;
 
-  Taskgraph tg;
+  IGraph tg;
   
   AmplInput ai;
   /*

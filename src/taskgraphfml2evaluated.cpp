@@ -2,7 +2,7 @@
 #include <fstream>
 #include <AmplInput.hpp>
 #include <sstream>
-#include "Taskgraph.hpp"
+#include "IGraph.hpp"
 int main(int argc, char **argv)
 {
   using namespace std;
@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 
   Record arch = archparser.parse(ifs);
 
-  Taskgraph taskgparser;
+  IGraph taskgparser;
   TaskgraphRecord taskgraph = taskgparser.parse(cin);
 
   taskgraph.setArchitecture(arch);

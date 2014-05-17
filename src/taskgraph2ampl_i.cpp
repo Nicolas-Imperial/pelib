@@ -5,7 +5,7 @@
 #include <iomanip>
 
 #include <AmplInput.hpp>
-#include "Taskgraph.hpp"
+#include "IGraph.hpp"
 
 int main(int argc, char **argv)
 {
@@ -13,7 +13,7 @@ int main(int argc, char **argv)
   using namespace pelib;
 
   Record architecture;
-  Taskgraph input;
+  IGraph input;
 
   AmplInput output;
   AmplInput ai;
