@@ -1,5 +1,5 @@
 CFLAGS=-isystem ../include $(CROWN_UTIL_SRC)/include -Wall
-CXXFLAGS=-isystem ../include -isystem $(CROWN_UTIL_SRC)/include -Wall -std=c++0x `pkg-config --cflags libxml++-2.6`
+CXXFLAGS=-isystem ../include -isystem $(CROWN_UTIL_SRC)/include -Wall -std=c++0x
 
 RELEASE_CFLAGS = -O3 -DNDEBUG
 DEBUG_CFLAGS = -g -O0 -DDEBUG=1
@@ -7,102 +7,103 @@ RELEASE_CXXFLAGS = -g -O3 -DNDEBUG
 DEBUG_CXXFLAGS = -g -O0 -DDEBUG=1
 
 LDFLAGS_TEST =
-LDFLAGS =
+LDFLAGS = -L$(CPPELIB_SRC)/src
 #$(muparser_dir)/lib 
 
-LIBS = -lmuparser -ligraph -lm `pkg-config --libs libxml++-2.6`
+LIBS = -lcppelib
+PKG = muparser igraph libxml++-2.6
 LIBS_TEST = 
 
 
 ## static library packages and their sources
-bin_package = demo demo_xmlformats taskgraph2ampl_i ampl_i2taskgraph duplicate_tasks taskgraphfml2evaluated ampl_i2i ampl_i2o ampl_o2i ampl_o2o ampl_i2cpp ampl_o2cpp run_record ampl_o2schedule
+bincxx_package = demo demo_xmlformats taskgraph2ampl_i ampl_i2taskgraph duplicate_tasks taskgraphfml2evaluated ampl_i2i ampl_i2o ampl_o2i ampl_o2o ampl_i2cpp ampl_o2cpp run_record ampl_o2schedule
 
-bin_demo_src = demo.cpp
-bin_demo_export = $(bin_demo_src) 
-bin_demo_deps = libcppelib.a
-bin_demo_libs = -lboost_regex -lboost_graph -lexpat 
-bin_demo_ldflags =
+bincxx_demo_src = demo.cpp
+bincxx_demo_export = $(bincxx_demo_src) 
+bincxx_demo_deps = libcppelib.a
+bincxx_demo_libs = -lboost_regex -lboost_graph -lexpat 
+bincxx_demo_ldflags =
 
-bin_duplicate_tasks_src =  duplicate_tasks.cpp
-bin_duplicate_tasks_export =  $(duplicate_tasks_src) 
-bin_duplicate_tasks_deps = libcppelib.a
-bin_duplicate_tasks_libs = -lboost_regex -lboost_graph -lexpat
-bin_duplicate_tasks_ldflags =
+bincxx_duplicate_tasks_src =  duplicate_tasks.cpp
+bincxx_duplicate_tasks_export =  $(duplicate_tasks_src) 
+bincxx_duplicate_tasks_deps = libcppelib.a
+bincxx_duplicate_tasks_libs = -lboost_regex -lboost_graph -lexpat
+bincxx_duplicate_tasks_ldflags =
 
-bin_taskgraph2ampl_i_src = taskgraph2ampl_i.cpp
-bin_taskgraph2ampl_i_export =  $(bin_taskgraph2ampl_src) 
-bin_taskgraph2ampl_i_deps = libcppelib.a
-bin_taskgraph2ampl_i_libs = -lboost_regex -lboost_graph -lexpat
-bin_taskgraph2ampl_i_ldflags =
+bincxx_taskgraph2ampl_i_src = taskgraph2ampl_i.cpp
+bincxx_taskgraph2ampl_i_export =  $(bincxx_taskgraph2ampl_src) 
+bincxx_taskgraph2ampl_i_deps = libcppelib.a
+bincxx_taskgraph2ampl_i_libs = -lboost_regex -lboost_graph -lexpat
+bincxx_taskgraph2ampl_i_ldflags =
 
-bin_ampl_i2taskgraph_src = ampl_i2taskgraph.cpp
-bin_ampl_i2taskgraph_export =  $(bin_ampl2taskgraph_src) 
-bin_ampl_i2taskgraph_deps = libcppelib.a
-bin_ampl_i2taskgraph_libs = -lboost_regex -lboost_graph -lexpat
-bin_ampl_i2taskgraph_ldflags =
+bincxx_ampl_i2taskgraph_src = ampl_i2taskgraph.cpp
+bincxx_ampl_i2taskgraph_export =  $(bincxx_ampl2taskgraph_src) 
+bincxx_ampl_i2taskgraph_deps = libcppelib.a
+bincxx_ampl_i2taskgraph_libs = -lboost_regex -lboost_graph -lexpat
+bincxx_ampl_i2taskgraph_ldflags =
 
-bin_taskgraphfml2evaluated_src = taskgraphfml2evaluated.cpp
-bin_taskgraphfml2evaluated_export =  $(bin_taskgraphfml2evaluated_src) 
-bin_taskgraphfml2evaluated_deps = libcppelib.a
-bin_taskgraphfml2evaluated_libs = -lboost_regex -lboost_graph -lexpat
-bin_taskgraphfml2evaluated_ldflags =
+bincxx_taskgraphfml2evaluated_src = taskgraphfml2evaluated.cpp
+bincxx_taskgraphfml2evaluated_export =  $(bincxx_taskgraphfml2evaluated_src) 
+bincxx_taskgraphfml2evaluated_deps = libcppelib.a
+bincxx_taskgraphfml2evaluated_libs = -lboost_regex -lboost_graph -lexpat
+bincxx_taskgraphfml2evaluated_ldflags =
 
-bin_ampl_o2schedule_src = ampl_o2schedule.cpp
-bin_ampl_o2schedule_export =  $(bin_taskgraphfml2evaluated_src) 
-bin_ampl_o2schedule_deps = libcppelib.a
-bin_ampl_o2schedule_libs = -lboost_regex -lboost_graph -lexpat
-bin_ampl_o2schedule_ldflags =
+bincxx_ampl_o2schedule_src = ampl_o2schedule.cpp
+bincxx_ampl_o2schedule_export =  $(bincxx_taskgraphfml2evaluated_src) 
+bincxx_ampl_o2schedule_deps = libcppelib.a
+bincxx_ampl_o2schedule_libs = -lboost_regex -lboost_graph -lexpat
+bincxx_ampl_o2schedule_ldflags =
 
-bin_demo_xmlformats_src = demo_xmlformats.cpp
-bin_demo_xmlformats_export = $(bin_demo_xmlformats_src) 
-bin_demo_xmlformats_deps = libcppelib.a
-bin_demo_xmlformats_libs = -lboost_regex -lboost_graph -lexpat 
-bin_demo_xmlformats_ldflags =
+bincxx_demo_xmlformats_src = demo_xmlformats.cpp
+bincxx_demo_xmlformats_export = $(bincxx_demo_xmlformats_src) 
+bincxx_demo_xmlformats_deps = libcppelib.a
+bincxx_demo_xmlformats_libs = -lboost_regex -lboost_graph -lexpat 
+bincxx_demo_xmlformats_ldflags =
 
-bin_ampl_i2i_src = ampl_i2i.cpp
-bin_ampl_i2i_export = $(bin_ampl_i2i_src) 
-bin_ampl_i2i_deps = libcppelib.a
-bin_ampl_i2i_libs = -lboost_regex -lboost_graph -lexpat 
-bin_ampl_i2i_ldflags =
+bincxx_ampl_i2i_src = ampl_i2i.cpp
+bincxx_ampl_i2i_export = $(bincxx_ampl_i2i_src) 
+bincxx_ampl_i2i_deps = libcppelib.a
+bincxx_ampl_i2i_libs = -lboost_regex -lboost_graph -lexpat 
+bincxx_ampl_i2i_ldflags =
 
-bin_ampl_i2o_src = ampl_i2o.cpp
-bin_ampl_i2o_export = $(bin_ampl_i2o_src) 
-bin_ampl_i2o_deps = libcppelib.a
-bin_ampl_i2o_libs = -lboost_regex -lboost_graph -lexpat 
-bin_ampl_i2o_ldflags =
+bincxx_ampl_i2o_src = ampl_i2o.cpp
+bincxx_ampl_i2o_export = $(bincxx_ampl_i2o_src) 
+bincxx_ampl_i2o_deps = libcppelib.a
+bincxx_ampl_i2o_libs = -lboost_regex -lboost_graph -lexpat 
+bincxx_ampl_i2o_ldflags =
 
-bin_ampl_o2i_src = ampl_o2i.cpp
-bin_ampl_o2i_export = $(bin_ampl_o2i_src) 
-bin_ampl_o2i_deps = libcppelib.a
-bin_ampl_o2i_libs = -lboost_regex -lboost_graph -lexpat 
-bin_ampl_o2i_ldflags =
+bincxx_ampl_o2i_src = ampl_o2i.cpp
+bincxx_ampl_o2i_export = $(bincxx_ampl_o2i_src) 
+bincxx_ampl_o2i_deps = libcppelib.a
+bincxx_ampl_o2i_libs = -lboost_regex -lboost_graph -lexpat 
+bincxx_ampl_o2i_ldflags =
 
-bin_ampl_o2o_src = ampl_o2o.cpp
-bin_ampl_o2o_export = $(bin_ampl_o2o_src) 
-bin_ampl_o2o_deps = libcppelib.a
-bin_ampl_o2o_libs = -lboost_regex -lboost_graph -lexpat
-bin_ampl_o2o_ldflags = 
+bincxx_ampl_o2o_src = ampl_o2o.cpp
+bincxx_ampl_o2o_export = $(bincxx_ampl_o2o_src) 
+bincxx_ampl_o2o_deps = libcppelib.a
+bincxx_ampl_o2o_libs = -lboost_regex -lboost_graph -lexpat
+bincxx_ampl_o2o_ldflags = 
 
-bin_ampl_i2cpp_src = ampl_i2cpp.cpp
-bin_ampl_i2cpp_export = $(bin_ampl_i2cpp_src) 
-bin_ampl_i2cpp_deps = libcppelib.a
-bin_ampl_i2cpp_libs = -lboost_regex -lboost_graph -lexpat
-bin_ampl_i2cpp_ldflags = 
+bincxx_ampl_i2cpp_src = ampl_i2cpp.cpp
+bincxx_ampl_i2cpp_export = $(bincxx_ampl_i2cpp_src) 
+bincxx_ampl_i2cpp_deps = libcppelib.a
+bincxx_ampl_i2cpp_libs = -lboost_regex -lboost_graph -lexpat
+bincxx_ampl_i2cpp_ldflags = 
 
-bin_ampl_o2cpp_src = ampl_o2cpp.cpp
-bin_ampl_o2cpp_export = $(bin_ampl_o2cpp_src) 
-bin_ampl_o2cpp_deps = libcppelib.a
-bin_ampl_o2cpp_libs = -lboost_regex -lboost_graph -lexpat
-bin_ampl_o2cpp_ldflags = 
+bincxx_ampl_o2cpp_src = ampl_o2cpp.cpp
+bincxx_ampl_o2cpp_export = $(bincxx_ampl_o2cpp_src) 
+bincxx_ampl_o2cpp_deps = libcppelib.a
+bincxx_ampl_o2cpp_libs = -lboost_regex -lboost_graph -lexpat
+bincxx_ampl_o2cpp_ldflags = 
 
-bin_run_record_src = run_record.cpp
-bin_run_record_export = $(bin_run_record_src) make_record.cpp
-bin_run_record_deps = libcppelib.a
-bin_run_record_libs = -lboost_regex -lboost_graph -lexpat
-bin_run_record_ldflags = 
+bincxx_run_record_src = run_record.cpp
+bincxx_run_record_export = $(bincxx_run_record_src) make_record.cpp
+bincxx_run_record_deps = libcppelib.a
+bincxx_run_record_libs = -lboost_regex -lboost_graph -lexpat
+bincxx_run_record_ldflags = 
 
 ## static library packages and their sources
-lib_package = cppelib unit
+libcxx_package = cppelib unit
 
 ## In order:
 ## Internal classes: exception, data structures, structures and collection parsers and output base classes, container
@@ -114,7 +115,7 @@ lib_package = cppelib unit
 ## Ampl output format classes: base class, data structure base class, parser and output data structure classes
 ## Cpp hierarchy base: data output only
 ## Cpp format classes: base class, data structure base class, output data structure classes; no parser because of lack of cpp parser base class
-lib_cppelib_src = \
+libcxx_cppelib_src = \
 ParseException.cpp CastException.cpp NoDecimalFloatException.cpp Data.cpp Record.cpp \
 RecordParser.cpp DataParser.cpp \
 RecordOutput.cpp DataOutput.cpp \
@@ -128,18 +129,20 @@ AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp Ampl
 CppDataOutput.cpp \
 Cpp.cpp CppData.cpp CppScalar.cpp CppVector.cpp CppSet.cpp CppMatrix.cpp \
 
-lib_cppelib_export = $(lib_cppelib_src)
-lib_cppelib_deps =
+libcxx_cppelib_export = $(lib_cppelib_src)
+libcxx_cppelib_deps =
 
-lib_unit_src = unit_test.cpp
-lib_unit_export = $(lib_unit_src)
-lib_unit_deps =
+libcxx_unit_src = unit_test.cpp
+libcxx_unit_export = $(libcxx_unit_src)
+libcxx_unit_deps =
 
 ## test packages and their sources
-test_package = parser 
+testcxx_package = parser 
 
-test_parser_src = test_parser.cpp 
-test_parser_export = $(test_parser_src) uni_test.dat 
-test_parser_deps = libcppelib.a libunit.a
-test_parser_libs = -lboost_regex -lrt `pkg-config igraph --libs`
-test_parser_ldflags = 
+testcxx_parser_src = testcxx_parser.cpp 
+testcxx_parser_export = $(testcxx_parser_src) uni_test.dat 
+testcxx_parser_deps = libcppelib.a libunit.a
+testcxx_parser_pkg = igraph
+testcxx_parser_libs = -lboost_regex -lrt
+testcxx_parser_ldflags = 
+

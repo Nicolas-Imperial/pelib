@@ -1,15 +1,12 @@
-#ifndef PELIB_SCHEDULERECORD
-#define PELIB_SCHEDULERECORD
-
 #include <libxml++/libxml++.h>
-#include "Schedule.hpp"
-
 #include "Record.hpp"
-
 
 extern "C"{
 #include <igraph.h>
 }
+
+#ifndef PELIB_SCHEDULERECORD
+#define PELIB_SCHEDULERECORD
 
 namespace pelib
 {

@@ -1,14 +1,15 @@
-#ifndef SCHEDULE_H
-#define SCHEDULE_H
 
 #include "IGraph.hpp"
 #include "Record.hpp"
-//#include "ScheduleRecord.hpp"
+#include "ScheduleRecord.hpp"
 
 #include <iostream>
 
+#ifndef SCHEDULE_H
+#define SCHEDULE_H
+
 namespace pelib{
-  class ScheduleRecord;
+  //class ScheduleRecord;
   class Schedule // : public output..
   {
   public:

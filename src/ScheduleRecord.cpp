@@ -1,6 +1,7 @@
 #include "ScheduleRecord.hpp"
+#include <set>
+#include <string>
 
-#include "Schedule.hpp"
 #include "Scalar.hpp"
 #include "Matrix.hpp"
 #include "Vector.hpp"
@@ -10,10 +11,10 @@
 #include <vector>
 #include <sstream>
 #include <cstdlib>
+#include <string>
 using namespace std;
 using namespace pelib;
 using namespace xmlpp;
-
 
 ScheduleRecord::ScheduleRecord(xmlpp::DomParser* theSchedule) : theSchedule(theSchedule)
 {}
@@ -21,13 +22,11 @@ ScheduleRecord::ScheduleRecord(xmlpp::DomParser* theSchedule) : theSchedule(theS
 ScheduleRecord::ScheduleRecord(const ScheduleRecord &rhs) : theSchedule(rhs.theSchedule)
 {}
 
-
 ScheduleRecord& ScheduleRecord::operator=(const ScheduleRecord &rhs)
 {
   this->theSchedule = rhs.theSchedule;
   return *this;
 }
-
     
 ScheduleRecord::~ScheduleRecord()
 {
@@ -58,7 +57,8 @@ Record ScheduleRecord::toRecord() const
   Node::NodeList processors = root->get_children();
   Node::NodeList::iterator iter;
 
-  set<string> all_taskids;
+  std::set<std::string> all_taskids;
+  //std::set<std::string, std::less<std::string>, std::allocator<string> > all_taskids;
   map<int, vector<task_info> > schedulemap;
   size_t max_schedule_size = 0;
   int n = stoi(root->get_attribute_value("tasks"));
@@ -99,7 +99,6 @@ Record ScheduleRecord::toRecord() const
       schedulemap.insert(pair<int,vector<task_info> >(coreid,task_infos));
       
     }
-
   
   vector<string> tmp(all_taskids.begin(),all_taskids.end());
   sort(tmp.begin(),tmp.end());
@@ -108,7 +107,6 @@ Record ScheduleRecord::toRecord() const
     {
       taskid2id.insert(pair<string,int>(tmp[i],i+1));
     }
-  
   
   map<int, map<int, int> > sched;
   map<int,int> frequencies;
@@ -146,4 +144,3 @@ Record ScheduleRecord::toRecord() const
   record.insert(&ampl_frequencies);
   return record;
 }
-    
