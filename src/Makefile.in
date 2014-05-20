@@ -1,19 +1,25 @@
-CFLAGS=-isystem ../include $(CROWN_UTIL_SRC)/include -Wall
-CXXFLAGS=-isystem ../include -isystem $(CROWN_UTIL_SRC)/include -Wall -std=c++0x
+## C global parameters
+CFLAGS_BASE=-isystem ../include 
+CFLAGS_RELEASE = -O3 -DNDEBUG
+CFLAGS_DEBUG = -g -O0 -DDEBUG=1
+CC_DEPS=
+CC_LIBS =
+CC_LDFLAGS = -L$(CPPELIB_SRC)/src -L.
+CC_TEST_LIBS = 
+CC_TEST_DEPS =$(CC_DEPS) libunitc+.a
+CC_TEST_LDFLAGS = -L$(CPPELIB_SRC)/src -L.
 
-RELEASE_CFLAGS = -O3 -DNDEBUG
-DEBUG_CFLAGS = -g -O0 -DDEBUG=1
-RELEASE_CXXFLAGS = -g -O3 -DNDEBUG
-DEBUG_CXXFLAGS = -g -O0 -DDEBUG=1
-
-LDFLAGS_TEST =
-LDFLAGS = -L$(CPPELIB_SRC)/src
-#$(muparser_dir)/lib 
-
-LIBS = -lcppelib
-PKG = muparser igraph libxml++-2.6
-LIBS_TEST = 
-
+## C++ global parameters
+CXXFLAGS_BASE=-isystem ../include -isystem $(CPPELIB_SRC)/include -DLONGEST_TASK_FIRST=1 -Wall -std=c++0x
+CXXFLAGS_RELEASE = -O3 -DNDEBUG
+CXXFLAGS_DEBUG = -g -O0 -DDEBUG=1
+CXX_LDFLAGS = -L$(CPPELIB_SRC)/src -L.
+CXX_PKG = igraph muparser libxml++-2.6
+CXX_DEPS=libcrown.a $(CPPELIB_SRC)/src/libcppelib.a
+CXX_LIBS =-lcrown -lcppelib -lboost_regex
+CXX_TEST_LIBS =$(CXX_LIBS) -lunitc++ -lrt 
+CXX_TEST_DEPS =$(CXX_DEPS) libunitc++.a
+CXX_TEST_LDFLAGS = -L$(CPPELIB_SRC)/src -L.
 
 ## static library packages and their sources
 bincxx_package = demo demo_xmlformats taskgraph2ampl_i ampl_i2taskgraph duplicate_tasks taskgraphfml2evaluated ampl_i2i ampl_i2o ampl_o2i ampl_o2o ampl_i2cpp ampl_o2cpp run_record ampl_o2schedule
