@@ -5,8 +5,8 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <RecordParser.hpp>
-#include <RecordOutput.hpp>
+#include <AlgebraParser.hpp>
+#include <AlgebraOutput.hpp>
 #include <CppDataOutput.hpp>
 #include <CppData.hpp>
 
@@ -15,7 +15,7 @@
 
 namespace pelib
 {
-	class Cpp: public RecordOutput
+	class Cpp: public AlgebraOutput
 	{
 		public:
 			Cpp(std::vector<CppData*> outputs);
@@ -36,11 +36,11 @@ namespace pelib
 			
 			virtual
 			void
-			dump(std::ostream& o, const Record &record) const;
+			dump(std::ostream& o, const Algebra &record) const;
 
 			virtual
 			void
-			dump(std::ostream& o, const Data *data) const;
+			dump(std::ostream& o, const AlgebraData *data) const;
 
 			virtual
 			Cpp&

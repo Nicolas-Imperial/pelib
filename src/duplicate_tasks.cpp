@@ -1,7 +1,7 @@
 #include <vector>
 #include <iostream>
 
-#include "IGraph.hpp"
+#include "GraphML.hpp"
   using namespace std;
   using namespace pelib;
 
@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 {
   if(argc == 1) return 0; //nothing to duplicate
   // usage: duplicate_tasks [id0 id1 ...]
-  IGraph input;
+  GraphML input;
   auto data = input.parse(cin);
   
 

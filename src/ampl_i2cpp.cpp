@@ -7,7 +7,7 @@ int
 main(int argc, char **argv)
 {
 	AmplInput input;
-	Cpp output("buildRecord");
+	Cpp output("buildAlgebra");
 
 	// Set floating point var output format to fixed at 7 digits
 	std::cout << std::setprecision(6)                                                                                                        

@@ -8,7 +8,7 @@ using namespace pelib;
 using namespace std;
 
 double
-MakespanSynthetic::calculate(const Record& tasks,const Record& architecture) const
+MakespanSynthetic::calculate(const Algebra& tasks,const Algebra& architecture) const
 {
 	int p = architecture.find<Scalar<int> >("p")->getValue();
 	int min_freq = *architecture.find<Set<int> >("F")->getValues().begin();

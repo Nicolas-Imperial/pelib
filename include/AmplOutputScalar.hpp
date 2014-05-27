@@ -15,11 +15,6 @@ namespace pelib
 	AmplOutputScalar: public AmplOutputData
 	{
 		public:
-			AmplOutputScalar(bool strict = true) : AmplOutputData(strict)
-			{
-				// Do nothing
-			}
-			
 			virtual
 			AmplOutputScalar*
 			clone() const
@@ -42,7 +37,7 @@ namespace pelib
 			}
 
 			virtual
-			Data*
+			AlgebraData*
 			parse(std::istream &in)
 			{
 				std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
@@ -50,7 +45,7 @@ namespace pelib
 				boost::cmatch match;
 				try
 				{
-					match = DataParser::match(std::string("(?:.*?)").append(getDetailedPattern()), str);
+					match = AlgebraDataParser::match(std::string("(?:.*?)").append(getDetailedPattern()), str);
 				} catch(NoDecimalFloatException &e)
 				{
 					std::ostringstream ss;
@@ -58,13 +53,13 @@ namespace pelib
 					throw ParseException(std::string("Asked a decimal conversion, but \"").append(ss.str()).append("\" is integer."));
 				}
 
-				Scalar<Value> *scalar = new Scalar<Value>(match[1], DataParser::convert<Value>(match[2], strict));
+				Scalar<Value> *scalar = new Scalar<Value>(match[1], AlgebraDataParser::convert<Value>(match[2], true));
 				return scalar;
 			}
 
 			virtual
 			void
-			dump(std::ostream &stream, const Data *data) const
+			dump(std::ostream &stream, const AlgebraData *data) const
 			{
 				const Scalar<Value> *scalar = dynamic_cast<const Scalar<Value>* >(data);
 				if(scalar == NULL) throw CastException("parameter \"data\" was not of type \"Scalar<Value>\".");

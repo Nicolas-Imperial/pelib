@@ -16,7 +16,7 @@ CXXFLAGS_DEBUG = -g -O0 -DDEBUG=1
 CXX_LDFLAGS = -L$(CPPELIB_SRC)/src -L.
 CXX_PKG = igraph muparser libxml++-2.6
 CXX_DEPS=libcrown.a $(CPPELIB_SRC)/src/libcppelib.a
-CXX_LIBS =-lcrown -lcppelib -lboost_regex
+CXX_LIBS =-lcppelib -lboost_regex
 CXX_TEST_LIBS =$(CXX_LIBS) -lunitc++ -lrt 
 CXX_TEST_DEPS =$(CXX_DEPS) libunitc++.a
 CXX_TEST_LDFLAGS = -L$(CPPELIB_SRC)/src -L.
@@ -31,31 +31,31 @@ bincxx_demo_libs = -lboost_regex -lboost_graph -lexpat
 bincxx_demo_ldflags =
 
 bincxx_duplicate_tasks_src =  duplicate_tasks.cpp
-bincxx_duplicate_tasks_export =  $(duplicate_tasks_src) 
+bincxx_duplicate_tasks_export = $(duplicate_tasks_src) 
 bincxx_duplicate_tasks_deps = libcppelib.a
 bincxx_duplicate_tasks_libs = -lboost_regex -lboost_graph -lexpat
 bincxx_duplicate_tasks_ldflags =
 
 bincxx_taskgraph2ampl_i_src = taskgraph2ampl_i.cpp
-bincxx_taskgraph2ampl_i_export =  $(bincxx_taskgraph2ampl_src) 
+bincxx_taskgraph2ampl_i_export = $(bincxx_taskgraph2ampl_src) 
 bincxx_taskgraph2ampl_i_deps = libcppelib.a
 bincxx_taskgraph2ampl_i_libs = -lboost_regex -lboost_graph -lexpat
 bincxx_taskgraph2ampl_i_ldflags =
 
 bincxx_ampl_i2taskgraph_src = ampl_i2taskgraph.cpp
-bincxx_ampl_i2taskgraph_export =  $(bincxx_ampl2taskgraph_src) 
+bincxx_ampl_i2taskgraph_export = $(bincxx_ampl2taskgraph_src) 
 bincxx_ampl_i2taskgraph_deps = libcppelib.a
 bincxx_ampl_i2taskgraph_libs = -lboost_regex -lboost_graph -lexpat
 bincxx_ampl_i2taskgraph_ldflags =
 
 bincxx_taskgraphfml2evaluated_src = taskgraphfml2evaluated.cpp
-bincxx_taskgraphfml2evaluated_export =  $(bincxx_taskgraphfml2evaluated_src) 
+bincxx_taskgraphfml2evaluated_export = $(bincxx_taskgraphfml2evaluated_src) 
 bincxx_taskgraphfml2evaluated_deps = libcppelib.a
 bincxx_taskgraphfml2evaluated_libs = -lboost_regex -lboost_graph -lexpat
 bincxx_taskgraphfml2evaluated_ldflags =
 
 bincxx_ampl_o2schedule_src = ampl_o2schedule.cpp
-bincxx_ampl_o2schedule_export =  $(bincxx_taskgraphfml2evaluated_src) 
+bincxx_ampl_o2schedule_export = $(bincxx_taskgraphfml2evaluated_src) 
 bincxx_ampl_o2schedule_deps = libcppelib.a
 bincxx_ampl_o2schedule_libs = -lboost_regex -lboost_graph -lexpat
 bincxx_ampl_o2schedule_ldflags =
@@ -103,7 +103,7 @@ bincxx_ampl_o2cpp_libs = -lboost_regex -lboost_graph -lexpat
 bincxx_ampl_o2cpp_ldflags = 
 
 bincxx_run_record_src = run_record.cpp
-bincxx_run_record_export = $(bincxx_run_record_src) make_record.cpp
+bincxx_run_record_export = $(bincxx_run_record_src) make_algebra.cpp
 bincxx_run_record_deps = libcppelib.a
 bincxx_run_record_libs = -lboost_regex -lboost_graph -lexpat
 bincxx_run_record_ldflags = 
@@ -122,16 +122,19 @@ libcxx_package = cppelib unit
 ## Cpp hierarchy base: data output only
 ## Cpp format classes: base class, data structure base class, output data structure classes; no parser because of lack of cpp parser base class
 libcxx_cppelib_src = \
-ParseException.cpp CastException.cpp NoDecimalFloatException.cpp Data.cpp Record.cpp \
-RecordParser.cpp DataParser.cpp \
-RecordOutput.cpp DataOutput.cpp \
+ParseException.cpp CastException.cpp NoDecimalFloatException.cpp Record.cpp \
+Data.cpp AlgebraData.cpp Algebra.cpp StreamingAppData.cpp StreamingApp.cpp \
+AlgebraParser.cpp DataParser.cpp AlgebraDataParser.cpp \
+AlgebraOutput.cpp DataOutput.cpp AlgebraDataOutput.cpp \
 Scalar.cpp Vector.cpp Matrix.cpp Set.cpp \
 AmplDataParser.cpp AmplDataOutput.cpp \
-AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp IGraph.cpp TaskgraphRecord.cpp Schedule.cpp ScheduleRecord.cpp\
+AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp GraphML.cpp TaskgraphRecord.cpp Schedule.cpp ScheduleRecord.cpp\
 AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
-MakespanSynthetic.cpp MakespanNumeric.cpp MakespanFft.cpp MakespanPreduce.cpp MakespanMergesort.cpp\
+Task.cpp Link.cpp Taskgraph.cpp Schedule.cpp Architecture.cpp \
+MakespanCalculator.cpp MakespanSynthetic.cpp MakespanConstant.cpp MakespanFFT.cpp MakespanPreduce.cpp MakespanMergesort.cpp\
 AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp \
 AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
+StreamingAppHandler.cpp XMLSchedule.cpp \
 CppDataOutput.cpp \
 Cpp.cpp CppData.cpp CppScalar.cpp CppVector.cpp CppSet.cpp CppMatrix.cpp \
 

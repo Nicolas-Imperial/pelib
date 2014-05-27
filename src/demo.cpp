@@ -19,10 +19,10 @@
 
 using namespace pelib;
 
-Record
-parse(RecordParser &parser, std::istream &input)
+Algebra
+parse(AlgebraParser &parser, std::istream &input)
 {
-	Record rec;
+	Algebra rec;
 	
 	try {
 		rec = parser.parse(input);
@@ -39,10 +39,10 @@ main(int argc, char **argv)
 {
 	AmplInput input;
 	AmplOutput output;
-	Record rec;
+	Algebra rec;
 
 	// We use an AMPL output, output format
-	RecordOutput &out = input;
+	AlgebraOutput &out = input;
 
 	// Set floating point var output format to fixed at 7 digits
 	std::cout << std::setprecision(6)                                                                                                        

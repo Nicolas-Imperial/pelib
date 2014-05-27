@@ -6,7 +6,7 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <Data.hpp>
+#include <AlgebraData.hpp>
 
 #ifndef PELIB_SCALAR
 #define PELIB_SCALAR
@@ -14,15 +14,15 @@
 namespace pelib
 {
 	template <class Value>
-	class Scalar: public Data
+	class Scalar: public AlgebraData
 	{
 		public:
-			Scalar(const std::string name, const Value value) : Data(name)
+			Scalar(const std::string name, const Value value) : AlgebraData(name)
 			{
 				this->value = value;
 			}
 
-			Scalar(const Scalar<Value>* scalar): Data(scalar->getName()), value(scalar->getValue())
+			Scalar(const Scalar<Value>* scalar) : AlgebraData(scalar->getName())
 			{
 				// Do nothing
 			}

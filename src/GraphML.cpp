@@ -1,4 +1,4 @@
-#include "IGraph.hpp"
+#include "GraphML.hpp"
 #include "TaskgraphRecord.hpp"
 
 #include "Vector.hpp"
@@ -9,25 +9,22 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-//#include <boost/graph/graphml.hpp>
-//#include <boost/graph/adjacency_list.hpp>
 #include <muParser.h>
 #include <vector>
 #include <sstream>
-extern "C"{
-#include <igraph.h>
-}
-using namespace pelib;
-using namespace std;
-
 #include <boost/math/special_functions/fpclassify.hpp> // isnan
 #include <cmath>
 #include <climits>
 #include <cstdio>
 
+extern "C" {
+#include <igraph.h>
+}
 
+using namespace pelib;
+using namespace std;
 
-TaskgraphRecord IGraph::parse(istream& data)
+TaskgraphRecord GraphML::parse(istream& data)
 {
   igraph_i_set_attribute_table(&igraph_cattribute_table); //do this to enable attribute fetching
 
@@ -65,7 +62,7 @@ TaskgraphRecord IGraph::parse(istream& data)
   return TaskgraphRecord(the_graph);
 }
 
-void IGraph::dump(ostream& o, const TaskgraphRecord& record) const 
+void GraphML::dump(ostream& o, const TaskgraphRecord& record) const 
 {
   int p[2];
   auto ans = pipe(p);
@@ -89,7 +86,7 @@ void IGraph::dump(ostream& o, const TaskgraphRecord& record) const
     },instream,&o);
 
 
-  igraph_write_graph_graphml(record.graph,fake_fileptr,true); 
+  igraph_write_graph_graphml(record.graph, fake_fileptr, true); 
   fclose(fake_fileptr);
 
   t.join();
@@ -97,7 +94,7 @@ void IGraph::dump(ostream& o, const TaskgraphRecord& record) const
   close(p[1]);
 }; 
 
-void IGraph::duplicate_tasks(TaskgraphRecord& record, const vector<int>& to_duplicate)
+void GraphML::duplicate_tasks(TaskgraphRecord& record, const vector<int>& to_duplicate)
 {
   //Implemented only for boost 
   throw runtime_error("Not implemented");

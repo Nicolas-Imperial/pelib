@@ -18,30 +18,15 @@
 #include <AmplOutputMatrix.hpp>
 
 #include "TaskgraphRecord.hpp"
-#include "Schedule.hpp"
+#include "XMLSchedule.hpp"
+
 using namespace pelib;
-
-Record
-parse(RecordParser &parser, std::istream &input)
-{
-	Record rec;
-	
-	try {
-		rec = parser.parse(input);
-	} catch(ParseException &e)
-	{
-		std::cerr << e.what() << std::endl;
-	}
-
-	return rec;
-}
 
 int
 main(int argc, char **argv)
 {
-  Schedule schedule;
-  schedule.parse(std::cin);
-
+	XMLSchedule schedule;
+	schedule.parse(std::cin);
 
 	return EXIT_SUCCESS;
 }

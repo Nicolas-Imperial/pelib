@@ -2,7 +2,7 @@
 #include <fstream>
 #include <AmplInput.hpp>
 #include <sstream>
-#include "IGraph.hpp"
+#include "GraphML.hpp"
 int main(int argc, char **argv)
 {
   using namespace std;
@@ -17,19 +17,18 @@ int main(int argc, char **argv)
   AmplInput archparser;
   ifstream ifs(argv[1]);
 
-  Record arch = archparser.parse(ifs);
+  Algebra arch = archparser.parse(ifs);
 
-  IGraph taskgparser;
+  GraphML taskgparser;
   TaskgraphRecord taskgraph = taskgparser.parse(cin);
 
-  taskgraph.setArchitecture(arch);
-  Record record = taskgraph.toRecord();
+  Algebra record = taskgraph.toAlgebra(arch);
 
   cout << std::setprecision(6) 
        << std::setiosflags(std::ios::fixed)
        << std::setiosflags(std::ios::showpoint);
 
-  TaskgraphRecord tgr(taskgraph,record);
+  TaskgraphRecord tgr(taskgraph, record);
   taskgparser.dump(cout, tgr);
   
   return 0;

@@ -5,15 +5,15 @@
 #include <iomanip>
 
 #include <AmplInput.hpp>
-#include "IGraph.hpp"
+#include "GraphML.hpp"
 
 int main(int argc, char **argv)
 {
   using namespace std;
   using namespace pelib;
 
-  Record architecture;
-  IGraph input;
+  Algebra architecture;
+  GraphML input;
 
   AmplInput output;
   AmplInput ai;
@@ -34,8 +34,7 @@ int main(int argc, char **argv)
 	    << std::setiosflags(std::ios::showpoint);  
 
   TaskgraphRecord tgr(input.parse(cin));
-  tgr.setArchitecture(architecture);
-  output.dump(cout,tgr);  
+  output.dump(cout, tgr.toAlgebra(architecture));  
 
   return 0;
 }

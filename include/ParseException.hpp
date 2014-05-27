@@ -1,3 +1,4 @@
+#include <string>
 #include <cstdlib>
 
 #ifndef PELIB_PARSEEXCEPTION

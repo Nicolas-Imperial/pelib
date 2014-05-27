@@ -14,9 +14,9 @@ namespace pelib
 		typedef std::map<Key, Value> VectorType;
 		
 		public:
-			AmplOutputVector(bool strict = true) : AmplOutputData(strict)
+			AmplOutputVector(bool strict = true)
 			{
-				// Do nothing
+				this->strict = strict;
 			}
 			virtual
 			AmplOutputVector*
@@ -40,13 +40,13 @@ namespace pelib
 			}
 
 			virtual
-			Data*
+			AlgebraData*
 			parse(std::istream &in)
 			{
 				VectorType values;
 				
 				std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-				boost::cmatch match = DataParser::match(std::string("(?:.*?)").append(getDetailedPattern()), str);
+				boost::cmatch match = AlgebraDataParser::match(std::string("(?:.*?)").append(getDetailedPattern()), str);
 				
 				boost::regex param_vector("(?:\\s*([^\\s]+)\\s+([^\\s]+))");
 				std::string remain = match[2];
@@ -65,7 +65,7 @@ namespace pelib
 
 					try
 					{
-						key = DataParser::convert<Key>(key_str, strict);
+						key = AlgebraDataParser::convert<Key>(key_str, strict);
 					} catch(NoDecimalFloatException &e)
 					{
 						std::ostringstream ss;
@@ -75,7 +75,7 @@ namespace pelib
 					
 					try
 					{
-						value = DataParser::convert<Value>(val_str, strict);
+						value = AlgebraDataParser::convert<Value>(val_str, strict);
 					} catch(NoDecimalFloatException &e)
 					{
 						value = e.getValue();
@@ -98,7 +98,7 @@ namespace pelib
 
 			virtual
 			void
-			dump(std::ostream &o, const Data *data) const
+			dump(std::ostream &o, const AlgebraData *data) const
 			{				
 				const Vector<Key, Value> *vector = dynamic_cast<const Vector<Key, Value>*>(data);
 				if(vector == NULL) throw CastException("parameter \"data\" was not of type \"Vector<Key, Value>\".");
@@ -115,6 +115,7 @@ namespace pelib
 			}
 
 		protected:
+			bool strict;
 		private:	
 	};
 }

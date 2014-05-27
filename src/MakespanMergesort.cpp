@@ -24,7 +24,7 @@ number_tasks_in_level(int task)
 	return pow(2, floor(log(task) / log(2)));
 }
 
-double MakespanMergesort::calculate(const Record& tasks,const Record& architecture) const
+double MakespanMergesort::calculate(const Algebra&  tasks,const Algebra&  architecture) const
 {
 	int p = architecture.find<Scalar<int> >("p")->getValue();
 	int min_freq = *architecture.find<Set<int> >("F")->getValues().begin();

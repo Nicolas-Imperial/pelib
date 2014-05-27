@@ -1,22 +1,19 @@
+#include <StreamingAppData.hpp>
 
-#include "IGraph.hpp"
-#include "Record.hpp"
-#include "ScheduleRecord.hpp"
+#ifndef PELIB_SCHEDULE
+#define PELIB_SCHEDULE
 
-#include <iostream>
+namespace pelib
+{
+	class Schedule : public StreamingAppData
+	{
+		public:
+			Schedule(std::string name);
+			virtual Schedule* clone() const;
 
-#ifndef SCHEDULE_H
-#define SCHEDULE_H
-
-namespace pelib{
-  //class ScheduleRecord;
-  class Schedule // : public output..
-  {
-  public:
-    void dump(std::ostream& os,const TaskgraphRecord& tgr,const Record& amploutput);
-    void dump(std::ostream& os,const ScheduleRecord& sr);
-    ScheduleRecord parse(std::istream &is);
-  };
+		protected:
+		private:		
+	};
 }
 
 #endif

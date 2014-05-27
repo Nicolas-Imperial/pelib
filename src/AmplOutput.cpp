@@ -26,8 +26,8 @@ namespace pelib
 		addOutputs();
 	}
 
-	AmplOutput::AmplOutput(std::vector<AmplOutputData*> parsers,
-			std::vector<AmplOutputData*> outputs)
+	AmplOutput::AmplOutput(std::vector<AmplOutputDataParser*> parsers,
+			std::vector<AmplOutputDataOutput*> outputs)
 	{
 		this->parsers = parsers;
 		this->outputs = outputs;
@@ -42,7 +42,7 @@ namespace pelib
 	void
 	AmplOutput::deleteParsers()
 	{
-		for(std::vector<AmplOutputData*>::iterator i = parsers.begin(); i != parsers.end(); i = parsers.erase(i))
+		for(std::vector<AmplOutputDataParser*>::iterator i = parsers.begin(); i != parsers.end(); i = parsers.erase(i))
 		{
 			delete *i;
 		}
@@ -51,7 +51,7 @@ namespace pelib
 	void
 	AmplOutput::deleteOutputs()
 	{
-		for(std::vector<AmplOutputData*>::iterator i = outputs.begin(); i != outputs.end(); i = outputs.erase(i))
+		for(std::vector<AmplOutputDataOutput*>::iterator i = outputs.begin(); i != outputs.end(); i = outputs.erase(i))
 		{
 			delete *i;
 		}
@@ -63,12 +63,12 @@ namespace pelib
 		deleteParsers();
 		deleteOutputs();
 
-		for(std::vector<AmplOutputData*>::const_iterator i = amplOutput.parsers.begin(); i != amplOutput.parsers.end(); i++)
+		for(std::vector<AmplOutputDataParser*>::const_iterator i = amplOutput.parsers.begin(); i != amplOutput.parsers.end(); i++)
 		{
 			parsers.push_back((*i)->clone());
 		}
 
-		for(std::vector<AmplOutputData*>::const_iterator i = amplOutput.outputs.begin(); i != amplOutput.outputs.end(); i++)
+		for(std::vector<AmplOutputDataOutput*>::const_iterator i = amplOutput.outputs.begin(); i != amplOutput.outputs.end(); i++)
 		{
 			outputs.push_back((*i)->clone());
 		}
@@ -76,10 +76,10 @@ namespace pelib
 		return *this;
 	}
 
-	Record
+	Algebra
 	AmplOutput::parse(std::istream &ampl_data)
 	{
-		Record record;
+		Algebra record;
 		std::string line;
 		
 		while(!getline(ampl_data, line, ';').fail())
@@ -90,24 +90,24 @@ namespace pelib
 
 			while(!getline(section, line, ';').fail())
 			{			
-				std::vector<AmplOutputData*>::iterator iter;
+				std::vector<AmplOutputDataParser*>::iterator iter;
 				for(iter = parsers.begin(); iter != parsers.end(); iter++)
 				{
-					AmplOutputData *parser = *iter;
+					AmplOutputDataParser *parser = *iter;
 					try {
 						// If any non-blank prefix to be discarded, it must be separated by a new line
 						std::string regex = std::string("(.*?\\n|)\\s*(")
 							.append(parser->getGlobalPattern())
 							.append(")(?:\\s*)");
 						
-						boost::cmatch match = DataParser::match(regex, line);
+						boost::cmatch match = AlgebraDataParser::match(regex, line);
 
 						std::stringstream token;
 						token.str(match[2]);
 
 						//std::cerr << "Discarded =\"" << match[1] << "\"." << std::endl;
 						//std::cerr << "Token =\"" << match[2] << "\"." << std::endl;
-						Data *data = parser->parse(token);
+						AlgebraData *data = parser->parse(token);
 						record.insert(data);
 
 						// Keep only the part we have not parsed
@@ -139,21 +139,21 @@ namespace pelib
 	}
 
 	void
-	AmplOutput::dump(std::ostream& o, const Record &record) const
+	AmplOutput::dump(std::ostream& o, const Algebra &record) const
 	{
-		std::map<std::string, const Data * const> records = record.getAllRecords();
-		for (std::map<std::string, const Data * const>::const_iterator rec = records.begin(); rec != records.end(); rec++)
+		std::map<std::string, const AlgebraData * const> records = record.getAllRecords();
+		for (std::map<std::string, const AlgebraData * const>::const_iterator rec = records.begin(); rec != records.end(); rec++)
 		{
 			dump(o, rec->second);
 		}
 	}
 
 	void
-	AmplOutput::dump(std::ostream& o, const Data *data) const
+	AmplOutput::dump(std::ostream& o, const AlgebraData *data) const
 	{
-		for (std::vector<AmplOutputData*>::const_iterator out = outputs.begin(); out != outputs.end(); out++)
+		for (std::vector<AmplOutputDataOutput*>::const_iterator out = outputs.begin(); out != outputs.end(); out++)
 		{
-			const DataOutput *output = *out;
+			const AmplOutputDataOutput *output = *out;
 			try
 			{
 				output->dump(o, data);
@@ -170,8 +170,8 @@ namespace pelib
 	void
 	AmplOutput::addParsers()
 	{		
-		parsers.push_back(new AmplOutputScalar<int>(true));
-		parsers.push_back(new AmplOutputScalar<float>(true));
+		parsers.push_back(new AmplOutputScalar<int>());
+		parsers.push_back(new AmplOutputScalar<float>());
 		parsers.push_back(new AmplOutputVector<int, int>());
 		parsers.push_back(new AmplOutputVector<int, float>());
 		parsers.push_back(new AmplOutputSet<int>());
@@ -183,8 +183,8 @@ namespace pelib
 	void			
 	AmplOutput::addOutputs()
 	{		
-		outputs.push_back(new AmplOutputScalar<int>(true));
-		outputs.push_back(new AmplOutputScalar<float>(true));
+		outputs.push_back(new AmplOutputScalar<int>());
+		outputs.push_back(new AmplOutputScalar<float>());
 		outputs.push_back(new AmplOutputVector<int, int>());
 		outputs.push_back(new AmplOutputVector<int, float>());
 		outputs.push_back(new AmplOutputSet<int>());

@@ -27,7 +27,7 @@ namespace pelib
 
 			virtual
 			void
-			dump(std::ostream &o, const Data *data) const
+			dump(std::ostream &o, const AlgebraData *data) const
 			{				
 				const Vector<Key, Value> *vector = dynamic_cast<const Vector<Key, Value>*>(data);
 				if(vector == NULL) throw CastException("parameter \"data\" was not of type \"Vector<Key, Value>\".");

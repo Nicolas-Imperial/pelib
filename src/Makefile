@@ -40,7 +40,7 @@ endef
 
 ## Get pkg-config output for the operation $2 (cflags|libs) on package list $1, with the corresponding options from variable $3$<package_name>
 define pkg-config
-$(foreach pkg,$1,$(strip $(if $(shell pkg-config --$2 "$(pkg) $(call $3$(pkg)_version)"),$(shell pkg-config --$2 "$(pkg) $(call $3$(pkg)_version)"),$(error Missing library))))
+$(if $(strip $1),$(if $(shell pkg-config --$2 $(foreach pkg,$1,"$(pkg) $(call $3$(pkg)_version)")),$(shell pkg-config --$2 $(foreach pkg,$1,"$(pkg) $(call $3$(pkg)_version)")),$(error Missing library)),)
 endef
 
 ## Gives all source files of projects $1 of type $2 (bin|lib|test) with language $3 (cc|cxx)
@@ -130,21 +130,31 @@ endef
 ## Gives all library switches brought by the makefile and its options
 ## Global pkg-config packages
 ## Global manual LIBS variable
-GLOBAL_CC_LIBS=$(LIBS) $(CC_LIBS) $(call pkg-config,$(CC_PKG),libs-only-l,CC_PKG_)
-GLOBAL_CXX_LIBS=$(LIBS) $(CXX_LIBS) $(call pkg-config,$(CXX_PKG),libs-only-l,CXX_PKG_)
-GLOBAL_CC_TEST_LIBS=$(LIBS) $(CC_TEST_LIBS) $(call pkg-config,$(CC_PKG_TEST),libs-only-l,CC_TEST_PKG_)
-GLOBAL_CXX_TEST_LIBS=$(LIBS) $(CXX_TEST_LIBS) $(call pkg-config,$(CXX_PKG_TEST),libs-only-l,CXX_TEST_PKG_)
+GLOBAL_CC_LIBS=$(LIBS) $(CC_LIBS)
+GLOBAL_CXX_LIBS=$(LIBS) $(CXX_LIBS)
+GLOBAL_CC_TEST_LIBS=$(LIBS) $(CC_TEST_LIBS)
+GLOBAL_CXX_TEST_LIBS=$(LIBS) $(CXX_TEST_LIBS)
+GLOBAL_CC_PKG=$(call pkg-config,$(CC_PKG),libs-only-l,CC_PKG_)
+GLOBAL_CXX_PKG=$(call pkg-config,$(CXX_PKG),libs-only-l,CXX_PKG_)
+GLOBAL_CC_TEST_PKG=$(call pkg-config,$(CC_PKG_TEST),libs-only-l,CC_TEST_PKG_)
+GLOBAL_CXX_TEST_PKG=$(call pkg-config,$(CXX_PKG_TEST),libs-only-l,CXX_TEST_PKG_)
 
 ## Gives all library switches of project $1 of type $2 (bin|lib|test) in language $3
 ## pkg-config provided switches from _pkg variable
 ## manual library switches from _libs variable
 define libs_project
-$(call pkg-config,$(call $2$3_$1_pkg),libs-only-l,$2$3_$1_pkg_) $($2$3_$(call suffixin,$@,$($2$3_package))_libs)
+$($2$3_$(call suffixin,$1,$($2$3_package))_libs)
+endef
+
+define pkg_project
+$(call pkg-config,$(call $2$3_$1_pkg),libs-only-l,$2$3_$1_pkg_)
 endef
 
 ## All C and C++ objects, eliminating duplicates
 cc_object = $(sort $(call object,$(bincc_package),bin,cc) $(call object,$(libcc_package),lib,cc) $(call object,$(testcc_package),test,cc))
 cxx_object = $(sort $(call object,$(bincxx_package),bin,cxx) $(call object,$(libcxx_package),lib,cxx) $(call object,$(testcxx_package),test,cxx))
+
+-include $(foreach file,$(cc_object) $(cxx_object),$(patsubst %.o,%.d,$(file)))
 
 ## Build the list of targets this makefile can build
 ## The list of all c and c++ packages, prefixed all these packages with a specific variant
@@ -190,10 +200,10 @@ $(cxx_object): $$(call source,$$@,$$(call projectof,$$@,$$(call typeof,$$@),cxx)
 	@rm -f $(patsubst %.o,%.d,$@).tmp
 
 $(bincc_list): $$(call object,$$(call suffixin,$$@,$$(bincc_package)),bin,cc) $$(call $$(patsubst %,bincc_%_deps,$$(call suffixin,$$@,$$(bincc_package))))
-	$(CC) -o $@ $(GLOBAL_CC_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(bincc_package),bin,cc),bin,cc) $(call object,$(call suffixin,$@,$(bincc_package)),bin,cc) $(GLOBAL_CC_LIBS) $(call libs_project,$@,bin,cc)
+	$(CC) -o $@ $(GLOBAL_CC_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(bincc_package),bin,cc),bin,cc) $(call object,$(call suffixin,$@,$(bincc_package)),bin,cc) $(GLOBAL_CC_LIBS) $(call libs_project,$@,bin,cc) $(GLOBAL_CC_PKG) $(call pkg_project,$@,bin,cc)
 
 $(bincxx_list): $$(call object,$$(call suffixin,$$@,$$(bincxx_package)),bin,cxx) $$(call $$(patsubst %,bincxx_%_deps,$$(call suffixin,$$@,$$(bincxx_package))))
-	$(CXX) -o $@ $(GLOBAL_CXX_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(bincxx_package),bin,cxx),bin,cxx) $(call object,$(call suffixin,$@,$(bincxx_package)),bin,cxx) $(GLOBAL_CXX_LIBS) $(call libs_project,$@,bin,cxx)
+	$(CXX) -o $@ $(GLOBAL_CXX_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(bincxx_package),bin,cxx),bin,cxx) $(call object,$(call suffixin,$@,$(bincxx_package)),bin,cxx) $(GLOBAL_CXX_LIBS) $(call libs_project,$@,bin,cxx) $(GLOBAL_CXX_PKG) $(call pkg_project,$@,bin,cxx)
 
 bin_package: $(bin_list)
 
@@ -206,10 +216,10 @@ $(libcxx_list): $$(call object,$$(patsubst lib%.a,%,$$@),lib,cxx) $$(call $$(pat
 lib_target: $(lib_list)
 
 $(testcc_list): $$(call object,$$(patsubst test_%,%,$$@),test,cc) $$(call $$(patsubst %,testcc_%_deps,$$(call suffixin,$$(patsubst lib%.a,%,$$@),$$(testcc_package))))
-	$(CC) -o $@ $(GLOBAL_CC_TEST_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(testcc_package),test,cc),test,cc) $(call object,$(call suffixin,$@,$(testcc_package)),test,cc) $(GLOBAL_CXX_TEST_LIBS) $(call libs_project,$@,test,cc)
+	$(CC) -o $@ $(GLOBAL_CC_TEST_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(testcc_package),test,cc),test,cc) $(call object,$(call suffixin,$@,$(testcc_package)),test,cc) $(GLOBAL_CC_LIBS) $(call libs_project,$@,test,cc) $(GLOBAL_CC_TEST_PKG) $(call pkg_project,$@,test,cc)
 
 $(testcxx_list): $$(call object,$$(patsubst test_%,%,$$@),test,cxx) $$(call $$(patsubst %,testcxx_%_deps,$$(call suffixin,$$(patsubst lib%.a,%,$$@),$$(testcxx_package))))
-	$(CXX) -o $@ $(GLOBAL_CXX_TEST_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(testcxx_package),test,cxx),test,cxx) $(call object,$(call suffixin,$@,$(testcxx_package)),test,cxx) $(GLOBAL_CXX_TEST_LIBS) $(call libs_project,$@,test,cxx)
+	$(CXX) -o $@ $(GLOBAL_CXX_TEST_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(testcxx_package),test,cxx),test,cxx) $(call object,$(call suffixin,$@,$(testcxx_package)),test,cxx) $(GLOBAL_CXX_LIBS) $(call libs_project,$@,test,cxx) $(GLOBAL_CXX_TEST_PKG) $(call pkg_project,$@,test,cxx)
 
 test_target: $(test_list)
 	

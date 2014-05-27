@@ -7,7 +7,7 @@
 #include <iomanip>
 #include <set>
 
-#include <Data.hpp>
+#include <AlgebraData.hpp>
 
 #ifndef PELIB_SET
 #define PELIB_SET
@@ -15,18 +15,18 @@
 namespace pelib
 {
 	template <class Value> 
-	class Set: public Data
+	class Set: public AlgebraData
 	{
 		//typedef std::set<Value, std::less<Value>, std::allocator<Value> > SetType;
 		typedef std::set<Value> SetType;
 		
 		public:
-			Set(const std::string name, const SetType values) : Data(name), values(values)
+			Set(const std::string name, const SetType values) : AlgebraData(name), values(values)
 			{
 				// Do nothing
 			}
 
-			Set(const Set<Value>* Set): Data(Set->getName()), values(Set->getValues())
+			Set(const Set<Value>* Set): AlgebraData(Set->getName()), values(Set->getValues())
 			{
 				// Do nothing
 			}

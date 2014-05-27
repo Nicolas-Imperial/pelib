@@ -1,4 +1,4 @@
-#include "MakespanFft.hpp"
+#include "MakespanFFT.hpp"
 #include "Scalar.hpp"
 #include "Set.hpp"
 #include "Matrix.hpp"
@@ -8,7 +8,7 @@ using namespace pelib;
 using namespace std;
 
 double
-MakespanFft::calculate(const Record& tasks,const Record& architecture) const
+MakespanFFT::calculate(const Algebra&  tasks,const Algebra&  architecture) const
 {
 	int p = architecture.find<Scalar<int> >("p")->getValue();
 	int min_freq = *architecture.find<Set<int> >("F")->getValues().begin();

@@ -29,7 +29,7 @@ namespace pelib
 
 			virtual
 			void
-			dump(std::ostream &stream, const Data *data) const
+			dump(std::ostream &stream, const AlgebraData *data) const
 			{
 				const Scalar<Value> *scalar = dynamic_cast<const Scalar<Value>* >(data);
 				if(scalar == NULL) throw CastException("parameter \"data\" was not of type \"Scalar<Value>\".");

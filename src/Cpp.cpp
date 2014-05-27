@@ -18,7 +18,7 @@ namespace pelib
 {
 	Cpp::Cpp()
 	{				
-		this->setName(std::string("make_record"));
+		this->setName(std::string("make_algebra"));
 		
 		// Add outputs
 		addOutputs();
@@ -26,7 +26,7 @@ namespace pelib
 
 	Cpp::Cpp(std::vector<CppData*> outputs)
 	{
-		this->setName(std::string("make_record"));
+		this->setName(std::string("make_algebra"));
 		this->outputs = outputs;
 	}
 
@@ -84,18 +84,18 @@ namespace pelib
 	}
 
 	void
-	Cpp::dump(std::ostream& o, const Record &record) const
+	Cpp::dump(std::ostream& o, const Algebra &record) const
 	{
-		o << "pelib::Record" << std::endl << this->getName() << "()" << std::endl << "{" << std::endl;
-		o << "pelib::Record new_record;" << std::endl;
+		o << "pelib::Algebra" << std::endl << this->getName() << "()" << std::endl << "{" << std::endl;
+		o << "pelib::Algebra new_algebra;" << std::endl;
 		
-		std::map<std::string, const Data * const> records = record.getAllRecords();
-		for (std::map<std::string, const Data * const>::const_iterator rec = records.begin(); rec != records.end(); rec++)
+		std::map<std::string, const AlgebraData * const> records = record.getAllRecords();
+		for (std::map<std::string, const AlgebraData * const>::const_iterator rec = records.begin(); rec != records.end(); rec++)
 		{
 			try
 			{
 				dump(o, rec->second);
-				o << "new_record.insert(&" << rec->first << ");" << std::endl;
+				o << "new_algebra.insert(&" << rec->first << ");" << std::endl;
 			}
 			catch (CastException &e)
 			{
@@ -104,18 +104,18 @@ namespace pelib
 			
 		}
 
-		o << "return new_record;" << std::endl;
+		o << "return new_algebra;" << std::endl;
 		o << "}" << std::endl;
 	}
 
 	void
-	Cpp::dump(std::ostream& o, const Data *data) const
+	Cpp::dump(std::ostream& o, const AlgebraData *data) const
 	{
 		bool was_output = false;
 		
 		for (std::vector<CppData*>::const_iterator out = outputs.begin(); out != outputs.end(); out++)
 		{	
-			const DataOutput *output = *out;
+			const CppDataOutput *output = *out;
 			
 			try
 			{

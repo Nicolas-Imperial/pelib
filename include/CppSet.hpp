@@ -30,7 +30,7 @@ namespace pelib
 
 			virtual
 			void
-			dump(std::ostream &o, const Data *data) const
+			dump(std::ostream &o, const AlgebraData *data) const
 			{				
 				const Set<Value> *set = dynamic_cast<const Set<Value>*>(data);
 				if(set == NULL) throw CastException("parameter \"data\" was not of type \"Set<Value>\".");

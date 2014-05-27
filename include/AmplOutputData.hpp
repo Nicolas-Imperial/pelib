@@ -1,20 +1,14 @@
-#include <AmplDataParser.hpp>
-#include <AmplDataOutput.hpp>
+#include <AmplOutputDataParser.hpp>
+#include <AmplOutputDataOutput.hpp>
 
 #ifndef PELIB_AMPLOUTPUTDATA
 #define PELIB_AMPLOUTPUTDATA
 
 namespace pelib
 {
-	class AmplOutputData: public AmplDataOutput, public AmplDataParser
+	class AmplOutputData: public AmplOutputDataOutput, public AmplOutputDataParser
 	{
 		public:
-			AmplOutputData(bool strict) : AmplDataParser(strict) {}
-	  virtual ~AmplOutputData() {}
-			virtual
-			AmplOutputData*
-			clone() const = 0;
-	  
 		protected:
 		private:		
 	};

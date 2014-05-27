@@ -3,9 +3,9 @@
 #include <Vector.hpp>
 #include <Set.hpp>
 #include <Matrix.hpp>
-#include <Record.hpp>
+#include <Algebra.hpp>
 
-#include "make_record.cpp"
+#include "make_algebra.cpp"
 
 using namespace pelib;
 
@@ -19,7 +19,7 @@ main(int argc, char **argv)
  	<< std::setiosflags(std::ios::fixed)                                                                                                     
 	<< std::setiosflags(std::ios::showpoint);
 
-	input.dump(std::cout, buildRecord());
+	input.dump(std::cout, buildAlgebra());
 
 	return EXIT_SUCCESS;
 }

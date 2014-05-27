@@ -1,8 +1,8 @@
+#include "MakespanCalculator.hpp"
+#include "Algebra.hpp"
+
 #ifndef MAKESPAN_MERGESORT
 #define MAKESPAN_MERGESORT
-
-#include "MakespanCalculator.hpp"
-#include "Record.hpp"
 
 namespace pelib
 {
@@ -11,7 +11,7 @@ namespace pelib
   public:
 
 
-    double calculate(const Record& tasks,const Record& architecture) const;
+    double calculate(const Algebra& tasks,const Algebra& architecture) const;
   };
 }
 

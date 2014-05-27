@@ -12,6 +12,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <string>
+
 using namespace std;
 using namespace pelib;
 using namespace xmlpp;
@@ -41,7 +42,8 @@ struct task_info
   int frequency;
 };
 
-Record ScheduleRecord::toRecord() const
+Algebra
+ScheduleRecord::toAlgebra() const
 {
   // Just like taskgraph conversion
   // this involves turning the data structure
@@ -136,7 +138,7 @@ Record ScheduleRecord::toRecord() const
   Scalar<int> ampl_p("p",p);
   Scalar<float> ampl_M("M",M);
   
-  Record record;
+  Algebra record;
   record.insert(&ampl_n);
   record.insert(&ampl_p);
   record.insert(&ampl_M);

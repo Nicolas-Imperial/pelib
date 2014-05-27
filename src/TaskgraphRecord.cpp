@@ -8,21 +8,23 @@
 #include <iomanip>
 
 #include <AmplOutput.hpp>
-#include <Record.hpp>
+#include <Algebra.hpp>
 #include <AmplDataParser.hpp>
 #include <Data.hpp>
 #include "Vector.hpp"
 #include "Matrix.hpp"
 #include "Scalar.hpp"
 #include "Set.hpp"
-#include "MakespanSelector.hpp"
 #include "MakespanCalculator.hpp"
 #include <muParser.h>
+
 extern "C"{
 #include <igraph.h>
 }
+
 using namespace std;
 #define VERY_SMALL 1e-6
+
 namespace pelib
 {	
 
@@ -47,17 +49,20 @@ namespace pelib
    
   TaskgraphRecord::TaskgraphRecord(igraph_t* graph) : graph(graph)
   {
-	architecture = nullptr;
+	//architecture = nullptr;
   }
 
   TaskgraphRecord::~TaskgraphRecord()
   {
     igraph_destroy(graph);
     delete graph;
+
+	/*
     if(architecture != nullptr)
       {
 	delete architecture;
       }
+	*/
   }
 
   TaskgraphRecord::TaskgraphRecord(const TaskgraphRecord &rhs)
@@ -73,11 +78,11 @@ namespace pelib
     return *this;
   }
   
-  TaskgraphRecord::TaskgraphRecord(const Record& record)
+  TaskgraphRecord::TaskgraphRecord(const Algebra& record)
   {
     igraph_i_set_attribute_table(&igraph_cattribute_table); //do this to enable attribute fetching
     graph = new igraph_t();
-    architecture = 0;
+    //architecture = 0;
     FILE* f = fopen("src/empty_taskgraph.graphml","r"); //TODO: include in ar? 
     if(!f)
       {
@@ -111,16 +116,16 @@ namespace pelib
     merge_taskgraph_record(record);
   }
 	 
-  TaskgraphRecord::TaskgraphRecord(const TaskgraphRecord& tgr, const Record& record)
+  TaskgraphRecord::TaskgraphRecord(const TaskgraphRecord& tgr, const Algebra& record)
   {
     igraph_i_set_attribute_table(&igraph_cattribute_table); //do this to enable attribute fetching
-    architecture = new Record(*tgr.architecture); //TODO: call clone() ?
+    //architecture = new Algebra(*tgr.architecture); //TODO: call clone() ?
     graph = new igraph_t();
     igraph_copy(graph,tgr.graph);    
     merge_taskgraph_record(record);
   }
 
-  void TaskgraphRecord::merge_taskgraph_record(const Record& record)
+  void TaskgraphRecord::merge_taskgraph_record(const Algebra& record)
   {
 
     vector<Vertex_info> tasks = buildVertexVector();
@@ -129,7 +134,7 @@ namespace pelib
     auto e = record.find<Matrix<int, int, float> >("e");
     if(e == nullptr)
       {
-	throw runtime_error("Record does not have neccesary data!\n");
+	throw runtime_error("Algebra does not have neccesary data!\n");
       }
     auto e_matrix = e->getValues();
     if(e_matrix.size() != tasks.size())
@@ -207,12 +212,12 @@ namespace pelib
 	}
 	else
 	{
-		if(architecture != nullptr)
-		{
+//		if(architecture != nullptr)
+//		{
 			stringstream ss;
 			ss << task.max_width;
 			task.efficiency_line = string("fml:p <= ") + ss.str() + "? 1 : 1e-6";
-		}
+//		}
 	}
 	
 	tasks.push_back(task);
@@ -224,6 +229,7 @@ namespace pelib
     return tasks;
   }
 
+/*
   Record
   TaskgraphRecord::toRecord() const
   {
@@ -237,9 +243,10 @@ namespace pelib
 	    abort();
 	}
   }
+*/
 
-  Record
-  TaskgraphRecord::toRecord(const Record &arch) const
+  Algebra
+  TaskgraphRecord::toAlgebra(const Algebra &arch) const
   {
     size_t processors;
 	const Scalar<int> *p = arch.find<Scalar<int> >("p");
@@ -320,13 +327,13 @@ namespace pelib
     pelib::Scalar<int> n("n",tasks.size());
 
     
-    Record record;
+    Algebra record;
     record.insert(&Wi);
     record.insert(&Tau);
     record.insert(&e);
     record.insert(&n);
 
-    const MakespanCalculator*  msc = MakespanSelector::getMakespanCalculator(GAS(graph,"target_makespan"));
+    const MakespanCalculator*  msc = MakespanCalculator::getMakespanCalculator(GAS(graph,"target_makespan"));
     double target_makespan = msc->calculate(record, arch);
 
     delete msc;
@@ -336,11 +343,12 @@ namespace pelib
     return record;
   }
 
-  void TaskgraphRecord::setArchitecture(const Record& architecture)
+/*
+  void TaskgraphRecord::setArchitecture(const Algebra& architecture)
   {
-    this->architecture = new Record(architecture);
+    this->architecture = new Algebra(architecture);
   }
-
+*/
 
   std::vector<std::string> TaskgraphRecord::get_taskids() const
   {
@@ -384,6 +392,7 @@ namespace pelib
     return -1;
   }
 
+/*
   float TaskgraphRecord::makespan_random(const vector<Vertex_info>& tasks )
   {
     //int n = architecture->find<Scalar<int> >("n")->getValue();
@@ -402,11 +411,12 @@ namespace pelib
     
     return (sum_pTw/max_freq + sum_pTw/min_freq) / 2;
   }
+*/
 
   float
-  TaskgraphRecord::getTargetMakespan() const
+  TaskgraphRecord::getTargetMakespan(const Algebra& architecture) const
   {
-	return this->toRecord().find<Scalar<float> >("M")->getValue();
+	return this->toAlgebra(architecture).find<Scalar<float> >("M")->getValue();
   }
 }
 

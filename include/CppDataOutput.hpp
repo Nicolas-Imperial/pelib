@@ -1,19 +1,15 @@
 #include <string>
 
-#include <DataOutput.hpp>
+#include <AlgebraDataOutput.hpp>
 
 #ifndef PELIB_CPPDATAOUTPUT
 #define PELIB_CPPDATAOUTPUT
 
 namespace pelib
 {
-	class CppDataOutput: public DataOutput
+	class CppDataOutput: public AlgebraDataOutput
 	{
 		public:
-			virtual
-			CppDataOutput*
-			clone() const = 0;
-			
 		protected:
 		private:
 	};

@@ -5,8 +5,8 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <RecordParser.hpp>
-#include <RecordOutput.hpp>
+#include <AlgebraParser.hpp>
+#include <AlgebraOutput.hpp>
 #include <AmplDataParser.hpp>
 #include <AmplDataOutput.hpp>
 #include <AmplInputData.hpp>
@@ -16,37 +16,34 @@
 
 namespace pelib
 {
-	class AmplInput: public RecordParser, public RecordOutput
+	class AmplInput: public AlgebraParser, public AlgebraOutput
 	{
 		public:
-			AmplInput(std::vector<AmplInputData*> parsers,
-			std::vector<AmplInputData*> outputs);
+			AmplInput(std::vector<AmplInputDataParser*> parsers,
+			std::vector<AmplInputDataOutput*> outputs);
 			AmplInput();
 
 			virtual
 			~AmplInput();
-			
-			virtual
-			Record
-			parse(std::istream &ampl_data);
+
+			Algebra
+			parse(std::istream &data);
 
 			virtual
 			void
-			dump(std::ostream& o, const Record &record) const;
+			dump(std::ostream& o, const Algebra &record) const;
 
 			virtual
 			void
-			dump(std::ostream& o, const Data *data) const;
+			dump(std::ostream& o, const AlgebraData *data) const;
 
 			virtual
 			AmplInput&
 			operator=(const AmplInput &rhs);
 
 		protected:
-			//std::vector<AmplDataParser*> parsers;
-			//std::vector<AmplDataParser*> outputs;
-			std::vector<AmplInputData*> parsers;
-			std::vector<AmplInputData*> outputs;
+			std::vector<AmplInputDataParser*> parsers;
+			std::vector<AmplInputDataOutput*> outputs;
 
 			void
 			deleteParsers();

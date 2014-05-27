@@ -1,5 +1,5 @@
 #include <libxml++/libxml++.h>
-#include "Record.hpp"
+#include "Algebra.hpp"
 
 extern "C"{
 #include <igraph.h>
@@ -12,7 +12,6 @@ namespace pelib
 {
   class ScheduleRecord
   {
-    friend class Schedule;
   public:
     ScheduleRecord() = delete;
     ScheduleRecord(xmlpp::DomParser* theSchedule);
@@ -22,7 +21,7 @@ namespace pelib
     ~ScheduleRecord();
     
     
-    Record toRecord() const;
+    Algebra toAlgebra() const;
     
   private:
     //TODO: Maybe store it in a more accessible format

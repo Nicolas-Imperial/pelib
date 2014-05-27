@@ -1,11 +1,9 @@
 #include "TaskgraphRecord.hpp"
 #include "AmplOutput.hpp"
-#include "IGraph.hpp"
-#include "Schedule.hpp"
-//#include "ScheduleRecord.hpp"
+#include "GraphML.hpp"
+#include "XMLSchedule.hpp"
 
 #include <fstream>
-
 
 using namespace pelib;
 using namespace std;
@@ -18,20 +16,20 @@ int main(int argc, char* argv[])
       return 1;
     }
 
-  IGraph tg;
+  GraphML tg;
   AmplOutput ao;
-  Schedule sch;
+  XMLSchedule sch;
 
   ifstream ifs(argv[1]);
 
   TaskgraphRecord tgr = tg.parse(ifs);
   ifs.close();
   
-  Record amplschedule(ao.parse(cin));
+  Algebra amplschedule = ao.parse(cin);
   //cout << "The schedule:" << endl;
   //ao.dump(cout,amplschedule);
 
-  sch.dump(cout, tgr, amplschedule);
+  //sch.dump(cout, tgr, amplschedule);
 
   return 0;
 }

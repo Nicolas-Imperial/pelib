@@ -5,8 +5,7 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <DataParser.hpp>
-#include <Record.hpp>
+#include <Algebra.hpp>
 
 #ifndef PELIB_RECORDPARSER
 #define PELIB_RECORDPARSER
@@ -16,13 +15,6 @@ namespace pelib
 	class RecordParser
 	{
 		public:
-			virtual
-			~RecordParser();
-			
-			virtual
-			Record
-			parse(std::istream &ampl_data) = 0;
-
 		protected:
 		private:
 	};

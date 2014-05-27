@@ -6,7 +6,7 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <Data.hpp>
+#include <AlgebraData.hpp>
 
 #ifndef PELIB_MATRIX
 #define PELIB_MATRIX
@@ -14,18 +14,18 @@
 namespace pelib
 {
 	template <class Col, class Row, class Value>
-	class Matrix: public Data
+	class Matrix: public AlgebraData
 	{
 		typedef std::map<Col, Value> RowType;
 		typedef std::map<Row, RowType> MatrixType;
 		
 		public:
-			Matrix(const std::string name, const MatrixType values) : Data(name)
+			Matrix(const std::string name, const MatrixType values) : AlgebraData(name)
 			{
 				this->values = values;
 			}
 
-			Matrix(const Matrix<Col, Row, Value>* matrix): Data(matrix->getName()), values(matrix->getValues())
+			Matrix(const Matrix<Col, Row, Value>* matrix): AlgebraData(matrix->getName()), values(matrix->getValues())
 			{
 				// Do nothing
 			}
@@ -63,6 +63,23 @@ namespace pelib
 			getRowSize() const // /!\ This is the size of a row, i.e. the number of columns
 			{
 				return values.begin()->second.size();
+			}
+
+			virtual
+			Matrix<Row, Col, Value>
+			transpose() const
+			{
+				std::map<Col, std::map<Row, Value> > new_values;
+				for(typename MatrixType::const_iterator i = values.begin(); i != values.end(); i++)
+				{
+					for(typename RowType::const_iterator j = i->second.begin(); j != i->second.end(); j++)
+					{
+						Value val = j->second;
+						new_values[j->first][i->first] = val;
+					}
+				}
+
+				return Matrix<Row, Col, Value>(this->getName(), new_values);
 			}
 			
 		protected:

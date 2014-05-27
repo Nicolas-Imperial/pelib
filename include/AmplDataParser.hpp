@@ -1,21 +1,15 @@
 #include <string>
 
-#include <DataParser.hpp>
+#include <AlgebraDataParser.hpp>
 
 #ifndef PELIB_AMPLDATAPARSER
 #define PELIB_AMPLDATAPARSER
 
 namespace pelib
 {
-	class AmplDataParser: public DataParser
+	class AmplDataParser: public AlgebraDataParser
 	{
 		public:
-			AmplDataParser(bool strict) : DataParser(strict) {}
-			
-			virtual
-			AmplDataParser*
-			clone() const = 0;
-			
 		protected:
 		private:
 	};

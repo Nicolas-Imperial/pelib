@@ -1,17 +1,15 @@
+#include "MakespanCalculator.hpp"
+#include "Algebra.hpp"
+
 #ifndef MAKESPAN_SYNTHETIC
 #define MAKESPAN_SYNTHETIC
-
-#include "MakespanCalculator.hpp"
-#include "Record.hpp"
 
 namespace pelib
 {
   class MakespanSynthetic : public MakespanCalculator
   {
   public:
-
-
-    double calculate(const Record& tasks,const Record& architecture) const;
+    double calculate(const Algebra& tasks,const Algebra& architecture) const;
   };
 }
 

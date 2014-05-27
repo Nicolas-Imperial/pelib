@@ -28,7 +28,7 @@ namespace pelib
 
 			virtual
 			void
-			dump(std::ostream &o, const Data *data) const
+			dump(std::ostream &o, const AlgebraData *data) const
 			{				
 				const Matrix<Col, Row, Value> *matrix = dynamic_cast<const Matrix<Col, Row, Value>*>(data);
 				if(matrix == NULL) throw CastException("parameter \"data\" was not of type \"Matrix<Col, Row, Value>\".");

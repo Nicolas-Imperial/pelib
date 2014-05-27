@@ -6,7 +6,7 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <Data.hpp>
+#include <AlgebraData.hpp>
 
 #ifndef PELIB_VECTOR
 #define PELIB_VECTOR
@@ -14,17 +14,17 @@
 namespace pelib
 {
 	template <class Key, class Value> 
-	class Vector: public Data
+	class Vector: public AlgebraData
 	{
 		typedef std::map<Key, Value> VectorType;
 		
 		public:
-			Vector(const std::string name, const VectorType values) : Data(name), values(values)
+			Vector(const std::string name, const VectorType values) : AlgebraData(name), values(values)
 			{
 				// Do nothing
 			}
 
-			Vector(const Vector<Key, Value>* vector): Data(vector->getName()), values(vector->getValues())
+			Vector(const Vector<Key, Value>* vector): AlgebraData(vector->getName()), values(vector->getValues())
 			{
 				// Do nothing
 			}

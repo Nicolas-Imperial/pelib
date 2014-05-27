@@ -26,8 +26,8 @@ namespace pelib
 		addOutputs();
 	}
 
-	AmplInput::AmplInput(std::vector<AmplInputData*> parsers,
-			std::vector<AmplInputData*> outputs)
+	AmplInput::AmplInput(std::vector<AmplInputDataParser*> parsers,
+			std::vector<AmplInputDataOutput*> outputs)
 	{
 		this->parsers = parsers;
 		this->outputs = outputs;
@@ -43,7 +43,7 @@ namespace pelib
 	AmplInput::deleteParsers()
 	{
 		
-		for(std::vector<AmplInputData*>::iterator i = parsers.begin(); i != parsers.end(); i = parsers.erase(i))
+		for(std::vector<AmplInputDataParser*>::iterator i = parsers.begin(); i != parsers.end(); i = parsers.erase(i))
 		{
 			delete *i;
 		}
@@ -52,7 +52,7 @@ namespace pelib
 	void
 	AmplInput::deleteOutputs()
 	{
-		for(std::vector<AmplInputData*>::iterator i = outputs.begin(); i != outputs.end(); i = outputs.erase(i))
+		for(std::vector<AmplInputDataOutput*>::iterator i = outputs.begin(); i != outputs.end(); i = outputs.erase(i))
 		{
 			delete *i;
 		}
@@ -64,12 +64,12 @@ namespace pelib
 		deleteParsers();
 		deleteOutputs();
 
-		for(std::vector<AmplInputData*>::const_iterator i = amplInput.parsers.begin(); i != amplInput.parsers.end(); i++)
+		for(std::vector<AmplInputDataParser*>::const_iterator i = amplInput.parsers.begin(); i != amplInput.parsers.end(); i++)
 		{
 			parsers.push_back((*i)->clone());
 		}
 
-		for(std::vector<AmplInputData*>::const_iterator i = amplInput.outputs.begin(); i != amplInput.outputs.end(); i++)
+		for(std::vector<AmplInputDataOutput*>::const_iterator i = amplInput.outputs.begin(); i != amplInput.outputs.end(); i++)
 		{
 			outputs.push_back((*i)->clone());
 		}
@@ -77,10 +77,10 @@ namespace pelib
 		return *this;
 	}
 
-	Record
+	Algebra
 	AmplInput::parse(std::istream &ampl_data)
 	{
-		Record record;
+		Algebra record;
 		std::string line;
 		std::string first_only = "\\1";
 		std::string nothing = "";
@@ -111,14 +111,14 @@ namespace pelib
 				continue;
 			}
 
-			std::vector<AmplInputData*>::iterator iter;
+			std::vector<AmplInputDataParser*>::iterator iter;
 			for(iter = parsers.begin(); iter != parsers.end(); iter++)
 			{
-				AmplInputData *parser = *iter;
+				AmplInputDataParser *parser = *iter;
 				try {
 					std::istringstream istr(line);
 					std::istream &str = istr;
-					Data *data = parser->parse(str);
+					AlgebraData *data = parser->parse(str);
 					record.insert(data);
 
 					// No need to try another parser; proceed with the next token
@@ -139,21 +139,21 @@ namespace pelib
 	}
 
 	void
-	AmplInput::dump(std::ostream& o, const Record &record) const
+	AmplInput::dump(std::ostream& o, const Algebra &record) const
 	{
-		const std::map<std::string, const Data * const> records = record.getAllRecords();
-		for (std::map<std::string, const Data * const>::const_iterator rec = records.begin(); rec != records.end(); rec++)
+		const std::map<std::string, const AlgebraData * const> records = record.getAllRecords();
+		for (std::map<std::string, const AlgebraData * const>::const_iterator rec = records.begin(); rec != records.end(); rec++)
 		{
 			dump(o, rec->second);
 		}
 	}
 
 	void
-	AmplInput::dump(std::ostream& o, const Data *data) const
+	AmplInput::dump(std::ostream& o, const AlgebraData *data) const
 	{
-		for (std::vector<AmplInputData*>::const_iterator out = outputs.begin(); out != outputs.end(); out++)
+		for (std::vector<AmplInputDataOutput*>::const_iterator out = outputs.begin(); out != outputs.end(); out++)
 		{
-			const DataOutput *output = *out;
+			const AmplInputDataOutput *output = *out;
 			try
 			{
 				output->dump(o, data);
@@ -170,8 +170,8 @@ namespace pelib
 	void
 	AmplInput::addParsers()
 	{		
-		parsers.push_back(new AmplInputScalar<int>(true));
-		parsers.push_back(new AmplInputScalar<float>(true));
+		parsers.push_back(new AmplInputScalar<int>());
+		parsers.push_back(new AmplInputScalar<float>());
 		parsers.push_back(new AmplInputVector<int, int>(true));
 		parsers.push_back(new AmplInputVector<int, float>(true));
 		parsers.push_back(new AmplInputSet<int>(true));
@@ -183,8 +183,8 @@ namespace pelib
 	void			
 	AmplInput::addOutputs()
 	{		
-		outputs.push_back(new AmplInputScalar<int>(true));
-		outputs.push_back(new AmplInputScalar<float>(true));
+		outputs.push_back(new AmplInputScalar<int>());
+		outputs.push_back(new AmplInputScalar<float>());
 		outputs.push_back(new AmplInputVector<int, int>(true));
 		outputs.push_back(new AmplInputVector<int, float>(true));
 		outputs.push_back(new AmplInputSet<int>(true));

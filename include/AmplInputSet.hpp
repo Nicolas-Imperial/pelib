@@ -15,9 +15,9 @@ namespace pelib
 		typedef std::set<Value, std::less<Value>, std::allocator<Value> > SetType;
 		
 		public:
-			AmplInputSet(bool strict = true) : AmplInputData(strict)
+			AmplInputSet(bool strict = true)
 			{
-				// Do nothing
+				this->strict = strict;
 			}
 			
 			virtual
@@ -28,13 +28,13 @@ namespace pelib
 			}
 			
 			virtual
-			Data*
+			AlgebraData*
 			parse(std::istream &in)
 			{
 				SetType values;
 				
 				std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-				boost::cmatch match=DataParser::match(getDetailedPattern(), str);
+				boost::cmatch match = AlgebraDataParser::match(getDetailedPattern(), str);
 				
 				boost::regex param_set("\\s*([^\\s]+)");
 				std::string remain = match[2];
@@ -49,7 +49,7 @@ namespace pelib
 					
 					try
 					{
-						value = DataParser::convert<Value>(*iter, strict);
+						value = AlgebraDataParser::convert<Value>(*iter, strict);
 					} catch(NoDecimalFloatException &e)
 					{
 						value = e.getValue();
@@ -72,7 +72,7 @@ namespace pelib
 
 			virtual
 			void
-			dump(std::ostream &o, const Data *data) const
+			dump(std::ostream &o, const AlgebraData *data) const
 			{
 				const Set<Value> *set = dynamic_cast<const Set<Value>*>(data);
 				if(set == NULL) throw CastException("parameter \"data\" was not of type \"Set<Value>\".");				
@@ -103,6 +103,7 @@ namespace pelib
 			}
 
 		protected:
+			bool strict;
 		private:	
 	};
 }

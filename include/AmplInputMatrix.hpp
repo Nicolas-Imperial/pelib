@@ -14,9 +14,9 @@ namespace pelib
 		typedef std::map<Row, RowType> MatrixType;
 		
 		public:
-			AmplInputMatrix(bool strict = true) : AmplInputData(strict)
+			AmplInputMatrix(bool strict = true)
 			{
-				// Do nothing
+				this->strict = strict;
 			}
 			
 			virtual
@@ -41,13 +41,13 @@ namespace pelib
 			}
 
 			virtual
-			Data*
+			AlgebraData*
 			parse(std::istream &in)
 			{
 				MatrixType values;
 				
 				std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-				boost::cmatch match = DataParser::match(getDetailedPattern(), str);
+				boost::cmatch match = AlgebraDataParser::match(getDetailedPattern(), str);
 				std::string indexes = match[2];
 				std::string remain = match[3];
 
@@ -62,7 +62,7 @@ namespace pelib
 				{
 					try
 					{
-						cols.push_back(DataParser::convert<Col>(*iter, strict));
+						cols.push_back(AlgebraDataParser::convert<Col>(*iter, strict));
 					} catch(NoDecimalFloatException &e)
 					{
 						std::ostringstream ss;
@@ -87,7 +87,7 @@ namespace pelib
 
 					try
 					{
-						row = DataParser::convert<Row>(*iter, strict);
+						row = AlgebraDataParser::convert<Row>(*iter, strict);
 					} catch(NoDecimalFloatException &e)
 					{
 						std::ostringstream ss;
@@ -100,7 +100,7 @@ namespace pelib
 					{
 						try
 						{
-							val = DataParser::convert<Value>(*iter, strict);
+							val = AlgebraDataParser::convert<Value>(*iter, strict);
 						} catch(NoDecimalFloatException &e)
 						{
 							val = e.getValue();
@@ -129,7 +129,7 @@ namespace pelib
 
 			virtual
 			void
-			dump(std::ostream &o, const Data *data) const
+			dump(std::ostream &o, const AlgebraData *data) const
 			{			
 				const Matrix<Col, Row, Value> *matrix = dynamic_cast<const Matrix<Col, Row, Value>*>(data);
 				if(matrix == NULL) throw CastException("parameter \"data\" was not of type \"Matrix<Col, Row, Value>\".");
@@ -158,6 +158,7 @@ namespace pelib
 			}
 	
 		protected:
+			bool strict;
 		private:		
 	};
 }

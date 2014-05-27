@@ -16,13 +16,7 @@ namespace pelib
 	class DataOutput
 	{
 		public:	
-			virtual
-			void
-			dump(std::ostream& o, const Data *data) const = 0;
-
-			virtual
-			DataOutput*
-			clone() const = 0;
+			virtual DataOutput* clone() const = 0;
 			
 		protected:
 		private:		

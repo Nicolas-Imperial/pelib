@@ -1,19 +1,14 @@
-#ifndef PELIB_TASKGRAPH
-#define PELIB_TASKGRAPH
-
 #include <vector>
-//#include <istream>
 #include <iostream>
-namespace pelib
-{
-class IGraph;
-}
+
 #include "TaskgraphRecord.hpp"
 
+#ifndef PELIB_GRAPHML
+#define PELIB_GRAPHML
 
 namespace pelib
 {
-  class IGraph
+  class GraphML
   {
   public:
     void dump(std::ostream&, const pelib::TaskgraphRecord&) const;

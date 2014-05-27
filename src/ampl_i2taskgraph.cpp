@@ -5,14 +5,14 @@
 #include <iomanip>
 
 #include <AmplInput.hpp>
-#include "IGraph.hpp"
+#include "GraphML.hpp"
 
 int main(int argc, char **argv)
 {
   using namespace std;
   using namespace pelib;
 
-  IGraph tg;
+  GraphML tg;
   
   AmplInput ai;
   /*
