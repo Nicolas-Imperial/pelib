@@ -22,13 +22,19 @@ CXX_TEST_DEPS =$(CXX_DEPS) libunitc++.a
 CXX_TEST_LDFLAGS = -L$(CPPELIB_SRC)/src -L.
 
 ## static library packages and their sources
-bincxx_package = demo demo_xmlformats taskgraph2ampl_i ampl_i2taskgraph duplicate_tasks taskgraphfml2evaluated ampl_i2i ampl_i2o ampl_o2i ampl_o2o ampl_i2cpp ampl_o2cpp run_record ampl_o2schedule
+bincxx_package = demo streamingapp_demo demo_xmlformats taskgraph2ampl_i ampl_i2taskgraph duplicate_tasks taskgraphfml2evaluated ampl_i2i ampl_i2o ampl_o2i ampl_o2o ampl_i2cpp ampl_o2cpp run_record ampl_o2schedule
 
 bincxx_demo_src = demo.cpp
 bincxx_demo_export = $(bincxx_demo_src) 
 bincxx_demo_deps = libcppelib.a
 bincxx_demo_libs = -lboost_regex -lboost_graph -lexpat 
 bincxx_demo_ldflags =
+
+bincxx_streamingapp_demo_src = streamingapp_demo.cpp
+bincxx_streamingapp_demo_export = $(bincxx_streamingapp_demo_src) 
+bincxx_streamingapp_demo_deps = libcppelib.a
+bincxx_streamingapp_demo_libs = -lboost_regex -lboost_graph -lexpat 
+bincxx_streamingapp_demo_ldflags =
 
 bincxx_duplicate_tasks_src =  duplicate_tasks.cpp
 bincxx_duplicate_tasks_export = $(duplicate_tasks_src) 
@@ -131,7 +137,8 @@ AmplDataParser.cpp AmplDataOutput.cpp \
 AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp GraphML.cpp TaskgraphRecord.cpp Schedule.cpp ScheduleRecord.cpp\
 AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
 Task.cpp Link.cpp Taskgraph.cpp Schedule.cpp Architecture.cpp \
-MakespanCalculator.cpp MakespanSynthetic.cpp MakespanConstant.cpp MakespanFFT.cpp MakespanPreduce.cpp MakespanMergesort.cpp\
+AmplArchitecture.cpp \
+MakespanCalculator.cpp MakespanSynthetic.cpp MakespanConstant.cpp MakespanFFT.cpp MakespanPreduce.cpp MakespanMergesort.cpp \
 AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp \
 AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
 StreamingAppHandler.cpp XMLSchedule.cpp \

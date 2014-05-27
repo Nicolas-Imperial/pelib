@@ -2,15 +2,11 @@
 
 namespace pelib
 {
-/*
-	Taskgraph::Taskgraph(const std::string name, const igraph_t *tg) : Data(name)
+	Taskgraph::Taskgraph()
 	{
-		igraph_copy(&igraph, tg);
 	}
-*/
-	Taskgraph::Taskgraph(const std::string name) : StreamingAppData(name) { /* Do nothing */ };
 
-	Taskgraph::Taskgraph(const Taskgraph* graph) : StreamingAppData(graph->getName())
+	Taskgraph::Taskgraph(const Taskgraph* graph)
 	{
 		igraph_copy(&this->igraph, graph->getIGraph());
 	}
@@ -23,7 +19,7 @@ namespace pelib
 	Taskgraph*
 	Taskgraph::clone() const
 	{
-		return new Taskgraph(name);
+		return new Taskgraph();
 	}
 
 	const igraph_t*

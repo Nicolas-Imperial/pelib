@@ -27,11 +27,9 @@ namespace pelib
 			virtual StreamingApp&
 			operator=(const StreamingApp &rhs);
 		protected:
-			/*
 			Schedule schedule;
 			Taskgraph taskgraph;
 			Architecture architecture;
-			*/
 
 		private:
 	};

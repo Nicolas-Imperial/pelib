@@ -92,7 +92,7 @@ XMLSchedule::parse(istream &is)
 
   return ScheduleRecord(parser);
 */
-	return new Schedule("hello world");
+	return new Schedule();
 }
 
 XMLSchedule*

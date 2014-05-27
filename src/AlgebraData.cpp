@@ -4,6 +4,25 @@
 
 namespace pelib
 {
-	AlgebraData::AlgebraData(const std::string new_name): Data(new_name) {}
-	AlgebraData::AlgebraData(const AlgebraData &original): Data(original) {}
+	AlgebraData::AlgebraData(const std::string name)
+	{
+		this->name = name;
+	}
+
+	AlgebraData::AlgebraData(const AlgebraData& data)
+	{
+		this->name = data.getName();
+	}
+	
+	void
+	AlgebraData::setName(const std::string name)
+	{
+		this->name = name;
+	}
+	
+	const std::string&
+	AlgebraData::getName() const
+	{
+		return this->name;
+	}
 }

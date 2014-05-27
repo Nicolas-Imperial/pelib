@@ -1,6 +1,8 @@
 #include <RecordOutput.hpp>
 #include <StreamingApp.hpp>
 
+#include <Schedule.hpp>
+
 #ifndef PELIB_STREAMINGAPPOUTPUT
 #define PELIB_STREAMINGAPPOUTPUT
 
@@ -15,7 +17,7 @@ namespace pelib
 
 			virtual
 			void
-			dump(std::ostream& o, const StreamingAppData *data) const = 0;
+			dumpSchedule(std::ostream& o, const Schedule *data) const = 0;
 			
 		protected:
 		private:

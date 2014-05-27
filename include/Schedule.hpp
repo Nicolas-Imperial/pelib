@@ -8,7 +8,6 @@ namespace pelib
 	class Schedule : public StreamingAppData
 	{
 		public:
-			Schedule(std::string name);
 			virtual Schedule* clone() const;
 
 		protected:

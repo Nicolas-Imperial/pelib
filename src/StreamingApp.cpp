@@ -10,6 +10,24 @@ namespace pelib
 		*this = rhs;
 	}
 
+	const Schedule&
+	StreamingApp::getSchedule() const
+	{
+		return this->schedule;
+	}
+
+	const Taskgraph&
+	StreamingApp::getTaskgraph() const
+	{
+		return this->taskgraph;
+	}
+
+	const Architecture&
+	StreamingApp::getArchitecture() const
+	{
+		return this->architecture;
+	}
+
 	StreamingApp&
 	StreamingApp::operator=(const StreamingApp &rhs)
 	{

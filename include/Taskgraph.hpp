@@ -20,8 +20,7 @@ namespace pelib
 	class Taskgraph: public StreamingAppData
 	{
 		public:
-			//Taskgraph(const std::string name, const igraph_t *tg);
-			Taskgraph(const std::string name);
+			Taskgraph();
 			Taskgraph(const Taskgraph* graph);
 			virtual ~Taskgraph();
 

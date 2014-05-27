@@ -10,9 +10,6 @@ namespace pelib
 	class StreamingAppData : public Data
 	{
 		public:
-			StreamingAppData(const std::string);
-			StreamingAppData(const StreamingAppData&);
-
 			virtual StreamingAppData* clone() const = 0;
 	};
 }

@@ -8,7 +8,7 @@ namespace pelib
 	class Architecture : public StreamingAppData
 	{
 		public:
-			Architecture(const std::string name);
+			Architecture();
 			Architecture(const Architecture *arch);
 			virtual Architecture* clone() const;
 
