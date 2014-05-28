@@ -18,7 +18,7 @@ namespace pelib
 		public:
 			virtual
 			Algebra
-			parse(std::istream &data) = 0;
+			parse(std::istream &data) const = 0;
 	};
 }
 

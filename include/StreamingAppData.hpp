@@ -1,6 +1,7 @@
 #include <string>
 
 #include <Data.hpp>
+#include <Algebra.hpp>
 
 #ifndef PELIB_STREAMINGAPPDATA
 #define PELIB_STREAMINGAPPDATA
@@ -11,6 +12,7 @@ namespace pelib
 	{
 		public:
 			virtual StreamingAppData* clone() const = 0;
+			virtual Algebra* buildAlgebra() const = 0;
 	};
 }
 

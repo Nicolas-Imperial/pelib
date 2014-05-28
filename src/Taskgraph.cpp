@@ -8,12 +8,10 @@ namespace pelib
 
 	Taskgraph::Taskgraph(const Taskgraph* graph)
 	{
-		igraph_copy(&this->igraph, graph->getIGraph());
 	}
 
 	Taskgraph::~Taskgraph()
 	{
-		igraph_destroy(&this->igraph);
 	}
 
 	Taskgraph*
@@ -25,6 +23,12 @@ namespace pelib
 	const igraph_t*
 	Taskgraph::getIGraph() const
 	{
-		return &igraph;
+		return NULL;
+	}
+
+	Algebra*
+	Taskgraph::buildAlgebra() const
+	{
+		return new Algebra();
 	}
 }

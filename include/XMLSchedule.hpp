@@ -12,7 +12,7 @@ namespace pelib
 	{
 		public:
 			virtual Schedule* parse(std::istream &is);
-			virtual	void dump(std::ostream &os, const Schedule *sched) const;
+			virtual	void dump(std::ostream &os, const StreamingAppData *data) const;
 			virtual XMLSchedule* clone() const;
 	};
 }

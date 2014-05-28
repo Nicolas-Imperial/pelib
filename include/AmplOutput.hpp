@@ -27,7 +27,7 @@ namespace pelib
 			~AmplOutput();
 			
 			Algebra
-			parse(std::istream &data);
+			parse(std::istream &data) const;
 
 			virtual
 			void

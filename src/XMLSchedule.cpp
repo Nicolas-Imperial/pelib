@@ -77,7 +77,7 @@ void Schedule::dump(std::ostream& os, const TaskgraphRecord& tgr, const Record& 
 */
 
 void
-XMLSchedule::dump(ostream& os, const Schedule *sched) const
+XMLSchedule::dump(ostream& os, const StreamingAppData *sched) const
 {
 	//sr.theSchedule->get_document()->write_to_stream(os);
 }

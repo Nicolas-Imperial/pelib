@@ -17,7 +17,6 @@ namespace pelib
 	template <class Value> 
 	class Set: public AlgebraData
 	{
-		//typedef std::set<Value, std::less<Value>, std::allocator<Value> > SetType;
 		typedef std::set<Value> SetType;
 		
 		public:

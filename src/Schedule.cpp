@@ -9,4 +9,10 @@ namespace pelib
 	{
 		return new Schedule();
 	}
+
+	Algebra*
+	Schedule::buildAlgebra() const
+	{
+		return new Algebra();
+	}
 }

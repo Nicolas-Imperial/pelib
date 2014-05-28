@@ -77,7 +77,7 @@ namespace pelib
 	}
 
 	Algebra
-	AmplOutput::parse(std::istream &ampl_data)
+	AmplOutput::parse(std::istream &ampl_data) const
 	{
 		Algebra record;
 		std::string line;
@@ -90,7 +90,7 @@ namespace pelib
 
 			while(!getline(section, line, ';').fail())
 			{			
-				std::vector<AmplOutputDataParser*>::iterator iter;
+				std::vector<AmplOutputDataParser*>::const_iterator iter;
 				for(iter = parsers.begin(); iter != parsers.end(); iter++)
 				{
 					AmplOutputDataParser *parser = *iter;

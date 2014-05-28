@@ -9,7 +9,7 @@ namespace pelib
 	class ArchitectureOutput : public StreamingAppDataOutput
 	{
 		public:	
-			virtual	void dump(std::ostream& o, const Architecture *data) const = 0;
+			virtual	void dump(std::ostream& o, const StreamingAppData *data) const = 0;
 			virtual ArchitectureOutput* clone() const = 0;
 
 		protected:

@@ -17,6 +17,7 @@ namespace pelib
 	{
 		public:	
 			virtual DataOutput* clone() const = 0;
+			virtual ~DataOutput();
 			
 		protected:
 		private:		

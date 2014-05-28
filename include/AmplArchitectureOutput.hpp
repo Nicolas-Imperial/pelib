@@ -8,8 +8,6 @@ namespace pelib
 {
 	class AmplArchitectureOutput : public ArchitectureOutput
 	{
-		public:
-			virtual	void dump(std::ostream &os, const Architecture *sched) const = 0;
 	};
 }
 

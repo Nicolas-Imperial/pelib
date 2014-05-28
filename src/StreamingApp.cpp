@@ -1,4 +1,5 @@
 #include <StreamingApp.hpp>
+#include <CastException.hpp>
 
 namespace pelib
 {	
@@ -33,13 +34,41 @@ namespace pelib
 	{
 		if(this != &rhs)
 		{
-			/*
 			this->schedule = rhs.getSchedule();
 			this->architecture = rhs.getArchitecture();
 			this->taskgraph = rhs.getTaskgraph();
-			*/
 		}
 		
 		return *this;
+	}
+
+	void
+	StreamingApp::insert(StreamingAppData* data)
+	{
+		const Taskgraph *tg = dynamic_cast<const Taskgraph* >(data);
+		if(tg == NULL)
+		{
+			const Architecture *arch = dynamic_cast<const Architecture* >(data);
+			if(arch == NULL)
+			{
+				const Schedule *sched = dynamic_cast<const Schedule* >(data);
+				if(sched == NULL)
+				{
+					throw CastException("Parameter \"data\" was not of type \"Taskgraph*\", \"Architecture*\" or \"Schedule*\".");
+				}
+				else
+				{
+					this->schedule = *(Schedule*)data;
+				}
+			}
+			else
+			{
+				this->architecture = *arch;
+			}
+		}
+		else
+		{
+			this->taskgraph = *(Taskgraph*)data;
+		}
 	}
 }

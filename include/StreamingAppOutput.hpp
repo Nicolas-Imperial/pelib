@@ -13,11 +13,11 @@ namespace pelib
 		public:
 			virtual
 			void
-			dump(std::ostream& o, const StreamingApp &record) const = 0;
-
+			dump(std::ostream& o, const StreamingAppData *data) const = 0;
+			
 			virtual
 			void
-			dumpSchedule(std::ostream& o, const Schedule *data) const = 0;
+			dump(std::ostream& o, const StreamingAppData &data) const = 0;
 			
 		protected:
 		private:

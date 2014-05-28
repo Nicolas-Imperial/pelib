@@ -19,6 +19,7 @@ namespace pelib
 	class DataParser
 	{
 		public:
+			virtual ~DataParser();
 			virtual
 			DataParser*
 			clone() const = 0;

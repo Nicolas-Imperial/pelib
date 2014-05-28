@@ -1,11 +1,4 @@
-#include <iostream>
-#include <cstdlib>
-#include <fstream>
-#include <string>
-#include <boost/regex.hpp>
-#include <iomanip>
-
-#include <Algebra.hpp>
+#include <sstream>
 
 #ifndef PELIB_RECORDPARSER
 #define PELIB_RECORDPARSER
@@ -15,7 +8,9 @@ namespace pelib
 	class RecordParser
 	{
 		public:
+			std::istream& getEmptyStream();
 		protected:
+			std::istringstream emptyStream;
 		private:
 	};
 }

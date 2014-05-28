@@ -12,7 +12,7 @@ namespace pelib
 	{
 		public:
 			virtual Architecture* parse(std::istream &is);
-			virtual	void dump(std::ostream &os, const Architecture *sched) const;
+			virtual	void dump(std::ostream &os, const StreamingAppData *data) const;
 			virtual AmplArchitecture* clone() const;
 	};
 }

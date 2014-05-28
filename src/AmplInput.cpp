@@ -15,6 +15,8 @@
 #include <ParseException.hpp>
 #include <CastException.hpp>
 
+using namespace std;
+
 namespace pelib
 {
 	AmplInput::AmplInput()
@@ -78,7 +80,7 @@ namespace pelib
 	}
 
 	Algebra
-	AmplInput::parse(std::istream &ampl_data)
+	AmplInput::parse(std::istream &ampl_data) const 
 	{
 		Algebra record;
 		std::string line;
@@ -111,7 +113,7 @@ namespace pelib
 				continue;
 			}
 
-			std::vector<AmplInputDataParser*>::iterator iter;
+			std::vector<AmplInputDataParser*>::const_iterator iter;
 			for(iter = parsers.begin(); iter != parsers.end(); iter++)
 			{
 				AmplInputDataParser *parser = *iter;
@@ -169,7 +171,7 @@ namespace pelib
 	// Protected
 	void
 	AmplInput::addParsers()
-	{		
+	{
 		parsers.push_back(new AmplInputScalar<int>());
 		parsers.push_back(new AmplInputScalar<float>());
 		parsers.push_back(new AmplInputVector<int, int>(true));
@@ -182,7 +184,7 @@ namespace pelib
 
 	void			
 	AmplInput::addOutputs()
-	{		
+	{
 		outputs.push_back(new AmplInputScalar<int>());
 		outputs.push_back(new AmplInputScalar<float>());
 		outputs.push_back(new AmplInputVector<int, int>(true));

@@ -11,7 +11,7 @@ namespace pelib
 		public:
 			virtual
 			StreamingApp
-			parse(std::istream &data) = 0;
+			parse(std::istream &taskgraph, std::istream &architecture, std::istream &schedule) const = 0;
 	};
 }
 

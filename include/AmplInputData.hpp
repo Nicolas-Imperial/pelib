@@ -9,11 +9,6 @@ namespace pelib
 	class AmplInputData: public AmplInputDataOutput, public AmplInputDataParser
 	{
 		public:
-/*
-			AmplInputData(bool strict) : AmplInputDataParser(strict) {}
-			virtual ~AmplInputData(){}
-			virtual	AmplInputData* clone() const = 0;
-*/
 		protected:
 		private:		
 	};

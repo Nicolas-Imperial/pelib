@@ -1,12 +1,5 @@
-#include <iostream>
-#include <cstdlib>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <boost/regex.hpp>
-#include <iomanip>
-
 #include <StreamingAppData.hpp>
+#include <Algebra.hpp>
 
 extern "C"{
 #include <igraph.h>
@@ -31,6 +24,8 @@ namespace pelib
 			virtual
 			const igraph_t*
 			getIGraph() const;
+
+			virtual Algebra* buildAlgebra() const;
 				
 		protected:
 			igraph_t igraph;

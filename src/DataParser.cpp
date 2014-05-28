@@ -2,4 +2,5 @@
 
 namespace pelib
 {
+	DataParser::~DataParser() { /* Do nothing */ }
 }

@@ -24,6 +24,9 @@ namespace pelib
 			virtual const Architecture&
 			getArchitecture() const;
 
+			virtual void
+			insert(StreamingAppData* data);
+
 			virtual StreamingApp&
 			operator=(const StreamingApp &rhs);
 		protected:
