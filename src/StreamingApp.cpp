@@ -3,10 +3,10 @@
 
 namespace pelib
 {	
-	StreamingApp::StreamingApp() { /* Do nothing */ }
+	StreamingApp::StreamingApp() : schedule("streaming", "streaming") { /* Do nothing */ }
 	StreamingApp::~StreamingApp() { /* Do nothing */ }
 
-	StreamingApp::StreamingApp(const StreamingApp &rhs)
+	StreamingApp::StreamingApp(const StreamingApp &rhs) : schedule(rhs.getSchedule().getName(), rhs.getSchedule().getAUTName()) 
 	{
 		*this = rhs;
 	}

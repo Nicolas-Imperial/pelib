@@ -18,9 +18,8 @@ AmplArchitecture::dump(ostream& os, const StreamingAppData *data) const
 	if(arch == NULL) throw CastException("parameter \"data\" was not of type \"Architecture*\".");
 
 	AmplInput output;
-	Algebra *alg = arch->buildAlgebra();
-	output.dump(os, *alg);
-	delete alg;
+	Algebra alg = arch->buildAlgebra();
+	output.dump(os, alg);
 }
 
 Architecture*

@@ -12,7 +12,7 @@ namespace pelib
 	{
 		public:
 			virtual StreamingAppData* clone() const = 0;
-			virtual Algebra* buildAlgebra() const = 0;
+			virtual Algebra buildAlgebra() const = 0;
 	};
 }
 

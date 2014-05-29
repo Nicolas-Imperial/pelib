@@ -25,7 +25,7 @@ namespace pelib
 			const igraph_t*
 			getIGraph() const;
 
-			virtual Algebra* buildAlgebra() const;
+			virtual Algebra buildAlgebra() const;
 				
 		protected:
 			igraph_t igraph;

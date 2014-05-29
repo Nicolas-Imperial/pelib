@@ -3,6 +3,7 @@
 
 #include <StreamNet.hpp>
 #include <AmplArchitecture.hpp>
+#include <XMLSchedule.hpp>
 
 namespace pelib
 {
@@ -88,28 +89,38 @@ namespace pelib
 
 		for(int i = 0; i < 3; i++)
 		{
-			std::stringstream input;
-			input << inputs[i]->rdbuf();
-			input.seekg(0);
+			// Read the whole input once
+			std::string line;
+			std::stringstream ss;
+			while(!getline(*inputs[i], line).fail())
+			{
+				ss << line << std::endl;
+			}
+			line = ss.str();
 
 			/*
-			 for(std::vector<TaskgraphParser*>::const_iterator iter = this->taskgraphParsers.begin(); iter != this->taskgraphParsers.end(); iter++)
-			 {
-				 TaskgraphParser *parser = *iter;
-				 try {
-					 Taskgraph *data = parser->parse(input);
-					 record.insert(data);
-
-					 // No need to try another parser; proceed with the next token
-					 break;
-			} catch (ParseException &e)
+			for(std::vector<TaskgraphParser*>::const_iterator iter = this->taskgraphParsers.begin(); iter != this->taskgraphParsers.end(); iter++)
 			{
-			// If error, rewind input and try the next parser
-			input.seekg(0);
+				std::stringstream input;
+				input.str(line);
+				
+				TaskgraphParser *parser = *iter;
+				try {
+				Taskgraph *data = parser->parse(input);
+					record.insert(data);
+
+					// No need to try another parser; proceed with the next token
+					break;
+				} catch (ParseException &e)
+				{
+				}
 			}
 		*/
 			for(std::vector<ArchitectureParser*>::const_iterator iter = this->architectureParsers.begin(); iter != this->architectureParsers.end(); iter++)
-			{
+			{				
+				std::stringstream input;
+				input.str(line);
+				
 				ArchitectureParser *parser = *iter;
 				try {
 					Architecture *data = parser->parse(input);
@@ -119,12 +130,14 @@ namespace pelib
 					break;
 				} catch (ParseException &e)
 				{
-					// If error, rewind input and try the next parser
-					input.seekg(0);
 				}
 			}
+			
 			for(std::vector<ScheduleParser*>::const_iterator iter = this->scheduleParsers.begin(); iter != this->scheduleParsers.end(); iter++)
 			{
+				std::stringstream input;
+				input.str(line);
+				
 				ScheduleParser *parser = *iter;
 				try {
 					Schedule *data = parser->parse(input);
@@ -134,8 +147,6 @@ namespace pelib
 					break;
 				} catch (ParseException &e)
 				{
-					// If error, rewind input and try the next parser
-					input.seekg(0);
 				}
 			}
 		}
@@ -173,6 +184,7 @@ namespace pelib
 	StreamNet::addParsers()
 	{
 		architectureParsers.push_back(new AmplArchitecture());
+		scheduleParsers.push_back(new XMLSchedule());
 	}
 
 	void			
@@ -180,5 +192,6 @@ namespace pelib
 	{		
 		// Add outputs here
 		outputs.push_back(new AmplArchitecture());
+		outputs.push_back(new XMLSchedule());
 	}
 }

@@ -26,9 +26,9 @@ namespace pelib
 		return NULL;
 	}
 
-	Algebra*
+	Algebra
 	Taskgraph::buildAlgebra() const
 	{
-		return new Algebra();
+		return Algebra();
 	}
 }

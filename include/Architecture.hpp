@@ -22,7 +22,7 @@ namespace pelib
 			virtual std::set<int, std::less<int>, std::allocator<int> > getFrequencies();
 			virtual void setFrequencies(const std::set<int, std::less<int>, std::allocator<int> >& freq);
 
-			virtual Algebra* buildAlgebra() const;
+			virtual Algebra buildAlgebra() const;
 
 		protected:
 			int coreNumber;

@@ -1,9 +1,10 @@
 #include <libxml++/libxml++.h>
-#include "Algebra.hpp"
 
 extern "C"{
 #include <igraph.h>
 }
+
+#include "Algebra.hpp"
 
 #ifndef PELIB_SCHEDULERECORD
 #define PELIB_SCHEDULERECORD

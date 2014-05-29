@@ -59,16 +59,16 @@ namespace pelib
 		this->frequencies = freq;
 	}
 	
-	Algebra*
+	Algebra
 	Architecture::buildAlgebra() const
 	{
-		Algebra *record = new Algebra();
+		Algebra record;
 
 		Scalar<int> scalar_p("p", coreNumber);
 		Set<int> set_F("F", frequencies);
 
-		record->insert(&scalar_p);
-		record->insert(&set_F);
+		record.insert(&scalar_p);
+		record.insert(&set_F);
 
 		return record;
 	}

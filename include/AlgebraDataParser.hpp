@@ -143,12 +143,6 @@ namespace pelib
 			std::string
 			getGlobalPattern() = 0;
 
-/*
-			virtual
-			AlgebraDataParser*
-			clone() const = 0;
-*/
-
 			virtual
 			AlgebraData*
 			parse(std::istream &in) = 0;
