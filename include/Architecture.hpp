@@ -19,7 +19,6 @@ namespace pelib
 			virtual void setCoreNumber(int p);
 
 			virtual const std::set<int, std::less<int>, std::allocator<int> >& getFrequencies() const;
-			virtual std::set<int, std::less<int>, std::allocator<int> > getFrequencies();
 			virtual void setFrequencies(const std::set<int, std::less<int>, std::allocator<int> >& freq);
 
 			virtual Algebra buildAlgebra() const;

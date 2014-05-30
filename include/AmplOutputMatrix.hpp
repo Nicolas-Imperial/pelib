@@ -134,22 +134,25 @@ namespace pelib
 				
 				o << matrix->getName() << " [*,*]" << std::endl << ":\t";
 				typename std::map<Row, std::map<Col, Value> >::const_iterator row_iter = matrix->getValues().begin();
-				for(typename std::map<Col, Value>::const_iterator col_iter = row_iter->second.begin(); col_iter != row_iter->second.end(); col_iter++)
-				{	
-					o << col_iter->first << "\t";
-				}
-				o << ":=" << std::endl;
-				
-				for(; row_iter != matrix->getValues().end(); row_iter++)
+				if(row_iter != matrix->getValues().end())
 				{
-					o << row_iter->first << "\t";
 					for(typename std::map<Col, Value>::const_iterator col_iter = row_iter->second.begin(); col_iter != row_iter->second.end(); col_iter++)
 					{	
-						 o << col_iter->second << "\t";
+						o << col_iter->first << "\t";
 					}
-					o << std::endl;
+					o << ":=" << std::endl;
+				
+					for(; row_iter != matrix->getValues().end(); row_iter++)
+					{
+						o << row_iter->first << "\t";
+						for(typename std::map<Col, Value>::const_iterator col_iter = row_iter->second.begin(); col_iter != row_iter->second.end(); col_iter++)
+						{	
+							 o << col_iter->second << "\t";
+						}
+						o << std::endl;
+					}
 				}
-
+				   
 				o << ";" << std::endl;
 			}
 	

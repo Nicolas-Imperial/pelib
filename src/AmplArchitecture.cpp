@@ -12,6 +12,12 @@ using namespace pelib;
 using namespace std;
 
 void
+AmplArchitecture::dump(ostream& os, const StreamingAppData &data) const
+{
+	dump(os, &data);
+}
+
+void
 AmplArchitecture::dump(ostream& os, const StreamingAppData *data) const
 {
 	const Architecture *arch = dynamic_cast<const Architecture* >(data);
@@ -23,7 +29,7 @@ AmplArchitecture::dump(ostream& os, const StreamingAppData *data) const
 }
 
 Architecture*
-AmplArchitecture::parse(istream &is)
+AmplArchitecture::parse(istream &is) const
 {
 	AmplInput reader;
 	std::string line;

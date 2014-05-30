@@ -8,14 +8,29 @@ using namespace pelib;
 using namespace std;
 
 double
-MakespanSynthetic::calculate(const Algebra& tasks,const Algebra& architecture) const
+MakespanSynthetic::calculate(const Taskgraph& tg, const Architecture& arch) const
 {
-	int p = architecture.find<Scalar<int> >("p")->getValue();
-	int min_freq = *architecture.find<Set<int> >("F")->getValues().begin();
-	int max_freq = *architecture.find<Set<int> >("F")->getValues().end();
-	int task;
-	int temp_wi;
-	double temp_e;
+	int p = arch.getCoreNumber();
+	int min_freq = *arch.getFrequencies().begin();
+	int max_freq = *arch.getFrequencies().end();
+
+	double sum_pTw = 0;
+	for(std::set<Task>::const_iterator i = tg.getTasks().begin(); i != tg.getTasks().end(); i++)
+	{
+		Task task = *i;
+		double wi = task.getMaxWidth();
+		wi = wi < p ? wi : p; // Cannot have a task running with more cores than architecture offers, even if width is higher
+		double time = task.runtime(wi, 1);
+		sum_pTw += time;
+	}
+
+	float minM = sum_pTw / (double)max_freq;
+	float maxM = sum_pTw / (double)min_freq;
+	float M = (minM + maxM) / 2;
+	
+	return M;
+
+	/*
 	const Matrix<int, int, float> *e = tasks.find<Matrix<int, int, float> >("e");
 	const Vector<int, int> *tau = tasks.find<Vector<int, int> >("Tau");
 	double sum_pTw = 0;
@@ -25,7 +40,7 @@ MakespanSynthetic::calculate(const Algebra& tasks,const Algebra& architecture) c
 
 	for(std::map<int, int>::const_iterator i = width.begin(); i != width.end(); i++)
 	{
-		task = i->first;
+		int task = i->first;
 		temp = tau->find(task);
 		temp_wi = i->second;
 		temp_wi = temp_wi < p ? temp_wi : p; // Cannot have a task running with more cores than architecture offers, even if width is higher 
@@ -38,5 +53,5 @@ MakespanSynthetic::calculate(const Algebra& tasks,const Algebra& architecture) c
 	float minM = sum_pTw / (double)max_freq;
 	float maxM = sum_pTw / (double)min_freq;
 	float M = (minM + maxM) / 2;
-	return M;
+	*/
 }

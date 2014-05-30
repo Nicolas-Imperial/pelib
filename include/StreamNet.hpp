@@ -1,7 +1,7 @@
 #include <StreamingAppParser.hpp>
 #include <StreamingAppOutput.hpp>
 
-//#include <TaskgraphParser.hpp>
+#include <TaskgraphParser.hpp>
 #include <ArchitectureParser.hpp>
 #include <ScheduleParser.hpp>
 
@@ -36,7 +36,7 @@ namespace pelib
 			operator=(const StreamNet &rhs);
 
 		protected:
-			//std::vector<TaskgraphParser*> taskgraphParsers;
+			std::vector<TaskgraphParser*> taskgraphParsers;
 			std::vector<ArchitectureParser*> architectureParsers;
 			std::vector<ScheduleParser*> scheduleParsers;
 			std::vector<StreamingAppDataOutput*> outputs;

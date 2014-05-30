@@ -22,12 +22,12 @@ extern "C"{
 #include <igraph.h>
 }
 
-using namespace std;
 #define VERY_SMALL 1e-6
+
+using namespace std;
 
 namespace pelib
 {	
-
   //used only as a temporary storage locally
   struct Vertex_info {
     int id;
@@ -96,7 +96,7 @@ namespace pelib
     fclose(f);
     
     int n = record.find<Scalar<int> >("n")->getValue();
-    igraph_add_vertices(graph,n,0);
+    igraph_add_vertices(graph, n, 0);
     SETGAS(graph,"autname","GENERATED_FROM_RECORD");
     SETGAS(graph,"target_makespan", "fml:synthetic");
 
@@ -295,7 +295,7 @@ namespace pelib
 	    
 	    for(p = 1; p <= processors; p +=1)
 	      {
-		row.insert(pair<int,float>((int)p,mathparser.Eval()));
+			row.insert(pair<int,float>((int)p,mathparser.Eval()));
 	      }
 	  }
 	else{
@@ -334,7 +334,7 @@ namespace pelib
     record.insert(&n);
 
     const MakespanCalculator*  msc = MakespanCalculator::getMakespanCalculator(GAS(graph,"target_makespan"));
-    double target_makespan = msc->calculate(record, arch);
+    double target_makespan = 0; //msc->calculate(record, arch);
 
     delete msc;
 

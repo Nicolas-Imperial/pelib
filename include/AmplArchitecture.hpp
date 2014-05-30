@@ -11,8 +11,9 @@ namespace pelib
 	class AmplArchitecture : public AmplArchitectureParser, public AmplArchitectureOutput
 	{
 		public:
-			virtual Architecture* parse(std::istream &is);
+			virtual Architecture* parse(std::istream &is) const;
 			virtual	void dump(std::ostream &os, const StreamingAppData *data) const;
+			virtual	void dump(std::ostream &os, const StreamingAppData &data) const;
 			virtual AmplArchitecture* clone() const;
 	};
 }

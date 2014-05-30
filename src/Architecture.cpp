@@ -46,12 +46,6 @@ namespace pelib
 	{
 		return this->frequencies;
 	}
-
-	std::set<int, std::less<int>, std::allocator<int> >
-	Architecture::getFrequencies()
-	{
-		return this->frequencies;
-	}
 		
 	void
 	Architecture::setFrequencies(const std::set<int, std::less<int>, std::allocator<int> >& freq)

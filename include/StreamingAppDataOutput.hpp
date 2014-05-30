@@ -15,8 +15,8 @@ namespace pelib
 			StreamingAppDataOutput*
 			clone() const = 0;
 		
-			virtual void
-			dump(std::ostream &str, const StreamingAppData* data) const = 0;
+			virtual void dump(std::ostream &str, const StreamingAppData *data) const = 0;
+			virtual void dump(std::ostream &str, const StreamingAppData &data) const = 0;
 
 		protected:
 		private:		

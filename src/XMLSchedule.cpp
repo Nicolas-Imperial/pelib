@@ -23,6 +23,11 @@ extern "C"{
 using namespace pelib;
 using namespace std;
 using namespace xmlpp;
+void
+XMLSchedule::dump(ostream& os, const StreamingAppData &data) const
+{
+	dump(os, &data);
+}
 
 void
 XMLSchedule::dump(ostream& os, const StreamingAppData *data) const
@@ -32,7 +37,7 @@ XMLSchedule::dump(ostream& os, const StreamingAppData *data) const
 	//sr.theSchedule->get_document()->write_to_stream(os);
 
 	map<int, std::vector<Task> > schedule = sched->getSchedule();
-	int processors = schedule.size();
+	//int processors = schedule.size();
 	float target_makespan = sched->getRoundTime();
 
 	set<string> task_ids;
@@ -40,14 +45,14 @@ XMLSchedule::dump(ostream& os, const StreamingAppData *data) const
 	{
 		for(vector<Task>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 		{
-			task_ids.insert(j->getId());
+			task_ids.insert(j->getTaskId());
 		}
 	}
 
 	os << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 		<< "<schedule name=\"schedule\" autname=\"" << sched->getAUTName() << "\" "
-		<< "cores=\"" << processors << "\" "
-		<< "tasks=\"" << task_ids.size() << "\" "
+		//<< "cores=\"" << processors << "\" "
+		//<< "tasks=\"" << task_ids.size() << "\" "
 		<< "roundtime=\"" << target_makespan << "\">\n";
 
 	for(map<int, vector<Task> >::const_iterator i = schedule.begin(); i != schedule.end(); i++)
@@ -59,33 +64,13 @@ XMLSchedule::dump(ostream& os, const StreamingAppData *data) const
 
 		for(vector<Task>::const_iterator j = i->second.begin(); j != i->second.end(); j++, order++)
 		{
-			//int id = j->getId(); // fixme: change string ID to number ID
-			//maxid = max(maxid, id);
-			string taskid = j->getId();
-
-			/*
-			if(id > 0)
-			{ 
-				// Bounds check. Will throw if there are more (higher numbered) tasks in amploutput schedule than in taskgraphrecord.
-				try
-				{
-					//taskid = taskids[id-1];
-					taskid = taskids.at(id-1); // With bounds check
-				}
-				catch (std::out_of_range e)
-				{
-					cerr << "Error: Missmatch, ampl_output task id " << id << " does not exist in the task graph\n";
-					throw e;
-				}
-
-				if(id == 0) // 0 = no more tasks scheduled on this core
-				{
-					break;
-				}
-				*/
-				os << "   <task taskid=\"" << taskid << "\" ordering=\"" << order << "\" "
-					<< "frequency=\"" << j->getFrequency() <<  "\" />\n";
-			//}
+			string taskid = j->getTaskId();
+			os << "   <task taskid=\"" << taskid << "\" "
+				<< "ordering=\"" << order << "\" "
+				<< "frequency=\"" << j->getFrequency() << "\" "
+				<< "width=\"" << j->getWidth() << "\" "
+				<< "workload=\"" << j->getWorkload() << "\" "
+				<< "/>\n";
 		}
 		os << " </core>\n";
 	}
@@ -93,7 +78,7 @@ XMLSchedule::dump(ostream& os, const StreamingAppData *data) const
 }
 
 Schedule*
-XMLSchedule::parse(istream &is)
+XMLSchedule::parse(istream &is) const
 {
 	DomParser* theSchedule = new DomParser();
 	//theSchedule->set_throw_messages(false);
@@ -104,7 +89,7 @@ XMLSchedule::parse(istream &is)
 		theSchedule->parse_stream(is);
 	} catch(xmlpp::parse_error &e)
 	{
-		throw ParseException(std::string("Not a valid XML format"));
+		throw ParseException(std::string("xmlpp::parse_error"));
 	}
 	
 	// Just like taskgraph conversion
@@ -120,51 +105,61 @@ XMLSchedule::parse(istream &is)
 	Element *root = theSchedule->get_document()->get_root_node();
 	Node::NodeList processors = root->get_children();
 
-	float M = stof(root->get_attribute_value("roundtime"));
-	std::string name = root->get_attribute_value("name");
-	std::string aut_name = root->get_attribute_value("autname");
-
-	Schedule *sched = new Schedule(name, aut_name);
-	sched->setRoundTime(M);
-	std::map<int, std::vector<Task> > schedule;
-	
-	for(Node::NodeList::iterator iter = processors.begin(); iter != processors.end(); ++iter) //for each core
+	try
 	{
-		if((*iter)->get_name().compare("core")) //skip indentation characters et cetera
-		{
-			continue;
-		}
+		float M = stof(root->get_attribute_value("roundtime"));
+		std::string name = root->get_attribute_value("name");
+		std::string aut_name = root->get_attribute_value("autname");
 
-		int core_id = stoi(dynamic_cast<Element*>(*iter)->get_attribute_value("coreid"));
-		std::vector<Task> core_schedule;
-		std::map<int, Task> core_schedule_map;
-
-		auto tasks = (*iter)->get_children();
-		for(auto taskiter = tasks.begin(); taskiter != tasks.end(); ++taskiter)
+		Schedule *sched = new Schedule(name, aut_name);
+		sched->setRoundTime(M);
+		std::map<int, std::vector<Task> > schedule;
+	
+		for(Node::NodeList::iterator iter = processors.begin(); iter != processors.end(); ++iter) //for each core
 		{
-			if((*taskiter)->get_name().compare("task")) //skip indentation characters et cetera
+			if((*iter)->get_name().compare("core")) //skip indentation characters et cetera
 			{
 				continue;
 			}
 
-			auto *igraph_task = dynamic_cast<Element*>(*taskiter);
+			int core_id = stoi(dynamic_cast<Element*>(*iter)->get_attribute_value("coreid"));
+			std::vector<Task> core_schedule;
+			std::map<int, Task> core_schedule_map;
 
-			Task task(igraph_task->get_attribute_value("taskid"));
-			task.setFrequency(stoi(igraph_task->get_attribute_value("frequency")));
-			core_schedule_map.insert(std::pair<int, Task>(stoi(igraph_task->get_attribute_value("ordering")), task)); 
+			auto tasks = (*iter)->get_children();
+			int task_id = 1;
+			for(auto taskiter = tasks.begin(); taskiter != tasks.end(); ++taskiter, task_id++)
+			{
+				if((*taskiter)->get_name().compare("task")) //skip indentation characters et cetera
+				{
+					continue;
+				}
+
+				auto *igraph_task = dynamic_cast<Element*>(*taskiter);
+
+				Task task(task_id, igraph_task->get_attribute_value("taskid"));
+				task.setFrequency(stof(igraph_task->get_attribute_value("frequency")));
+				task.setWidth(stof(igraph_task->get_attribute_value("width")));
+				task.setWorkload(stof(igraph_task->get_attribute_value("workload")));
+				core_schedule_map.insert(std::pair<int, Task>(stof(igraph_task->get_attribute_value("ordering")), task)); 
+			}
+
+			for(auto taskiter = core_schedule_map.begin(); taskiter != core_schedule_map.end(); taskiter++)
+			{
+				core_schedule.push_back(taskiter->second);
+			}
+
+			schedule.insert(std::pair<int, std::vector<Task> >(core_id, core_schedule));
 		}
+		
+		sched->setSchedule(schedule);
 
-		for(auto taskiter = core_schedule_map.begin(); taskiter != core_schedule_map.end(); taskiter++)
-		{
-			core_schedule.push_back(taskiter->second);
-		}
-
-		schedule.insert(std::pair<int, std::vector<Task> >(core_id, core_schedule));
+		return sched;
 	}
-
-	sched->setSchedule(schedule);
-
-	return sched;
+	catch(std::invalid_argument &e)
+	{
+		throw ParseException(std::string("std::invalid_argument"));
+	}
 }
 
 XMLSchedule*

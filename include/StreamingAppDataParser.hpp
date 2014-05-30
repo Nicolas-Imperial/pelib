@@ -22,7 +22,7 @@ namespace pelib
 		public:
 			virtual
 			StreamingAppData*
-			parse(std::istream &in) = 0;
+			parse(std::istream &in) const = 0;
 
 			virtual
 			StreamingAppDataParser*

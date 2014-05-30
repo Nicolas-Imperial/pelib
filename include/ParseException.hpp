@@ -6,7 +6,7 @@
 
 namespace pelib
 {
-	class ParseException: std::exception
+	class ParseException: std::exception // or std::runtime_error?
 	{
 		public:
 			ParseException(std::string message) throw();

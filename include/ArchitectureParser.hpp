@@ -11,7 +11,7 @@ namespace pelib
 		public:
 			virtual
 			Architecture*
-			parse(std::istream &in) = 0;
+			parse(std::istream &in) const = 0;
 
 			virtual ArchitectureParser* clone() const = 0;
 

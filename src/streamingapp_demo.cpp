@@ -6,6 +6,7 @@
 #include <Architecture.hpp>
 
 #include <AmplOutput.hpp>
+#include <GraphML.hpp>
 
 using namespace pelib;
 using namespace std;
@@ -28,19 +29,20 @@ main(int argc, char **argv)
 	std::ifstream sched_file;
 	sched_file.open (argv[3], std::ios::in);
 	
-	//app = input.parse(tg_file, arch_file, sched_file);
-	app = input.parse(input.getEmptyStream(), arch_file, sched_file);
+	app = input.parse(tg_file, arch_file, sched_file);
 	
 	tg_file.close();
 	arch_file.close();
 	sched_file.close();
 
+	input.dump(cout, app.getTaskgraph());
+	GraphML().dump(cout, app.getTaskgraph(), app.getArchitecture());
 	input.dump(cout, app.getArchitecture());
 	input.dump(cout, app.getSchedule());
 
+	AmplOutput().dump(cout, app.getTaskgraph().buildAlgebra(app.getArchitecture()));
 	AmplOutput().dump(cout, app.getArchitecture().buildAlgebra());
 	AmplOutput().dump(cout, app.getSchedule().buildAlgebra());
 	
 	return EXIT_SUCCESS;
 }
-

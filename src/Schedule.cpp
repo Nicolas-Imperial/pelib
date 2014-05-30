@@ -38,7 +38,7 @@ namespace pelib
 		{
 			for(vector<Task>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 			{
-				task_ids.insert(j->getId());
+				task_ids.insert(j->getTaskId());
 			}
 		}
 
@@ -61,7 +61,7 @@ namespace pelib
 			ordering = 0;
 			for(vector<Task>::const_iterator j = i->second.begin(); j != i->second.end(); j++, ordering++)
 			{
-				int id = taskid2id.find(j->getId())->second;
+				int id = taskid2id.find(j->getTaskId())->second;
 				schedule_row.insert(pair<int, int>(ordering, id));
 				frequencies.insert(pair<int, int>(id, j->getFrequency()));
 

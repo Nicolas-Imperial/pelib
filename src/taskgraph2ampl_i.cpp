@@ -5,36 +5,39 @@
 #include <iomanip>
 
 #include <AmplInput.hpp>
-#include "GraphML.hpp"
+#include <Architecture.hpp>
+#include <AmplArchitecture.hpp>
+#include <GraphML.hpp>
 
 int main(int argc, char **argv)
 {
-  using namespace std;
-  using namespace pelib;
+	using namespace std;
+	using namespace pelib;
 
-  Algebra architecture;
-  GraphML input;
+	Architecture *architecture;
+	AmplArchitecture ai;
+	if(argc == 2)
+	{
+		ifstream tmp(argv[1]);
+		architecture = ai.parse(tmp);
+		tmp.close();
+	}
+	else
+	{
+		cerr << "Warning: No architecture information supplied. Using default values\n";
+	}
+	
+	GraphML input;
+	AmplInput output;
 
-  AmplInput output;
-  AmplInput ai;
-  if(argc == 2)
-    {
-      ifstream tmp(argv[1]);
-      architecture = ai.parse(tmp);
-      tmp.close();
-    }
-  else
-    {
-      cerr << "Warning: No architecture information supplied. Using default values\n";
-    }
-  
-  // Set floating point var output format to fixed at 7 digits
-  std::cout << std::setprecision(6)                                                                                                        
-	    << std::setiosflags(std::ios::fixed)                                                                                                     
-	    << std::setiosflags(std::ios::showpoint);  
+	// Set floating point var output format to fixed at 7 digits
+	std::cout << std::setprecision(6)                                                                                                        
+		<< std::setiosflags(std::ios::fixed)                                                                                                     
+		<< std::setiosflags(std::ios::showpoint);  
 
-  TaskgraphRecord tgr(input.parse(cin));
-  output.dump(cout, tgr.toAlgebra(architecture));  
+	Taskgraph *tg = input.parse(cin);
 
-  return 0;
+	output.dump(cout, tg->buildAlgebra(*architecture));
+
+	return 0;
 }

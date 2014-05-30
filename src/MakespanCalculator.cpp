@@ -6,9 +6,11 @@
 #include <MakespanMergesort.hpp>
 #include <MakespanConstant.hpp>
 
+#include <ParseException.hpp>
+
 namespace pelib
 {
-	const MakespanCalculator*
+	MakespanCalculator*
 	MakespanCalculator::getMakespanCalculator(const std::string key)
 	{
 		if(key.compare("fml:synthetic") == 0)
@@ -31,6 +33,6 @@ namespace pelib
 	{
 	}
         */
-		throw std::runtime_error("Makespan type not recognized: " + key);
+		throw ParseException("Makespan type not recognized: " + key);
 	}
 }

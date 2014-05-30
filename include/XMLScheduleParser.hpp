@@ -10,7 +10,6 @@ namespace pelib
 	class XMLScheduleParser : public ScheduleParser
 	{
 		public:
-			virtual Schedule* parse(std::istream &is) = 0;
 	};
 }
 

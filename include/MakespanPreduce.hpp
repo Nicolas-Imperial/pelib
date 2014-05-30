@@ -9,9 +9,7 @@ namespace pelib
   class MakespanPreduce : public MakespanCalculator
   {
   public:
-
-
-    double calculate(const Algebra& tasks,const Algebra& architecture) const;
+	virtual double calculate(const Taskgraph& tg,const Architecture& arch) const;
   };
 }
 

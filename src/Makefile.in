@@ -134,14 +134,14 @@ AlgebraParser.cpp DataParser.cpp AlgebraDataParser.cpp \
 AlgebraOutput.cpp DataOutput.cpp AlgebraDataOutput.cpp \
 Scalar.cpp Vector.cpp Matrix.cpp Set.cpp \
 AmplDataParser.cpp AmplDataOutput.cpp \
-AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp GraphML.cpp TaskgraphRecord.cpp Schedule.cpp ScheduleRecord.cpp\
+AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp GraphML.cpp TaskgraphRecord.cpp Schedule.cpp \
 AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
 Task.cpp Link.cpp Taskgraph.cpp Schedule.cpp Architecture.cpp \
 AmplArchitecture.cpp \
 MakespanCalculator.cpp MakespanSynthetic.cpp MakespanConstant.cpp MakespanFFT.cpp MakespanPreduce.cpp MakespanMergesort.cpp \
 AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp \
 AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
-StreamNet.cpp XMLSchedule.cpp \
+StreamNet.cpp XMLSchedule.cpp GraphML.cpp \
 CppDataOutput.cpp \
 Cpp.cpp CppData.cpp CppScalar.cpp CppVector.cpp CppSet.cpp CppMatrix.cpp \
 RecordParser.cpp

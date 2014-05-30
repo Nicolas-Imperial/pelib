@@ -9,6 +9,7 @@
 
 int main(int argc, char **argv)
 {
+#if 0
   using namespace std;
   using namespace pelib;
 
@@ -33,7 +34,7 @@ int main(int argc, char **argv)
   myfile.open (argv[1], std::ios::in);
   tg.dump(cout, TaskgraphRecord(ai.parse(myfile)));
   myfile.close(); */
-
+#endif
 
   return 0;
 }

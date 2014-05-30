@@ -9,7 +9,6 @@ namespace pelib
 	class AmplArchitectureParser : public ArchitectureParser
 	{
 		public:
-			virtual Architecture* parse(std::istream &is) = 0;
 	};
 }
 

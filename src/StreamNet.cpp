@@ -2,8 +2,11 @@
 #include <CastException.hpp>
 
 #include <StreamNet.hpp>
+#include <GraphML.hpp>
 #include <AmplArchitecture.hpp>
 #include <XMLSchedule.hpp>
+
+using namespace std;
 
 namespace pelib
 {
@@ -25,16 +28,16 @@ namespace pelib
 	void
 	StreamNet::deleteParsers()
 	{
-		/*
 		for(std::vector<TaskgraphParser*>::iterator i = taskgraphParsers.begin(); i != taskgraphParsers.end(); i = taskgraphParsers.erase(i))
 		{
 			delete *i;
 		}
-		*/
+
 		for(std::vector<ArchitectureParser*>::iterator i = architectureParsers.begin(); i != architectureParsers.end(); i = architectureParsers.erase(i))
 		{
 			delete *i;
 		}
+		
 		for(std::vector<ScheduleParser*>::iterator i = scheduleParsers.begin(); i != scheduleParsers.end(); i = scheduleParsers.erase(i))
 		{
 			delete *i;
@@ -56,12 +59,10 @@ namespace pelib
 		deleteParsers();
 		deleteOutputs();
 
-		/*
 		for(std::vector<TaskgraphParser*>::iterator i = taskgraphParsers.begin(); i != taskgraphParsers.end(); i = taskgraphParsers.erase(i))
 		{
 			taskgraphParsers.push_back((*i)->clone());
 		}
-		*/
 		
 		for(std::vector<ArchitectureParser*>::iterator i = architectureParsers.begin(); i != architectureParsers.end(); i = architectureParsers.erase(i))
 		{
@@ -85,72 +86,89 @@ namespace pelib
 	StreamNet::parse(std::istream &taskgraph, std::istream &architecture, std::istream &schedule) const
 	{
 		StreamingApp record;
-		std::istream *inputs[3] = {&taskgraph, &architecture, &schedule};
+		std::string tg_str, arch_str, sched_str;
+		std::stringstream ss;
 
-		for(int i = 0; i < 3; i++)
+		// Read the whole inputs once
+		// Taskgraph
+		ss.str(std::string());
+		while(!getline(taskgraph, tg_str).fail())
 		{
-			// Read the whole input once
-			std::string line;
-			std::stringstream ss;
-			while(!getline(*inputs[i], line).fail())
-			{
-				ss << line << std::endl;
-			}
-			line = ss.str();
+			ss << tg_str << std::endl;
+		}
+		tg_str = ss.str();
 
-			/*
-			for(std::vector<TaskgraphParser*>::const_iterator iter = this->taskgraphParsers.begin(); iter != this->taskgraphParsers.end(); iter++)
-			{
-				std::stringstream input;
-				input.str(line);
+		// Architecture
+		ss.str(std::string());
+		while(!getline(architecture, arch_str).fail())
+		{
+			ss << arch_str << std::endl;
+		}
+		arch_str = ss.str();
+
+		// Schedule
+		ss.str(std::string());
+		while(!getline(schedule, sched_str).fail())
+		{
+			ss << sched_str << std::endl;
+		}
+		sched_str = ss.str();
+
+		// Now parse them with whatever we have
+		// Taskgraph
+		for(std::vector<TaskgraphParser*>::const_iterator iter = this->taskgraphParsers.begin(); iter != this->taskgraphParsers.end(); iter++)
+		{
+			std::stringstream input;
+			input.str(tg_str);
 				
-				TaskgraphParser *parser = *iter;
-				try {
+			TaskgraphParser *parser = *iter;
+			try {
 				Taskgraph *data = parser->parse(input);
-					record.insert(data);
+				record.insert(data);
 
-					// No need to try another parser; proceed with the next token
-					break;
-				} catch (ParseException &e)
-				{
-				}
-			}
-		*/
-			for(std::vector<ArchitectureParser*>::const_iterator iter = this->architectureParsers.begin(); iter != this->architectureParsers.end(); iter++)
-			{				
-				std::stringstream input;
-				input.str(line);
-				
-				ArchitectureParser *parser = *iter;
-				try {
-					Architecture *data = parser->parse(input);
-					record.insert(data);
-
-					// No need to try another parser; proceed with the next token
-					break;
-				} catch (ParseException &e)
-				{
-				}
-			}
-			
-			for(std::vector<ScheduleParser*>::const_iterator iter = this->scheduleParsers.begin(); iter != this->scheduleParsers.end(); iter++)
+				// No need to try another parser; proceed with the next token
+				break;
+			} catch (ParseException &e)
 			{
-				std::stringstream input;
-				input.str(line);
-				
-				ScheduleParser *parser = *iter;
-				try {
-					Schedule *data = parser->parse(input);
-					record.insert(data);
-
-					// No need to try another parser; proceed with the next token
-					break;
-				} catch (ParseException &e)
-				{
-				}
 			}
 		}
+
+		// Architecture
+		for(std::vector<ArchitectureParser*>::const_iterator iter = this->architectureParsers.begin(); iter != this->architectureParsers.end(); iter++)
+		{				
+			std::stringstream input;
+			input.str(arch_str);
+			
+			ArchitectureParser *parser = *iter;
+			try {
+				Architecture *data = parser->parse(input);
+				record.insert(data);
+
+				// No need to try another parser; proceed with the next token
+				break;
+			} catch (ParseException &e)
+			{
+			}
+		}
+
+		// Schedule
+		for(std::vector<ScheduleParser*>::const_iterator iter = this->scheduleParsers.begin(); iter != this->scheduleParsers.end(); iter++)
+		{
+			std::stringstream input;
+			input.str(sched_str);
 				
+			ScheduleParser *parser = *iter;
+			try {
+				Schedule *data = parser->parse(input);
+				record.insert(data);
+
+				// No need to try another parser; proceed with the next token
+				break;
+			} catch (ParseException &e)
+			{
+			}
+		}
+			
 		return record;
 	}
 
@@ -183,7 +201,10 @@ namespace pelib
 	void
 	StreamNet::addParsers()
 	{
+		taskgraphParsers.push_back(new GraphML());
+		
 		architectureParsers.push_back(new AmplArchitecture());
+		
 		scheduleParsers.push_back(new XMLSchedule());
 	}
 
@@ -191,6 +212,7 @@ namespace pelib
 	StreamNet::addOutputs()
 	{		
 		// Add outputs here
+		outputs.push_back(new GraphML());
 		outputs.push_back(new AmplArchitecture());
 		outputs.push_back(new XMLSchedule());
 	}

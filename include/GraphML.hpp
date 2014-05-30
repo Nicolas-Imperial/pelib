@@ -1,26 +1,27 @@
-#include <vector>
-#include <iostream>
+#include "Taskgraph.hpp"
 
-#include "TaskgraphRecord.hpp"
+#include <GraphMLParser.hpp>
+#include <GraphMLOutput.hpp>
+#include <Architecture.hpp>
 
-#ifndef PELIB_GRAPHML
-#define PELIB_GRAPHML
+#ifndef PELIB_GRAPHML_H
+#define PELIB_GRAPHML_H
 
 namespace pelib
 {
-  class GraphML
-  {
-  public:
-    void dump(std::ostream&, const pelib::TaskgraphRecord&) const;
-    TaskgraphRecord parse(std::istream&);
-
-    void duplicate_tasks(TaskgraphRecord& data, const std::vector<int> & to_duplicate);
-  };
+	using namespace std;
+	
+	class GraphML : public GraphMLParser, public GraphMLOutput
+	{
+		public:
+			virtual GraphML* clone() const;
+			virtual Taskgraph* parse(std::istream &is) const;
+			virtual void dump(std::ostream &str, const StreamingAppData *data) const;
+			virtual void dump(std::ostream &str, const StreamingAppData &data) const;
+			virtual	void dump(std::ostream &os, const StreamingAppData &data, const Architecture &arch) const;
+			virtual void dump(ostream& os, const StreamingAppData *data, const Architecture *arch) const;
+		protected:
+	};
 }
-
-
-
-
-
 
 #endif

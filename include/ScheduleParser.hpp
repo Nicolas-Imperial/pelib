@@ -11,7 +11,7 @@ namespace pelib
 		public:
 			virtual
 			Schedule*
-			parse(std::istream &in) = 0;
+			parse(std::istream &in) const = 0;
 
 			virtual ScheduleParser* clone() const = 0;
 

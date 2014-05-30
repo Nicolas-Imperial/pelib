@@ -1,8 +1,10 @@
 #include <iostream>
 #include <fstream>
-#include <AmplInput.hpp>
 #include <sstream>
-#include "GraphML.hpp"
+
+#include <AmplArchitecture.hpp>
+#include <GraphML.hpp>
+
 int main(int argc, char **argv)
 {
   using namespace std;
@@ -14,22 +16,19 @@ int main(int argc, char **argv)
       return 0;
     }
 
-  AmplInput archparser;
+  AmplArchitecture archparser;
   ifstream ifs(argv[1]);
 
-  Algebra arch = archparser.parse(ifs);
+  Architecture *arch = archparser.parse(ifs);
 
   GraphML taskgparser;
-  TaskgraphRecord taskgraph = taskgparser.parse(cin);
-
-  Algebra record = taskgraph.toAlgebra(arch);
+  Taskgraph *taskgraph = taskgparser.parse(cin);
 
   cout << std::setprecision(6) 
        << std::setiosflags(std::ios::fixed)
        << std::setiosflags(std::ios::showpoint);
 
-  TaskgraphRecord tgr(taskgraph, record);
-  taskgparser.dump(cout, tgr);
+  taskgparser.dump(cout, taskgraph, arch);
   
   return 0;
 }

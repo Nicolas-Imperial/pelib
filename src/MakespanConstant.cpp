@@ -5,7 +5,7 @@ using namespace std;
 
 MakespanConstant::MakespanConstant(double val) : value(val) {}
 
-double MakespanConstant::calculate(const Algebra& tasks,const Algebra&  architecture) const
+double MakespanConstant::calculate(const Taskgraph& tg,const Architecture& arch) const
 {
   return value;
 }

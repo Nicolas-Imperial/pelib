@@ -10,6 +10,7 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
+	/*
   if(argc != 2)
     {
       cerr << "Need taskgraph to perform this task\n";
@@ -30,6 +31,7 @@ int main(int argc, char* argv[])
   //ao.dump(cout,amplschedule);
 
   //sch.dump(cout, tgr, amplschedule);
+  */
 
   return 0;
 }

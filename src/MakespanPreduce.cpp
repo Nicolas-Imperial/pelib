@@ -8,8 +8,29 @@ using namespace pelib;
 using namespace std;
 
 double
-MakespanPreduce::calculate(const Algebra& tasks,const Algebra& architecture) const
+MakespanPreduce::calculate(const Taskgraph& tg,const Architecture& arch) const
 {
+	int p = arch.getCoreNumber();
+	int min_freq = *arch.getFrequencies().begin();
+	int max_freq = *arch.getFrequencies().end();
+
+	double sum_pTw = 0;
+	for(std::set<Task>::const_iterator i = tg.getTasks().begin(); i != tg.getTasks().end(); i++)
+	{
+		Task task = *i;
+		double wi = task.getMaxWidth();
+		wi = wi < p ? wi : p; // Cannot have a task running with more cores than architecture offers, even if width is higher
+		double time = task.runtime(1, 1) / wi; // We assume perfect scalability here
+		sum_pTw += time;
+	}
+
+	float minM = sum_pTw / (double)max_freq;
+	float maxM = sum_pTw / (double)min_freq;
+	float M = (minM + maxM) / 2;
+	
+	return M;
+
+	/*
 	int p = architecture.find<Scalar<int> >("p")->getValue();
 	int min_freq = *architecture.find<Set<int> >("F")->getValues().begin();
 	int max_freq = *architecture.find<Set<int> >("F")->getValues().end();
@@ -52,4 +73,5 @@ MakespanPreduce::calculate(const Algebra& tasks,const Algebra& architecture) con
 	}
 
 	return M;
+*/
 }
