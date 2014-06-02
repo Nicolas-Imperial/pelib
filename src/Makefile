@@ -65,6 +65,11 @@ define object
 $(foreach proj,$1,$(patsubst %.$(call ext,$3),$2$3_$(proj)_%.o,$(call src_project_file_var,$(proj),$2,$3)))
 endef
 
+## Gives object files of projects in list $1, of type $2 (bin|lib|test) with language $3 (cc|cxx), prefixed with their project name, project variant and source file variant
+define embed
+$(foreach proj,$1,$(patsubst %,%.o,$(call $2$3_$(proj)_embed)))
+endef
+
 ## Gives object files of projects $1 of type $2 (bin|lib|test) with language $3 (cc|cxx), prefixed with their project name, but no project or source file variant
 define object_noprefix
 $(foreach proj,$1,$(patsubst %.$(call ext,$3),$2_$(proj)_%.o,$(call src,$(proj),$2,$3)))
@@ -87,7 +92,6 @@ $(call suffixin,$(patsubst %.o,%.$(call ext,$4),$1),$(call src,$2,$3,$4))
 endef
 
 ## Gives all makefile-wise cflags
-#_CFLAGS = $(CFLAGS) $(CFLAGS_BASE) $(if $(DEBUG:0=),$(CFLAGS_DEBUG),$(CFLAGS_RELEASE))
 ## Overridable global CFLAG variable
 ## Base CFLAGS from MAKEFILE
 ## pkg-config CFLAGS
@@ -150,13 +154,13 @@ define pkg_project
 $(call pkg-config,$(call $2$3_$1_pkg),libs-only-l,$2$3_$1_pkg_)
 endef
 
-## Gives all source files of projects $1 of type $2 (bin|lib|test) with language $3 (cc|cxx)
-all_src = $(call src,$(bincc_package),bin,cc) $(call src,$(bincxx_package),bin,cxx) $(call src,$(libcc_package),lib,cc) $(call src,$(libcxx_package),lib,cxx) $(call src,$(testcc_package),test,cc) $(call src,$(testcxx_package),test,cxx)
 ## All C and C++ objects, eliminating duplicates
 cc_object = $(sort $(call object,$(bincc_package),bin,cc) $(call object,$(libcc_package),lib,cc) $(call object,$(testcc_package),test,cc))
 cxx_object = $(sort $(call object,$(bincxx_package),bin,cxx) $(call object,$(libcxx_package),lib,cxx) $(call object,$(testcxx_package),test,cxx))
 cc_pkgconfig = $(foreach var,$(libcc_package),$(patsubst %,%.pc,$(var)))
 cxx_pkgconfig = $(foreach var,$(libcxx_package),$(patsubst %,%.pc,$(var)))
+embed_object = $(sort $(call embed,$(bincc_package),bin,cc) $(call embed,$(libcc_package),lib,cc) $(call embed,$(testcc_package),test,cc)) $(sort $(call embed,$(bincxx_package),bin,cxx) $(call embed,$(libcxx_package),lib,cxx) $(call embed,$(testcxx_package),test,cxx))
+embed_src = $(foreach var,$(embed_object),$(patsubst %.o,%,$(var)))
 
 -include $(foreach file,$(cc_object) $(cxx_object),$(patsubst %.o,%.d,$(file)))
 
@@ -183,7 +187,11 @@ test_list = $(testcc_list) $(testcxx_list)
 
 all: submake $(bin_list) $(lib_list)
 
-$(all_src): Makefile Makefile.in
+## Force rebuild upon Makefile update
+$(cc_object) $(cxx_object): Makefile Makefile.in
+
+$(embed_object): $(embed_src)
+	$(LD) -r -b binary -o $@ $(patsubst %.o,%,$@)
 
 $(cc_object): $$(call source,$$@,$$(call projectof,$$@,$$(call typeof,$$@),cc),$$(call typeof,$$@),cc)
 	$(CC) -c $(GLOBAL_CFLAGS) $(call cflags_project,$(call projectof,$@,$(call typeof,$@),cc),$(call typeof,$@),cc) $(call cflags_file,$@,$(call typeof,$@)) $(CPPFLAGS) -o $@ $<
@@ -205,61 +213,63 @@ $(cxx_object): $$(call source,$$@,$$(call projectof,$$@,$$(call typeof,$$@),cxx)
 	@sed -e 's/.*://' -e 's/\\$$//' < $(patsubst %.o,%.d,$@).tmp | fmt -1 | sed -e 's/^ *//' -e 's/$$/:/' >> $(patsubst %.o,%.d,$@)
 	@rm -f $(patsubst %.o,%.d,$@).tmp
 
-$(bincc_list): $$(call object,$$(call suffixin,$$@,$$(bincc_package)),bin,cc) $$(call $$(patsubst %,bincc_%_deps,$$(call suffixin,$$@,$$(bincc_package))))
-	$(CC) -o $@ $(GLOBAL_CC_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(bincc_package),bin,cc),bin,cc) $(call object,$(call suffixin,$@,$(bincc_package)),bin,cc) $(GLOBAL_CC_LIBS) $(call libs_project,$@,bin,cc) $(GLOBAL_CC_PKG) $(call pkg_project,$@,bin,cc)
+$(bincc_list): $$(call object,$$(call suffixin,$$@,$$(bincc_package)),bin,cc) $$(call $$(patsubst %,bincc_%_deps,$$(call suffixin,$$@,$$(bincc_package)))) $$(call embed,$$(call suffixin,$$@,$$(bincc_package)),bin,cc)
+	$(CC) -o $@ $(GLOBAL_CC_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(bincc_package),bin,cc),bin,cc) $(call object,$(call suffixin,$@,$(bincc_package)),bin,cc) $(call embed,$(call suffixin,$@,$(bincc_package)),bin,cc) $(GLOBAL_CC_LIBS) $(call libs_project,$@,bin,cc) $(GLOBAL_CC_PKG) $(call pkg_project,$@,bin,cc)
 
-$(bincxx_list): $$(call object,$$(call suffixin,$$@,$$(bincxx_package)),bin,cxx) $$(call $$(patsubst %,bincxx_%_deps,$$(call suffixin,$$@,$$(bincxx_package))))
-	$(CXX) -o $@ $(GLOBAL_CXX_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(bincxx_package),bin,cxx),bin,cxx) $(call object,$(call suffixin,$@,$(bincxx_package)),bin,cxx) $(GLOBAL_CXX_LIBS) $(call libs_project,$@,bin,cxx) $(GLOBAL_CXX_PKG) $(call pkg_project,$@,bin,cxx)
+$(bincxx_list): $$(call object,$$(call suffixin,$$@,$$(bincxx_package)),bin,cxx) $$(call $$(patsubst %,bincxx_%_deps,$$(call suffixin,$$@,$$(bincxx_package)))) $$(call embed,$$(call suffixin,$$@,$$(bincxx_package)),bin,cxx)
+	$(CXX) -o $@ $(GLOBAL_CXX_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(bincxx_package),bin,cxx),bin,cxx) $(call object,$(call suffixin,$@,$(bincxx_package)),bin,cxx) $(call embed,$(call suffixin,$@,$(bincxx_package)),bin,cxx) $(GLOBAL_CXX_LIBS) $(call libs_project,$@,bin,cxx) $(GLOBAL_CXX_PKG) $(call pkg_project,$@,bin,cxx)
 
 bin_package: $(bin_list)
 
-$(libcc_list): $$(call object,$$(patsubst lib%.a,%,$$@),lib,cc) $$(call $$(patsubst %,libcc_%_deps,$$(call suffixin,$$(patsubst lib%.a,%,$$@),$$(libcc_package))))
-	ar rs $@ $(call object,$(patsubst lib%.a,%,$@),lib,cc)
+$(libcc_list): $$(call object,$$(patsubst lib%.a,%,$$@),lib,cc) $$(call embed,$$(patsubst lib%.a,%,$$@),lib,cc) $$(call $$(patsubst %,libcc_%_deps,$$(call suffixin,$$(patsubst lib%.a,%,$$@),$$(libcc_package))))
+	ar rs $@ $(call object,$(patsubst lib%.a,%,$@),lib,cc) $(call embed,$(patsubst lib%.a,%,$@),lib,cc)
 
-$(libcxx_list): $$(call object,$$(patsubst lib%.a,%,$$@),lib,cxx) $$(call $$(patsubst %,libcxx_%_deps,$$(call suffixin,$$(patsubst lib%.a,%,$$@),$$(libcxx_package))))
-	ar rs $@ $(call object,$(patsubst lib%.a,%,$@),lib,cxx)
+$(libcxx_list): $$(call object,$$(patsubst lib%.a,%,$$@),lib,cxx) $$(call embed,$$(patsubst lib%.a,%,$$@),lib,cxx) $$(call $$(patsubst %,libcxx_%_deps,$$(call suffixin,$$(patsubst lib%.a,%,$$@),$$(libcxx_package))))
+	ar rs $@ $(call object,$(patsubst lib%.a,%,$@),lib,cxx) $(call embed,$(patsubst lib%.a,%,$@),lib,cxx)
 
 lib_target: $(lib_list)
 
-$(testcc_list): $$(call object,$$(patsubst test_%,%,$$@),test,cc) $$(call $$(patsubst %,testcc_%_deps,$$(call suffixin,$$(patsubst lib%.a,%,$$@),$$(testcc_package))))
-	$(CC) -o $@ $(GLOBAL_CC_TEST_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(testcc_package),test,cc),test,cc) $(call object,$(call suffixin,$@,$(testcc_package)),test,cc) $(GLOBAL_CC_LIBS) $(call libs_project,$@,test,cc) $(GLOBAL_CC_TEST_PKG) $(call pkg_project,$@,test,cc)
+$(testcc_list): $$(call object,$$(patsubst test_%,%,$$@),test,cc) $$(call $$(patsubst %,testcc_%_deps,$$(call suffixin,$$(patsubst lib%.a,%,$$@),$$(testcc_package)))) $$(call embed,$$(call suffixin,$$@,$$(testcc_package)),test,cc)
+	$(CC) -o $@ $(GLOBAL_CC_TEST_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(testcc_package),test,cc),test,cc) $(call object,$(call suffixin,$@,$(testcc_package)),test,cc) $(call embed,$(call suffixin,$@,$(testcc_package)),test,cc) $(GLOBAL_CC_LIBS) $(call libs_project,$@,test,cc) $(GLOBAL_CC_TEST_PKG) $(call pkg_project,$@,test,cc)
 
-$(testcxx_list): $$(call object,$$(patsubst test_%,%,$$@),test,cxx) $$(call $$(patsubst %,testcxx_%_deps,$$(call suffixin,$$(patsubst lib%.a,%,$$@),$$(testcxx_package))))
-	$(CXX) -o $@ $(GLOBAL_CXX_TEST_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(testcxx_package),test,cxx),test,cxx) $(call object,$(call suffixin,$@,$(testcxx_package)),test,cxx) $(GLOBAL_CXX_LIBS) $(call libs_project,$@,test,cxx) $(GLOBAL_CXX_TEST_PKG) $(call pkg_project,$@,test,cxx)
+$(testcxx_list): $$(call object,$$(patsubst test_%,%,$$@),test,cxx) $$(call $$(patsubst %,testcxx_%_deps,$$(call suffixin,$$(patsubst lib%.a,%,$$@),$$(testcxx_package)))) $$(call embed,$$(call suffixin,$$@,$$(testcxx_package)),test,cxx)
+	$(CXX) -o $@ $(GLOBAL_CXX_TEST_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(testcxx_package),test,cxx),test,cxx) $(call object,$(call suffixin,$@,$(testcxx_package)),test,cxx) $(call embed,$(call suffixin,$@,$(testcxx_package)),test,cxx) $(GLOBAL_CXX_LIBS) $(call libs_project,$@,test,cxx) $(GLOBAL_CXX_TEST_PKG) $(call pkg_project,$@,test,cxx)
 
 test_target: $(test_list)
 
-$(cc_pkgconfig): Makefile Makefile.in
+$(cc_pkgconfig):
 	@echo prefix=$(prefix) > $@
-	@echo exec_prefix=$(if $(call libcc_$(patsubst %.pc,%,$@)_pkg_exec_prefix),$(call libcc_$(patsubst %.pc,%,$@)_pkg_exec_prefix),\$\{prefix\}) >> $@
-	@echo libdir=$(if $(call libcc_$(patsubst %.pc,%,$@)_pkg_libdir),$(call libcc_$(patsubst %.pc,%,$@)_pkg_libdir),\$\{exec_prefix\}/lib) >> $@
-	@echo includedir=$(if $(call libcc_$(patsubst %.pc,%,$@)_pkg_includedir),$(call libcc_$(patsubst %.pc,%,$@)_pkg_includedir),\$\{prefix\}/include) >> $@
-	@echo >>$@
+	@echo exec_prefix=$(if $(call libcc_$(patsubst %.pc,%,$@)_pkg_exec_prefix),$(call libcc_$(patsubst %.pc,%,$@)_pkg_exec_prefix),'$$'\{prefix\}) >> $@
+	@echo libdir=$(if $(call libcc_$(patsubst %.pc,%,$@)_pkg_libdir),$(call libcc_$(patsubst %.pc,%,$@)_pkg_libdir),'$$'\{exec_prefix\}/lib) >> $@
+	@echo includedir=$(if $(call libcc_$(patsubst %.pc,%,$@)_pkg_includedir),$(call libcc_$(patsubst %.pc,%,$@)_pkg_includedir),'$$'\{prefix\}/include) >> $@
+	@echo >> $@
 	@echo Name: $(if $(call libcc_$(patsubst %.pc,%,$@)_pkg_name),$(call libcc_$(patsubst %.pc,%,$@)_pkg_name),$(patsubst %.pc,lib%,$@)) >> $@
 	@echo Description: $(call libcc_$(patsubst %.pc,%,$@)_pkg_description) >> $@
 	@echo Version: $(version) >> $@
 	@echo URL: $(call libcc_$(patsubst %.pc,%,$@)_pkg_url) >> $@
-	@echo Libs: $(call libcc_$(patsubst %.pc,%,$@)_pkg_libs) >> $@
-	@echo Libs.private: $(call libcc_$(patsubst %.pc,%,$@)_pkg_libs_private) >> $@
+	@echo Libs: -l$(patsubst %.pc,%,$@) $(call libcc_$(patsubst %.pc,%,$@)_pkg_libs) >> $@
+	@echo Libs.private: $(GLOBAL_CC_LDFLAGS) $(call $2$3_$1_ldflags) $(GLOBAL_CC_LIBS) $(call libcc_$(patsubst %.pc,%,$@)_libs) $(call libcc_$(patsubst %.pc,%,$@)_pkg_libs_private) >> $@
 	@echo Require: $(call libcc_$(patsubst %.pc,%,$@)_pkg_require) >> $@
-	@echo Require.private: $(call libcc_$(patsubst %.pc,%,$@)_pkg_require_private) >> $@
-	@echo Cflags: $(call libcc_$(patsubst %.pc,%,$@)_pkg_cflags) >> $@
+	@echo Require.private: $(foreach var,$(CC_PKG),"$(var) $(call CC_PKG_$(var)_version)") $(foreach var,$(call libcc_$(patsubst %.pc,%,$@)_pkg),"$(var) $(call libcc_$(patsubst %.pc,%,$@)_pkg_$(var)_version)") $(call libcc_$(patsubst %.pc,%,$@)_pkg_require_private) >> $@
+	@echo Conflicts: $(call libcc_$(patsubst %.pc,%,$@)_pkg_conflicts) >> $@
+	@echo Cflags: $(GLOBAL_CFLAGS) $(call cflags_project,$(patsubst %.pc,%,$@),lib,cc) $(CPPFLAGS) $(call libcc_$(patsubst %.pc,%,$@)_pkg_ccflags) >> $@
 
-$(cxx_pkgconfig): Makefile Makefile.in
+$(cxx_pkgconfig):
 	@echo prefix=$(prefix) > $@
-	@echo exec_prefix=$(if $(call libcxx_$(patsubst %.pc,%,$@)_pkg_exec_prefix),$(call libcxx_$(patsubst %.pc,%,$@)_pkg_exec_prefix),\$\{prefix\}) >> $@
-	@echo libdir=$(if $(call libcxx_$(patsubst %.pc,%,$@)_pkg_libdir),$(call libcxx_$(patsubst %.pc,%,$@)_pkg_libdir),\$\{exec_prefix\}/lib) >> $@
-	@echo includedir=$(if $(call libcxx_$(patsubst %.pc,%,$@)_pkg_includedir),$(call libcxx_$(patsubst %.pc,%,$@)_pkg_includedir),\$\{prefix\}/include) >> $@
-	@echo >>$@
+	@echo exec_prefix=$(if $(call libcxx_$(patsubst %.pc,%,$@)_pkg_exec_prefix),$(call libcxx_$(patsubst %.pc,%,$@)_pkg_exec_prefix),'$$'\{prefix\}) >> $@
+	@echo libdir=$(if $(call libcxx_$(patsubst %.pc,%,$@)_pkg_libdir),$(call libcxx_$(patsubst %.pc,%,$@)_pkg_libdir),'$$'\{exec_prefix\}/lib) >> $@
+	@echo includedir=$(if $(call libcxx_$(patsubst %.pc,%,$@)_pkg_includedir),$(call libcxx_$(patsubst %.pc,%,$@)_pkg_includedir),'$$'\{prefix\}/include) >> $@
+	@echo >> $@
 	@echo Name: $(if $(call libcxx_$(patsubst %.pc,%,$@)_pkg_name),$(call libcxx_$(patsubst %.pc,%,$@)_pkg_name),$(patsubst %.pc,lib%,$@)) >> $@
 	@echo Description: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_description) >> $@
 	@echo Version: $(version) >> $@
 	@echo URL: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_url) >> $@
-	@echo Libs: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_libs) >> $@
-	@echo Libs.private: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_libs_private) >> $@
+	@echo Libs: -l$(patsubst %.pc,%,$@) $(call libcxx_$(patsubst %.pc,%,$@)_pkg_libs) >> $@
+	@echo Libs.private: $(GLOBAL_CXX_LDFLAGS) $(call $2$3_$1_ldflags) $(GLOBAL_CXX_LIBS) $(call libcxx_$(patsubst %.pc,%,$@)_libs) $(call libcxx_$(patsubst %.pc,%,$@)_pkg_libs_private) >> $@
 	@echo Require: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_require) >> $@
-	@echo Require.private: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_require_private) >> $@
-	@echo Cflags: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_cxxflags) >> $@
+	@echo Require.private: $(foreach var,$(CXX_PKG),"$(var) $(call CXX_PKG_$(var)_version)") $(foreach var,$(call libcxx_$(patsubst %.pc,%,$@)_pkg),"$(var) $(call libcxx_$(patsubst %.pc,%,$@)_pkg_$(var)_version)") $(call libcxx_$(patsubst %.pc,%,$@)_pkg_require_private) >> $@
+	@echo Conflicts: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_conflicts) >> $@
+	@echo Cflags: $(GLOBAL_CXXFLAGS) $(call cxxflags_project,$(patsubst %.pc,%,$@),lib,cxx) $(CPPFLAGS) $(call libcxx_$(patsubst %.pc,%,$@)_pkg_cxxflags) >> $@
 
 dist: submake
 	mkdir -p $(distdir)
@@ -292,13 +302,15 @@ install: submake $(bin_list) $(lib_target) $(cc_pkgconfig) $(cxx_pkgconfig)
 	$(if $(lib_target),install -m 644 $(lib_target) $(DESTDIR)$(libdir))
 	$(if $(bin_list),install -d $(DESTDIR)$(bindir))
 	$(if $(bin_list),install -m 755 $(bin_list) $(DESTDIR)$(bindir))
-	$(if $(pkgconfig),install -m 644 $(DESTDIR)$(libdir)/pkgconfig $(if $(pkgconfig),cp $(pkgconfig) $(distdir)))
+	$(if $(lib_target),install -d $(DESTDIR)$(libdir)/pkgconfig)
+	$(if $(cc_pkgconfig) $(cxx_pkgconfig),install -m 644 $(cc_pkgconfig) $(cxx_pkgconfig) $(DESTDIR)$(libdir)/pkgconfig)
 
 uninstall: submake
-	$(RM) $(foreach var,$(bin_package), $(DESTDIR)$(bindir)/$(var))
+	$(RM) $(foreach var,$(bin_list), $(DESTDIR)$(bindir)/$(var))
 	$(RM) $(foreach var,$(lib_target), $(DESTDIR)$(libdir)/$(var))
+	$(RM) $(foreach var,$(cc_pkgconfig) $(cxx_pkgconfig), $(DESTDIR)$(libdir)/pkgconfig/$(var))
 	
-submake: Makefile Makefile.in
+submake:
 	@$(shell echo for i in "$(foreach var,$(subdirs),$(var))"\; do $(MAKE) -C \$$i '$(MAKEFLAGS)' $(MAKECMDGOALS) distdir=$(distdir)/\$$i\; done)
 
 FORCE:

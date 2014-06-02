@@ -11,7 +11,7 @@ namespace pelib
   public:
     MakespanConstant(double val);
 
-	virtual double calculate(const Taskgraph& tg,const Architecture& arch) const;
+	virtual double calculate(const Taskgraph& tg, const Architecture& arch) const;
  
   private:
     const double value;

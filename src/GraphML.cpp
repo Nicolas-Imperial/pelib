@@ -49,8 +49,8 @@ GraphML::dump(ostream& os, const StreamingAppData *data, const Architecture *arc
   	igraph_create(graph, &edges, 0, true);
 
 	// Add graph attributes
-	SETGAS(graph,"autname","GENERATED_FROM_RECORD");
-	SETGAS(graph,"target_makespan", "fml:synthetic");
+	SETGAS(graph,"autname", tg->getAUTName().c_str());
+	SETGAS(graph,"target_makespan", tg->getMakespanCalculator().c_str());
 
 	// Add vertices
 	int ret = igraph_add_vertices(graph, tg->getTasks().size(), 0);

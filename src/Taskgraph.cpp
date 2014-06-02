@@ -1,23 +1,64 @@
 #include <Taskgraph.hpp>
 #include <MakespanCalculator.hpp>
 #include <ParseException.hpp>
+#include <CastException.hpp>
 
 #include <Scalar.hpp>
 #include <Vector.hpp>
 #include <Matrix.hpp>
 
+using namespace std;
+
 namespace pelib
 {
-	Taskgraph::Taskgraph()
+	Taskgraph::Taskgraph() {}
+
+	Taskgraph::Taskgraph(const Taskgraph *graph)
 	{
+		this->autName = graph->getAUTName();
+		this->makespanCalculator = graph->getMakespanCalculator();
+		this->tasks = graph->getTasks();
 	}
 
-	Taskgraph::Taskgraph(const Taskgraph* graph)
+	Taskgraph::Taskgraph(const Algebra &algebra)
 	{
-	}
+		this->autName = "Generated_from_algebra";
+		const Scalar<float> *M = algebra.find<Scalar<float> >("M");
+		const Scalar<int> *n = algebra.find<Scalar<int> >("n");
+		const Vector<int, int> *tau = algebra.find<Vector<int, int> >("Tau");
+		const Vector<int, int> *Wi = algebra.find<Vector<int, int> >("Wi");
+		const Matrix<int, int, float> *e = algebra.find<Matrix<int, int, float> >("e");
+		
+		if(M == NULL || n == NULL || tau == NULL || Wi == NULL || e == NULL)
+		{
+			throw CastException("Missing parameter. Need float scalar M, integer scalar n, integer vectors tau and Wi (of size n), and float matrix e of n lines.");
+		}
+		else
+		{
+			stringstream ss;
+			ss << M->getValue();
+			this->makespanCalculator = ss.str(); 
+		}
 
-	Taskgraph::~Taskgraph()
-	{
+		for(map<int, int>::const_iterator i = tau->getValues().begin(); i != tau->getValues().end(); i++)
+		{
+			int id = i->first;
+			int work = i->second;
+			int max_wi = Wi->getValues().find(id)->second;
+
+			stringstream ss;
+			for(map<int, float>::const_iterator j = e->getValues().find(id)->second.begin(); j != e->getValues().find(id)->second.end(); j++)
+			{
+				ss << j->second << " ";
+			}
+			
+			Task t(id);
+			t.setWorkload(work);
+			t.setMaxWidth(max_wi);
+			t.setEfficiencyString(ss.str());
+
+			this->tasks.insert(t);
+		}
 	}
 
 	Taskgraph*
@@ -56,13 +97,16 @@ namespace pelib
 			map_e.insert(pair<int, map<int, float> >(i->getId(), task_e));
 		}
 
-		Vector<int, int> tau("tau", map_tau);
+		Vector<int, int> tau("Tau", map_tau);
 		Vector<int, int> Wi("Wi", map_Wi);
 		Matrix<int, int, float> e("e", map_e);
+		Scalar<float> M("M", getRoundTime(arch));
 
+		out.insert(&n);
 		out.insert(&tau);
 		out.insert(&Wi);
 		out.insert(&e);
+		out.insert(&M);
 
 		return out;
 	}
@@ -100,13 +144,13 @@ namespace pelib
 	}
 
 	double
-	Taskgraph::getRoundTime(Architecture &arch) const
+	Taskgraph::getRoundTime(const Architecture &arch) const
 	{
 		MakespanCalculator *calculator = MakespanCalculator::getMakespanCalculator(this->getMakespanCalculator());
-		calculator->calculate(*this, arch);
+		double time = calculator->calculate(*this, arch);
 		delete calculator;
 		
-		return 0;
+		return time;
 	}
 	
 	const set<Task>&

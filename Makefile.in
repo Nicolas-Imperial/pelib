@@ -1,10 +1,10 @@
 package = cppelib
 version = 1.0
 
-export prefix = /usr/local
-export exec_prefix = $(prefix)
-export bindir = $(exec_prefix)/bin
-export libdir = $(exec_prefix)/lib
-export includedir = $(prefix)/include
+prefix = /usr/local
+exec_prefix = $(prefix)
+bindir = $(exec_prefix)/bin
+libdir = $(exec_prefix)/lib
+includedir = $(prefix)/include
 
 subdirs = src include

@@ -4,6 +4,9 @@ include Makefile.in
 tarname = $(package)
 distdir = $(tarname)-$(version)
 
+## Export variables
+export packages version prefix exec_prefix bindir libdir includedir
+
 # Check make version
 VERSION = $(shell make --version|head -1|cut -f 1-2 -d ' ')
 

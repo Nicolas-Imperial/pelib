@@ -9,6 +9,7 @@ namespace pelib
 	{
 		public:
 			Task(int id, std::string taskId);
+			Task(int id);
 			
 			virtual double
 			getFrequency() const;

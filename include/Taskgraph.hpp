@@ -21,8 +21,8 @@ namespace pelib
 	{
 		public:
 			Taskgraph();
-			Taskgraph(const Taskgraph* graph);
-			virtual ~Taskgraph();
+			Taskgraph(const Taskgraph *graph);
+			Taskgraph(const Algebra &algebra);
 
 			virtual
 			Taskgraph*
@@ -41,7 +41,7 @@ namespace pelib
 			getMakespanCalculator() const;
 
 			virtual double
-			getRoundTime(Architecture &arch) const;
+			getRoundTime(const Architecture &arch) const;
 
 			virtual void
 			setMakespanCalculator(const string makespanCalculator);

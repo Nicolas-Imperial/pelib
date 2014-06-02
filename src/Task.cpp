@@ -9,14 +9,49 @@ namespace pelib
 {
 	Task::Task(int id, std::string taskId)
 	{
+		if(id <= 0)
+		{
+			throw ParseException("A task ID must be stricly higher than 0");
+		}
 		this->id = id;
 		this->taskId = taskId;
-		this->name = "";
+		this->name = taskId;
 		this->frequency = 1;
 		this->width = 1;
 		this->maxWidth = 1;
 		this->workload = 1;
 		this->efficiencyString = "fml:p <= ? 1 : 1e-6";
+	}
+
+	Task::Task(int id)
+	{
+		if(id <= 0)
+		{
+			throw ParseException("A task ID must be stricly higher than 0");
+		}
+		this->id = id;
+		this->frequency = 1;
+		this->width = 1;
+		this->maxWidth = 1;
+		this->workload = 1;
+		this->efficiencyString = "fml:p <= ? 1 : 1e-6";
+
+		stringstream ss;
+		ss << id;
+		int id_size = ss.str().size();
+		ss.str(std::string());
+		ss.clear();
+		ss << "task";
+		
+		for(int i = 0; i < id_size; i++)
+		{
+			ss << "_";
+		}
+		ss << id;
+		string base = ss.str(); 
+
+		this->name = base + "_name";
+		this->taskId = base + "_id";
 	}
 	
 	double
@@ -118,7 +153,7 @@ namespace pelib
 				count++;
 			}
 
-			if(count >= (size_t)p)
+			if(count > (size_t)p)
 			{
 				num = def;
 			}

@@ -14,9 +14,10 @@ int main(int argc, char **argv)
 	using namespace std;
 	using namespace pelib;
 
-	Architecture *architecture;
+	Architecture *architecture, default_arch;
 	AmplArchitecture ai;
-	if(argc == 2)
+	
+	if(argc >= 2)
 	{
 		ifstream tmp(argv[1]);
 		architecture = ai.parse(tmp);
@@ -25,6 +26,7 @@ int main(int argc, char **argv)
 	else
 	{
 		cerr << "Warning: No architecture information supplied. Using default values\n";
+		architecture = &default_arch;
 	}
 	
 	GraphML input;
@@ -35,6 +37,12 @@ int main(int argc, char **argv)
 		<< std::setiosflags(std::ios::fixed)                                                                                                     
 		<< std::setiosflags(std::ios::showpoint);  
 
+	/*
+	std::ifstream myfile;
+	myfile.open (argv[2], std::ios::in);
+	Taskgraph *tg = input.parse(myfile);
+	myfile.close();
+	*/
 	Taskgraph *tg = input.parse(cin);
 
 	output.dump(cout, tg->buildAlgebra(*architecture));
