@@ -3,4 +3,5 @@
 
 namespace pelib
 {
+	Data::~Data() {}
 }

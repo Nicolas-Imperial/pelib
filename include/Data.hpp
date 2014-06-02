@@ -8,6 +8,8 @@ namespace pelib
 	class Data
 	{
 		public:
+			virtual ~Data();
+
 			virtual
 			Data*
 			clone() const = 0;

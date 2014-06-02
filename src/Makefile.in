@@ -148,6 +148,10 @@ RecordParser.cpp
 
 libcxx_cppelib_export = $(lib_cppelib_src)
 libcxx_cppelib_deps =
+libcxx_cppelib_pkg_ld = test_ldflags
+libcxx_cppelib_pkg_libs = test_libs
+libcxx_cppelib_pkg_cxxflags = test_cxxflags
+libcxx_cppelib_pkg_description = test_description
 
 libcxx_unit_src = unit_test.cpp
 libcxx_unit_export = $(libcxx_unit_src)
@@ -163,3 +167,20 @@ testcxx_parser_pkg = igraph
 testcxx_parser_libs = -lboost_regex -lrt
 testcxx_parser_ldflags = 
 
+#FIRST=test
+
+test:
+	@echo Begin test
+	@echo all_src=\"$(all_src)\"
+	@echo End of test
+	@/bin/false
+	@echo cc_pkgconfig=\"$(cc_pkgconfig)\"
+	@echo cxx_pkgconfig=\"$(cxx_pkgconfig)\"
+	@echo libcc_package=$(libcc_package)
+	@echo libcxx_package=$(libcxx_package)
+	@echo $(foreach var,$(libcc_package),$(var))
+	@echo $(foreach var,$(libcxx_package),$(var))
+	@echo $(foreach var,$(libcc_package),$(patsubst %,%.pc,$(var)))
+	@echo $(foreach var,$(libcxx_package),$(patsubst %,%.pc,$(var)))
+	@echo End of test
+	@/bin/false

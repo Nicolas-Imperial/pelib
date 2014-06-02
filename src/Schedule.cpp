@@ -2,10 +2,10 @@
 #include <string>
 
 #include <Schedule.hpp>
-#include <Scalar.cpp>
-#include <Vector.cpp>
-#include <Matrix.cpp>
-#include <Set.cpp>
+#include <Scalar.hpp>
+#include <Vector.hpp>
+#include <Matrix.hpp>
+#include <Set.hpp>
 
 using namespace std;
 

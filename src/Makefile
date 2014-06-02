@@ -150,9 +150,13 @@ define pkg_project
 $(call pkg-config,$(call $2$3_$1_pkg),libs-only-l,$2$3_$1_pkg_)
 endef
 
+## Gives all source files of projects $1 of type $2 (bin|lib|test) with language $3 (cc|cxx)
+all_src = $(call src,$(bincc_package),bin,cc) $(call src,$(bincxx_package),bin,cxx) $(call src,$(libcc_package),lib,cc) $(call src,$(libcxx_package),lib,cxx) $(call src,$(testcc_package),test,cc) $(call src,$(testcxx_package),test,cxx)
 ## All C and C++ objects, eliminating duplicates
 cc_object = $(sort $(call object,$(bincc_package),bin,cc) $(call object,$(libcc_package),lib,cc) $(call object,$(testcc_package),test,cc))
 cxx_object = $(sort $(call object,$(bincxx_package),bin,cxx) $(call object,$(libcxx_package),lib,cxx) $(call object,$(testcxx_package),test,cxx))
+cc_pkgconfig = $(foreach var,$(libcc_package),$(patsubst %,%.pc,$(var)))
+cxx_pkgconfig = $(foreach var,$(libcxx_package),$(patsubst %,%.pc,$(var)))
 
 -include $(foreach file,$(cc_object) $(cxx_object),$(patsubst %.o,%.d,$(file)))
 
@@ -177,7 +181,9 @@ testcc_list = $(foreach var,$(testcc_package),test_$(call VARIANT_test_$(var))$(
 testcxx_list = $(foreach var,$(testcxx_package),test_$(call VARIANT_test_$(var))$(var))
 test_list = $(testcc_list) $(testcxx_list)
 
-all: submake $(bin_list) $(lib_list) 
+all: submake $(bin_list) $(lib_list)
+
+$(all_src): Makefile Makefile.in
 
 $(cc_object): $$(call source,$$@,$$(call projectof,$$@,$$(call typeof,$$@),cc),$$(call typeof,$$@),cc)
 	$(CC) -c $(GLOBAL_CFLAGS) $(call cflags_project,$(call projectof,$@,$(call typeof,$@),cc),$(call typeof,$@),cc) $(call cflags_file,$@,$(call typeof,$@)) $(CPPFLAGS) -o $@ $<
@@ -222,18 +228,54 @@ $(testcxx_list): $$(call object,$$(patsubst test_%,%,$$@),test,cxx) $$(call $$(p
 	$(CXX) -o $@ $(GLOBAL_CXX_TEST_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(testcxx_package),test,cxx),test,cxx) $(call object,$(call suffixin,$@,$(testcxx_package)),test,cxx) $(GLOBAL_CXX_LIBS) $(call libs_project,$@,test,cxx) $(GLOBAL_CXX_TEST_PKG) $(call pkg_project,$@,test,cxx)
 
 test_target: $(test_list)
-	
+
+$(cc_pkgconfig): Makefile Makefile.in
+	@echo prefix=$(prefix) > $@
+	@echo exec_prefix=$(if $(call libcc_$(patsubst %.pc,%,$@)_pkg_exec_prefix),$(call libcc_$(patsubst %.pc,%,$@)_pkg_exec_prefix),\$\{prefix\}) >> $@
+	@echo libdir=$(if $(call libcc_$(patsubst %.pc,%,$@)_pkg_libdir),$(call libcc_$(patsubst %.pc,%,$@)_pkg_libdir),\$\{exec_prefix\}/lib) >> $@
+	@echo includedir=$(if $(call libcc_$(patsubst %.pc,%,$@)_pkg_includedir),$(call libcc_$(patsubst %.pc,%,$@)_pkg_includedir),\$\{prefix\}/include) >> $@
+	@echo >>$@
+	@echo Name: $(if $(call libcc_$(patsubst %.pc,%,$@)_pkg_name),$(call libcc_$(patsubst %.pc,%,$@)_pkg_name),$(patsubst %.pc,lib%,$@)) >> $@
+	@echo Description: $(call libcc_$(patsubst %.pc,%,$@)_pkg_description) >> $@
+	@echo Version: $(version) >> $@
+	@echo URL: $(call libcc_$(patsubst %.pc,%,$@)_pkg_url) >> $@
+	@echo Libs: $(call libcc_$(patsubst %.pc,%,$@)_pkg_libs) >> $@
+	@echo Libs.private: $(call libcc_$(patsubst %.pc,%,$@)_pkg_libs_private) >> $@
+	@echo Require: $(call libcc_$(patsubst %.pc,%,$@)_pkg_require) >> $@
+	@echo Require.private: $(call libcc_$(patsubst %.pc,%,$@)_pkg_require_private) >> $@
+	@echo Cflags: $(call libcc_$(patsubst %.pc,%,$@)_pkg_cflags) >> $@
+
+$(cxx_pkgconfig): Makefile Makefile.in
+	@echo prefix=$(prefix) > $@
+	@echo exec_prefix=$(if $(call libcxx_$(patsubst %.pc,%,$@)_pkg_exec_prefix),$(call libcxx_$(patsubst %.pc,%,$@)_pkg_exec_prefix),\$\{prefix\}) >> $@
+	@echo libdir=$(if $(call libcxx_$(patsubst %.pc,%,$@)_pkg_libdir),$(call libcxx_$(patsubst %.pc,%,$@)_pkg_libdir),\$\{exec_prefix\}/lib) >> $@
+	@echo includedir=$(if $(call libcxx_$(patsubst %.pc,%,$@)_pkg_includedir),$(call libcxx_$(patsubst %.pc,%,$@)_pkg_includedir),\$\{prefix\}/include) >> $@
+	@echo >>$@
+	@echo Name: $(if $(call libcxx_$(patsubst %.pc,%,$@)_pkg_name),$(call libcxx_$(patsubst %.pc,%,$@)_pkg_name),$(patsubst %.pc,lib%,$@)) >> $@
+	@echo Description: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_description) >> $@
+	@echo Version: $(version) >> $@
+	@echo URL: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_url) >> $@
+	@echo Libs: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_libs) >> $@
+	@echo Libs.private: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_libs_private) >> $@
+	@echo Require: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_require) >> $@
+	@echo Require.private: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_require_private) >> $@
+	@echo Cflags: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_cxxflags) >> $@
+
 dist: submake
 	mkdir -p $(distdir)
 	cp Makefile $(distdir)
 	cp Makefile.in $(distdir)
-	-cp $(sort $(foreach var,$(bin_package:%=bin_%_export),$(call $(var)))) $(distdir)
-	-cp $(sort $(foreach var,$(lib_package:%=lib_%_export),$(call $(var)))) $(distdir)
-	-cp $(sort $(foreach var,$(test_package:%=test_%_export),$(call $(var)))) $(distdir)
+	$(if $(bincc_package:%=bincc_%_export),cp $(sort $(foreach var,$(bincc_package:%=bincc_%_export),$(call $(var)))) $(distdir),)
+	$(if $(bincxx_package:%=bincxx_%_export),cp $(sort $(foreach var,$(bincxx_package:%=bincxx_%_export),$(call $(var)))) $(distdir),)
+	$(if $(libcc_package:%=libcc_%_export),cp $(sort $(foreach var,$(libcc_package:%=libcc_%_export),$(call $(var)))) $(distdir),)
+	$(if $(libcxx_package:%=libcxx_%_export),cp $(sort $(foreach var,$(libcxx_package:%=libcxx_%_export),$(call $(var)))) $(distdir),)
+	$(if $(testcc_package:%=testcc_%_export),cp $(sort $(foreach var,$(testcc_package:%=testcc_%_export),$(call $(var)))) $(distdir),)
+	$(if $(testcxx_package:%=testcxx_%_export),cp $(sort $(foreach var,$(testcxx_package:%=testcxx_%_export),$(call $(var)))) $(distdir),)
         
 clean: submake
 	$(RM) $(cc_object) $(foreach var,$(cc_object),$(var:%.o=%.d))
 	$(RM) $(cxx_object) $(foreach var,$(cxx_object),$(var:%.o=%.d))
+	$(RM) $(cc_pkgconfig) $(cxx_pkgconfig)
 	$(RM) $(test_target)
 	$(RM) $(bin_list)
 	$(RM) $(lib_target)
@@ -245,17 +287,18 @@ check: submake $(test_list)
 
 checkdist distcheck: dist
         
-install: submake $(bin_package) $(lib_target)
-	install -d $(DESTDIR)$(libdir)
-	install -m 644 $(lib_target) $(DESTDIR)$(libdir)
-	install -d $(DESTDIR)$(bindir)
-	install -m 755 $(bin_package) $(DESTDIR)$(bindir)
+install: submake $(bin_list) $(lib_target) $(cc_pkgconfig) $(cxx_pkgconfig)
+	$(if $(lib_target),install -d $(DESTDIR)$(libdir))
+	$(if $(lib_target),install -m 644 $(lib_target) $(DESTDIR)$(libdir))
+	$(if $(bin_list),install -d $(DESTDIR)$(bindir))
+	$(if $(bin_list),install -m 755 $(bin_list) $(DESTDIR)$(bindir))
+	$(if $(pkgconfig),install -m 644 $(DESTDIR)$(libdir)/pkgconfig $(if $(pkgconfig),cp $(pkgconfig) $(distdir)))
 
 uninstall: submake
 	$(RM) $(foreach var,$(bin_package), $(DESTDIR)$(bindir)/$(var))
 	$(RM) $(foreach var,$(lib_target), $(DESTDIR)$(libdir)/$(var))
 	
-submake:
+submake: Makefile Makefile.in
 	@$(shell echo for i in "$(foreach var,$(subdirs),$(var))"\; do $(MAKE) -C \$$i '$(MAKEFLAGS)' $(MAKECMDGOALS) distdir=$(distdir)/\$$i\; done)
 
 FORCE:
