@@ -40,7 +40,7 @@ endef
 
 ## Get pkg-config output for the operation $2 (cflags|libs) on package list $1, with the corresponding options from variable $3$<package_name>
 define pkg-config
-$(if $(strip $1),$(if $(shell pkg-config --$2 $(foreach pkg,$1,"$(pkg) $(call $3$(pkg)_version)")),$(shell pkg-config --$2 $(foreach pkg,$1,"$(pkg) $(call $3$(pkg)_version)")),$(error Missing library)),)
+$(if $(strip $1),$(if $(shell pkg-config --$2 --static $(foreach pkg,$1,"$(pkg) $(call $3$(pkg)_version)")),$(shell pkg-config --$2 --static $(foreach pkg,$1,"$(pkg) $(call $3$(pkg)_version)")),$(error Missing library)),)
 endef
 
 ## Gives all source files of projects $1 of type $2 (bin|lib|test) with language $3 (cc|cxx)
@@ -188,7 +188,7 @@ test_list = $(testcc_list) $(testcxx_list)
 all: submake $(bin_list) $(lib_list)
 
 ## Force rebuild upon Makefile update
-$(cc_object) $(cxx_object): Makefile Makefile.in
+$(cc_object) $(cxx_object) $(embed_object) $(cc_pkgconfig) $(cxx_pkgconfig): Makefile Makefile.in
 
 $(embed_object): $(embed_src)
 	$(LD) -r -b binary -o $@ $(patsubst %.o,%,$@)
@@ -265,7 +265,7 @@ $(cxx_pkgconfig):
 	@echo Version: $(version) >> $@
 	@echo URL: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_url) >> $@
 	@echo Libs: -l$(patsubst %.pc,%,$@) $(call libcxx_$(patsubst %.pc,%,$@)_pkg_libs) >> $@
-	@echo Libs.private: $(GLOBAL_CXX_LDFLAGS) $(call $2$3_$1_ldflags) $(GLOBAL_CXX_LIBS) $(call libcxx_$(patsubst %.pc,%,$@)_libs) $(call libcxx_$(patsubst %.pc,%,$@)_pkg_libs_private) >> $@
+	@echo Libs.private: $(GLOBAL_CXX_LDFLAGS) $(call ldflags_project,$(call suffixin,$(patsubst %.pc,%,$@),$(libcxx_package),lib,cxx),lib,cxx) $(GLOBAL_CXX_LIBS) $(call libs_project,$(patsubst %.pc,%,$@),lib,cxx) $(GLOBAL_CXX_PKG) $(call pkg_project,$(patsubst %.pc,%,$@),lib,cxx) $(call libcxx_$(patsubst %.pc,%,$@)_pkg_libs_private) >> $@
 	@echo Require: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_require) >> $@
 	@echo Require.private: $(foreach var,$(CXX_PKG),"$(var) $(call CXX_PKG_$(var)_version)") $(foreach var,$(call libcxx_$(patsubst %.pc,%,$@)_pkg),"$(var) $(call libcxx_$(patsubst %.pc,%,$@)_pkg_$(var)_version)") $(call libcxx_$(patsubst %.pc,%,$@)_pkg_require_private) >> $@
 	@echo Conflicts: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_conflicts) >> $@

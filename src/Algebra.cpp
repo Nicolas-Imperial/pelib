@@ -28,9 +28,6 @@ namespace pelib
 	void
 	Algebra::merge(const Algebra& record)
 	{
-		// Call what a record would do
-		merge(record);
-
 		// Copy all AlgebraData
 		for(auto iter = record.getAllRecords().begin(); iter != record.getAllRecords().end(); iter++)
 		{

@@ -6,6 +6,7 @@
 #include <Vector.hpp>
 #include <Matrix.hpp>
 #include <Set.hpp>
+#include <CastException.hpp>
 
 using namespace std;
 
@@ -16,6 +17,47 @@ namespace pelib
 		roundTime = 0;
 		this->name = name;
 		this->autName = autName;
+	}
+
+	Schedule::Schedule(Algebra &algebra)
+	{
+		roundTime = 0;
+		this->name = "Algebra_schedule";
+		this->autName = "Algebra_aut";
+
+		this->autName = "Generated_from_algebra";
+		const Scalar<float> *M = algebra.find<Scalar<float> >("M");
+		const Vector<int, int> *tau = algebra.find<Vector<int, int> >("Tau");
+		const Vector<int, int> *wi = algebra.find<Vector<int, int> >("wi");
+		const Matrix<int, int, int> *sched = algebra.find<Matrix<int, int, int> >("schedule");
+		
+		if(M == NULL || tau == NULL || wi == NULL)
+		{
+			throw CastException("Missing parameter");
+		}
+		else
+		{
+			this->roundTime = M->getValue();
+
+			for(map<int, map<int, int> >::const_iterator i = sched->getValues().begin(); i != sched->getValues().end(); i++)
+			{
+				vector<Task> core_schedule;
+				
+				for(map<int, int>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
+				{
+					if(j->second > 0)
+					{
+						Task task(j->second);
+						task.setWorkload(tau->getValues().find(j->second)->second);
+						task.setWidth(wi->getValues().find(j->second)->second);
+
+						core_schedule.push_back(task);
+					}
+				}
+
+				schedule.insert(pair<int, vector<Task> >(i->first, core_schedule));
+			}
+		}
 	}
 	
 	Schedule*

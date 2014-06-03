@@ -11,6 +11,7 @@ namespace pelib
 	{
 		public:
 			Schedule(std::string name, std::string autName);
+			Schedule(Algebra &algebra);
 			virtual Schedule* clone() const;
 			virtual Algebra buildAlgebra() const;
 
