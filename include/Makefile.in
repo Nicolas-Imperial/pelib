@@ -12,6 +12,12 @@ AmplInput.hpp AmplInputData.hpp AmplInputScalar.hpp AmplInputVector.hpp AmplInpu
 AmplOutput.hpp AmplOutputData.hpp AmplOutputScalar.hpp AmplOutputVector.hpp AmplOutputSet.hpp AmplOutputMatrix.hpp XMLSchedule.hpp \
 CppDataOutput.hpp \
 Cpp.hpp CppData.hpp CppScalar.hpp CppVector.hpp CppSet.hpp CppMatrix.hpp \
+RecordParser.hpp constraints.hpp RecordOutput.hpp AlgebraDataParser.hpp AlgebraDataOutput.hpp AmplInputDataParser.hpp \
+AmplInputDataOutput.hpp AmplOutputDataParser.hpp AmplOutputDataOutput.hpp StreamingAppData.hpp StreamingApp.hpp \
+GraphMLParser.hpp GraphMLOutput.hpp TaskgraphParser.hpp TaskgraphOutput.hpp StreamingAppDataParser.hpp StreamingAppDataOutput.hpp \
+AmplArchitecture.hpp AmplArchitectureParser.hpp AmplArchitectureOutput.hpp ArchitectureParser.hpp ArchitectureOutput.hpp \
+StreamNet.hpp StreamingAppParser.hpp StreamingAppOutput.hpp ScheduleParser.hpp ScheduleOutput.hpp \
+XMLScheduleParser.hpp XMLScheduleOutput.hpp 
 
 ## Further directories to follow
 subdirs =

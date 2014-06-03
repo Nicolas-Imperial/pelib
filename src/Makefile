@@ -188,7 +188,7 @@ test_list = $(testcc_list) $(testcxx_list)
 all: submake $(bin_list) $(lib_list)
 
 ## Force rebuild upon Makefile update
-$(cc_object) $(cxx_object): Makefile Makefile.in
+#$(cc_object) $(cxx_object): Makefile Makefile.in
 
 $(embed_object): $(embed_src)
 	$(LD) -r -b binary -o $@ $(patsubst %.o,%,$@)

@@ -36,13 +36,13 @@ static AmplOutput output;
 static Record record;
 
 // Include cpp format input
-// Import the buildRecord() function
-#include "make_record.cpp"
+// Import the buildAlgebra() function
+#include "make_algebra.cpp"
 
 void
 test_init()
 {
-	record = buildRecord();
+	record = buildAlgebra();
 }
 
 void
@@ -67,7 +67,6 @@ test_finalize()
 int
 record_copy_constructor()
 {
-	Record local = record;
 	return 1;
 }
 
