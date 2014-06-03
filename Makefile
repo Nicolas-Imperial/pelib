@@ -20,6 +20,7 @@ $(abspath $(distdir)): FORCE clean-dist
 	@$(shell echo for i in "$(foreach var,$(subdirs),$(var))"\; do $(MAKE) -C \$$i dist distdir=$(abspath $(distdir))/\$$i\; done)
 	cp Makefile $(abspath $(distdir))
 	cp Makefile.in $(abspath $(distdir))
+	cp Doxyfile $(abspath $(distdir))
 	
 clean: clean-tree clean-dist
 
