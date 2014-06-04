@@ -1,4 +1,3 @@
-#include "TaskgraphRecord.hpp"
 #include "AmplOutput.hpp"
 #include "GraphML.hpp"
 #include "XMLSchedule.hpp"
@@ -23,7 +22,7 @@ int main(int argc, char* argv[])
 
   ifstream ifs(argv[1]);
 
-  TaskgraphRecord tgr = tg.parse(ifs);
+  Taskgraph tgr = tg.parse(ifs);
   ifs.close();
   
   Algebra amplschedule = ao.parse(cin);

@@ -146,6 +146,7 @@ namespace pelib
 	double
 	Taskgraph::getRoundTime(const Architecture &arch) const
 	{
+		//cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] getTasks().size() = " << getTasks().size() << endl;
 		MakespanCalculator *calculator = MakespanCalculator::getMakespanCalculator(this->getMakespanCalculator());
 		double time = calculator->calculate(*this, arch);
 		delete calculator;

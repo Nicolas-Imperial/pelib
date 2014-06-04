@@ -13,6 +13,7 @@ namespace pelib
 		{
 			throw ParseException("A task ID must be stricly higher than 0");
 		}
+		
 		this->id = id;
 		this->taskId = taskId;
 		this->name = taskId;
@@ -29,6 +30,7 @@ namespace pelib
 		{
 			throw ParseException("A task ID must be stricly higher than 0");
 		}
+		
 		this->id = id;
 		this->frequency = 1;
 		this->width = 1;
@@ -146,7 +148,7 @@ namespace pelib
 			stringstream stream(getEfficiencyString());
 
 			double num;
-			size_t count = 0;
+			size_t count = 1;
 
 			while(stream >> num && count < (size_t)p)
 			{
@@ -214,8 +216,11 @@ namespace pelib
 	Task::runtime(double width, double frequency) const
 	{
 		double work = getWorkload();
+		//cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] work = " << work << endl;
 		work = work / (width * getEfficiency(width));
+		//cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] work = " << work << endl;
 		work = work / frequency;
+		//cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] work = " << work << endl;
 		
 		return work; 
 	}

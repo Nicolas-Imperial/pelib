@@ -297,7 +297,7 @@ check: submake $(test_list)
 
 checkdist distcheck: dist
         
-install: submake $(bin_list) $(lib_target) $(cc_pkgconfig) $(cxx_pkgconfig)
+install: submake uninstall $(bin_list) $(lib_target) $(cc_pkgconfig) $(cxx_pkgconfig)
 	$(if $(lib_target),install -d $(DESTDIR)$(libdir))
 	$(if $(lib_target),install -m 644 $(lib_target) $(DESTDIR)$(libdir))
 	$(if $(bin_list),install -d $(DESTDIR)$(bindir))

@@ -17,7 +17,6 @@
 #include <AmplOutputVector.hpp>
 #include <AmplOutputMatrix.hpp>
 
-#include "TaskgraphRecord.hpp"
 #include "XMLSchedule.hpp"
 
 using namespace pelib;

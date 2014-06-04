@@ -8,8 +8,9 @@ using namespace pelib;
 using namespace std;
 
 double
-MakespanFFT::calculate(const Taskgraph& tg,const Architecture& arch) const
+MakespanFFT::calculate(const Taskgraph &tg, const Architecture &arch) const
 {
+	//cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] tg.getTasks().size() = " << tg.getTasks().size() << endl;
 	int p = arch.getCoreNumber();
 	int min_freq = *arch.getFrequencies().begin();
 	int max_freq = *arch.getFrequencies().end();
@@ -17,6 +18,7 @@ MakespanFFT::calculate(const Taskgraph& tg,const Architecture& arch) const
 	set<int> workloads;
 	for(std::set<Task>::const_iterator i = tg.getTasks().begin(); i != tg.getTasks().end(); i++)
 	{
+		//cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "]" << endl;
 		workloads.insert(i->getWorkload());
 	}
 	int max_workload = *workloads.end();
@@ -25,6 +27,7 @@ MakespanFFT::calculate(const Taskgraph& tg,const Architecture& arch) const
 	for(std::set<Task>::const_iterator i = tg.getTasks().begin(); i != tg.getTasks().end(); i++)
 	{
 		Task task = *i;
+		//cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "]" << endl;
 
 		if(task.getWorkload() == max_workload)
 		{
@@ -34,9 +37,12 @@ MakespanFFT::calculate(const Taskgraph& tg,const Architecture& arch) const
 		
 		double wi = task.getMaxWidth();
 		wi = wi < p ? wi : p; // Cannot have a task running with more cores than architecture offers, even if width is higher
-		double time = task.runtime(1, 1) / p;
+		double time = task.runtime(1, 1) / wi;
+		//cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] wi = " << wi << endl;
 		sum_pTw += time;
 	}
+	//cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] sum_pTw = " << sum_pTw << endl;
+
 
 	float minM = sum_pTw / (double)max_freq;
 	float maxM = sum_pTw / (double)min_freq;

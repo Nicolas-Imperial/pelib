@@ -9,7 +9,6 @@
 #include <Algebra.hpp>
 #include <AmplDataParser.hpp>
 #include <AlgebraData.hpp>
-#include <TaskgraphRecord.hpp>
 
 namespace pelib
 {	
