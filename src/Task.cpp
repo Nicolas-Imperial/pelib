@@ -212,15 +212,12 @@ namespace pelib
 		this->name = name;
 	}
 
-	bool
+	double
 	Task::runtime(double width, double frequency) const
 	{
 		double work = getWorkload();
-		//cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] work = " << work << endl;
 		work = work / (width * getEfficiency(width));
-		//cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] work = " << work << endl;
 		work = work / frequency;
-		//cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] work = " << work << endl;
 		
 		return work; 
 	}

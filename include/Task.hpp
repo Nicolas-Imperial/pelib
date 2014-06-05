@@ -56,7 +56,7 @@ namespace pelib
 			virtual void
 			setMaxWidth(double maxWidth);
 
-			virtual bool
+			virtual double
 			runtime(double width = 1, double frequency = 1) const;
 
 			virtual bool
