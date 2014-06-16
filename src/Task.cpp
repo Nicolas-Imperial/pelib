@@ -126,6 +126,8 @@ namespace pelib
 			using namespace mu;
 			string fml = getEfficiencyString().substr(4);
 			double d_p = p;
+			double d_W = this->getMaxWidth();
+			double d_tau = this->getWorkload();
 
 			Parser mathparser;
 			mathparser.SetExpr(fml);
@@ -134,6 +136,10 @@ namespace pelib
 			// It is allowed to define parameters not present in the
 			// formula, it will just be ignored.
 			mathparser.DefineVar("p", &d_p);
+			mathparser.DefineVar("W", &d_W);
+			mathparser.DefineVar("tau", &d_tau);
+
+			//cout << "tau = " << d_tau << "; W = " << d_W << "; p = " << p << "; " << fml << endl;
 
 			try
 			{

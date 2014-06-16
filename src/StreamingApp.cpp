@@ -71,4 +71,14 @@ namespace pelib
 			this->taskgraph = *(Taskgraph*)data;
 		}
 	}
+
+	Algebra
+	StreamingApp::buildAlgebra() const
+	{
+		Algebra ret = this->getTaskgraph().buildAlgebra(this->getArchitecture());
+		ret.merge(this->getArchitecture().buildAlgebra());
+		ret.merge(this->getSchedule().buildAlgebra());
+
+		return ret;
+	}
 }

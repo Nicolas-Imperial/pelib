@@ -2,6 +2,7 @@
 #include <Taskgraph.hpp>
 #include <Architecture.hpp>
 #include <Schedule.hpp>
+#include <Algebra.hpp>
 
 #ifndef PELIB_STREAMINGAPP
 #define PELIB_STREAMINGAPP
@@ -26,6 +27,9 @@ namespace pelib
 
 			virtual void
 			insert(StreamingAppData* data);
+
+			virtual Algebra
+			buildAlgebra() const;
 
 			virtual StreamingApp&
 			operator=(const StreamingApp &rhs);

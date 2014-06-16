@@ -13,13 +13,13 @@ namespace pelib
 	MakespanCalculator*
 	MakespanCalculator::getMakespanCalculator(const std::string key)
 	{
-		if(key.compare("fml:synthetic") == 0)
+		if(key.compare("class:synthetic") == 0)
 			return new MakespanSynthetic();
-		if(key.compare("fml:fft") == 0)
+		if(key.compare("class:fft") == 0)
 			return new MakespanFFT();
-		if(key.compare("fml:preduce") == 0)
+		if(key.compare("class:preduce") == 0)
 			return new MakespanPreduce();
-		if(key.compare("fml:mergesort") == 0)
+		if(key.compare("class:mergesort") == 0)
 			return new MakespanMergesort();
      
 		try{
