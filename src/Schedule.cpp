@@ -31,7 +31,7 @@ namespace pelib
 		const Vector<int, int> *wi = algebra.find<Vector<int, int> >("wi");
 		const Matrix<int, int, int> *sched = algebra.find<Matrix<int, int, int> >("schedule");
 		
-		if(M == NULL || tau == NULL || wi == NULL)
+		if(M == NULL || tau == NULL || wi == NULL || sched == NULL)
 		{
 			throw CastException("Missing parameter");
 		}

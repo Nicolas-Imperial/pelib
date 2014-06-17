@@ -1,6 +1,7 @@
-#include "AmplOutput.hpp"
-#include "GraphML.hpp"
-#include "XMLSchedule.hpp"
+#include <AmplOutput.hpp>
+#include <GraphML.hpp>
+#include <XMLSchedule.hpp>
+#include <AmplArchitecture.hpp>
 
 #include <fstream>
 
@@ -9,30 +10,31 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-	/*
-  if(argc != 2)
-    {
-      cerr << "Need taskgraph to perform this task\n";
-      return 1;
-    }
+	if(argc != 3)
+	{
+		cerr << "Need a taskgraph and architecture to perform this task" << endl;
+		return 1;
+	}
 
-  GraphML tg;
-  AmplOutput ao;
-  XMLSchedule sch;
+	ifstream tg_str(argv[1]);
+	Taskgraph tg = GraphML().parse(tg_str);
+	tg_str.close();
 
-  ifstream ifs(argv[1]);
+	ifstream arch_str(argv[2]);
+	Architecture arch = AmplArchitecture().parse(arch_str);
+	arch_str.close();
 
-  Taskgraph tgr = tg.parse(ifs);
-  ifs.close();
-  
-  Algebra amplschedule = ao.parse(cin);
-  //cout << "The schedule:" << endl;
-  //ao.dump(cout,amplschedule);
+	//ifstream sched_str(argv[3]);
+	//Algebra amplschedule = AmplOutput().parse(sched_str);
+	//sched_str.close();
+	Algebra amplschedule = AmplOutput().parse(cin);
+	
+	amplschedule.merge(tg.buildAlgebra(arch));
+	amplschedule.merge(arch.buildAlgebra());
+	
+	XMLSchedule().dump(cout, Schedule(amplschedule));
 
-  //sch.dump(cout, tgr, amplschedule);
-  */
-
-  return 0;
+	return 0;
 }
 
   
