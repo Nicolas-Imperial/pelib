@@ -30,8 +30,9 @@ namespace pelib
 		const Vector<int, int> *tau = algebra.find<Vector<int, int> >("Tau");
 		const Vector<int, int> *wi = algebra.find<Vector<int, int> >("wi");
 		const Matrix<int, int, int> *sched = algebra.find<Matrix<int, int, int> >("schedule");
+		const Vector<int, int> *freq = algebra.find<Vector<int, int> >("frequency");
 		
-		if(M == NULL || tau == NULL || wi == NULL || sched == NULL)
+		if(M == NULL || tau == NULL || wi == NULL || sched == NULL || freq == NULL)
 		{
 			throw CastException("Missing parameter");
 		}
@@ -50,6 +51,7 @@ namespace pelib
 						Task task(j->second);
 						task.setWorkload(tau->getValues().find(j->second)->second);
 						task.setWidth(wi->getValues().find(j->second)->second);
+						task.setFrequency(freq->getValues().find(j->second)->second);
 
 						core_schedule.push_back(task);
 					}
