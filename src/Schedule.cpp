@@ -25,7 +25,6 @@ namespace pelib
 		this->name = name;
 		this->autName = autName;
 
-		this->autName = "Generated_from_algebra";
 		const Scalar<float> *M = algebra.find<Scalar<float> >("M");
 		const Vector<int, int> *tau = algebra.find<Vector<int, int> >("Tau");
 		const Vector<int, int> *wi = algebra.find<Vector<int, int> >("wi");
