@@ -19,11 +19,11 @@ namespace pelib
 		this->autName = autName;
 	}
 
-	Schedule::Schedule(Algebra &algebra)
+	Schedule::Schedule(std::string name, std::string autName, Algebra &algebra)
 	{
 		roundTime = 0;
-		this->name = "Algebra_schedule";
-		this->autName = "Algebra_aut";
+		this->name = name;
+		this->autName = autName;
 
 		this->autName = "Generated_from_algebra";
 		const Scalar<float> *M = algebra.find<Scalar<float> >("M");
