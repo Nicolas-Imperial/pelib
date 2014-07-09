@@ -1,3 +1,5 @@
+#include <sstream>
+
 #include <Taskgraph.hpp>
 #include <MakespanCalculator.hpp>
 #include <ParseException.hpp>
@@ -179,7 +181,7 @@ namespace pelib
 	}
 
 	const Task&
-	Taskgraph::findTask(const string taskId) const
+	Taskgraph::findTask(const string &taskId) const
 	{
 		for(set<Task>::const_iterator iter = this->tasks.begin(); iter != this->tasks.end(); iter++)
 		{
@@ -190,5 +192,21 @@ namespace pelib
 		}
 
 		throw ParseException("No task \"" + taskId + "\" exists in this taskgraph.");
+	}
+
+	const Task&
+	Taskgraph::findTask(int id) const
+	{
+		for(set<Task>::const_iterator iter = this->tasks.begin(); iter != this->tasks.end(); iter++)
+		{
+			if(iter->getId() == id)
+			{
+				return *iter;
+			}
+		}
+
+		std::ostringstream stream;
+		stream << "No task \"" << id << "\" exists in this taskgraph.";
+		throw ParseException(stream.str());
 	}
 }

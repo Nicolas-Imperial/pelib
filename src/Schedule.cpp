@@ -12,18 +12,18 @@ using namespace std;
 
 namespace pelib
 {
-	Schedule::Schedule(std::string name, std::string autName)
+	Schedule::Schedule(const std::string &name, const std::string &autName)
 	{
 		roundTime = 0;
 		this->name = name;
 		this->autName = autName;
 	}
 
-	Schedule::Schedule(std::string name, std::string autName, Algebra &algebra)
+	Schedule::Schedule(const std::string &name, const Taskgraph &tg, const Algebra &algebra)
 	{
 		roundTime = 0;
 		this->name = name;
-		this->autName = autName;
+		this->autName = tg.getAUTName();
 
 		const Scalar<float> *M = algebra.find<Scalar<float> >("M");
 		const Vector<int, int> *tau = algebra.find<Vector<int, int> >("Tau");
@@ -47,7 +47,7 @@ namespace pelib
 				{
 					if(j->second > 0)
 					{
-						Task task(j->second);
+						Task task(j->second, tg.findTask(j->second).getTaskId());
 						task.setWorkload(tau->getValues().find(j->second)->second);
 						task.setWidth(wi->getValues().find(j->second)->second);
 						task.setFrequency(freq->getValues().find(j->second)->second);

@@ -34,10 +34,8 @@ XMLSchedule::dump(ostream& os, const StreamingAppData *data) const
 {
 	const Schedule *sched = dynamic_cast<const Schedule* >(data);
 	if(sched == NULL) throw CastException("parameter \"data\" was not of type \"Schedule*\".");
-	//sr.theSchedule->get_document()->write_to_stream(os);
 
 	map<int, std::vector<Task> > schedule = sched->getSchedule();
-	//int processors = schedule.size();
 	float target_makespan = sched->getRoundTime();
 
 	set<string> task_ids;
@@ -51,14 +49,15 @@ XMLSchedule::dump(ostream& os, const StreamingAppData *data) const
 
 	os << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 		<< "<schedule name=\"" << sched->getName() << "\" autname=\"" << sched->getAUTName() << "\" "
-		//<< "cores=\"" << processors << "\" "
-		//<< "tasks=\"" << task_ids.size() << "\" "
-		<< "roundtime=\"" << target_makespan << "\">\n";
+		<< "roundtime=\"" << target_makespan << "\" "
+		<< "cores=\"" << schedule.size() << "\" "
+		<< "tasks=\"" << task_ids.size() << "\""
+		<< "> \n";
 
 	for(map<int, vector<Task> >::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 	{
 		int p = i->first;
-		os << " <core coreid=\"" << p << "\">\n";
+		os << " <core coreid=\"" << p - 1 << "\">\n";
 		std::vector<Task> core_schedule = i->second;
 		int order = 0;
 

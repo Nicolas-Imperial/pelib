@@ -53,7 +53,10 @@ namespace pelib
 			setTasks(const set<Task>&);
 
 			virtual const Task&
-			findTask(const string taskId) const;
+			findTask(const string &taskId) const;
+
+			virtual const Task&
+			findTask(int id) const;
 				
 		protected:
 			string autName, makespanCalculator;

@@ -181,7 +181,7 @@ GraphML::parse(istream &is) const
 	set<Task> tasks;
 	for(int id = 0; id < igraph_vcount(the_graph); id++)
 	{
-		Task task(id + 1, strcmp(VAS(the_graph, "taskid", id),"") != 0 ? VAS(the_graph, "taskid", id) : "UNNAMED_TASKID");
+		Task task(id + 1, strcmp(VAS(the_graph, "taskid", id), "") != 0 ? VAS(the_graph, "taskid", id) : "UNNAMED_TASKID");
 		task.setName(strcmp(VAS(the_graph, "taskname", id),"") != 0 ? VAS(the_graph, "taskname", id) : "UNNAMED_TASKNAME");
 		task.setWorkload(!isnan((float)VAN(the_graph, "workload", id)) ? VAN(the_graph, "workload", id): 1.0);
 		task.setMaxWidth((int)VAN(the_graph, "max_width", id) != INT_MIN ?  VAN(the_graph, "max_width", id) : 1);

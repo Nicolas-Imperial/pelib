@@ -1,5 +1,6 @@
 #include <StreamingAppData.hpp>
 #include <Algebra.hpp>
+#include <Taskgraph.hpp>
 #include <Task.hpp>
 
 #ifndef PELIB_SCHEDULE
@@ -10,8 +11,8 @@ namespace pelib
 	class Schedule : public StreamingAppData
 	{
 		public:
-			Schedule(std::string name, std::string autName);
-			Schedule(std::string name, std::string autName, Algebra &algebra);
+			Schedule(const std::string &name, const std::string &autName);
+			Schedule(const std::string &name, const Taskgraph &tg, const Algebra &algebra);
 			virtual Schedule* clone() const;
 			virtual Algebra buildAlgebra() const;
 

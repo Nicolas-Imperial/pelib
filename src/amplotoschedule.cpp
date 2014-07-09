@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 	amplschedule.merge(tg.buildAlgebra(arch));
 	amplschedule.merge(arch.buildAlgebra());
 	
-	XMLSchedule().dump(cout, Schedule("converted_from_ampl", tg.getAUTName(), amplschedule));
+	XMLSchedule().dump(cout, Schedule("converted_from_ampl", tg, amplschedule));
 
 	return 0;
 }
