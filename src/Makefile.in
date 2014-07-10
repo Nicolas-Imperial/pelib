@@ -24,7 +24,7 @@ CXX_TEST_DEPS = $(CXX_DEPS) libunitc++.a
 CXX_TEST_LDFLAGS =
 
 ## static library packages and their sources
-bincxx_package = demo streamingapp_demo demo_xmlformats graphmltoampli amplitographml duplicate_tasks graphmlfmltographmleval amplitoampli amplitoamplo amplotoampli amplotoamplo amplitocpp amplotocpp run_record amplotoschedule
+bincxx_package = demo streamingapp_demo demo_xmlformats graphmltoampli amplitographml duplicate_tasks graphmlfmltographmleval amplitoampli amplitoamplo amplotoampli amplotoamplo amplitocpp amplotocpp run_record amplotoschedule amplmatrixtoraw
 
 bincxx_demo_src = demo.cpp
 bincxx_demo_export = $(bincxx_demo_src) 
@@ -115,6 +115,12 @@ bincxx_run_record_export = $(bincxx_run_record_src) make_algebra.cpp
 bincxx_run_record_deps = libcppelib.a
 bincxx_run_record_libs = -lcppelib $(libcxx_cppelib_libs)
 bincxx_run_record_ldflags = -L.
+
+bincxx_amplmatrixtoraw_src = amplmatrixtoraw.cpp
+bincxx_amplmatrixtoraw_export = $(bincxx_amplmatrixtoraw_src)
+bincxx_amplmatrixtoraw_deps = libcppelib.a
+bincxx_amplmatrixtoraw_libs = -lcppelib $(libcxx_cppelib_libs)
+bincxx_amplmatrixtoraw_ldflags = -L.
 
 ## static library packages and their sources
 libcxx_package = unit cppelib
