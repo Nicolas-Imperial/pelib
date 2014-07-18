@@ -38,13 +38,12 @@ MakespanFFT::calculate(const Taskgraph &tg, const Architecture &arch) const
 		}
 		
 		double wi = task.getMaxWidth();
-		wi = wi < p ? wi : p; // Cannot have a task running with more cores than architecture offers, even if width is higher
+		wi = p; // We assume perfect parallelization, no matter what
 		double time = task.runtime(1, 1) / wi;
 		//cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] wi = " << wi << endl;
 		sum_pTw += time;
 	}
 	//cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] sum_pTw = " << sum_pTw << endl;
-
 
 	float minM = sum_pTw / (double)max_freq;
 	float maxM = sum_pTw / (double)min_freq;

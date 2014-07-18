@@ -27,10 +27,6 @@ number_tasks_in_level(int task)
 
 double MakespanMergesort::calculate(const Taskgraph& tg, const Architecture& arch) const
 {
-	int p = arch.getCoreNumber();
-	int min_freq = *arch.getFrequencies().begin();
-	int max_freq = *arch.getFrequencies().end();
-
 	int max_workload = 0;
 	for(std::set<Task>::const_iterator i = tg.getTasks().begin(); i != tg.getTasks().end(); i++)
 	{
@@ -40,6 +36,11 @@ double MakespanMergesort::calculate(const Taskgraph& tg, const Architecture& arc
 			max_workload = workload;
 		}
 	}
+
+	int max_freq = *arch.getFrequencies().end();
+	/*
+	int min_freq = *arch.getFrequencies().begin();
+	int p = arch.getCoreNumber();
 
 	double sum_pTw = 0;
 	for(std::set<Task>::const_iterator i = tg.getTasks().begin(); i != tg.getTasks().end(); i++)
@@ -59,8 +60,10 @@ double MakespanMergesort::calculate(const Taskgraph& tg, const Architecture& arc
 	}
 
 	float minM = sum_pTw / (double)max_freq;
-	float maxM = sum_pTw / (double)min_freq;
-	float M = (minM + maxM) / 2;
+	//float maxM = sum_pTw / (double)min_freq;
+	//float M = (minM + maxM) / 2;
 	
-	return M;
+	return minM;
+	*/
+	return (float)max_workload / (float)max_freq;
 }

@@ -14,18 +14,27 @@ MakespanSynthetic::calculate(const Taskgraph& tg, const Architecture& arch) cons
 	int min_freq = *arch.getFrequencies().begin();
 	int max_freq = *arch.getFrequencies().end();
 
-	double sum_pTw = 0;
+	double pseudo_seq = 0;
+	double parallel = 0;
 	for(std::set<Task>::const_iterator i = tg.getTasks().begin(); i != tg.getTasks().end(); i++)
 	{
 		Task task = *i;
 		double wi = task.getMaxWidth();
 		wi = wi < p ? wi : p; // Cannot have a task running with more cores than architecture offers, even if width is higher
-		double time = task.runtime(wi, 1);
-		sum_pTw += time;
+		double pseudo_seq_time = task.runtime(1, 1) / task.getEfficiency(wi); // Assume tasks run sequentially, but pay the parallelization penatly; actual parallelization comes later
+		double parallel_time = task.runtime(wi, 1); // Assume tasks run sequentially, but pay the parallelization penatly; actual parallelization comes later
+		pseudo_seq += pseudo_seq_time;
+		parallel += parallel_time; 
 	}
 
-	float minM = sum_pTw / (double)max_freq;
-	float maxM = sum_pTw / (double)min_freq;
+	// A perfectly load-balanced schedule would be
+	float perfect = pseudo_seq / p;
+
+	// Take the workload as an average between a perfect and the worst (all mapped on one core) schedule
+	parallel = (3 * perfect + parallel) / 4;
+
+	float minM = parallel / (double)max_freq;
+	float maxM = parallel / (double)min_freq;
 	float M = (minM + maxM) / 2;
 
 	return M;

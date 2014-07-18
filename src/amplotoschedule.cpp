@@ -10,7 +10,7 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-	if(argc != 3)
+	if(argc < 3)
 	{
 		cerr << "Need a taskgraph and architecture to perform this task" << endl;
 		return 1;
@@ -24,9 +24,11 @@ int main(int argc, char* argv[])
 	Architecture arch = AmplArchitecture().parse(arch_str);
 	arch_str.close();
 
-	//ifstream sched_str(argv[3]);
-	//Algebra amplschedule = AmplOutput().parse(sched_str);
-	//sched_str.close();
+	/*
+	ifstream sched_str(argv[3]);
+	Algebra amplschedule = AmplOutput().parse(sched_str);
+	sched_str.close();
+	*/
 	Algebra amplschedule = AmplOutput().parse(cin);
 	
 	amplschedule.merge(tg.buildAlgebra(arch));
