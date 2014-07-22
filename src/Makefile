@@ -4,6 +4,9 @@
 ## Export all variables to sub-makefiles
 export
 
+## Make this folder as a pkgconfig search path so locally compiled libraries can be resolved before installation
+export PKG_CONFIG_PATH:=.:$(PKG_CONFIG_PATH)
+
 ## Default target
 DEFAULT=all
 
@@ -68,6 +71,11 @@ endef
 ## Gives object files of projects in list $1, of type $2 (bin|lib|test) with language $3 (cc|cxx), prefixed with their project name, project variant and source file variant
 define embed
 $(foreach proj,$1,$(patsubst %,%.o,$(call $2$3_$(proj)_embed)))
+endef
+
+## Gives the source files of the embedded object files in $1
+define embed_src
+$(foreach var,$1,$(patsubst %.o,%,$(var)))
 endef
 
 ## Gives object files of projects $1 of type $2 (bin|lib|test) with language $3 (cc|cxx), prefixed with their project name, but no project or source file variant
@@ -160,7 +168,6 @@ cxx_object = $(sort $(call object,$(bincxx_package),bin,cxx) $(call object,$(lib
 cc_pkgconfig = $(foreach var,$(libcc_package),$(patsubst %,%.pc,$(var)))
 cxx_pkgconfig = $(foreach var,$(libcxx_package),$(patsubst %,%.pc,$(var)))
 embed_object = $(sort $(call embed,$(bincc_package),bin,cc) $(call embed,$(libcc_package),lib,cc) $(call embed,$(testcc_package),test,cc)) $(sort $(call embed,$(bincxx_package),bin,cxx) $(call embed,$(libcxx_package),lib,cxx) $(call embed,$(testcxx_package),test,cxx))
-embed_src = $(foreach var,$(embed_object),$(patsubst %.o,%,$(var)))
 
 -include $(foreach file,$(cc_object) $(cxx_object),$(patsubst %.o,%.d,$(file)))
 
@@ -190,7 +197,7 @@ all: submake $(bin_list) $(lib_list)
 ## Force rebuild upon Makefile update
 $(cc_object) $(cxx_object) $(embed_object) $(cc_pkgconfig) $(cxx_pkgconfig): Makefile Makefile.in
 
-$(embed_object): $(embed_src)
+$(embed_object): $$(embed_src,$$@)
 	$(LD) -r -b binary -o $@ $(patsubst %.o,%,$@)
 
 $(cc_object): $$(call source,$$@,$$(call projectof,$$@,$$(call typeof,$$@),cc),$$(call typeof,$$@),cc)
@@ -230,10 +237,10 @@ $(libcxx_list): $$(call object,$$(patsubst lib%.a,%,$$@),lib,cxx) $$(call embed,
 lib_target: $(lib_list)
 
 $(testcc_list): $$(call object,$$(patsubst test_%,%,$$@),test,cc) $$(call $$(patsubst %,testcc_%_deps,$$(call suffixin,$$(patsubst lib%.a,%,$$@),$$(testcc_package)))) $$(call embed,$$(call suffixin,$$@,$$(testcc_package)),test,cc)
-	$(CC) -o $@ $(GLOBAL_CC_TEST_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(testcc_package),test,cc),test,cc) $(call object,$(call suffixin,$@,$(testcc_package)),test,cc) $(call embed,$(call suffixin,$@,$(testcc_package)),test,cc) $(GLOBAL_CC_LIBS) $(call libs_project,$@,test,cc) $(GLOBAL_CC_TEST_PKG) $(call pkg_project,$@,test,cc)
+	$(CC) -o $@ $(GLOBAL_CC_TEST_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(testcc_package),test,cc),test,cc) $(call object,$(call suffixin,$@,$(testcc_package)),test,cc) $(call embed,$(call suffixin,$@,$(testcc_package)),test,cc) $(GLOBAL_CC_LIBS) $(call libs_project,$(call suffixin,$@,$(testcc_package)),test,cc) $(GLOBAL_CC_TEST_PKG) $(call pkg_project,$(call suffixin,$@,$(testcc_package)),test,cc)
 
 $(testcxx_list): $$(call object,$$(patsubst test_%,%,$$@),test,cxx) $$(call $$(patsubst %,testcxx_%_deps,$$(call suffixin,$$(patsubst lib%.a,%,$$@),$$(testcxx_package)))) $$(call embed,$$(call suffixin,$$@,$$(testcxx_package)),test,cxx)
-	$(CXX) -o $@ $(GLOBAL_CXX_TEST_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(testcxx_package),test,cxx),test,cxx) $(call object,$(call suffixin,$@,$(testcxx_package)),test,cxx) $(call embed,$(call suffixin,$@,$(testcxx_package)),test,cxx) $(GLOBAL_CXX_LIBS) $(call libs_project,$@,test,cxx) $(GLOBAL_CXX_TEST_PKG) $(call pkg_project,$@,test,cxx)
+	$(CXX) -o $@ $(GLOBAL_CXX_TEST_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(testcxx_package),test,cxx),test,cxx) $(call object,$(call suffixin,$@,$(testcxx_package)),test,cxx) $(call embed,$(call suffixin,$@,$(testcxx_package)),test,cxx) $(GLOBAL_CXX_LIBS) $(call libs_project,$(call suffixin,$@,$(testcxx_package)),test,cxx) $(GLOBAL_CXX_TEST_PKG) $(call pkg_project,$(call suffixin,$@,$(testcxx_package)),test,cxx)
 
 test_target: $(test_list)
 
@@ -286,6 +293,7 @@ clean: submake
 	$(RM) $(cc_object) $(foreach var,$(cc_object),$(var:%.o=%.d))
 	$(RM) $(cxx_object) $(foreach var,$(cxx_object),$(var:%.o=%.d))
 	$(RM) $(cc_pkgconfig) $(cxx_pkgconfig)
+	$(RM) $(embed_object)
 	$(RM) $(test_target)
 	$(RM) $(bin_list)
 	$(RM) $(lib_target)
@@ -297,7 +305,7 @@ check: submake $(test_list)
 
 checkdist distcheck: dist
         
-install: submake uninstall $(bin_list) $(lib_target) $(cc_pkgconfig) $(cxx_pkgconfig)
+install: submake $(bin_list) $(lib_target) $(cc_pkgconfig) $(cxx_pkgconfig)
 	$(if $(lib_target),install -d $(DESTDIR)$(libdir))
 	$(if $(lib_target),install -m 644 $(lib_target) $(DESTDIR)$(libdir))
 	$(if $(bin_list),install -d $(DESTDIR)$(bindir))

@@ -12,7 +12,7 @@ MakespanSynthetic::calculate(const Taskgraph& tg, const Architecture& arch) cons
 {
 	int p = arch.getCoreNumber();
 	int min_freq = *arch.getFrequencies().begin();
-	int max_freq = *arch.getFrequencies().end();
+	int max_freq = *arch.getFrequencies().rbegin();
 
 	double pseudo_seq = 0;
 	double parallel = 0;

@@ -37,8 +37,8 @@ parse(AlgebraParser &parser, std::istream &input)
 int
 main(int argc, char **argv)
 {
-	AmplInput input;
-	AmplOutput output;
+	AmplInput input(AmplInput::floatHandlers());
+	AmplOutput output(AmplOutput::floatHandlers());
 	Algebra rec;
 
 	// We use an AMPL output, output format
@@ -62,16 +62,16 @@ main(int argc, char **argv)
 	out.dump(std::cout, rec);
 
 	// Output one raw value in parameters scalar n, in vector Wi and float matrix e
-	std::cout << rec.find<Scalar<int> >("n")->getValue() << std::endl;
-	std::cout << rec.find<Vector<int, int> >("Wi")->getSize() << std::endl;
+	std::cout << rec.find<Scalar<float> >("n")->getValue() << std::endl;
+	std::cout << rec.find<Vector<int, float> >("Wi")->getSize() << std::endl;
 	std::cout << rec.find<Matrix<int, int, float> >("e")->getRowSize() << std::endl;
 
 	// Extract, rename and output a few parameters
-	Scalar<int> nn(rec.find<Scalar<int> >("n"));
+	Scalar<float> nn(rec.find<Scalar<float> >("n"));
 	nn.setName("nn");
 	out.dump(std::cout, &nn);
 
-	Vector<int, int> yy(rec.find<Vector<int, int> >("Wi"));
+	Vector<int, float> yy(rec.find<Vector<int, float> >("Wi"));
 	yy.setName("yy");
 	out.dump(std::cout, &yy);
 	

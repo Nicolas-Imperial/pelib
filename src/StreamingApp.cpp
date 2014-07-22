@@ -76,8 +76,8 @@ namespace pelib
 	StreamingApp::buildAlgebra() const
 	{
 		Algebra ret = this->getTaskgraph().buildAlgebra(this->getArchitecture());
-		ret.merge(this->getArchitecture().buildAlgebra());
-		ret.merge(this->getSchedule().buildAlgebra());
+		ret = ret.merge(this->getArchitecture().buildAlgebra());
+		ret = ret.merge(this->getSchedule().buildAlgebra());
 
 		return ret;
 	}

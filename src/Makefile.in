@@ -14,7 +14,7 @@ CC_TEST_LDFLAGS =
 CXXFLAGS_BASE=-isystem ../include -Wall -std=c++0x
 CXXFLAGS_RELEASE = -O3 -DNDEBUG
 CXXFLAGS_DEBUG = -g -O0 -DDEBUG=1
-CXX_PKG = igraph muparser libxml++-2.6
+#CXX_PKG = igraph muparser libxml++-2.6
 CXX_PKG_igraph_version = >= 0.7.1
 CXX_DEPS =
 CXX_LIBS = 
@@ -30,96 +30,112 @@ bincxx_demo_src = demo.cpp
 bincxx_demo_export = $(bincxx_demo_src) 
 bincxx_demo_deps = libcppelib.a
 bincxx_demo_libs = -lcppelib $(libcxx_cppelib_libs)
+bincxx_demo_pkg = $(libcxx_cppelib_pkg)
 bincxx_demo_ldflags = -L.
 
 bincxx_streamingapp_demo_src = streamingapp_demo.cpp
 bincxx_streamingapp_demo_export = $(bincxx_streamingapp_demo_src) 
 bincxx_streamingapp_demo_deps = libcppelib.a
 bincxx_streamingapp_demo_libs = -lcppelib $(libcxx_cppelib_libs)
+bincxx_streamingapp_demo_pkg = $(libcxx_cppelib_pkg)
 bincxx_streamingapp_demo_ldflags = -L.
 
 bincxx_duplicate_tasks_src =  duplicate_tasks.cpp
 bincxx_duplicate_tasks_export = $(bincxx_duplicate_tasks_src) 
 bincxx_duplicate_tasks_deps = libcppelib.a
 bincxx_duplicate_tasks_libs = -lcppelib $(libcxx_cppelib_libs)
+bincxx_duplicate_tasks_pkg = $(libcxx_cppelib_pkg)
 bincxx_duplicate_tasks_ldflags = -L.
 
 bincxx_graphmltoampli_src = graphmltoampli.cpp
 bincxx_graphmltoampli_export = $(bincxx_graphmltoampli_src) 
 bincxx_graphmltoampli_deps = libcppelib.a
 bincxx_graphmltoampli_libs = -lcppelib $(libcxx_cppelib_libs)
+bincxx_graphmltoampli_pkg = $(libcxx_cppelib_pkg)
 bincxx_graphmltoampli_ldflags = -L.
 
 bincxx_amplitographml_src = amplitographml.cpp
 bincxx_amplitographml_export = $(bincxx_amplitographml_src) 
 bincxx_amplitographml_deps = libcppelib.a
 bincxx_amplitographml_libs = -lcppelib $(libcxx_cppelib_libs)
+bincxx_amplitographml_pkg = $(libcxx_cppelib_pkg)
 bincxx_amplitographml_ldflags = -L.
 
 bincxx_graphmlfmltographmleval_src = graphmlfmltographmleval.cpp
 bincxx_graphmlfmltographmleval_export = $(bincxx_graphmlfmltographmleval_src) 
 bincxx_graphmlfmltographmleval_deps = libcppelib.a
 bincxx_graphmlfmltographmleval_libs = -lcppelib $(libcxx_cppelib_libs)
+bincxx_graphmlfmltographmleval_pkg = $(libcxx_cppelib_pkg)
 bincxx_graphmlfmltographmleval_ldflags = -L.
 
 bincxx_amplotoschedule_src = amplotoschedule.cpp
 bincxx_amplotoschedule_export = $(bincxx_amplotoschedule_src) 
 bincxx_amplotoschedule_deps = libcppelib.a
 bincxx_amplotoschedule_libs = -lcppelib $(libcxx_cppelib_libs)
+bincxx_amplotoschedule_pkg = $(libcxx_cppelib_pkg)
 bincxx_amplotoschedule_ldflags = -L.
 
 bincxx_demo_xmlformats_src = demo_xmlformats.cpp
 bincxx_demo_xmlformats_export = $(bincxx_demo_xmlformats_src) 
 bincxx_demo_xmlformats_deps = libcppelib.a
 bincxx_demo_xmlformats_libs = -lcppelib $(libcxx_cppelib_libs)
+bincxx_demo_xmlformats_pkg = $(libcxx_cppelib_pkg)
 bincxx_demo_xmlformats_ldflags = -L.
 
 bincxx_amplitoampli_src = amplitoampli.cpp
 bincxx_amplitoampli_export = $(bincxx_amplitoampli_src) 
 bincxx_amplitoampli_deps = libcppelib.a
 bincxx_amplitoampli_libs = -lcppelib $(libcxx_cppelib_libs)
+bincxx_amplitoampli_pkg = $(libcxx_cppelib_pkg)
 bincxx_amplitoampli_ldflags = -L.
 
 bincxx_amplitoamplo_src = amplitoamplo.cpp
 bincxx_amplitoamplo_export = $(bincxx_amplitoamplo_src) 
 bincxx_amplitoamplo_deps = libcppelib.a
 bincxx_amplitoamplo_libs = -lcppelib $(libcxx_cppelib_libs)
+bincxx_amplitoamplo_pkg = $(libcxx_cppelib_pkg)
 bincxx_amplitoamplo_ldflags = -L.
 
 bincxx_amplotoampli_src = amplotoampli.cpp
 bincxx_amplotoampli_export = $(bincxx_amplotoampli_src) 
 bincxx_amplotoampli_deps = libcppelib.a
 bincxx_amplotoampli_libs = -lcppelib $(libcxx_cppelib_libs)
+bincxx_amplotoampli_pkg = $(libcxx_cppelib_pkg)
 bincxx_amplotoampli_ldflags = -L.
 
 bincxx_amplotoamplo_src = amplotoamplo.cpp
 bincxx_amplotoamplo_export = $(bincxx_amplotoamplo_src) 
 bincxx_amplotoamplo_deps = libcppelib.a
 bincxx_amplotoamplo_libs = -lcppelib $(libcxx_cppelib_libs)
+bincxx_amplotoamplo_pkg = $(libcxx_cppelib_pkg)
 bincxx_amplotoamplo_ldflags = -L.
 
 bincxx_amplitocpp_src = amplitocpp.cpp
 bincxx_amplitocpp_export = $(bincxx_amplitocpp_src) 
 bincxx_amplitocpp_deps = libcppelib.a
 bincxx_amplitocpp_libs = -lcppelib $(libcxx_cppelib_libs)
+bincxx_amplitocpp_pkg = $(libcxx_cppelib_pkg)
 bincxx_amplitocpp_ldflags = -L.
 
 bincxx_amplotocpp_src = amplotocpp.cpp
 bincxx_amplotocpp_export = $(bincxx_amplotocpp_src) 
 bincxx_amplotocpp_deps = libcppelib.a
 bincxx_amplotocpp_libs = -lcppelib $(libcxx_cppelib_libs)
+bincxx_amplotocpp_pkg = $(libcxx_cppelib_pkg)
 bincxx_amplotocpp_ldflags = -L.
 
 bincxx_run_record_src = run_record.cpp
 bincxx_run_record_export = $(bincxx_run_record_src) make_algebra.cpp
 bincxx_run_record_deps = libcppelib.a
 bincxx_run_record_libs = -lcppelib $(libcxx_cppelib_libs)
+bincxx_run_record_pkg = $(libcxx_cppelib_pkg)
 bincxx_run_record_ldflags = -L.
 
 bincxx_amplmatrixtoraw_src = amplmatrixtoraw.cpp
 bincxx_amplmatrixtoraw_export = $(bincxx_amplmatrixtoraw_src)
 bincxx_amplmatrixtoraw_deps = libcppelib.a
 bincxx_amplmatrixtoraw_libs = -lcppelib $(libcxx_cppelib_libs)
+bincxx_amplmatrixtoraw_pkg = $(libcxx_cppelib_pkg)
 bincxx_amplmatrixtoraw_ldflags = -L.
 
 ## static library packages and their sources
@@ -157,6 +173,7 @@ libcxx_cppelib_export = $(libcxx_cppelib_src)
 libcxx_cppelib_libs = -lboost_regex -lboost_graph -lexpat
 libcxx_cppelib_ldflags = 
 libcxx_cppelib_deps =
+libcxx_cppelib_pkg = igraph muparser libxml++-2.6
 libcxx_cppelib_pkg_url = http://www.ida.liu.se/~nicme26
 libcxx_cppelib_pkg_ld = 
 libcxx_cppelib_pkg_libs = 
@@ -174,7 +191,8 @@ testcxx_package = parser
 testcxx_parser_src = test_parser.cpp 
 testcxx_parser_export = $(testcxx_parser_src) make_algebra.cpp
 testcxx_parser_deps = libcppelib.a libunit.a
-testcxx_parser_pkg = $(libcxx_cppelib_pkg)
 testcxx_parser_libs = -lunit -lcppelib $(libcxx_cppelib_libs)
-testcxx_parser_ldflags =  -L.
+testcxx_parser_pkg = $(libcxx_cppelib_pkg)
+testcxx_parser_ldflags = -L.
+testcxx_parser_embed = fft_n15_1.graphml fft_n15_1_input.dat fft_n15_1_output.dat p8.dat schedule.xml crown.dat schedule.dat
 

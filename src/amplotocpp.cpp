@@ -6,7 +6,7 @@ using namespace pelib;
 int
 main(int argc, char **argv)
 {
-	AmplOutput input;
+	AmplOutput input(AmplOutput::floatHandlers());
 	Cpp output("buildRecord");
 
 	// Set floating point var output format to fixed at 7 digits

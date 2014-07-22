@@ -19,17 +19,19 @@ namespace pelib
 		this->autName = autName;
 	}
 
-	Schedule::Schedule(const std::string &name, const Taskgraph &tg, const Algebra &algebra)
+	Schedule::Schedule(const std::string &name, const Taskgraph &tg, const Algebra &data)
 	{
 		roundTime = 0;
 		this->name = name;
 		this->autName = tg.getAUTName();
 
+		Algebra algebra = data.merge(tg.buildAlgebra());
+		
 		const Scalar<float> *M = algebra.find<Scalar<float> >("M");
-		const Vector<int, int> *tau = algebra.find<Vector<int, int> >("Tau");
-		const Vector<int, int> *wi = algebra.find<Vector<int, int> >("wi");
-		const Matrix<int, int, int> *sched = algebra.find<Matrix<int, int, int> >("schedule");
-		const Vector<int, int> *freq = algebra.find<Vector<int, int> >("frequency");
+		const Vector<int, float> *tau = algebra.find<Vector<int, float> >("Tau");
+		const Vector<int, float> *wi = algebra.find<Vector<int, float> >("wi");
+		const Matrix<int, int, float> *sched = algebra.find<Matrix<int, int, float> >("schedule");
+		const Vector<int, float> *freq = algebra.find<Vector<int, float> >("frequency");
 		
 		if(M == NULL || tau == NULL || wi == NULL || sched == NULL || freq == NULL)
 		{
@@ -39,11 +41,11 @@ namespace pelib
 		{
 			this->roundTime = M->getValue();
 
-			for(map<int, map<int, int> >::const_iterator i = sched->getValues().begin(); i != sched->getValues().end(); i++)
+			for(map<int, map<int, float> >::const_iterator i = sched->getValues().begin(); i != sched->getValues().end(); i++)
 			{
 				vector<Task> core_schedule;
 				
-				for(map<int, int>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
+				for(map<int, float>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 				{
 					if(j->second > 0)
 					{
@@ -85,20 +87,20 @@ namespace pelib
 			}
 		}
 
-		map<string,int>taskid2id;
+		map<string, int>taskid2id;
 		int counter = 1;
 		for(set<string>::const_iterator i = task_ids.begin(); i != task_ids.end(); i++, counter++)
 		{
 			taskid2id.insert(pair<string, int>(*i, counter));
 		}
 
-		map<int, map<int, int> > sched;
-		map<int,int> frequencies;
+		map<int, map<int, float> > sched;
+		map<int, float> frequencies;
 		const map<int, vector<Task> > schedule = getSchedule();
 		size_t ordering = 0, max_tasks = 0;
 		for(map<int, vector<Task> >::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 		{
-			map<int, int> schedule_row;
+			map<int, float> schedule_row;
 			int core = i->first;			
 
 			ordering = 0;
@@ -106,12 +108,12 @@ namespace pelib
 			{
 				int id = taskid2id.find(j->getTaskId())->second;
 				schedule_row.insert(pair<int, int>(ordering, id));
-				frequencies.insert(pair<int, int>(id, j->getFrequency()));
+				frequencies.insert(pair<int, float>(id, j->getFrequency()));
 
 				max_tasks = ordering > max_tasks ? ordering : max_tasks; 
 			}
 
-			sched.insert(pair<int, map<int,int> >(core+1,schedule_row));
+			sched.insert(pair<int, map<int, float> >(core+1, schedule_row));
 		}
 
 		// pad with 0
@@ -124,8 +126,8 @@ namespace pelib
 			}
 		}
 		
-		Matrix<int,int,int> ampl_schedule("schedule", sched);
-		Vector<int,int> ampl_frequencies("frequency", frequencies);
+		Matrix<int, int, float> ampl_schedule("schedule", sched);
+		Vector<int, float> ampl_frequencies("frequency", frequencies);
 		Scalar<float> ampl_M("M", getRoundTime());
 
 		algebra.insert(&ampl_M);

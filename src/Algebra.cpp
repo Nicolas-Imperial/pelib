@@ -13,6 +13,11 @@
 namespace pelib
 {	
 	Algebra::Algebra() { /* Do nothing */ }
+	
+	Algebra::Algebra(const std::map<std::string, const AlgebraData* const> &records)
+	{
+		this->records = records;
+	}
 
 	Algebra::~Algebra()
 	{
@@ -24,14 +29,26 @@ namespace pelib
 		*this = rhs;
 	}
 
-	void
-	Algebra::merge(const Algebra& record)
+	Algebra
+	Algebra::merge(const Algebra& record) const
 	{
 		// Copy all AlgebraData
-		for(auto iter = record.getAllRecords().begin(); iter != record.getAllRecords().end(); iter++)
+		std::map<std::string, const AlgebraData * const> rec;
+
+		// Copy all records stored in this instance
+		for(std::map<std::string, const AlgebraData * const>::const_iterator iter = records.begin(); iter != records.end(); iter++)
 		{
-			records.insert(std::pair<std::string, pelib::AlgebraData*>(iter->second->getName(), iter->second->clone()));
+			rec.insert(std::pair<std::string, pelib::AlgebraData*>(iter->second->getName(), iter->second->clone()));
 		}
+
+		// Copy all records from the foreign instance
+		for(std::map<std::string, const AlgebraData * const>::const_iterator iter = record.getAllRecords().begin(); iter != record.getAllRecords().end(); iter++)
+		{
+			rec.insert(std::pair<std::string, pelib::AlgebraData*>(iter->second->getName(), iter->second->clone()));
+		}
+
+		// Build a new algebra with all records
+		return Algebra(rec);
 	}
 
 	const std::map<std::string, const AlgebraData * const>&

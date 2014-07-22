@@ -15,6 +15,11 @@ namespace pelib
 	AmplOutputScalar: public AmplOutputData
 	{
 		public:
+			AmplOutputScalar(bool strict = true)
+			{
+				this->strict = strict;
+			}
+			
 			virtual
 			AmplOutputScalar*
 			clone() const
@@ -53,7 +58,7 @@ namespace pelib
 					throw ParseException(std::string("Asked a decimal conversion, but \"").append(ss.str()).append("\" is integer."));
 				}
 
-				Scalar<Value> *scalar = new Scalar<Value>(match[1], AlgebraDataParser::convert<Value>(match[2], true));
+				Scalar<Value> *scalar = new Scalar<Value>(match[1], AlgebraDataParser::convert<Value>(match[2], strict));
 				return scalar;
 			}
 
@@ -68,6 +73,7 @@ namespace pelib
 			}
 	
 		protected:
+			bool strict;
 		private:		
 	};
 }

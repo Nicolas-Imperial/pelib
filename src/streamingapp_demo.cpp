@@ -40,9 +40,9 @@ main(int argc, char **argv)
 	input.dump(cout, app.getArchitecture());
 	input.dump(cout, app.getSchedule());
 
-	AmplOutput().dump(cout, app.getTaskgraph().buildAlgebra(app.getArchitecture()));
-	AmplOutput().dump(cout, app.getArchitecture().buildAlgebra());
-	AmplOutput().dump(cout, app.getSchedule().buildAlgebra());
+	AmplOutput(AmplOutput::floatHandlers()).dump(cout, app.getTaskgraph().buildAlgebra(app.getArchitecture()));
+	AmplOutput(AmplOutput::floatHandlers()).dump(cout, app.getArchitecture().buildAlgebra());
+	AmplOutput(AmplOutput::floatHandlers()).dump(cout, app.getSchedule().buildAlgebra());
 	
 	return EXIT_SUCCESS;
 }

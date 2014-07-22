@@ -23,7 +23,7 @@ AmplArchitecture::dump(ostream& os, const StreamingAppData *data) const
 	const Architecture *arch = dynamic_cast<const Architecture* >(data);
 	if(arch == NULL) throw CastException("parameter \"data\" was not of type \"Architecture*\".");
 
-	AmplInput output;
+	AmplInput output(AmplInput::intFloatHandlers());
 	Algebra alg = arch->buildAlgebra();
 	output.dump(os, alg);
 }
@@ -31,21 +31,21 @@ AmplArchitecture::dump(ostream& os, const StreamingAppData *data) const
 Architecture*
 AmplArchitecture::parse(istream &is) const
 {
-	AmplInput reader;
+	AmplInput reader(AmplInput::floatHandlers());
 	std::string line;
 	Algebra alg_arch = reader.parse(is);
 
 	Architecture *arch = new Architecture();
 
-	const Scalar<int> *scalar_p = alg_arch.find<Scalar<int> >("p");
-	const Set<int> *set_F = alg_arch.find<Set<int> >("F");
+	const Scalar<float> *scalar_p = alg_arch.find<Scalar<float> >("p");
+	const Set<float> *set_F = alg_arch.find<Set<float> >("F");
 
 	if(scalar_p == NULL || set_F == NULL)
 	{
 		throw ParseException(std::string("Missing core number scalar \"p\" or frequency set \"F\" in input."));
 	}
 	
-	arch->setCoreNumber(scalar_p->getValue());
+	arch->setCoreNumber((int)scalar_p->getValue());
 	arch->setFrequencies(set_F->getValues());
 	
 	return arch;

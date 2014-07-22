@@ -6,8 +6,8 @@ using namespace pelib;
 int
 main(int argc, char **argv)
 {
-	AmplInput input;
-	AmplOutput output;
+	AmplInput input(AmplInput::floatHandlers());
+	AmplOutput output(AmplOutput::floatHandlers());
 
 	// Set floating point var output format to fixed at 7 digits
 	std::cout << std::setprecision(6)                                                                                                        

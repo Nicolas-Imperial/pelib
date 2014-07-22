@@ -5,6 +5,7 @@
 #include <iomanip>
 
 #include <AmplInput.hpp>
+#include <AmplOutput.hpp>
 #include <Architecture.hpp>
 #include <AmplArchitecture.hpp>
 #include <GraphML.hpp>
@@ -30,7 +31,7 @@ int main(int argc, char **argv)
 	}
 	
 	GraphML input;
-	AmplInput output;
+	AmplInput output(AmplInput::intFloatHandlers());
 
 	// Set floating point var output format to fixed at 7 digits
 	std::cout << std::setprecision(6)                                                                                                        

@@ -19,6 +19,7 @@ using namespace std;
 
 namespace pelib
 {
+	/*
 	AmplInput::AmplInput()
 	{
 		// Add parsers
@@ -33,6 +34,13 @@ namespace pelib
 	{
 		this->parsers = parsers;
 		this->outputs = outputs;
+	}
+	*/
+
+	AmplInput::AmplInput(std::pair<std::vector<AmplInputDataParser*>, std::vector<AmplInputDataOutput*> > handlers)
+	{
+		this->parsers = handlers.first;
+		this->outputs = handlers.second;
 	}
 
 	AmplInput::~AmplInput()
@@ -168,10 +176,76 @@ namespace pelib
 		}
 	}
 
+	std::vector<AmplInputDataParser*> AmplInput::floatParsers()
+	{
+		std::vector<AmplInputDataParser*> parsers;
+		
+		parsers.push_back(new AmplInputScalar<float>(false));
+		parsers.push_back(new AmplInputVector<int, float>(false));
+		parsers.push_back(new AmplInputSet<float>(false));
+		parsers.push_back(new AmplInputMatrix<int, int, float>(false));
+
+		return parsers;
+	}
+		
+	std::vector<AmplInputDataOutput*> AmplInput::floatOutputs()
+	{
+		std::vector<AmplInputDataOutput*> outputs;
+
+		outputs.push_back(new AmplInputScalar<float>(false));
+		outputs.push_back(new AmplInputVector<int, float>(false));
+		outputs.push_back(new AmplInputSet<float>(false));
+		outputs.push_back(new AmplInputMatrix<int, int, float>(false));
+
+		return outputs;
+	}
+
+	std::pair<std::vector<AmplInputDataParser*>, std::vector<AmplInputDataOutput*> > AmplInput::floatHandlers()
+	{
+		return std::pair<std::vector<AmplInputDataParser*>, std::vector<AmplInputDataOutput*> >(AmplInput::floatParsers(), AmplInput::floatOutputs());
+	}
+
+	std::vector<AmplInputDataParser*> AmplInput::intFloatParsers()
+	{
+		std::vector<AmplInputDataParser*> parsers;
+		parsers.push_back(new AmplInputScalar<int>());
+		parsers.push_back(new AmplInputScalar<float>());
+		parsers.push_back(new AmplInputVector<int, int>(true));
+		parsers.push_back(new AmplInputVector<int, float>(true));
+		parsers.push_back(new AmplInputSet<int>(true));
+		parsers.push_back(new AmplInputSet<float>(true));
+		parsers.push_back(new AmplInputMatrix<int, int, int>(true));
+		parsers.push_back(new AmplInputMatrix<int, int, float>(true));
+
+		return parsers;
+	}
+		
+	std::vector<AmplInputDataOutput*> AmplInput::intFloatOutputs()
+	{
+		std::vector<AmplInputDataOutput*> outputs;
+
+		outputs.push_back(new AmplInputScalar<int>());
+		outputs.push_back(new AmplInputScalar<float>());
+		outputs.push_back(new AmplInputVector<int, int>(true));
+		outputs.push_back(new AmplInputVector<int, float>(true));
+		outputs.push_back(new AmplInputSet<int>(true));
+		outputs.push_back(new AmplInputSet<float>(true));
+		outputs.push_back(new AmplInputMatrix<int, int, int>(true));
+		outputs.push_back(new AmplInputMatrix<int, int, float>(true));
+
+		return outputs;
+	}
+
+	std::pair<std::vector<AmplInputDataParser*>, std::vector<AmplInputDataOutput*> > AmplInput::intFloatHandlers()
+	{
+		return std::pair<std::vector<AmplInputDataParser*>, std::vector<AmplInputDataOutput*> >(AmplInput::intFloatParsers(), AmplInput::intFloatOutputs());
+	}
+
+	/*
 	// Protected
 	void
 	AmplInput::addParsers()
-	{
+	{	
 		parsers.push_back(new AmplInputScalar<int>());
 		parsers.push_back(new AmplInputScalar<float>());
 		parsers.push_back(new AmplInputVector<int, int>(true));
@@ -194,4 +268,5 @@ namespace pelib
 		outputs.push_back(new AmplInputMatrix<int, int, int>(true));
 		outputs.push_back(new AmplInputMatrix<int, int, float>(true));
 	}
+*/
 }

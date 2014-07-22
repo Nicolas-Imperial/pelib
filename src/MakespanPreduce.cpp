@@ -12,7 +12,7 @@ MakespanPreduce::calculate(const Taskgraph& tg,const Architecture& arch) const
 {
 	int p = arch.getCoreNumber();
 	int min_freq = *arch.getFrequencies().begin();
-	int max_freq = *arch.getFrequencies().end();
+	int max_freq = *arch.getFrequencies().rbegin();
 
 	double sum_pTw = 0;
 	for(std::set<Task>::const_iterator i = tg.getTasks().begin(); i != tg.getTasks().end(); i++)

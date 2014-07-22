@@ -26,9 +26,9 @@ namespace pelib
 	{
 		this->autName = "Generated_from_algebra";
 		const Scalar<float> *M = algebra.find<Scalar<float> >("M");
-		const Scalar<int> *n = algebra.find<Scalar<int> >("n");
-		const Vector<int, int> *tau = algebra.find<Vector<int, int> >("Tau");
-		const Vector<int, int> *Wi = algebra.find<Vector<int, int> >("Wi");
+		const Scalar<float> *n = algebra.find<Scalar<float> >("n");
+		const Vector<int, float> *tau = algebra.find<Vector<int, float> >("Tau");
+		const Vector<int, float> *Wi = algebra.find<Vector<int, float> >("Wi");
 		const Matrix<int, int, float> *e = algebra.find<Matrix<int, int, float> >("e");
 		
 		if(M == NULL || n == NULL || tau == NULL || Wi == NULL || e == NULL)
@@ -42,11 +42,11 @@ namespace pelib
 			this->makespanCalculator = ss.str(); 
 		}
 
-		for(map<int, int>::const_iterator i = tau->getValues().begin(); i != tau->getValues().end(); i++)
+		for(map<int, float>::const_iterator i = tau->getValues().begin(); i != tau->getValues().end(); i++)
 		{
-			int id = i->first;
-			int work = i->second;
-			int max_wi = Wi->getValues().find(id)->second;
+			float id = i->first;
+			float work = i->second;
+			float max_wi = Wi->getValues().find(id)->second;
 
 			stringstream ss;
 			for(map<int, float>::const_iterator j = e->getValues().find(id)->second.begin(); j != e->getValues().find(id)->second.end(); j++)
@@ -80,15 +80,15 @@ namespace pelib
 	{
 		Algebra out;
 
-		Scalar<int> n("n", getTasks().size());
+		Scalar<float> n("n", getTasks().size());
 		map<int, map<int, float> > map_e;
-		map<int, int> map_tau;
-		map<int, int> map_Wi;
+		map<int, float> map_tau;
+		map<int, float> map_Wi;
 
 		for(set<Task>::const_iterator i = getTasks().begin(); i != getTasks().end(); i++)
 		{
-			map_tau.insert(pair<int, int>(i->getId(), i->getWorkload()));
-			map_Wi.insert(pair<int, int>(i->getId(), i->getMaxWidth()));
+			map_tau.insert(pair<int, float>(i->getId(), i->getWorkload()));
+			map_Wi.insert(pair<int, float>(i->getId(), i->getMaxWidth()));
 
 			map<int, float> task_e;
 			for(int j = 1; j <= arch.getCoreNumber(); j++)
@@ -99,9 +99,10 @@ namespace pelib
 			map_e.insert(pair<int, map<int, float> >(i->getId(), task_e));
 		}
 
-		Vector<int, int> tau("Tau", map_tau);
-		Vector<int, int> Wi("Wi", map_Wi);
+		Vector<int, float> tau("Tau", map_tau);
+		Vector<int, float> Wi("Wi", map_Wi);
 		Matrix<int, int, float> e("e", map_e);
+
 		Scalar<float> M("M", getRoundTime(arch));
 
 		out.insert(&n);
@@ -158,6 +159,12 @@ namespace pelib
 	
 	const set<Task>&
 	Taskgraph::getTasks() const
+	{
+		return tasks;
+	}
+
+	set<Task>&
+	Taskgraph::getTasks()
 	{
 		return tasks;
 	}

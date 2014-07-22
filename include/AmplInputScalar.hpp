@@ -15,6 +15,11 @@ namespace pelib
 	AmplInputScalar: public AmplInputData
 	{
 		public:
+			AmplInputScalar(bool strict = true)
+			{
+				this->strict = strict;
+			}
+			
 			virtual
 			AmplInputScalar*
 			clone() const
@@ -41,7 +46,7 @@ namespace pelib
 
 				std::string match1 = match[1];
 				std::string match2 = match[2];
-				Value val = AlgebraDataParser::convert<Value>(match2, true);
+				Value val = AlgebraDataParser::convert<Value>(match2, strict);
 				Scalar<Value> *scalar = new Scalar<Value>(match1, val);
 				return scalar;
 			}
@@ -71,6 +76,7 @@ namespace pelib
 			}
 	
 		protected:
+			bool strict;
 		private:		
 	};
 }

@@ -11,7 +11,7 @@ export packages version prefix exec_prefix bindir libdir includedir
 VERSION = $(shell make --version|head -1|cut -f 1-2 -d ' ')
 
 all check install uninstall: version
-	@$(shell echo for i in "$(foreach var,$(subdirs),$(var))"\; do $(MAKE) -C \$$i $@ \; done)
+	@$(shell echo for i in "$(foreach var,$(subdirs),$(var))"\; do $(MAKE) -C \$$i $@ \|\| exit \$$? \; done)
 	
 $(abspath $(distdir)).tar.gz: FORCE $(abspath $(distdir))
 	tar -ch -C $(abspath $(distdir)) -O .| gzip -9 -c > $(abspath $(distdir)).tar.gz

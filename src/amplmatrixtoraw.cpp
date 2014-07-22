@@ -8,7 +8,7 @@ using namespace std;
 int
 main(int argc, char **argv)
 {
-	AmplOutput input;
+	AmplOutput input(AmplOutput::floatHandlers());
 
 	if(argc < 2)
 	{

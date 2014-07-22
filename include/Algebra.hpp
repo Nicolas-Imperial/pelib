@@ -16,8 +16,9 @@ namespace pelib
 {
 	class Algebra : public Record
 	{
-		public:				
+		public:
 			Algebra();
+			Algebra(const std::map<std::string, const AlgebraData * const>&);
 			Algebra(const Algebra &rhs);
 			virtual	~Algebra();
 
@@ -27,9 +28,9 @@ namespace pelib
 			std::map<std::string, const int *>&
 			copyRecords();
 
-			void merge(const Record& rec) {};
-			virtual void
-			merge(const Algebra&); 
+			//void merge(const Record& rec) {};
+			virtual Algebra
+			merge(const Algebra&) const; 
 
 			template<class T>
 			std::map<std::string, const T* const>

@@ -29,10 +29,10 @@ int main(int argc, char* argv[])
 	Algebra amplschedule = AmplOutput().parse(sched_str);
 	sched_str.close();
 	*/
-	Algebra amplschedule = AmplOutput().parse(cin);
+	Algebra amplschedule = AmplOutput(AmplOutput::floatHandlers()).parse(cin);
 	
-	amplschedule.merge(tg.buildAlgebra(arch));
-	amplschedule.merge(arch.buildAlgebra());
+	amplschedule = amplschedule.merge(tg.buildAlgebra(arch));
+	amplschedule = amplschedule.merge(arch.buildAlgebra());
 	
 	XMLSchedule().dump(cout, Schedule("converted_from_ampl", tg, amplschedule));
 

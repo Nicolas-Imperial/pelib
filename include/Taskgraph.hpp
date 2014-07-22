@@ -49,6 +49,9 @@ namespace pelib
 			virtual const set<Task>&
 			getTasks() const;
 
+			virtual set<Task>&
+			getTasks();
+
 			virtual void
 			setTasks(const set<Task>&);
 

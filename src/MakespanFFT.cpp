@@ -12,13 +12,13 @@ MakespanFFT::calculate(const Taskgraph &tg, const Architecture &arch) const
 {
 	//cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] tg.getTasks().size() = " << tg.getTasks().size() << endl;
 	int p = arch.getCoreNumber();
-	int min_freq = *arch.getFrequencies().begin();
-	int max_freq = *arch.getFrequencies().end();
+	float min_freq = *arch.getFrequencies().begin();
+	float max_freq = *arch.getFrequencies().rbegin();
 
-	int max_workload = 0;
+	float max_workload = 0;
 	for(std::set<Task>::const_iterator i = tg.getTasks().begin(); i != tg.getTasks().end(); i++)
 	{
-		int workload = i->getWorkload();
+		float workload = i->getWorkload();
 		if(workload > max_workload)
 		{
 			max_workload = workload;

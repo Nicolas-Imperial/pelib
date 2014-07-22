@@ -18,14 +18,14 @@ namespace pelib
 			virtual int getCoreNumber() const;
 			virtual void setCoreNumber(int p);
 
-			virtual const std::set<int, std::less<int>, std::allocator<int> >& getFrequencies() const;
-			virtual void setFrequencies(const std::set<int, std::less<int>, std::allocator<int> >& freq);
+			virtual const std::set<float>& getFrequencies() const;
+			virtual void setFrequencies(const std::set<float>& freq);
 
 			virtual Algebra buildAlgebra() const;
 
 		protected:
 			int coreNumber;
-			std::set<int, std::less<int>, std::allocator<int> > frequencies;
+			std::set<float> frequencies;
 		private:		
 	};
 }

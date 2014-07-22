@@ -19,9 +19,9 @@ namespace pelib
 	class AmplOutput: public AlgebraParser, public AlgebraOutput
 	{
 		public:
-			AmplOutput(std::vector<AmplOutputDataParser*> parsers,
-			std::vector<AmplOutputDataOutput*> outputs);
-			AmplOutput();
+			//AmplOutput(std::vector<AmplOutputDataParser*> parsers, std::vector<AmplOutputDataOutput*> outputs);
+			AmplOutput(std::pair<std::vector<AmplOutputDataParser*>, std::vector<AmplOutputDataOutput*> > handlers);
+			//AmplOutput();
 
 			virtual
 			~AmplOutput();
@@ -41,6 +41,14 @@ namespace pelib
 			AmplOutput&
 			operator=(const AmplOutput &rhs);
 
+			static std::vector<AmplOutputDataParser*> floatParsers();
+			static std::vector<AmplOutputDataOutput*> floatOutputs();
+			static std::pair<std::vector<AmplOutputDataParser*>, std::vector<AmplOutputDataOutput*> > floatHandlers();
+
+			static std::vector<AmplOutputDataParser*> intFloatParsers();
+			static std::vector<AmplOutputDataOutput*> intFloatOutputs();
+			static std::pair<std::vector<AmplOutputDataParser*>, std::vector<AmplOutputDataOutput*> > intFloatHandlers();
+
 		protected:
 			std::vector<AmplOutputDataParser*> parsers;
 			std::vector<AmplOutputDataOutput*> outputs;
@@ -50,13 +58,13 @@ namespace pelib
 
 			void
 			deleteOutputs();
-
+/*
 			void
 			addParsers();
 
 			void
 			addOutputs();
-			
+	*/		
 		private:
 	};
 }

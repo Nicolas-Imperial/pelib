@@ -1,0 +1,5 @@
+# Number of cores
+param p := 8;
+
+# Frequency levels
+set F := 1 2 3 4 5;

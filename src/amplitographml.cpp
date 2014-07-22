@@ -13,7 +13,7 @@ int main(int argc, char **argv)
   using namespace pelib;
 
   GraphML tg; 
-  AmplInput ai;
+  AmplInput ai(AmplInput::floatHandlers());
 
   std::cout << std::setprecision(6)                                                                                                        
 	    << std::setiosflags(std::ios::fixed)                                                                                                     

@@ -9,6 +9,7 @@
 using namespace pelib;
 using namespace std;
 
+#if 0
 static int
 number_tasks_in_level(int task)
 {
@@ -24,6 +25,7 @@ number_tasks_in_level(int task)
 	*/
 	return pow(2, floor(log(task) / log(2)));
 }
+#endif
 
 double MakespanMergesort::calculate(const Taskgraph& tg, const Architecture& arch) const
 {
