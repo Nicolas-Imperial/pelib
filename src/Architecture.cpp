@@ -58,7 +58,7 @@ namespace pelib
 	{
 		Algebra record;
 
-		Scalar<int> scalar_p("p", coreNumber);
+		Scalar<float> scalar_p("p", coreNumber);
 		Set<float> set_F("F", frequencies);
 
 		record.insert(&scalar_p);

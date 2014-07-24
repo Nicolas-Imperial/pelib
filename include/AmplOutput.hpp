@@ -38,6 +38,10 @@ namespace pelib
 			dump(std::ostream& o, const AlgebraData *data) const;
 
 			virtual
+			void
+			dump(std::ostream& o, const AlgebraData &data) const;
+
+			virtual
 			AmplOutput&
 			operator=(const AmplOutput &rhs);
 

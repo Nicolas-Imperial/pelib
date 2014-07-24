@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schedule name="converted_from_ampl" autname="Generated_from_algebra" roundtime="1.8" cores="8" tasks="15"> 
  <core coreid="0">
-   <task taskid="task_1_id" ordering="0" frequency="2" width="4" workload="8" />
-   <task taskid="task__10_id" ordering="1" frequency="3" width="1" workload="1" />
-   <task taskid="task__15_id" ordering="2" frequency="3" width="1" workload="1" />
+   <task taskid="task_1_id" starting_time="0" frequency="2" width="4" workload="8" />
+   <task taskid="task__10_id" starting_time="1.08108" frequency="3" width="1" workload="1" />
+   <task taskid="task__15_id" starting_time="1.41441" frequency="3" width="1" workload="1" />
  </core>
  <core coreid="1">
-   <task taskid="task_1_id" ordering="0" frequency="2" width="4" workload="8" />
-   <task taskid="task__11_id" ordering="1" frequency="3" width="1" workload="1" />
-   <task taskid="task__14_id" ordering="2" frequency="3" width="1" workload="1" />
+   <task taskid="task_1_id" starting_time="0" frequency="2" width="4" workload="8" />
+   <task taskid="task__11_id" starting_time="1.08108" frequency="3" width="1" workload="1" />
+   <task taskid="task__14_id" starting_time="1.41441" frequency="3" width="1" workload="1" />
  </core>
  <core coreid="2">
-   <task taskid="task_1_id" ordering="0" frequency="2" width="4" workload="8" />
-   <task taskid="task_5_id" ordering="1" frequency="3" width="1" workload="2" />
+   <task taskid="task_1_id" starting_time="0" frequency="2" width="4" workload="8" />
+   <task taskid="task_5_id" starting_time="1.08108" frequency="3" width="1" workload="2" />
  </core>
  <core coreid="3">
-   <task taskid="task_1_id" ordering="0" frequency="2" width="4" workload="8" />
-   <task taskid="task__12_id" ordering="1" frequency="3" width="1" workload="1" />
-   <task taskid="task__13_id" ordering="2" frequency="3" width="1" workload="1" />
+   <task taskid="task_1_id" starting_time="0" frequency="2" width="4" workload="8" />
+   <task taskid="task__12_id" starting_time="1.08108" frequency="3" width="1" workload="1" />
+   <task taskid="task__13_id" starting_time="1.41441" frequency="3" width="1" workload="1" />
  </core>
  <core coreid="4">
-   <task taskid="task_2_id" ordering="0" frequency="2" width="2" workload="4" />
-   <task taskid="task_7_id" ordering="1" frequency="3" width="1" workload="2" />
+   <task taskid="task_2_id" starting_time="0" frequency="2" width="2" workload="4" />
+   <task taskid="task_7_id" starting_time="1.08108" frequency="3" width="1" workload="2" />
  </core>
  <core coreid="5">
-   <task taskid="task_2_id" ordering="0" frequency="2" width="2" workload="4" />
-   <task taskid="task_8_id" ordering="1" frequency="3" width="1" workload="1" />
-   <task taskid="task_9_id" ordering="2" frequency="3" width="1" workload="1" />
+   <task taskid="task_2_id" starting_time="0" frequency="2" width="2" workload="4" />
+   <task taskid="task_8_id" starting_time="1.08108" frequency="3" width="1" workload="1" />
+   <task taskid="task_9_id" starting_time="1.41441" frequency="3" width="1" workload="1" />
  </core>
  <core coreid="6">
-   <task taskid="task_3_id" ordering="0" frequency="2" width="2" workload="4" />
-   <task taskid="task_6_id" ordering="1" frequency="3" width="1" workload="2" />
+   <task taskid="task_3_id" starting_time="0" frequency="2" width="2" workload="4" />
+   <task taskid="task_6_id" starting_time="1.08108" frequency="3" width="1" workload="2" />
  </core>
  <core coreid="7">
-   <task taskid="task_3_id" ordering="0" frequency="2" width="2" workload="4" />
-   <task taskid="task_4_id" ordering="1" frequency="3" width="1" workload="2" />
+   <task taskid="task_3_id" starting_time="0" frequency="2" width="2" workload="4" />
+   <task taskid="task_4_id" starting_time="1.08108" frequency="3" width="1" workload="2" />
  </core>
 </schedule>

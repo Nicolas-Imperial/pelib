@@ -22,6 +22,7 @@ namespace pelib
 		this->maxWidth = 1;
 		this->workload = 1;
 		this->efficiencyString = "fml:p <= ? 1 : 1e-6";
+		this->start_time = 0;
 	}
 
 	Task::Task(int id)
@@ -54,6 +55,7 @@ namespace pelib
 
 		this->name = base + "_name";
 		this->taskId = base + "_id";
+		this->start_time = 0;
 	}
 	
 	double
@@ -216,6 +218,18 @@ namespace pelib
 	Task::setName(const std::string name)
 	{
 		this->name = name;
+	}
+
+	double
+	Task::getStartTime() const
+	{
+		return this->start_time;
+	}
+
+	void
+	Task::setStartTime(double startTime)
+	{
+		this->start_time = startTime;
 	}
 
 	double

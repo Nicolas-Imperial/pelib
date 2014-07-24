@@ -39,7 +39,7 @@ double MakespanMergesort::calculate(const Taskgraph& tg, const Architecture& arc
 		}
 	}
 
-	int max_freq = *arch.getFrequencies().end();
+	int max_freq = *arch.getFrequencies().rbegin();
 	/*
 	int min_freq = *arch.getFrequencies().begin();
 	int p = arch.getCoreNumber();

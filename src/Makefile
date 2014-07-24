@@ -319,7 +319,7 @@ uninstall: submake
 	$(RM) $(foreach var,$(cc_pkgconfig) $(cxx_pkgconfig), $(DESTDIR)$(libdir)/pkgconfig/$(var))
 	
 submake:
-	@$(shell echo for i in "$(foreach var,$(subdirs),$(var))"\; do $(MAKE) -C \$$i '$(MAKEFLAGS)' $(MAKECMDGOALS) distdir=$(distdir)/\$$i\; done)
+	@$(shell echo for i in "$(foreach var,$(subdirs),$(var))"\; do $(MAKE) -C \$$i \|\| exit \$$? \; done)
 
 FORCE:
 .PHONY: all clean check install uninstall dist FORCE submake bin_package lib_target test_target

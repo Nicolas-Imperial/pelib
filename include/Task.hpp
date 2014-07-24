@@ -57,6 +57,12 @@ namespace pelib
 			setMaxWidth(double maxWidth);
 
 			virtual double
+			getStartTime() const;
+
+			virtual void
+			setStartTime(double startTime);
+
+			virtual double
 			runtime(double width = 1, double frequency = 1) const;
 
 			virtual bool
@@ -68,6 +74,7 @@ namespace pelib
 		protected:
 			double frequency, width;
 			double workload, maxWidth;
+			float start_time;
 			int id;
 			std::string taskId, name, efficiencyString;
 			

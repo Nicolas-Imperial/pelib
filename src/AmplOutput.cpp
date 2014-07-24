@@ -173,6 +173,12 @@ namespace pelib
 		}
 	}
 
+	void
+	AmplOutput::dump(std::ostream& o, const AlgebraData &data) const
+	{
+		dump(o, &data);
+	}
+
 	std::vector<AmplOutputDataParser*> AmplOutput::floatParsers()
 	{
 		std::vector<AmplOutputDataParser*> parsers;

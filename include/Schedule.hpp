@@ -7,7 +7,7 @@
 #define PELIB_SCHEDULE
 
 namespace pelib
-{
+{	
 	class Schedule : public StreamingAppData
 	{
 		public:
@@ -34,16 +34,16 @@ namespace pelib
 			virtual void
 			setAUTName(const std::string autName);
 
-			virtual const std::map<int, std::vector<Task> >&
+			virtual const std::map<int, std::map<float, Task> >&
 			getSchedule() const;
 
 			virtual void
-			setSchedule(const std::map<int, std::vector<Task> >& schedule);
+			setSchedule(const std::map<int, std::map<float, Task> > &schedule);
 
 		protected:
 			double roundTime;
 			std::string name, autName;
-			std::map<int, std::vector<Task> > schedule;
+			std::map<int, std::map<float, Task> > schedule;
 			
 		private:		
 	};
