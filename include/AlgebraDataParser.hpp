@@ -5,6 +5,7 @@
 #include <string>
 #include <boost/regex.hpp>
 #include <iomanip>
+#include <boost/algorithm/string.hpp>
 
 #include <ParseException.hpp>
 #include <NoDecimalFloatException.hpp>
@@ -27,12 +28,36 @@ namespace pelib
 			convert(std::string element, bool strict = 0)
 			{
 				Target out;
-				std::istringstream converter(element);
-				converter >> out;
-
-				if(converter.fail())
+				bool infinity, positive;
+				boost::algorithm::to_lower(element);
+				
+				if(element.compare("+inf") == 0 || element.compare("inf") == 0)
 				{
-					throw ParseException(std::string("Couln't convert literal \"").append(element).append("\" into type \"").append(typeid(out).name()).append("\"."));
+					out = std::numeric_limits<Target>::max();
+					infinity = true;
+					positive = true;
+				}
+				else
+				{
+					if(element.compare("-inf") == 0)
+					{
+						out = std::numeric_limits<Target>::min();
+						infinity = true;
+						positive = false;
+					}
+					else
+					{
+						std::istringstream converter(element);
+						converter >> out;
+						infinity = false;
+
+						if(converter.fail())
+						{
+							throw ParseException(std::string("Couln't convert literal \"").append(element).append("\" into type \"").append(typeid(out).name()).append("\"."));
+						}
+
+						positive = out >= 0;
+					}
 				}
 
 #if TRACE
@@ -63,21 +88,26 @@ namespace pelib
 						{
 							// OK so it doesn't parse a fixed-point notation
 							// Then I suppose it was a scientific notation; let's see if it indeed denotes a decimal digit
-							long long int int_test;
-							std::istringstream converter(element);
-							converter >> int_test;
+							long long int int_test = floor(out);
+							//std::istringstream converter(element);
+							//converter >> int_test;
 
 #if TRACE
 							std::cerr << "\"" << element << "\" is not at fixed-point format, may be scientific notation" << std::endl;
 #endif
 
-							if(int_test == out)
+							if(int_test == out && !infinity)
 							{
 								// Integer-converted and floating-point were equal, then it was an integer, you fool
 #if TRACE
 								std::cerr << "The decimal part of \"" << element << "\" is nul, therefore we have an integer" << std::endl;
 #endif
 								throw NoDecimalFloatException(std::string("Asked a decimal conversion, but \"").append(element).append("\" is integer."), out);
+							}
+
+							if(infinity && std::numeric_limits<Target>::has_infinity)
+							{
+								out = positive ? std::numeric_limits<Target>::infinity() : -1 * std::numeric_limits<Target>::infinity();
 							}
 #if TRACE
 							std::cerr << "Passed the scientific format matching" << std::endl;
@@ -104,27 +134,52 @@ namespace pelib
 							std::cerr << "It is not fixed-point format, good" << std::endl;
 #endif
 							// Then I suppose it was a scientific notation; let's see if it indeed denotes an integer digit
-							double int_test;
-							std::istringstream converter(element);
-							converter >> int_test;
-
-							if(int_test != out)
+							if(!infinity)
 							{
+								double int_test;
+								std::istringstream converter(element);
+								converter >> int_test;
+
+								if(int_test != out)
+								{
 #if TRACE
-								std::cerr << "But this is not an integer anyway" << std::endl;
+									std::cerr << "But this is not an integer anyway" << std::endl;
 #endif
-								// Integer-converted and floating-point were equal, then it was an integer, you fool
-								throw ParseException(std::string("Asked an integer conversion, but \"").append(element).append("\" is decimal."));
+									// Integer-converted and floating-point were equal, then it was an integer, you fool
+									throw ParseException(std::string("Asked an integer conversion, but \"").append(element).append("\" is decimal."));
+								}
+#if TRACE
+								std::cerr << "OK I valid this conversion" << std::endl;
+#endif
+								return out;
 							}
-#if TRACE
-							std::cerr << "OK I valid this conversion" << std::endl;
-#endif
-							return out;
+							else
+							{
+								if(infinity && std::numeric_limits<Target>::has_infinity)
+								{
+									return positive ? std::numeric_limits<Target>::infinity() : -1 * std::numeric_limits<Target>::infinity();
+								}
+								else
+								{
+									return out;
+								}
+							}
 						}
 #if TRACE
 						std::cerr << "But element was fixed-point format" << std::endl;
 #endif
 						throw ParseException(std::string("Asked an integer conversion, but \"").append(element).append("\" is decimal."));
+					}
+				}
+				else
+				{
+					if(infinity && std::numeric_limits<Target>::has_infinity)
+					{
+						return positive ? std::numeric_limits<Target>::infinity() : -1 * std::numeric_limits<Target>::infinity();
+					}
+						else
+					{
+						return out;
 					}
 				}
 

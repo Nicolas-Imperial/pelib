@@ -122,7 +122,6 @@ namespace pelib
 	double
 	Task::getEfficiency(int p, double def) const
 	{
-		// TODO: implement
 		if(getEfficiencyString().substr(0, 4) == "fml:")
 		{
 			using namespace mu;

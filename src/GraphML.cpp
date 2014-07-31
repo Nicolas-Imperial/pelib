@@ -4,6 +4,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <thread>
+#include <boost/algorithm/string.hpp>
 
 extern "C"{
 #include <igraph.h>
@@ -63,11 +64,15 @@ GraphML::dump(ostream& os, const StreamingAppData *data, const Architecture *arc
 		SETVAS(graph, "taskid", task.getId() - 1, task.getTaskId().c_str());
 		SETVAS(graph, "taskname", task.getId() - 1, task.getName().c_str());
 		SETVAN(graph, "workload", task.getId() - 1, task.getWorkload());
-		SETVAN(graph, "max_width", task.getId() - 1, task.getMaxWidth());
+		stringstream max_width;
 
+		// If no architecture is provided, just dump efficiency and max width as is.
+		// Otherwise, compute and output each possible value one by one, and
+		// replace any larger value of max_width than number of core, by number of cores 
 		if (arch == NULL)
 		{
 			SETVAS(graph, "efficiency", task.getId() - 1, task.getEfficiencyString().c_str());
+			max_width << task.getMaxWidth();
 		}
 		else
 		{
@@ -79,7 +84,14 @@ GraphML::dump(ostream& os, const StreamingAppData *data, const Architecture *arc
 			}
 
 			SETVAS(graph, "efficiency", task.getId() - 1, ss.str().c_str());
+
+			if(task.getMaxWidth() >= arch->getCoreNumber())
+			{
+				max_width << arch->getCoreNumber();
+			}
 		}
+
+		SETVAS(graph, "max_width", task.getId() - 1, max_width.str().c_str());
 	}
 
 	// Dump data to stream os
@@ -184,7 +196,35 @@ GraphML::parse(istream &is) const
 		Task task(id + 1, strcmp(VAS(the_graph, "taskid", id), "") != 0 ? VAS(the_graph, "taskid", id) : "UNNAMED_TASKID");
 		task.setName(strcmp(VAS(the_graph, "taskname", id),"") != 0 ? VAS(the_graph, "taskname", id) : "UNNAMED_TASKNAME");
 		task.setWorkload(!isnan((float)VAN(the_graph, "workload", id)) ? VAN(the_graph, "workload", id): 1.0);
-		task.setMaxWidth((int)VAN(the_graph, "max_width", id) != INT_MIN ?  VAN(the_graph, "max_width", id) : 1);
+		const char *str = VAS(the_graph, "max_width", id);
+		string max_width_str(str);
+		boost::algorithm::to_lower(max_width_str);
+		boost::algorithm::trim(max_width_str);
+		float max_width;
+
+		if(max_width_str.compare("inf") == 0 || max_width_str.compare("+inf") == 0)
+		{
+			max_width = std::numeric_limits<float>::infinity();
+		}
+		else
+		{
+			if(max_width_str.compare("-inf") == 0)
+			{
+				max_width = 1;
+			}
+			else
+			{
+				std::istringstream converter(max_width_str);
+				converter >> max_width;
+
+				if(converter.fail())
+				{
+					throw ParseException(std::string("Couln't convert literal \"").append(max_width_str).append("\" into type \"").append(typeid(max_width).name()).append("\"."));
+				}
+			}
+		}
+		task.setMaxWidth(max_width);
+		//task.setMaxWidth((int)VAN(the_graph, "max_width", id) != INT_MIN ?  VAN(the_graph, "max_width", id) : 1);
 
 		if (strcmp(VAS(the_graph, "efficiency", id), "") != 0)
 		{

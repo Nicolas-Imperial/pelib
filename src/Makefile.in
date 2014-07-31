@@ -24,7 +24,7 @@ CXX_TEST_DEPS = $(CXX_DEPS) libunitc++.a
 CXX_TEST_LDFLAGS =
 
 ## static library packages and their sources
-bincxx_package = demo streamingapp_demo demo_xmlformats graphmltoampli amplitographml duplicate_tasks graphmlfmltographmleval amplitoampli amplitoamplo amplotoampli amplotoamplo amplitocpp amplotocpp run_record amplotoschedule amplmatrixtoraw
+bincxx_package = demo streamingapp_demo demo_xmlformats graphmltoampli amplitographml duplicate_tasks graphmlfmltographmleval amplitoampli amplitoamplo amplotoampli amplotoamplo amplitocpp amplotocpp run_record amplotoschedule amplmatrixtoraw streamittographml
 
 bincxx_demo_src = demo.cpp
 bincxx_demo_export = $(bincxx_demo_embed) $(bincxx_demo_src) 
@@ -137,6 +137,13 @@ bincxx_amplmatrixtoraw_deps = libcppelib.a
 bincxx_amplmatrixtoraw_libs = -lcppelib $(libcxx_cppelib_libs)
 bincxx_amplmatrixtoraw_pkg = $(libcxx_cppelib_pkg)
 bincxx_amplmatrixtoraw_ldflags = -L.
+
+bincxx_streamittographml_src = streamittographml.cpp
+bincxx_streamittographml_export = $(bincxx_streamittographml_embed) $(bincxx_streamittographml_src)
+bincxx_streamittographml_deps = libcppelib.a
+bincxx_streamittographml_libs = -lcppelib $(libcxx_cppelib_libs)
+bincxx_streamittographml_pkg = $(libcxx_cppelib_pkg)
+bincxx_streamittographml_ldflags = -L.
 
 ## static library packages and their sources
 libcxx_package = unit cppelib
