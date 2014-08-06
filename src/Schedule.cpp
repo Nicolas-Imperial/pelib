@@ -51,12 +51,12 @@ namespace pelib
 				
 				for(map<int, float>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 				{
-					if(j->second > 0)
+					if(floor(j->second) > 0)
 					{
-						Task task(j->second, tg.findTask((int)j->second).getTaskId());
-						task.setWorkload(tau->getValues().find((int)j->second)->second);
-						task.setWidth(wi->getValues().find((int)j->second)->second);
-						task.setFrequency(freq->getValues().find((int)j->second)->second);
+						Task task(j->second, tg.findTask((int)floor(j->second)).getTaskId());
+						task.setWorkload(tau->getValues().find((int)floor(j->second))->second);
+						task.setWidth(wi->getValues().find((int)floor(j->second))->second);
+						task.setFrequency(freq->getValues().find((int)floor(j->second))->second);
 						task.setMaxWidth(tg.getTasks().find(task)->getMaxWidth());
 						task.setEfficiencyString(tg.getTasks().find(task)->getEfficiencyString());
 

@@ -88,7 +88,16 @@ namespace pelib
 		for(set<Task>::const_iterator i = getTasks().begin(); i != getTasks().end(); i++)
 		{
 			map_tau.insert(pair<int, float>(i->getId(), i->getWorkload()));
-			map_Wi.insert(pair<int, float>(i->getId(), i->getMaxWidth()));
+			float max_width = 0;
+			if(i->getMaxWidth() > arch.getCoreNumber())
+			{
+				max_width = arch.getCoreNumber();
+			}
+			else
+			{
+				max_width = i->getMaxWidth();
+			}
+			map_Wi.insert(pair<int, float>(i->getId(), max_width));
 
 			map<int, float> task_e;
 			for(int j = 1; j <= arch.getCoreNumber(); j++)
