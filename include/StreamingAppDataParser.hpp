@@ -20,9 +20,12 @@ namespace pelib
 	class StreamingAppDataParser : public DataParser
 	{
 		public:
+			// TODO: Does it make sens to keep this virtual method?
+			/*
 			virtual
 			StreamingAppData*
 			parse(std::istream &in) const = 0;
+			*/
 
 			virtual
 			StreamingAppDataParser*

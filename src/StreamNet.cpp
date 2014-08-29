@@ -89,6 +89,11 @@ namespace pelib
 		std::string tg_str, arch_str, sched_str;
 		std::stringstream ss;
 
+		// Taskgraph, Architecture and Schedule data structures
+		Taskgraph *tg;
+		Architecture *arch;
+		Schedule *sched;
+
 		// Read the whole inputs once
 		// Taskgraph
 		ss.str(std::string());
@@ -123,8 +128,8 @@ namespace pelib
 				
 			TaskgraphParser *parser = *iter;
 			try {
-				Taskgraph *data = parser->parse(input);
-				record.insert(data);
+				tg = parser->parse(input);
+				record.insert(tg);
 
 				// No need to try another parser; proceed with the next token
 				break;
@@ -141,8 +146,8 @@ namespace pelib
 			
 			ArchitectureParser *parser = *iter;
 			try {
-				Architecture *data = parser->parse(input);
-				record.insert(data);
+				arch = parser->parse(input);
+				record.insert(arch);
 
 				// No need to try another parser; proceed with the next token
 				break;
@@ -159,8 +164,8 @@ namespace pelib
 				
 			ScheduleParser *parser = *iter;
 			try {
-				Schedule *data = parser->parse(input);
-				record.insert(data);
+				sched = parser->parse(input, *tg);
+				record.insert(sched);
 
 				// No need to try another parser; proceed with the next token
 				break;

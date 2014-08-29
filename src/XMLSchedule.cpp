@@ -79,7 +79,7 @@ XMLSchedule::dump(ostream& os, const StreamingAppData *data) const
 }
 
 Schedule*
-XMLSchedule::parse(istream &is) const
+XMLSchedule::parse(istream &is, Taskgraph &tg) const
 {
 	DomParser* theSchedule = new DomParser();
 	//theSchedule->set_throw_messages(false);
@@ -127,8 +127,7 @@ XMLSchedule::parse(istream &is) const
 			std::map<float, Task> core_schedule_map;
 
 			auto tasks = (*iter)->get_children();
-			int task_id = 1;
-			for(auto taskiter = tasks.begin(); taskiter != tasks.end(); ++taskiter, task_id++)
+			for(auto taskiter = tasks.begin(); taskiter != tasks.end(); ++taskiter)
 			{
 				if((*taskiter)->get_name().compare("task")) //skip indentation characters et cetera
 				{
@@ -137,7 +136,10 @@ XMLSchedule::parse(istream &is) const
 
 				auto *igraph_task = dynamic_cast<Element*>(*taskiter);
 
-				Task task(task_id, igraph_task->get_attribute_value("taskid"));
+				Task tg_task = tg.findTask(igraph_task->get_attribute_value("taskid"));
+				//cout << "Counter = " << task_id << ", tg_task.getId() = " << tg_task.getId() << ", tg_task.getTaskId() = \"" << tg_task.getTaskId() << "." << endl; 
+
+				Task task(tg_task.getId(), tg_task.getTaskId());
 				task.setFrequency(stof(igraph_task->get_attribute_value("frequency")));
 				task.setWidth(stof(igraph_task->get_attribute_value("width")));
 				task.setWorkload(stof(igraph_task->get_attribute_value("workload")));

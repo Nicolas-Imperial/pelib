@@ -93,21 +93,14 @@ namespace pelib
 	Schedule::buildAlgebra() const
 	{
 		Algebra algebra;
-
-		std::set<std::string> task_ids;
+		
+		map<string, int>taskid2id; 
 		for(map<int, map<float, Task> >::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 		{
 			for(map<float, Task>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 			{
-				task_ids.insert(j->second.getTaskId());
+				taskid2id.insert(pair<string, int>(j->second.getTaskId(), j->second.getId()));
 			}
-		}
-
-		map<string, int>taskid2id;
-		int counter = 1;
-		for(set<string>::const_iterator i = task_ids.begin(); i != task_ids.end(); i++, counter++)
-		{
-			taskid2id.insert(pair<string, int>(*i, counter));
 		}
 
 		map<int, map<int, float> > sched;

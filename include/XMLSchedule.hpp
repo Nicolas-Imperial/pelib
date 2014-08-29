@@ -11,7 +11,7 @@ namespace pelib
 	class XMLSchedule : public XMLScheduleParser, public XMLScheduleOutput
 	{
 		public:
-			virtual Schedule* parse(std::istream &is) const;
+			virtual Schedule* parse(std::istream &is, Taskgraph &tg) const;
 			virtual	void dump(std::ostream &os, const StreamingAppData *data) const;
 			virtual	void dump(std::ostream &os, const StreamingAppData &data) const;
 			virtual XMLSchedule* clone() const;
