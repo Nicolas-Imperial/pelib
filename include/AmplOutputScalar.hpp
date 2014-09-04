@@ -31,14 +31,14 @@ namespace pelib
 			std::string
 			getDetailedPattern()
 			{
-				return "(\\w[\\w\\d_]*)\\s*=\\s*([\\w\\d][\\w\\d_\\.]*)";
+				return "(\\w[\\w\\d_]*)\\s*=\\s*([\\w\\d][\\w\\d_\\.+]*)";
 			}
 
 			virtual
 			std::string
 			getGlobalPattern()
 			{
-				return "\\w[\\w\\d_]*\\s*=\\s*[\\w\\d][\\w\\d_\\.]*";
+				return "\\w[\\w\\d_]*\\s*=\\s*[\\w\\d][\\w\\d_\\.+]*";
 			}
 
 			virtual

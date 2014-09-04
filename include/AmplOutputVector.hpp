@@ -29,7 +29,7 @@ namespace pelib
 			std::string
 			getDetailedPattern()
 			{
-				return "(\\w[\\w\\d_]*)\\s*\\[\\*\\]\\s*:=\\s*((?:[\\w\\d][\\w\\d_]*\\s+[\\w\\d][\\w\\d_\\.]*[\\s\\n]+)+)";
+				return "(\\w[\\w\\d_]*)\\s*\\[\\*\\]\\s*:=\\s*((?:[\\w\\d][\\w\\d_+\\.]*\\s+[\\w\\d][\\w\\d_\\.+]*[\\s\\n]+)+)";
 			}
 
 			virtual
@@ -46,6 +46,8 @@ namespace pelib
 				VectorType values;
 				
 				std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+				//std::cerr << str << std::endl;
+				//std::cerr << std::string("(?:.*?)").append(getDetailedPattern()) << std::endl;
 				boost::cmatch match = AlgebraDataParser::match(std::string("(?:.*?)").append(getDetailedPattern()), str);
 				
 				boost::regex param_vector("(?:\\s*([^\\s]+)\\s+([^\\s]+))");

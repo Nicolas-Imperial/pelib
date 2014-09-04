@@ -37,7 +37,7 @@ namespace pelib
 			std::string
 			getGlobalPattern()
 			{
-				return "\\w[\\w\\d_]*\\s*\\[\\*,\\*\\]\\s*:\\s*(?:[\\w\\d]+\\s*)+\\s*:=.+";
+				return "\\w[\\w\\d_]*\\s*\\[\\*,\\*\\]\\s*:\\s*(?:[\\w\\d\\.+]+\\s*)+\\s*:=.+";
 			}
 
 			virtual
