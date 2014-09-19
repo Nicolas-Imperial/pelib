@@ -55,22 +55,26 @@ namespace pelib
 					{
 						Task task(j->second, tg.findTask((int)floor(j->second)).getTaskId());
 						task.setWorkload(tau->getValues().find((int)floor(j->second))->second);
-						task.setWidth(wi->getValues().find((int)floor(j->second))->second);
-						task.setFrequency(freq->getValues().find((int)floor(j->second))->second);
-						task.setMaxWidth(tg.getTasks().find(task)->getMaxWidth());
-						task.setEfficiencyString(tg.getTasks().find(task)->getEfficiencyString());
+						if(task.getWorkload() > 0)
+						{
+							task.setWidth(wi->getValues().find((int)floor(j->second))->second);
+							task.setFrequency(freq->getValues().find((int)floor(j->second))->second);
+							task.setMaxWidth(tg.getTasks().find(task)->getMaxWidth());
+							task.setEfficiencyString(tg.getTasks().find(task)->getEfficiencyString());
 
-						if(starting_time == NULL)
-						{
-							task.setStartTime(start);
+							if(starting_time == NULL)
+							{
+								task.setStartTime(start);
+							}
+							else
+							{
+								task.setStartTime(starting_time->getValues().find((int)j->second)->second);
+							}
+
+							//cerr << "Core: " << i->first << "; Task: " << j->second << "; taskid: " << tg.findTask((int)floor(j->second)).getTaskId() << "; Start time: " << task.getStartTime() << endl;
+							core_schedule.insert(pair<float, Task>(task.getStartTime(), task));
+							start += task.runtime(task.getWidth(), task.getFrequency());
 						}
-						else
-						{
-							task.setStartTime(starting_time->getValues().find((int)j->second)->second);
-						}
-							
-						core_schedule.insert(pair<float, Task>(task.getStartTime(), task));
-						start += task.runtime(task.getWidth(), task.getFrequency());
 					}
 				}
 
