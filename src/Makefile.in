@@ -166,8 +166,8 @@ Scalar.cpp Vector.cpp Matrix.cpp Set.cpp \
 AmplDataParser.cpp AmplDataOutput.cpp \
 AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp GraphML.cpp Schedule.cpp \
 AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
-Task.cpp Link.cpp Taskgraph.cpp Schedule.cpp Architecture.cpp \
-AmplArchitecture.cpp \
+Task.cpp Link.cpp Taskgraph.cpp Schedule.cpp Platform.cpp \
+AmplPlatform.cpp \
 MakespanCalculator.cpp MakespanFormula.cpp MakespanSynthetic.cpp MakespanConstant.cpp MakespanFFT.cpp MakespanPreduce.cpp MakespanMergesort.cpp \
 AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp \
 AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
