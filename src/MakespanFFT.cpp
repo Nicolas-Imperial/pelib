@@ -47,6 +47,7 @@ MakespanFFT::calculate(const Taskgraph &tg, const Architecture &arch) const
 
 	float minM = sum_pTw / (double)max_freq;
 	float maxM = sum_pTw / (double)min_freq;
+	//cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] minM = " << minM << "; maxM = " << maxM << endl;
 	float M = (minM + maxM) / 2;
 	
 	return M;

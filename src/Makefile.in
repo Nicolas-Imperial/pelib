@@ -168,7 +168,7 @@ AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInpu
 AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
 Task.cpp Link.cpp Taskgraph.cpp Schedule.cpp Architecture.cpp \
 AmplArchitecture.cpp \
-MakespanCalculator.cpp MakespanSynthetic.cpp MakespanConstant.cpp MakespanFFT.cpp MakespanPreduce.cpp MakespanMergesort.cpp \
+MakespanCalculator.cpp MakespanFormula.cpp MakespanSynthetic.cpp MakespanConstant.cpp MakespanFFT.cpp MakespanPreduce.cpp MakespanMergesort.cpp \
 AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp \
 AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
 StreamNet.cpp XMLSchedule.cpp GraphML.cpp \
@@ -180,7 +180,7 @@ libcxx_cppelib_export = $(libcxx_cppelib_embed) $(libcxx_cppelib_src)
 libcxx_cppelib_libs = -lboost_regex -lboost_graph -lexpat
 libcxx_cppelib_ldflags = 
 libcxx_cppelib_deps =
-libcxx_cppelib_pkg = igraph muparser libxml++-2.6
+libcxx_cppelib_pkg = igraph libxml++-2.6
 libcxx_cppelib_pkg_url = http://www.ida.liu.se/~nicme26
 libcxx_cppelib_pkg_ld = 
 libcxx_cppelib_pkg_libs = 

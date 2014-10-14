@@ -3,7 +3,26 @@
 #include <Task.hpp>
 #include <ParseException.hpp>
 
+#include <exprtk.hpp>
+
 using namespace std;
+
+struct print : public exprtk::ifunction<double>
+{
+	public:
+		print(ostream &stream)
+			: exprtk::ifunction<double>(1), stream(stream)
+		{}  
+
+		inline double operator()(const double &value) 
+		{   
+			stream << value << endl;
+			return value;
+		}   
+
+	private:
+		ostream &stream;
+};
 
 namespace pelib
 {
@@ -125,30 +144,39 @@ namespace pelib
 		if(getEfficiencyString().substr(0, 4) == "fml:")
 		{
 			using namespace mu;
-			string fml = getEfficiencyString().substr(4);
-			double d_p = p;
-			double d_W = this->getMaxWidth();
-			double d_tau = this->getWorkload();
+			string formula = getEfficiencyString().substr(4);
 
-			Parser mathparser;
-			mathparser.SetExpr(fml);
-			// This is where you may define additional parameters
-			// for the efficiency function.
-			// It is allowed to define parameters not present in the
-			// formula, it will just be ignored.
-			mathparser.DefineVar("p", &d_p);
-			mathparser.DefineVar("W", &d_W);
-			mathparser.DefineVar("tau", &d_tau);
+			print print_cout(cout);
+			print print_cerr(cerr);
 
-			//cout << "tau = " << d_tau << "; W = " << d_W << "; p = " << p << "; " << fml << endl;
+			typedef exprtk::expression<double> expression_t;
+			typedef exprtk::parser<double>         parser_t;
 
-			try
-			{
-				return mathparser.Eval();
-			} catch (ParseException &e) // TODO: catch whatever mathparser would throw
+			double W = this->getMaxWidth();
+			double tau = this->getWorkload();
+			expression_t expression;
+			double pp = p;
+
+			exprtk::symbol_table<double> symbol_table;
+			symbol_table.add_variable("W", W);
+			symbol_table.add_variable("p", pp);
+			symbol_table.add_variable("tau", tau);
+			symbol_table.add_function("cout", print_cout);
+			symbol_table.add_function("cerr", print_cerr);
+
+			expression.register_symbol_table(symbol_table);
+
+			parser_t parser;
+
+			parser.compile(formula, expression);	
+			double output =  expression.value();
+
+			if(std::isnan(output)) // TODO: catch whatever mathparser would throw
 			{
 				throw new ParseException("Could not parse efficiency formula \"" + getEfficiencyString() + "\"");
-			}
+			}	
+
+			return output;		
 		}
 		else
 		{
