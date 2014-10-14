@@ -2,7 +2,7 @@
 #include <StreamingAppOutput.hpp>
 
 #include <TaskgraphParser.hpp>
-#include <ArchitectureParser.hpp>
+#include <PlatformParser.hpp>
 #include <ScheduleParser.hpp>
 
 #include <ScheduleOutput.hpp>
@@ -21,7 +21,7 @@ namespace pelib
 			~StreamNet();
 
 			virtual StreamingApp
-			parse(std::istream &taskgraph, std::istream &architecture, std::istream &schedule) const;
+			parse(std::istream &taskgraph, std::istream &platform, std::istream &schedule) const;
 
 			virtual
 			void
@@ -37,7 +37,7 @@ namespace pelib
 
 		protected:
 			std::vector<TaskgraphParser*> taskgraphParsers;
-			std::vector<ArchitectureParser*> architectureParsers;
+			std::vector<PlatformParser*> platformParsers;
 			std::vector<ScheduleParser*> scheduleParsers;
 			std::vector<StreamingAppDataOutput*> outputs;
 

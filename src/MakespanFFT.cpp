@@ -8,7 +8,7 @@ using namespace pelib;
 using namespace std;
 
 double
-MakespanFFT::calculate(const Taskgraph &tg, const Architecture &arch) const
+MakespanFFT::calculate(const Taskgraph &tg, const Platform &arch) const
 {
 	//cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] tg.getTasks().size() = " << tg.getTasks().size() << endl;
 	int p = arch.getCoreNumber();

@@ -8,7 +8,7 @@ using namespace pelib;
 using namespace std;
 
 double
-MakespanPreduce::calculate(const Taskgraph& tg,const Architecture& arch) const
+MakespanPreduce::calculate(const Taskgraph& tg,const Platform& arch) const
 {
 	int p = arch.getCoreNumber();
 	int min_freq = *arch.getFrequencies().begin();
@@ -19,7 +19,7 @@ MakespanPreduce::calculate(const Taskgraph& tg,const Architecture& arch) const
 	{
 		Task task = *i;
 		double wi = task.getMaxWidth();
-		wi = wi < p ? wi : p; // Cannot have a task running with more cores than architecture offers, even if width is higher
+		wi = wi < p ? wi : p; // Cannot have a task running with more cores than platform offers, even if width is higher
 		double time = task.runtime(1, 1) / wi; // We assume perfect scalability here
 		sum_pTw += time;
 	}

@@ -2,7 +2,7 @@
 
 #include <GraphMLParser.hpp>
 #include <GraphMLOutput.hpp>
-#include <Architecture.hpp>
+#include <Platform.hpp>
 
 #ifndef PELIB_GRAPHML_H
 #define PELIB_GRAPHML_H
@@ -18,8 +18,8 @@ namespace pelib
 			virtual Taskgraph* parse(std::istream &is) const;
 			virtual void dump(std::ostream &str, const StreamingAppData *data) const;
 			virtual void dump(std::ostream &str, const StreamingAppData &data) const;
-			virtual	void dump(std::ostream &os, const StreamingAppData &data, const Architecture &arch) const;
-			virtual void dump(ostream& os, const StreamingAppData *data, const Architecture *arch) const;
+			virtual	void dump(std::ostream &os, const StreamingAppData &data, const Platform &arch) const;
+			virtual void dump(ostream& os, const StreamingAppData *data, const Platform *arch) const;
 		protected:
 	};
 }

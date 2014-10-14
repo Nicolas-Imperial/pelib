@@ -1,12 +1,12 @@
-#include <Architecture.hpp>
-#include <ArchitectureOutput.hpp>
+#include <Platform.hpp>
+#include <PlatformOutput.hpp>
 
-#ifndef PELIB_AMPLARCHITECTUREOUTPUT
-#define PELIB_AMPLARCHITECTUREOUTPUT
+#ifndef PELIB_AMPLPLATFORMOUTPUT
+#define PELIB_AMPLPLATFORMOUTPUT
 
 namespace pelib
 {
-	class AmplArchitectureOutput : public ArchitectureOutput
+	class AmplPlatformOutput : public PlatformOutput
 	{
 	};
 }

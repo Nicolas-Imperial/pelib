@@ -29,7 +29,7 @@ using namespace std;
 using namespace xmlpp;
 
 void
-GraphML::dump(ostream& os, const StreamingAppData *data, const Architecture *arch) const
+GraphML::dump(ostream& os, const StreamingAppData *data, const Platform *arch) const
 {
 	const Taskgraph *tg = dynamic_cast<const Taskgraph* >(data);
 	if(tg == NULL) throw CastException("Parameter \"data\" was not of type \"Taskgraph*\".");
@@ -66,7 +66,7 @@ GraphML::dump(ostream& os, const StreamingAppData *data, const Architecture *arc
 		SETVAN(graph, "workload", task.getId() - 1, task.getWorkload());
 		stringstream max_width;
 
-		// If no architecture is provided, just dump efficiency and max width as is.
+		// If no platform is provided, just dump efficiency and max width as is.
 		// Otherwise, compute and output each possible value one by one, and
 		// replace any larger value of max_width than number of core, by number of cores 
 		if (arch == NULL)
@@ -140,7 +140,7 @@ GraphML::dump(ostream& os, const StreamingAppData &data) const
 }
 
 void
-GraphML::dump(ostream& os, const StreamingAppData &data, const Architecture &arch) const
+GraphML::dump(ostream& os, const StreamingAppData &data, const Platform &arch) const
 {
 	dump(os, &data, &arch);
 }

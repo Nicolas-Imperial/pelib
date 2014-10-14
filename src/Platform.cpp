@@ -1,4 +1,4 @@
-#include <Architecture.hpp>
+#include <Platform.hpp>
 
 #include <Scalar.hpp>
 #include <Set.hpp>
@@ -7,22 +7,22 @@ using namespace std;
 
 namespace pelib
 {
-	Architecture::Architecture()
+	Platform::Platform()
 	{
 		coreNumber = 1;
 		frequencies.insert(1);
 	}
 	
-	Architecture::Architecture(const Architecture *arch)
+	Platform::Platform(const Platform *arch)
 	{
 		coreNumber = arch->getCoreNumber();
 		frequencies = arch->getFrequencies();
 	}
 	
-	Architecture*
-	Architecture::clone() const
+	Platform*
+	Platform::clone() const
 	{
-		Architecture *arch = new Architecture();
+		Platform *arch = new Platform();
 		arch->setCoreNumber(this->getCoreNumber());
 		arch->setFrequencies(this->getFrequencies());
 
@@ -30,31 +30,31 @@ namespace pelib
 	}
 
 	int
-	Architecture::getCoreNumber() const
+	Platform::getCoreNumber() const
 	{
 		return this->coreNumber;
 	}
 	
 	void
-	Architecture::setCoreNumber(int p)
+	Platform::setCoreNumber(int p)
 	{
 		this->coreNumber = p;
 	}
 
 	const std::set<float>&
-	Architecture::getFrequencies() const
+	Platform::getFrequencies() const
 	{
 		return this->frequencies;
 	}
 		
 	void
-	Architecture::setFrequencies(const std::set<float>& freq)
+	Platform::setFrequencies(const std::set<float>& freq)
 	{
 		this->frequencies = freq;
 	}
 	
 	Algebra
-	Architecture::buildAlgebra() const
+	Platform::buildAlgebra() const
 	{
 		Algebra record;
 

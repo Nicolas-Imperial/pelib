@@ -6,8 +6,8 @@
 
 #include <AmplInput.hpp>
 #include <AmplOutput.hpp>
-#include <Architecture.hpp>
-#include <AmplArchitecture.hpp>
+#include <Platform.hpp>
+#include <AmplPlatform.hpp>
 #include <GraphML.hpp>
 
 int main(int argc, char **argv)
@@ -15,19 +15,19 @@ int main(int argc, char **argv)
 	using namespace std;
 	using namespace pelib;
 
-	Architecture *architecture, default_arch;
-	AmplArchitecture ai;
+	Platform *platform, default_arch;
+	AmplPlatform ai;
 	
 	if(argc >= 2)
 	{
 		ifstream tmp(argv[1]);
-		architecture = ai.parse(tmp);
+		platform = ai.parse(tmp);
 		tmp.close();
 	}
 	else
 	{
-		cerr << "Warning: No architecture information supplied. Using default values\n";
-		architecture = &default_arch;
+		cerr << "Warning: No platform information supplied. Using default values\n";
+		platform = &default_arch;
 	}
 	
 	GraphML input;
@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 	*/
 	Taskgraph *tg = input.parse(cin);
 
-	output.dump(cout, tg->buildAlgebra(*architecture));
+	output.dump(cout, tg->buildAlgebra(*platform));
 
 	return 0;
 }

@@ -72,11 +72,11 @@ namespace pelib
 	Algebra
 	Taskgraph::buildAlgebra() const
 	{
-		return buildAlgebra(Architecture());
+		return buildAlgebra(Platform());
 	}
 	
 	Algebra
-	Taskgraph::buildAlgebra(const Architecture &arch) const
+	Taskgraph::buildAlgebra(const Platform &arch) const
 	{
 		Algebra out;
 
@@ -156,7 +156,7 @@ namespace pelib
 	}
 
 	double
-	Taskgraph::getRoundTime(const Architecture &arch) const
+	Taskgraph::getRoundTime(const Platform &arch) const
 	{
 		//cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] getTasks().size() = " << getTasks().size() << endl;
 		MakespanCalculator *calculator = MakespanCalculator::getMakespanCalculator(this->getMakespanCalculator());

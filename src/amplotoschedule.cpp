@@ -1,7 +1,7 @@
 #include <AmplOutput.hpp>
 #include <GraphML.hpp>
 #include <XMLSchedule.hpp>
-#include <AmplArchitecture.hpp>
+#include <AmplPlatform.hpp>
 
 #include <fstream>
 
@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
 {
 	if(argc < 3)
 	{
-		cerr << "Need a taskgraph and architecture to perform this task" << endl;
+		cerr << "Need a taskgraph and platform to perform this task" << endl;
 		return 1;
 	}
 
@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 	tg_str.close();
 
 	ifstream arch_str(argv[2]);
-	Architecture arch = AmplArchitecture().parse(arch_str);
+	Platform arch = AmplPlatform().parse(arch_str);
 	arch_str.close();
 
 	/*

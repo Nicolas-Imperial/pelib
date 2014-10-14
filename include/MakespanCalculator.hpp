@@ -1,4 +1,4 @@
-#include <Architecture.hpp>
+#include <Platform.hpp>
 #include <Taskgraph.hpp>
 
 #ifndef MAKESPAN_CALCULATOR
@@ -10,7 +10,7 @@ namespace pelib
   {
 	public:
     virtual ~MakespanCalculator(){}
-    virtual double calculate(const Taskgraph& tg, const Architecture& arch) const = 0;
+    virtual double calculate(const Taskgraph& tg, const Platform& arch) const = 0;
 
     static MakespanCalculator* getMakespanCalculator(const std::string key);
   };

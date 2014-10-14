@@ -15,7 +15,7 @@ using namespace std;
 struct e : public exprtk::ifunction<double>
 {
 	public:
-		e(const set<Task> &tasks, const Architecture &arch)
+		e(const set<Task> &tasks, const Platform &arch)
 			: exprtk::ifunction<double>(2), tasks(tasks), arch(arch)
 		{}  
 
@@ -27,7 +27,7 @@ struct e : public exprtk::ifunction<double>
 
 	private:
 		const set<Task> &tasks;
-		const Architecture &arch;
+		const Platform &arch;
 };
 
 struct print : public exprtk::ifunction<double>
@@ -50,7 +50,7 @@ struct print : public exprtk::ifunction<double>
 MakespanFormula::MakespanFormula(string formula) : formula(formula) {}
 
 double
-MakespanFormula::calculate(const Taskgraph &tg, const Architecture &arch) const
+MakespanFormula::calculate(const Taskgraph &tg, const Platform &arch) const
 {
 	e matrix_e(tg.getTasks(), arch);
 	print print_cout(cout);

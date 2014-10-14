@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 
-#include <AmplArchitecture.hpp>
+#include <AmplPlatform.hpp>
 #include <GraphML.hpp>
 
 int main(int argc, char **argv)
@@ -12,14 +12,14 @@ int main(int argc, char **argv)
 
   if(argc < 2)
     {
-      cerr << "usage: cat takgraph.graphml | " << argv[0] << " <architecture.dat>";
+      cerr << "usage: cat takgraph.graphml | " << argv[0] << " <platform.dat>";
       return 0;
     }
 
-  AmplArchitecture archparser;
+  AmplPlatform archparser;
   ifstream ifs(argv[1]);
 
-  Architecture *arch = archparser.parse(ifs);
+  Platform *arch = archparser.parse(ifs);
 
   GraphML taskgparser;
   Taskgraph *taskgraph = taskgparser.parse(cin);

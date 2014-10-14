@@ -3,17 +3,17 @@
 #include <StreamingAppData.hpp>
 #include <Algebra.hpp>
 
-#ifndef PELIB_ARCHITECTURE
-#define PELIB_ARCHITECTURE
+#ifndef PELIB_PLATFORM
+#define PELIB_PLATFORM
 
 namespace pelib
 {
-	class Architecture : public StreamingAppData
+	class Platform : public StreamingAppData
 	{
 		public:
-			Architecture();
-			Architecture(const Architecture *arch);
-			virtual Architecture* clone() const;
+			Platform();
+			Platform(const Platform *arch);
+			virtual Platform* clone() const;
 
 			virtual int getCoreNumber() const;
 			virtual void setCoreNumber(int p);

@@ -4,7 +4,7 @@
 #include <StreamingAppData.hpp>
 #include <Algebra.hpp>
 #include <Task.hpp>
-#include <Architecture.hpp>
+#include <Platform.hpp>
 
 extern "C"{
 #include <igraph.h>
@@ -29,7 +29,7 @@ namespace pelib
 			clone() const;
 
 			virtual Algebra buildAlgebra() const;
-			virtual Algebra buildAlgebra(const Architecture &arch) const;
+			virtual Algebra buildAlgebra(const Platform &arch) const;
 
 			virtual string
 			getAUTName() const;
@@ -41,7 +41,7 @@ namespace pelib
 			getMakespanCalculator() const;
 
 			virtual double
-			getRoundTime(const Architecture &arch) const;
+			getRoundTime(const Platform &arch) const;
 
 			virtual void
 			setMakespanCalculator(const string makespanCalculator);

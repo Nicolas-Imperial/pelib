@@ -1,20 +1,20 @@
-#include <Architecture.hpp>
+#include <Platform.hpp>
 
-#include <AmplArchitectureParser.hpp>
-#include <AmplArchitectureOutput.hpp>
+#include <AmplPlatformParser.hpp>
+#include <AmplPlatformOutput.hpp>
 
-#ifndef PELIB_AMPLARCHITECTURE
-#define PELIB_AMPLARCHITECTURE
+#ifndef PELIB_AMPLPLATFORM
+#define PELIB_AMPLPLATFORM
 
 namespace pelib
 {
-	class AmplArchitecture : public AmplArchitectureParser, public AmplArchitectureOutput
+	class AmplPlatform : public AmplPlatformParser, public AmplPlatformOutput
 	{
 		public:
-			virtual Architecture* parse(std::istream &is) const;
+			virtual Platform* parse(std::istream &is) const;
 			virtual	void dump(std::ostream &os, const StreamingAppData *data) const;
 			virtual	void dump(std::ostream &os, const StreamingAppData &data) const;
-			virtual AmplArchitecture* clone() const;
+			virtual AmplPlatform* clone() const;
 	};
 }
 

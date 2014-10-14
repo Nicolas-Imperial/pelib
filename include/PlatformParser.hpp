@@ -1,19 +1,19 @@
-#include <Architecture.hpp>
+#include <Platform.hpp>
 #include <StreamingAppDataParser.hpp>
 
-#ifndef PELIB_ARCHITECTUREPARSER
-#define PELIB_ARCHITECTUREPARSER
+#ifndef PELIB_PLATFORMPARSER
+#define PELIB_PLATFORMPARSER
 
 namespace pelib
 {
-	class ArchitectureParser : public StreamingAppDataParser
+	class PlatformParser : public StreamingAppDataParser
 	{
 		public:
 			virtual
-			Architecture*
+			Platform*
 			parse(std::istream &in) const = 0;
 
-			virtual ArchitectureParser* clone() const = 0;
+			virtual PlatformParser* clone() const = 0;
 
 		protected:
 		private:

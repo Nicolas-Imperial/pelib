@@ -1,12 +1,12 @@
-#include <Architecture.hpp>
-#include <ArchitectureParser.hpp>
+#include <Platform.hpp>
+#include <PlatformParser.hpp>
 
-#ifndef PELIB_AMPLARCHITECTUREPARSER
-#define PELIB_AMPLARCHITECTUREPARSER
+#ifndef PELIB_AMPLPLATFORMPARSER
+#define PELIB_AMPLPLATFORMPARSER
 
 namespace pelib
 {
-	class AmplArchitectureParser : public ArchitectureParser
+	class AmplPlatformParser : public PlatformParser
 	{
 		public:
 	};

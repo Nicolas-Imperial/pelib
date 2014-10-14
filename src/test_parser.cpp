@@ -13,7 +13,7 @@
 #include <AmplOutput.hpp>
 
 #include <GraphML.hpp>
-#include <AmplArchitecture.hpp>
+#include <AmplPlatform.hpp>
 #include <XMLSchedule.hpp>
 
 #include <AmplInputData.hpp>
@@ -59,8 +59,8 @@ std::istringstream istream_taskgraph_amploutput;
 
 extern char _binary_p8_dat_start;
 extern size_t _binary_p8_dat_size;
-std::string string_architecture;
-std::istringstream istream_architecture;
+std::string string_platform;
+std::istringstream istream_platform;
 
 extern char _binary_schedule_xml_start;
 extern size_t _binary_schedule_xml_size;
@@ -100,9 +100,9 @@ test_setup()
 	istream_taskgraph_amploutput.clear();
 	istream_taskgraph_amploutput.str(string_taskgraph_amploutput);
 	
-	string_architecture = std::string(&_binary_p8_dat_start).substr(0, (size_t)(&_binary_p8_dat_size));
-	istream_architecture.clear();
-	istream_architecture.str(string_architecture);
+	string_platform = std::string(&_binary_p8_dat_start).substr(0, (size_t)(&_binary_p8_dat_size));
+	istream_platform.clear();
+	istream_platform.str(string_platform);
 	
 	string_schedule_xml = std::string(&_binary_schedule_xml_start).substr(0, (size_t)(&_binary_schedule_xml_size));
 	istream_schedule_xml.clear();
@@ -134,7 +134,7 @@ int
 parse_and_convert_graphml()
 {
 	Taskgraph tg_graphml = GraphML().parse(istream_taskgraph_graphml);
-	Architecture arch = AmplArchitecture().parse(istream_architecture);
+	Platform arch = AmplPlatform().parse(istream_platform);
 	
 	Algebra tg_graphml_algebra = tg_graphml.buildAlgebra(arch);
 	Taskgraph tg_from_algebra(tg_graphml_algebra);
@@ -164,7 +164,7 @@ parse_and_convert_graphml()
 	cout << "===============" << endl;
 	cout << string_taskgraph_amploutput << endl;
 	cout << "===============" << endl;
-	cout << string_architecture << endl;
+	cout << string_platform << endl;
 	cout << "===============" << endl;
 	cout << string_schedule_xml << endl;
 	cout << "===============" << endl;
@@ -179,7 +179,7 @@ int
 parse_and_convert_schedule()
 {
 	Taskgraph tg_graphml = GraphML().parse(istream_taskgraph_graphml);
-	Architecture arch = AmplArchitecture().parse(istream_architecture);
+	Platform arch = AmplPlatform().parse(istream_platform);
 	Algebra ampl_schedule = AmplOutput(AmplOutput::floatHandlers()).parse(istream_schedule_amploutput);
 	Schedule schedule("converted_from_ampl", tg_graphml, ampl_schedule);
 	

@@ -9,7 +9,7 @@ namespace pelib
   class MakespanMergesort : public MakespanCalculator
   {
   public:
-    virtual double calculate(const Taskgraph& tg,const Architecture& arch) const;
+    virtual double calculate(const Taskgraph& tg,const Platform& arch) const;
   };
 }
 

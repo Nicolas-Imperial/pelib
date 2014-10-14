@@ -27,7 +27,7 @@ number_tasks_in_level(int task)
 }
 #endif
 
-double MakespanMergesort::calculate(const Taskgraph& tg, const Architecture& arch) const
+double MakespanMergesort::calculate(const Taskgraph& tg, const Platform& arch) const
 {
 	int max_workload = 0;
 	for(std::set<Task>::const_iterator i = tg.getTasks().begin(); i != tg.getTasks().end(); i++)
@@ -56,7 +56,7 @@ double MakespanMergesort::calculate(const Taskgraph& tg, const Architecture& arc
 		}
 		
 		double wi = number_tasks_in_level(max_workload / task.getWorkload());
-		wi = wi < p ? wi : p; // Cannot have a task running with more cores than architecture offers, even if width is higher
+		wi = wi < p ? wi : p; // Cannot have a task running with more cores than platform offers, even if width is higher
 		double time = task.runtime(1, 1) / wi;
 		sum_pTw += time;
 	}

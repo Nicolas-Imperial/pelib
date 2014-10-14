@@ -1,6 +1,6 @@
 #include <Record.hpp>
 #include <Taskgraph.hpp>
-#include <Architecture.hpp>
+#include <Platform.hpp>
 #include <Schedule.hpp>
 #include <Algebra.hpp>
 
@@ -22,8 +22,8 @@ namespace pelib
 			virtual const Taskgraph&
 			getTaskgraph() const;
 
-			virtual const Architecture&
-			getArchitecture() const;
+			virtual const Platform&
+			getPlatform() const;
 
 			virtual void
 			insert(StreamingAppData* data);
@@ -36,7 +36,7 @@ namespace pelib
 		protected:
 			Schedule schedule;
 			Taskgraph taskgraph;
-			Architecture architecture;
+			Platform platform;
 
 		private:
 	};

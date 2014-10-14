@@ -1,7 +1,7 @@
 #include <AmplInput.hpp>
 
-#include <Architecture.hpp>
-#include <AmplArchitecture.hpp>
+#include <Platform.hpp>
+#include <AmplPlatform.hpp>
 #include <ParseException.hpp>
 #include <CastException.hpp>
 
@@ -12,30 +12,30 @@ using namespace pelib;
 using namespace std;
 
 void
-AmplArchitecture::dump(ostream& os, const StreamingAppData &data) const
+AmplPlatform::dump(ostream& os, const StreamingAppData &data) const
 {
 	dump(os, &data);
 }
 
 void
-AmplArchitecture::dump(ostream& os, const StreamingAppData *data) const
+AmplPlatform::dump(ostream& os, const StreamingAppData *data) const
 {
-	const Architecture *arch = dynamic_cast<const Architecture* >(data);
-	if(arch == NULL) throw CastException("parameter \"data\" was not of type \"Architecture*\".");
+	const Platform *arch = dynamic_cast<const Platform* >(data);
+	if(arch == NULL) throw CastException("parameter \"data\" was not of type \"Platform*\".");
 
 	AmplInput output(AmplInput::intFloatHandlers());
 	Algebra alg = arch->buildAlgebra();
 	output.dump(os, alg);
 }
 
-Architecture*
-AmplArchitecture::parse(istream &is) const
+Platform*
+AmplPlatform::parse(istream &is) const
 {
 	AmplInput reader(AmplInput::floatHandlers());
 	std::string line;
 	Algebra alg_arch = reader.parse(is);
 
-	Architecture *arch = new Architecture();
+	Platform *arch = new Platform();
 
 	const Scalar<float> *scalar_p = alg_arch.find<Scalar<float> >("p");
 	const Set<float> *set_F = alg_arch.find<Set<float> >("F");
@@ -51,8 +51,8 @@ AmplArchitecture::parse(istream &is) const
 	return arch;
 }
 
-AmplArchitecture*
-AmplArchitecture::clone() const
+AmplPlatform*
+AmplPlatform::clone() const
 {
-	return new AmplArchitecture();
+	return new AmplPlatform();
 }

@@ -10,7 +10,7 @@ namespace pelib
   {
 	public:
 		MakespanFormula(string formula);
-		virtual double calculate(const Taskgraph& tg,const Architecture& arch) const;
+		virtual double calculate(const Taskgraph& tg,const Platform& arch) const;
 		  
 	private:
     	const string formula;

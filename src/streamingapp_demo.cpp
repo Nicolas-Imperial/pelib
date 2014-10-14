@@ -2,8 +2,8 @@
 
 #include <StreamingApp.hpp>
 #include <StreamNet.hpp>
-#include <AmplArchitecture.hpp>
-#include <Architecture.hpp>
+#include <AmplPlatform.hpp>
+#include <Platform.hpp>
 
 #include <AmplOutput.hpp>
 #include <GraphML.hpp>
@@ -36,12 +36,12 @@ main(int argc, char **argv)
 	sched_file.close();
 
 	input.dump(cout, app.getTaskgraph());
-	GraphML().dump(cout, app.getTaskgraph(), app.getArchitecture());
-	input.dump(cout, app.getArchitecture());
+	GraphML().dump(cout, app.getTaskgraph(), app.getPlatform());
+	input.dump(cout, app.getPlatform());
 	input.dump(cout, app.getSchedule());
 
-	AmplOutput(AmplOutput::floatHandlers()).dump(cout, app.getTaskgraph().buildAlgebra(app.getArchitecture()));
-	AmplOutput(AmplOutput::floatHandlers()).dump(cout, app.getArchitecture().buildAlgebra());
+	AmplOutput(AmplOutput::floatHandlers()).dump(cout, app.getTaskgraph().buildAlgebra(app.getPlatform()));
+	AmplOutput(AmplOutput::floatHandlers()).dump(cout, app.getPlatform().buildAlgebra());
 	AmplOutput(AmplOutput::floatHandlers()).dump(cout, app.getSchedule().buildAlgebra());
 	
 	return EXIT_SUCCESS;

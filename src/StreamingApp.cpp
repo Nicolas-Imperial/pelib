@@ -23,10 +23,10 @@ namespace pelib
 		return this->taskgraph;
 	}
 
-	const Architecture&
-	StreamingApp::getArchitecture() const
+	const Platform&
+	StreamingApp::getPlatform() const
 	{
-		return this->architecture;
+		return this->platform;
 	}
 
 	StreamingApp&
@@ -35,7 +35,7 @@ namespace pelib
 		if(this != &rhs)
 		{
 			this->schedule = rhs.getSchedule();
-			this->architecture = rhs.getArchitecture();
+			this->platform = rhs.getPlatform();
 			this->taskgraph = rhs.getTaskgraph();
 		}
 		
@@ -48,13 +48,13 @@ namespace pelib
 		const Taskgraph *tg = dynamic_cast<const Taskgraph* >(data);
 		if(tg == NULL)
 		{
-			const Architecture *arch = dynamic_cast<const Architecture* >(data);
+			const Platform *arch = dynamic_cast<const Platform* >(data);
 			if(arch == NULL)
 			{
 				const Schedule *sched = dynamic_cast<const Schedule* >(data);
 				if(sched == NULL)
 				{
-					throw CastException("Parameter \"data\" was not of type \"Taskgraph*\", \"Architecture*\" or \"Schedule*\".");
+					throw CastException("Parameter \"data\" was not of type \"Taskgraph*\", \"Platform*\" or \"Schedule*\".");
 				}
 				else
 				{
@@ -63,7 +63,7 @@ namespace pelib
 			}
 			else
 			{
-				this->architecture = *arch;
+				this->platform = *arch;
 			}
 		}
 		else
@@ -75,8 +75,8 @@ namespace pelib
 	Algebra
 	StreamingApp::buildAlgebra() const
 	{
-		Algebra ret = this->getTaskgraph().buildAlgebra(this->getArchitecture());
-		ret = ret.merge(this->getArchitecture().buildAlgebra());
+		Algebra ret = this->getTaskgraph().buildAlgebra(this->getPlatform());
+		ret = ret.merge(this->getPlatform().buildAlgebra());
 		ret = ret.merge(this->getSchedule().buildAlgebra());
 
 		return ret;

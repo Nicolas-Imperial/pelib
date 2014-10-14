@@ -3,7 +3,7 @@
 
 #include <StreamNet.hpp>
 #include <GraphML.hpp>
-#include <AmplArchitecture.hpp>
+#include <AmplPlatform.hpp>
 #include <XMLSchedule.hpp>
 
 using namespace std;
@@ -33,7 +33,7 @@ namespace pelib
 			delete *i;
 		}
 
-		for(std::vector<ArchitectureParser*>::iterator i = architectureParsers.begin(); i != architectureParsers.end(); i = architectureParsers.erase(i))
+		for(std::vector<PlatformParser*>::iterator i = platformParsers.begin(); i != platformParsers.end(); i = platformParsers.erase(i))
 		{
 			delete *i;
 		}
@@ -64,9 +64,9 @@ namespace pelib
 			taskgraphParsers.push_back((*i)->clone());
 		}
 		
-		for(std::vector<ArchitectureParser*>::iterator i = architectureParsers.begin(); i != architectureParsers.end(); i = architectureParsers.erase(i))
+		for(std::vector<PlatformParser*>::iterator i = platformParsers.begin(); i != platformParsers.end(); i = platformParsers.erase(i))
 		{
-			architectureParsers.push_back((*i)->clone());
+			platformParsers.push_back((*i)->clone());
 		}
 		
 		for(std::vector<ScheduleParser*>::iterator i = scheduleParsers.begin(); i != scheduleParsers.end(); i = scheduleParsers.erase(i))
@@ -83,15 +83,15 @@ namespace pelib
 	}
 
 	StreamingApp
-	StreamNet::parse(std::istream &taskgraph, std::istream &architecture, std::istream &schedule) const
+	StreamNet::parse(std::istream &taskgraph, std::istream &platform, std::istream &schedule) const
 	{
 		StreamingApp record;
 		std::string tg_str, arch_str, sched_str;
 		std::stringstream ss;
 
-		// Taskgraph, Architecture and Schedule data structures
-		Taskgraph *tg;
-		Architecture *arch;
+		// Taskgraph, Platform and Schedule data structures
+		Taskgraph *tg = NULL;
+		Platform *arch;
 		Schedule *sched;
 
 		// Read the whole inputs once
@@ -103,9 +103,9 @@ namespace pelib
 		}
 		tg_str = ss.str();
 
-		// Architecture
+		// Platform
 		ss.str(std::string());
-		while(!getline(architecture, arch_str).fail())
+		while(!getline(platform, arch_str).fail())
 		{
 			ss << arch_str << std::endl;
 		}
@@ -138,13 +138,13 @@ namespace pelib
 			}
 		}
 
-		// Architecture
-		for(std::vector<ArchitectureParser*>::const_iterator iter = this->architectureParsers.begin(); iter != this->architectureParsers.end(); iter++)
+		// Platform
+		for(std::vector<PlatformParser*>::const_iterator iter = this->platformParsers.begin(); iter != this->platformParsers.end(); iter++)
 		{				
 			std::stringstream input;
 			input.str(arch_str);
 			
-			ArchitectureParser *parser = *iter;
+			PlatformParser *parser = *iter;
 			try {
 				arch = parser->parse(input);
 				record.insert(arch);
@@ -157,7 +157,7 @@ namespace pelib
 		}
 
 		// Schedule
-		for(std::vector<ScheduleParser*>::const_iterator iter = this->scheduleParsers.begin(); iter != this->scheduleParsers.end(); iter++)
+		for(std::vector<ScheduleParser*>::const_iterator iter = this->scheduleParsers.begin(); iter != this->scheduleParsers.end() && tg != NULL; iter++)
 		{
 			std::stringstream input;
 			input.str(sched_str);
@@ -208,7 +208,7 @@ namespace pelib
 	{
 		taskgraphParsers.push_back(new GraphML());
 		
-		architectureParsers.push_back(new AmplArchitecture());
+		platformParsers.push_back(new AmplPlatform());
 		
 		scheduleParsers.push_back(new XMLSchedule());
 	}
@@ -218,7 +218,7 @@ namespace pelib
 	{		
 		// Add outputs here
 		outputs.push_back(new GraphML());
-		outputs.push_back(new AmplArchitecture());
+		outputs.push_back(new AmplPlatform());
 		outputs.push_back(new XMLSchedule());
 	}
 }

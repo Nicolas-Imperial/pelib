@@ -8,7 +8,7 @@ using namespace pelib;
 using namespace std;
 
 double
-MakespanSynthetic::calculate(const Taskgraph& tg, const Architecture& arch) const
+MakespanSynthetic::calculate(const Taskgraph& tg, const Platform& arch) const
 {
 	int p = arch.getCoreNumber();
 	int min_freq = *arch.getFrequencies().begin();
@@ -20,7 +20,7 @@ MakespanSynthetic::calculate(const Taskgraph& tg, const Architecture& arch) cons
 	{
 		Task task = *i;
 		double wi = task.getMaxWidth();
-		wi = wi < p ? wi : p; // Cannot have a task running with more cores than architecture offers, even if width is higher
+		wi = wi < p ? wi : p; // Cannot have a task running with more cores than platform offers, even if width is higher
 		double pseudo_seq_time = task.runtime(1, 1) / task.getEfficiency(wi); // Assume tasks run sequentially, but pay the parallelization penatly; actual parallelization comes later
 		double parallel_time = task.runtime(wi, 1); // Assume tasks run sequentially, but pay the parallelization penatly; actual parallelization comes later
 		pseudo_seq += pseudo_seq_time;
