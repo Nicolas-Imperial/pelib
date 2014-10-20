@@ -192,12 +192,15 @@ testcc_list = $(foreach var,$(testcc_package),test_$(call VARIANT_test_$(var))$(
 testcxx_list = $(foreach var,$(testcxx_package),test_$(call VARIANT_test_$(var))$(var))
 test_list = $(testcc_list) $(testcxx_list)
 
+## Disable implicit rules
+.SUFFIXES:
+
 all: submake $(bin_list) $(lib_list)
 
 ## Force rebuild upon Makefile update
 $(cc_object) $(cxx_object) $(embed_object) $(cc_pkgconfig) $(cxx_pkgconfig): Makefile Makefile.in
 
-$(embed_object): $$(embed_src,$$@)
+$(embed_object): $$(call embed_src,$$@)
 	$(LD) -r -b binary -o $@ $(patsubst %.o,%,$@)
 
 $(cc_object): $$(call source,$$@,$$(call projectof,$$@,$$(call typeof,$$@),cc),$$(call typeof,$$@),cc)

@@ -140,18 +140,25 @@ parse_and_convert_graphml()
 	Taskgraph tg_from_algebra(tg_graphml_algebra);
 
 	string efficiency = tg_graphml.getTasks().begin()->getEfficiencyString();
-	tg_from_algebra.setMakespanCalculator("class:fft");
+	tg_from_algebra.setMakespanCalculator("fml:var minF := 0; for(var j := 2; j <= n[]; j += 1) { minF += tau[j - 1] / (2 * p[] * min(F)); }; var maxF := 0; for(var j := 2; j <= n[]; j += 1) { maxF += tau[j - 1] / (2 * p[] * max(F)); }; minF + maxF");
 	set<Task> &tasks = tg_from_algebra.getTasks();
+	set<Task> newtasks;
 	for(set<Task>::iterator i = tasks.begin(); i != tasks.end(); i++)
 	{
 		Task t = *i;
 		t.setEfficiencyString(efficiency);
-		tasks.erase(i);
-		tasks.insert(t);
+		newtasks.insert(t);
 	}
+	tg_from_algebra.setTasks(newtasks);
 	
 	stringstream reference;
 	GraphML().dump(reference, tg_from_algebra);
+
+	if(reference.str().compare(string_taskgraph_graphml) != 0)
+	{
+		cout << "Expected: " << string_taskgraph_graphml << endl;
+		cout << "Obtained: " << reference.str() << endl;
+	}
 	
 	return reference.str().compare(string_taskgraph_graphml) == 0;
 
@@ -185,6 +192,12 @@ parse_and_convert_schedule()
 	
 	stringstream reference;
 	XMLSchedule().dump(reference, schedule);
+
+	if(reference.str().compare(string_schedule_xml) != 0)
+	{
+		cout << "Expected: " << string_schedule_xml << endl;
+		cout << "Obtained: " << reference.str() << endl;
+	}
 	
 	return reference.str().compare(string_schedule_xml) == 0;
 }

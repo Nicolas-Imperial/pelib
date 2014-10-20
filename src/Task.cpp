@@ -1,9 +1,10 @@
-#include <muParser.h>
+#include <iostream>
+#include <sstream>
+
+#include <exprtk.hpp>
 
 #include <Task.hpp>
 #include <ParseException.hpp>
-
-#include <exprtk.hpp>
 
 using namespace std;
 
@@ -143,7 +144,6 @@ namespace pelib
 	{
 		if(getEfficiencyString().substr(0, 4) == "fml:")
 		{
-			using namespace mu;
 			string formula = getEfficiencyString().substr(4);
 
 			print print_cout(cout);

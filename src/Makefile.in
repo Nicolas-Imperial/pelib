@@ -168,7 +168,7 @@ AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInpu
 AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
 Task.cpp Link.cpp Taskgraph.cpp Schedule.cpp Platform.cpp \
 AmplPlatform.cpp \
-MakespanCalculator.cpp MakespanFormula.cpp MakespanSynthetic.cpp MakespanConstant.cpp MakespanFFT.cpp MakespanPreduce.cpp MakespanMergesort.cpp \
+MakespanCalculator.cpp MakespanFormula.cpp MakespanConstant.cpp \
 AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp \
 AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
 StreamNet.cpp XMLSchedule.cpp GraphML.cpp \

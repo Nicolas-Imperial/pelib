@@ -54,7 +54,7 @@ namespace pelib
 				ss << j->second << " ";
 			}
 			
-			Task t(id);
+			Task t((int)id);
 			t.setWorkload(work);
 			t.setMaxWidth(max_wi);
 			t.setEfficiencyString(ss.str());
