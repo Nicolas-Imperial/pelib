@@ -5,6 +5,7 @@
 #include <string>
 #include <boost/regex.hpp>
 #include <iomanip>
+#include <map>
 
 #include <AlgebraData.hpp>
 #include <Record.hpp>

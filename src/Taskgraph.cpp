@@ -46,10 +46,10 @@ namespace pelib
 		{
 			float id = i->first;
 			float work = i->second;
-			float max_wi = Wi->getValues().find(id)->second;
+			float max_wi = Wi->getValues().find((int)id)->second;
 
 			stringstream ss;
-			for(map<int, float>::const_iterator j = e->getValues().find(id)->second.begin(); j != e->getValues().find(id)->second.end(); j++)
+			for(map<int, float>::const_iterator j = e->getValues().find((int)id)->second.begin(); j != e->getValues().find((int)id)->second.end(); j++)
 			{
 				ss << j->second << " ";
 			}

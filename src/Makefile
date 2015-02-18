@@ -89,12 +89,12 @@ define projectof
 $(call longest,$(foreach proj,$(call $2$3_package),$(if $(filter $2$3_$(proj)%,$1),$(proj),)))
 endef
 
-## Gives the type of project the object file $1 is part of
+## Gives the type of project (bin|lib|test) the object file $1 is part of
 define typeof
 $(if $(filter bin%,$1),bin,$(if $(filter lib%,$1),lib,$(if $(filter test%,$1),test,)))
 endef
 
-## Gives the source file of object $1 project $2 of $3 (bin|lib|test) in language $4 (cc_cxx)
+## Gives the source file of object $1 project $2 of $3 (bin|lib|test) in language $4 (cc/cxx)
 define source
 $(call suffixin,$(patsubst %.o,%.$(call ext,$4),$1),$(call src,$2,$3,$4))
 endef
@@ -105,8 +105,8 @@ endef
 ## pkg-config CFLAGS
 ## Global DEBUG/RELEASE CFLAGS
 ## No need of a function here
-GLOBAL_CFLAGS = $(CFLAGS) $(CFLAGS_BASE) $(call pkg-config,$(CC_PKG),cflags,CC_PKG_) $(if $(DEBUG:0=),$(CFLAGS_DEBUG),$(CFLAGS_RELEASE))
-GLOBAL_CXXFLAGS = $(CXXFLAGS) $(CXXFLAGS_BASE) $(call pkg-config,$(CXX_PKG),cflags,CXX_PKG_) $(if $(DEBUG:0=),$(CXXFLAGS_DEBUG),$(CXXFLAGS_RELEASE))
+GLOBAL_CFLAGS=$(CFLAGS_BASE) $(call pkg-config,$(CC_PKG),cflags,CC_PKG_) $(if $(DEBUG:0=),$(CFLAGS_DEBUG),$(CFLAGS_RELEASE)) $(CFLAGS)
+GLOBAL_CXXFLAGS=$(CXXFLAGS_BASE) $(call pkg-config,$(CXX_PKG),cflags,CXX_PKG_) $(if $(DEBUG:0=),$(CXXFLAGS_DEBUG),$(CXXFLAGS_RELEASE)) $(CXXFLAGS)
 
 ## Gives cflags for project $1 of type $2 (bin|lib|test) in language $3 (cc|cxx)
 ## Project cflags
@@ -120,8 +120,8 @@ define cxxflags_project
 $(call $2$3_$1_cxxflags) $(call pkg-config,$(call $2$3_$1_pkg),cflags,$2$3_$1_pkg_)
 endef
 
-GLOBAL_CC_LDFLAGS=$(LDFLAGS) $(CC_LDFLAGS) $(call pkg-config,$(CC_PKG),libs-only-L,CC_PKG_)
-GLOBAL_CXX_LDFLAGS=$(LDFLAGS) $(CXX_LDFLAGS) $(call pkg-config,$(CXX_PKG),libs-only-L,CXX_PKG_)
+GLOBAL_CC_LDFLAGS=$(LDFLAGS) $(CC_LDFLAGS) $(call pkg-config,$(CC_PKG),libs-only-L,CC_PKG_) $(LDFLAGS)
+GLOBAL_CXX_LDFLAGS=$(LDFLAGS) $(CXX_LDFLAGS) $(call pkg-config,$(CXX_PKG),libs-only-L,CXX_PKG_) $(LDFLAGS)
 
 define ldflags_project
 $(call $2$3_$1_ldflags) $(call pkg-config,$(call $2$3_$1_pkg),libs-only-L,$2$3_$1_pkg_)
@@ -142,10 +142,10 @@ endef
 ## Gives all library switches brought by the makefile and its options
 ## Global pkg-config packages
 ## Global manual LIBS variable
-GLOBAL_CC_LIBS=$(LIBS) $(CC_LIBS)
-GLOBAL_CXX_LIBS=$(LIBS) $(CXX_LIBS)
-GLOBAL_CC_TEST_LIBS=$(LIBS) $(CC_TEST_LIBS)
-GLOBAL_CXX_TEST_LIBS=$(LIBS) $(CXX_TEST_LIBS)
+GLOBAL_CC_LIBS=$(CC_LIBS) $(LIBS)
+GLOBAL_CXX_LIBS=$(CXX_LIBS) $(LIBS)
+GLOBAL_CC_TEST_LIBS=$(CC_TEST_LIBS) $(LIBS)
+GLOBAL_CXX_TEST_LIBS=$(CXX_TEST_LIBS) $(LIBS)
 GLOBAL_CC_PKG=$(call pkg-config,$(CC_PKG),libs-only-l,CC_PKG_)
 GLOBAL_CXX_PKG=$(call pkg-config,$(CXX_PKG),libs-only-l,CXX_PKG_)
 GLOBAL_CC_TEST_PKG=$(call pkg-config,$(CC_PKG_TEST),libs-only-l,CC_TEST_PKG_)
@@ -204,8 +204,8 @@ $(embed_object): $$(call embed_src,$$@)
 	$(LD) -r -b binary -o $@ $(patsubst %.o,%,$@)
 
 $(cc_object): $$(call source,$$@,$$(call projectof,$$@,$$(call typeof,$$@),cc),$$(call typeof,$$@),cc)
-	$(CC) -c $(GLOBAL_CFLAGS) $(call cflags_project,$(call projectof,$@,$(call typeof,$@),cc),$(call typeof,$@),cc) $(call cflags_file,$@,$(call typeof,$@)) $(CPPFLAGS) -o $@ $<
-	$(CC) -M $(GLOBAL_CFLAGS) $(call cflags_project,$(call projectof,$@,$(call typeof,$@),cc),$(call typeof,$@),cc) $(call cflags_file,$@,$(call typeof,$@)) $(CPPFLAGS) $< -MF $(patsubst %.o,%.d,$@)
+	$(CC) -c $(call cflags_project,$(call projectof,$@,$(call typeof,$@),cc),$(call typeof,$@),cc) $(call cflags_file,$@,$(call typeof,$@)) $(GLOBAL_CFLAGS) $(CPPFLAGS) -o $@ $<
+	$(CC) -M $(call cflags_project,$(call projectof,$@,$(call typeof,$@),cc),$(call typeof,$@),cc) $(call cflags_file,$@,$(call typeof,$@)) $(GLOBAL_CFLAGS) $(CPPFLAGS) $< -MF $(patsubst %.o,%.d,$@)
 	@# Generate dependencies to header files
 	@# More tricks to manage header renaming stored in different folders (http://scottmcpeak.com/autodepend/autodepend.html)
 	@mv -f $(patsubst %.o,%.d,$@) $(patsubst %o,%d,$@).tmp
@@ -214,8 +214,8 @@ $(cc_object): $$(call source,$$@,$$(call projectof,$$@,$$(call typeof,$$@),cc),$
 	@rm -f $(patsubst %.o,%.d,$@).tmp
 
 $(cxx_object): $$(call source,$$@,$$(call projectof,$$@,$$(call typeof,$$@),cxx),$$(call typeof,$$@),cxx)
-	$(CXX) -c $(GLOBAL_CXXFLAGS) $(call cxxflags_project,$(call projectof,$@,$(call typeof,$@),cxx),$(call typeof,$@),cxx) $(call cxxflags_file,$@,$(call typeof,$@)) $(CPPFLAGS) -o $@ $<
-	$(CXX) -M $(GLOBAL_CXXFLAGS) $(call cxxflags_project,$(call projectof,$@,$(call typeof,$@),cxx),$(call typeof,$@),cxx) $(call cxxflags_file,$@,$(call typeof,$@)) $(CPPFLAGS) $< -MF $(patsubst %.o,%.d,$@)
+	$(CXX) -c $(call cxxflags_project,$(call projectof,$@,$(call typeof,$@),cxx),$(call typeof,$@),cxx) $(call cxxflags_file,$@,$(call typeof,$@)) $(GLOBAL_CXXFLAGS) $(CPPFLAGS) -o $@ $<
+	$(CXX) -M $(call cxxflags_project,$(call projectof,$@,$(call typeof,$@),cxx),$(call typeof,$@),cxx) $(call cxxflags_file,$@,$(call typeof,$@)) $(GLOBAL_CXXFLAGS) $(CPPFLAGS) $< -MF $(patsubst %.o,%.d,$@)
 	@# Generate dependencies to header files
 	@# More tricks to manage header renaming stored in different folders (http://scottmcpeak.com/autodepend/autodepend.html)
 	@mv -f $(patsubst %.o,%.d,$@) $(patsubst %o,%d,$@).tmp
@@ -224,10 +224,10 @@ $(cxx_object): $$(call source,$$@,$$(call projectof,$$@,$$(call typeof,$$@),cxx)
 	@rm -f $(patsubst %.o,%.d,$@).tmp
 
 $(bincc_list): $$(call object,$$(call suffixin,$$@,$$(bincc_package)),bin,cc) $$(call $$(patsubst %,bincc_%_deps,$$(call suffixin,$$@,$$(bincc_package)))) $$(call embed,$$(call suffixin,$$@,$$(bincc_package)),bin,cc)
-	$(CC) -o $@ $(GLOBAL_CC_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(bincc_package),bin,cc),bin,cc) $(call object,$(call suffixin,$@,$(bincc_package)),bin,cc) $(call embed,$(call suffixin,$@,$(bincc_package)),bin,cc) $(GLOBAL_CC_LIBS) $(call libs_project,$@,bin,cc) $(GLOBAL_CC_PKG) $(call pkg_project,$@,bin,cc)
+	$(CC) -o $@ $(GLOBAL_CC_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(bincc_package),bin,cc),bin,cc) $(call object,$(call suffixin,$@,$(bincc_package)),bin,cc) $(call embed,$(call suffixin,$@,$(bincc_package)),bin,cc) $(call libs_project,$@,bin,cc) $(GLOBAL_CC_PKG) $(call pkg_project,$@,bin,cc) $(GLOBAL_CC_PKG) $(GLOBAL_CC_LIBS)
 
 $(bincxx_list): $$(call object,$$(call suffixin,$$@,$$(bincxx_package)),bin,cxx) $$(call $$(patsubst %,bincxx_%_deps,$$(call suffixin,$$@,$$(bincxx_package)))) $$(call embed,$$(call suffixin,$$@,$$(bincxx_package)),bin,cxx)
-	$(CXX) -o $@ $(GLOBAL_CXX_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(bincxx_package),bin,cxx),bin,cxx) $(call object,$(call suffixin,$@,$(bincxx_package)),bin,cxx) $(call embed,$(call suffixin,$@,$(bincxx_package)),bin,cxx) $(GLOBAL_CXX_LIBS) $(call libs_project,$@,bin,cxx) $(GLOBAL_CXX_PKG) $(call pkg_project,$@,bin,cxx)
+	$(CXX) -o $@ $(GLOBAL_CXX_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(bincxx_package),bin,cxx),bin,cxx) $(call object,$(call suffixin,$@,$(bincxx_package)),bin,cxx) $(call embed,$(call suffixin,$@,$(bincxx_package)),bin,cxx) $(call libs_project,$@,bin,cxx) $(call pkg_project,$@,bin,cxx) $(GLOBAL_CXX_PKG) $(GLOBAL_CXX_LIBS)
 
 bin_package: $(bin_list)
 
@@ -240,10 +240,10 @@ $(libcxx_list): $$(call object,$$(patsubst lib%.a,%,$$@),lib,cxx) $$(call embed,
 lib_target: $(lib_list)
 
 $(testcc_list): $$(call object,$$(patsubst test_%,%,$$@),test,cc) $$(call $$(patsubst %,testcc_%_deps,$$(call suffixin,$$(patsubst lib%.a,%,$$@),$$(testcc_package)))) $$(call embed,$$(call suffixin,$$@,$$(testcc_package)),test,cc)
-	$(CC) -o $@ $(GLOBAL_CC_TEST_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(testcc_package),test,cc),test,cc) $(call object,$(call suffixin,$@,$(testcc_package)),test,cc) $(call embed,$(call suffixin,$@,$(testcc_package)),test,cc) $(GLOBAL_CC_LIBS) $(call libs_project,$(call suffixin,$@,$(testcc_package)),test,cc) $(GLOBAL_CC_TEST_PKG) $(call pkg_project,$(call suffixin,$@,$(testcc_package)),test,cc)
+	$(CC) -o $@ $(GLOBAL_CC_TEST_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(testcc_package),test,cc),test,cc) $(call object,$(call suffixin,$@,$(testcc_package)),test,cc) $(call embed,$(call suffixin,$@,$(testcc_package)),test,cc) $(call libs_project,$(call suffixin,$@,$(testcc_package)),test,cc) $(call pkg_project,$(call suffixin,$@,$(testcc_package)),test,cc) $(GLOBAL_CC_TEST_PKG) $(GLOBAL_CC_LIBS)
 
 $(testcxx_list): $$(call object,$$(patsubst test_%,%,$$@),test,cxx) $$(call $$(patsubst %,testcxx_%_deps,$$(call suffixin,$$(patsubst lib%.a,%,$$@),$$(testcxx_package)))) $$(call embed,$$(call suffixin,$$@,$$(testcxx_package)),test,cxx)
-	$(CXX) -o $@ $(GLOBAL_CXX_TEST_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(testcxx_package),test,cxx),test,cxx) $(call object,$(call suffixin,$@,$(testcxx_package)),test,cxx) $(call embed,$(call suffixin,$@,$(testcxx_package)),test,cxx) $(GLOBAL_CXX_LIBS) $(call libs_project,$(call suffixin,$@,$(testcxx_package)),test,cxx) $(GLOBAL_CXX_TEST_PKG) $(call pkg_project,$(call suffixin,$@,$(testcxx_package)),test,cxx)
+	$(CXX) -o $@ $(GLOBAL_CXX_TEST_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(testcxx_package),test,cxx),test,cxx) $(call object,$(call suffixin,$@,$(testcxx_package)),test,cxx) $(call embed,$(call suffixin,$@,$(testcxx_package)),test,cxx) $(call libs_project,$(call suffixin,$@,$(testcxx_package)),test,cxx) $(call pkg_project,$(call suffixin,$@,$(testcxx_package)),test,cxx) $(GLOBAL_CXX_PKG) $(GLOBAL_CXX_LIBS)
 
 test_target: $(test_list)
 

@@ -88,7 +88,7 @@ namespace pelib
 						{
 							// OK so it doesn't parse a fixed-point notation
 							// Then I suppose it was a scientific notation; let's see if it indeed denotes a decimal digit
-							long long int int_test = floor(out);
+							long long int int_test = (long long int)floor(out);
 							//std::istringstream converter(element);
 							//converter >> int_test;
 

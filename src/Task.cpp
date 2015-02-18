@@ -27,7 +27,7 @@ struct print : public exprtk::ifunction<double>
 
 namespace pelib
 {
-	Task::Task(int id, std::string taskId)
+	Task::Task(const int id, const std::string taskId)
 	{
 		if(id <= 0)
 		{
@@ -45,7 +45,7 @@ namespace pelib
 		this->start_time = 0;
 	}
 
-	Task::Task(int id)
+	Task::Task(const int id)
 	{
 		if(id <= 0)
 		{
@@ -229,7 +229,7 @@ namespace pelib
 		return getId() < other.getId();
 	}
     
-    bool
+	bool
 	Task::operator==(const Task &other) const
 	{
 		return getId() == other.getId();
@@ -263,7 +263,7 @@ namespace pelib
 	Task::runtime(double width, double frequency) const
 	{
 		double work = getWorkload();
-		work = work / (width * getEfficiency(width));
+		work = work / (width * getEfficiency((int)width));
 		work = work / frequency;
 		
 		return work; 

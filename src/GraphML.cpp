@@ -3,9 +3,10 @@
 #include <vector>
 #include <sstream>
 #include <cstdlib>
-#include <thread>
 #include <boost/algorithm/string.hpp>
 
+#include <signal.h>
+#include <pthread.h>
 extern "C"{
 #include <igraph.h>
 }
@@ -22,11 +23,58 @@ extern "C"{
 #include <CastException.hpp>
 #include <ParseException.hpp>
 
-#include <signal.h>
-
 using namespace pelib;
 using namespace std;
 using namespace xmlpp;
+
+struct reader_args
+{
+	FILE *instream;
+	ostream *o;
+};
+typedef struct reader_args reader_args_t;
+
+static void*
+thread_reader(void* aux)
+{
+	reader_args_t *args = (reader_args_t*)aux;
+	
+	char c;
+	while ((c = fgetc (args->instream)) != EOF)
+	{
+		(*args->o) << c;
+	}
+
+	return NULL;
+}
+
+struct writer_args
+{
+	int file_descr;
+	istream *i;
+};
+typedef struct writer_args writer_args_t;
+
+static void*
+thread_writer(void* aux)
+{
+	writer_args_t *args = (writer_args_t*)aux;
+
+	char c = args->i->get();
+	while(!args->i->eof())
+	{
+		size_t ans = write(args->file_descr, &c, 1);
+		
+		if(ans < 0)
+		{
+			throw runtime_error("Error: Pipe has been possessed X-(");
+		}
+		
+		c = args->i->get();
+	}
+	
+	return NULL;
+}
 
 void
 GraphML::dump(ostream& os, const StreamingAppData *data, const Platform *arch) const
@@ -96,7 +144,7 @@ GraphML::dump(ostream& os, const StreamingAppData *data, const Platform *arch) c
 
 	// Dump data to stream os
 	int p[2];
-	auto ans = pipe(p);
+	int ans = pipe(p);
 	if(ans)
 	{
 		throw runtime_error("Error: no pipe :/");
@@ -107,19 +155,20 @@ GraphML::dump(ostream& os, const StreamingAppData *data, const Platform *arch) c
 
 	// Spawn a thread that reads from the pipe as fast as it can.
 	// This is required if igraph indend to output massive amounts of data
-	auto t = std::thread([](FILE* instream, ostream* o){
-		char c;
-		while ((c = fgetc (instream)) != EOF)
-		{
-			(*o) << c;
-		}
-		fclose (instream);
-	}, instream,&os);
+	pthread_attr_t attr;
+	pthread_t thread;
+	reader_args_t args;
+	args.instream = instream;
+	args.o = &os;
 
-	igraph_write_graph_graphml(graph,fake_fileptr,true); 
+	pthread_attr_init(&attr);
+	pthread_create(&thread, &attr, &thread_reader, (void*) &args);
+
+	igraph_write_graph_graphml(graph, fake_fileptr, true); 
 	fclose(fake_fileptr);
 
-	t.join();
+	pthread_join(thread, NULL);
+	fclose (instream);
 	close(p[0]);
 	close(p[1]);
 
@@ -157,7 +206,7 @@ GraphML::parse(istream &is) const
 
 	// Create a FILE* from istream by building a posix pipe. This wont work in windows...
 	int p[2];
-	auto ans = pipe(p);
+	int ans = pipe(p);
 	if(ans)
 	{
 		throw runtime_error("Error: no pipe :/");
@@ -165,30 +214,22 @@ GraphML::parse(istream &is) const
 
 	FILE *fake_fileptr = fdopen(p[0], "r");   
 
-	auto t = std::thread([](int file_descr, istream* data)
-	{
-		char c = data->get();
-		while(!data->eof())
-		{
-			auto ans = write(file_descr, &c, 1);
-			
-			if(ans < 0)
-			{
-				throw runtime_error("Error: Pipe has been possessed X-(");
-			}
-			
-			c = data->get();
-		}
-		
-		close(file_descr);
-	}, p[1], &is);
+	pthread_attr_t attr;
+	pthread_t thread;
+	writer_args_t args;
+	args.file_descr = p[1];
+	args.i = &is;
+
+	pthread_attr_init(&attr);
+	pthread_create(&thread, &attr, &thread_writer, (void*) &args);
 
 	// Parse input file
 	igraph_read_graph_graphml(the_graph,fake_fileptr,0);
 
 	// Clone the file and wait for the pipe to finish
 	close(p[0]);
-	t.join();
+	pthread_join(thread, NULL);
+	close(p[1]);
 
 	set<Task> tasks;
 	for(int id = 0; id < igraph_vcount(the_graph); id++)
