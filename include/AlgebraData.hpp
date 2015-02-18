@@ -10,7 +10,6 @@ namespace pelib
 	class AlgebraData : public Data
 	{
 		public:
-			Data(const std::string);
 			AlgebraData(const std::string);
 			AlgebraData(const AlgebraData&);
 

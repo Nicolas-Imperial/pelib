@@ -177,7 +177,7 @@ Cpp.cpp CppData.cpp CppScalar.cpp CppVector.cpp CppSet.cpp CppMatrix.cpp \
 RecordParser.cpp
 
 libcxx_cppelib_export = $(libcxx_cppelib_embed) $(libcxx_cppelib_src)
-libcxx_cppelib_libs = -lboost_regex -lboost_graph -lexpat
+libcxx_cppelib_libs = -lboost_regex -lboost_graph -lexpat -lpthread
 libcxx_cppelib_ldflags = 
 libcxx_cppelib_deps =
 libcxx_cppelib_pkg = igraph libxml++-2.6
