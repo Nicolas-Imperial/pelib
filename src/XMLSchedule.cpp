@@ -3,6 +3,7 @@
 #include <vector>
 #include <sstream>
 #include <cstdlib>
+#include <string>
 
 extern "C"{
 #include <igraph.h>
@@ -104,11 +105,11 @@ XMLSchedule::parse(istream &is, Taskgraph &tg) const
 	// in the schedule.
 
 	Element *root = theSchedule->get_document()->get_root_node();
-	Node::NodeList processors = root->get_children();
+	xmlpp::Node::NodeList processors = root->get_children();
 
 	try
 	{
-		float M = stof(root->get_attribute_value("roundtime"));
+		float M = atof(root->get_attribute_value("roundtime").c_str());
 		std::string name = root->get_attribute_value("name");
 		std::string aut_name = root->get_attribute_value("autname");
 
@@ -116,34 +117,34 @@ XMLSchedule::parse(istream &is, Taskgraph &tg) const
 		sched->setRoundTime(M);
 		std::map<int, std::map<float, Task> > schedule;
 	
-		for(Node::NodeList::iterator iter = processors.begin(); iter != processors.end(); ++iter) //for each core
+		for(xmlpp::Node::NodeList::iterator iter = processors.begin(); iter != processors.end(); ++iter) //for each core
 		{
 			if((*iter)->get_name().compare("core")) //skip indentation characters et cetera
 			{
 				continue;
 			}
 
-			int core_id = stoi(dynamic_cast<Element*>(*iter)->get_attribute_value("coreid"));
+			int core_id = atoi(dynamic_cast<xmlpp::Element*>(*iter)->get_attribute_value("coreid").c_str());
 			std::map<float, Task> core_schedule_map;
 
-			auto tasks = (*iter)->get_children();
-			for(auto taskiter = tasks.begin(); taskiter != tasks.end(); ++taskiter)
+			std::list<xmlpp::Node*> tasks = (*iter)->get_children();
+			for(std::list<xmlpp::Node*>::iterator taskiter = tasks.begin(); taskiter != tasks.end(); ++taskiter)
 			{
 				if((*taskiter)->get_name().compare("task")) //skip indentation characters et cetera
 				{
 					continue;
 				}
 
-				auto *igraph_task = dynamic_cast<Element*>(*taskiter);
+				Element *igraph_task = dynamic_cast<Element*>(*taskiter);
 
 				Task tg_task = tg.findTask(igraph_task->get_attribute_value("taskid"));
 				//cout << "Counter = " << task_id << ", tg_task.getId() = " << tg_task.getId() << ", tg_task.getTaskId() = \"" << tg_task.getTaskId() << "." << endl; 
 
 				Task task(tg_task.getId(), tg_task.getTaskId());
-				task.setFrequency(stof(igraph_task->get_attribute_value("frequency")));
-				task.setWidth(stof(igraph_task->get_attribute_value("width")));
-				task.setWorkload(stof(igraph_task->get_attribute_value("workload")));
-				task.setStartTime(stof(igraph_task->get_attribute_value("starting_time")));
+				task.setFrequency(atof(igraph_task->get_attribute_value("frequency").c_str()));
+				task.setWidth(atof(igraph_task->get_attribute_value("width").c_str()));
+				task.setWorkload(atof(igraph_task->get_attribute_value("workload").c_str()));
+				task.setStartTime(atof(igraph_task->get_attribute_value("starting_time").c_str()));
 				core_schedule_map.insert(std::pair<float, Task>(task.getStartTime(), task)); 
 			}
 

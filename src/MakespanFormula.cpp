@@ -22,7 +22,7 @@ struct e : public exprtk::ifunction<double>
 		inline double operator()(const double &id, const double &p) 
 		{   
 			Task key((int)id, "key");
-			return tasks.find(key)->getEfficiency(p);
+			return tasks.find(key)->getEfficiency((int)p);
 		}   
 
 	private:

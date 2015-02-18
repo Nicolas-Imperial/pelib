@@ -4112,9 +4112,12 @@ namespace exprtk
             return value_;
          }
 
-      private:
 
-         string_literal_node(const string_literal_node<T>&);
+         string_literal_node(const string_literal_node<T>& value)
+	 {
+            this->value_ = value.str();
+	 }
+      private:
          string_literal_node<T>& operator=(const string_literal_node<T>&);
 
          const std::string value_;
@@ -17533,7 +17536,10 @@ namespace exprtk
 
          inline expression_node_ptr operator()(const std::string& s) const
          {
-            return node_allocator_->allocate<string_literal_node_t>(s);
+            return new string_literal_node_t(s);
+            //return node_allocator_->allocate<string_literal_node_t>((const string_literal_node_t)s);
+            //Sequence<std::string> seq(s);
+            //return node_allocator_->allocate<string_literal_node_t>(seq);
          }
 
          inline expression_node_ptr operator()(std::string& s, range_pack& rp) const

@@ -71,7 +71,8 @@ namespace pelib
 						value = AlgebraDataParser::convert<Value>(*iter, strict);
 					} catch(NoDecimalFloatException &e)
 					{
-						value = e.getValue();
+						float float_value = e.getValue();
+						value = (Value) float_value;
 						integer_values++;
 					}
 

@@ -53,7 +53,7 @@ namespace pelib
 				{
 					if(floor(j->second) > 0)
 					{
-						Task task(j->second, tg.findTask((int)floor(j->second)).getTaskId());
+						Task task((int)j->second, tg.findTask((int)floor(j->second)).getTaskId());
 						task.setWorkload(tau->getValues().find((int)floor(j->second))->second);
 						if(task.getWorkload() > 0)
 						{

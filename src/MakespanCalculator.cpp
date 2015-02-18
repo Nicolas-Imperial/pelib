@@ -1,10 +1,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <MakespanCalculator.hpp>
-#include <MakespanSynthetic.hpp>
-#include <MakespanFFT.hpp>
-#include <MakespanPreduce.hpp>
-#include <MakespanMergesort.hpp>
 #include <MakespanConstant.hpp>
 #include <MakespanFormula.hpp>
 #include <ParseException.hpp>

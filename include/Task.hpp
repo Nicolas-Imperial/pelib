@@ -8,8 +8,8 @@ namespace pelib
 	class Task
 	{
 		public:
-			Task(int id, std::string taskId);
-			Task(int id);
+			Task(const int id, const std::string taskId);
+			Task(const int id);
 			
 			virtual double
 			getFrequency() const;
@@ -78,7 +78,7 @@ namespace pelib
 			int id;
 			std::string taskId, name, efficiencyString;
 			
-			static constexpr float very_small = 1e-6;
+			static const float very_small = 1e-6;
 			
 		private:
 	};

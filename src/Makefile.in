@@ -11,7 +11,7 @@ CC_TEST_DEPS =$(CC_DEPS) libunitc.a
 CC_TEST_LDFLAGS =
 
 ## C++ global parameters
-CXXFLAGS_BASE=-isystem ../include -Wall -std=c++0x
+CXXFLAGS_BASE=-isystem ../include -Wall
 CXXFLAGS_RELEASE = -O3 -DNDEBUG
 CXXFLAGS_DEBUG = -g -O0 -DDEBUG=1
 #CXX_PKG = igraph muparser libxml++-2.6
