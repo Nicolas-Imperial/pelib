@@ -1,7 +1,7 @@
 package = cppelib
 version = 1.0
 
-prefix = /usr/local
+prefix = $(HOME)/.local
 exec_prefix = $(prefix)
 bindir = $(exec_prefix)/bin
 libdir = $(exec_prefix)/lib

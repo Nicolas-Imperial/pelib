@@ -1,31 +1,40 @@
 # http://www.freesoftwaremagazine.com/articles/gnu_coding_standards_applied_to_autotools
 
-include Makefile.in
-tarname = $(package)
-distdir = $(tarname)-$(version)
+## Default target
+DEFAULT=all
 
-## Export variables
-export packages version prefix exec_prefix bindir libdir includedir
+## The default target is the first target in the makefile
+$(DEFAULT):
+
+## Export all variables to sub-makefiles
+export
+
+include Makefile.in
+
+tarname = $(package)
+distdir = $(abspath $(tarname)-$(version))
+
+## Targets asked for running, or default target if none
+TARGETS=$(if $(MAKECMDGOALS),$(MAKECMDGOALS),$(DEFAULT))
 
 # Check make version
 VERSION = $(shell make --version|head -1|cut -f 1-2 -d ' ')
 
-all check install uninstall: version
-	@$(shell echo for i in "$(foreach var,$(subdirs),$(var))"\; do $(MAKE) -C \$$i $@ \|\| exit \$$? \; done)
-	
-$(abspath $(distdir)).tar.gz: FORCE $(abspath $(distdir))
+## Make all targets called dependant on some action to be run beforehand
+$(TARGETS): $(FIRST)
+
+all check install uninstall: version submake
+
+$(abspath $(distdir)).tar.gz: $(abspath $(distdir))
 	tar -ch -C $(abspath $(distdir)) -O .| gzip -9 -c > $(abspath $(distdir)).tar.gz
 	
-$(abspath $(distdir)): FORCE clean-dist
-	@$(shell echo for i in "$(foreach var,$(subdirs),$(var))"\; do $(MAKE) -C \$$i dist distdir=$(abspath $(distdir))/\$$i\; done)
+$(abspath $(distdir)): submake
 	cp Makefile $(abspath $(distdir))
 	cp Makefile.in $(abspath $(distdir))
-	cp Doxyfile $(abspath $(distdir))
 	
-clean: clean-tree clean-dist
+clean: submake clean-tree clean-dist
 
 clean-tree:
-	@$(shell echo for i in "$(foreach var,$(subdirs),$(var))"\; do $(MAKE) -C \$$i clean\; done)
 	
 clean-dist:
 	$(RM) -r $(abspath $(distdir))
@@ -43,8 +52,11 @@ checkdist: $(abspath $(distdir)).tar.gz
 
 version:
 	$(if $(findstring GNU Make,echo $(VERSION)),,@echo This Makefile requires GNU make)
-	$(if $(findstring GNU Make,echo $(VERSION)),,@/bin/false) 
+	$(if $(findstring GNU Make,echo $(VERSION)),,@/bin/false)
+
+submake:
+	@$(shell echo for i in "$(foreach var,$(subdirs),$(var))"\; do $(MAKE) -C \$$i $(MAKECMDGOALS) distdir=$(distdir)/\$$i\; done)
 
 FORCE:
 .PHONY: FORCE all version clean dist distcheck copy clean-dist clean-tree
-.PHONY: install uninstall
+.PHONY: install uninstall submake
