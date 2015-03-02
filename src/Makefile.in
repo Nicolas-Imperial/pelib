@@ -30,15 +30,15 @@ CXX_TEST_DEPS = $(CXX_DEPS) libunitc++.a
 CXX_TEST_LDFLAGS =
 
 ## static library packages and their sources
-bincxx_package = demo streamingapp_demo demo_xmlformats graphmltoampli amplitographml duplicate_tasks graphmlfmltographmleval amplitoampli amplitoamplo amplotoampli amplotoamplo amplitocpp amplotocpp run_record amplotoschedule amplmatrixtoraw streamittographml kerlaug
+bincxx_package = demo streamingapp_demo demo_xmlformats graphmltoampli amplitographml duplicate_tasks graphmlfmltographmleval amplitoampli amplitoamplo amplotoampli amplotoamplo amplitocpp amplotocpp run_record amplotoschedule amplmatrixtoraw streamittographml snekkja 
 
-bincxx_kerlaug_src = kerlaug.cpp
-bincxx_kerlaug_export = $(bincxx_kerlaug_embed) $(bincxx_kerlaug_src) 
-bincxx_kerlaug_deps = libcppelib.a
-bincxx_kerlaug_libs = -lcppelib $(libcxx_cppelib_libs)
-bincxx_kerlaug_pkg = $(libcxx_cppelib_pkg)
-bincxx_kerlaug_ldflags = -L.
-bincxx_kerlaug_static = 1
+bincxx_snekkja_src = snekkja.cpp
+bincxx_snekkja_export = $(bincxx_snekkja_embed) $(bincxx_snekkja_src) 
+bincxx_snekkja_deps = libcppelib.a
+bincxx_snekkja_libs = -lcppelib $(libcxx_cppelib_libs)
+bincxx_snekkja_pkg = $(libcxx_cppelib_pkg)
+bincxx_snekkja_ldflags = -L.
+bincxx_snekkja_static = 1
 
 bincxx_demo_src = demo.cpp
 bincxx_demo_export = $(bincxx_demo_embed) $(bincxx_demo_src) 

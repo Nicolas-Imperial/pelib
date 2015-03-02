@@ -45,6 +45,7 @@ thread_reader(void* aux)
 		(*args->o) << c;
 	}
 
+	fclose(args->instream);
 	return NULL;
 }
 
@@ -73,6 +74,7 @@ thread_writer(void* aux)
 		c = args->i->get();
 	}
 	
+	close(args->file_descr);
 	return NULL;
 }
 
@@ -170,7 +172,6 @@ GraphML::dump(ostream& os, const StreamingAppData *data, const Platform *arch) c
 	pthread_join(thread, NULL);
 	fclose (instream);
 	close(p[0]);
-	close(p[1]);
 
 	igraph_destroy(graph);
 	delete graph;
@@ -223,13 +224,15 @@ GraphML::parse(istream &is) const
 	pthread_attr_init(&attr);
 	pthread_create(&thread, &attr, &thread_writer, (void*) &args);
 
+//	char ch;
+//	while( ( ch = fgetc(fake_fileptr) ) != EOF )
+//      		printf("%c",ch);
 	// Parse input file
 	igraph_read_graph_graphml(the_graph,fake_fileptr,0);
 
 	// Clone the file and wait for the pipe to finish
 	close(p[0]);
 	pthread_join(thread, NULL);
-	close(p[1]);
 
 	set<Task> tasks;
 	for(int id = 0; id < igraph_vcount(the_graph); id++)
