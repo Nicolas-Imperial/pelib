@@ -100,7 +100,7 @@ read_args(char **argv)
 				}
 				else
 				{
-					cerr << "[WARN ] Invalid value \"" << argv << "\"for option \"" << opt << "\". Ignoring \"" << opt << "\" directive." << endl;
+					cerr << "[WARN ] Invalid value \"" << argv << "\" for option \"" << opt << "\". Ignoring \"" << opt << "\" directive." << endl;
 					argv--;
 				}
 			}
