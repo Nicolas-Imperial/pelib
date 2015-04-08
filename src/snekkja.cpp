@@ -44,7 +44,7 @@ read_args(char **argv)
 	{
 //		cerr << "[DEBUG] argv = \"" << *argv << "\"." << endl;
 //		cerr << "[DEBUG] strcmp(*argv, \"--tasks\") == \"" << strcmp(*argv, "--tasks") << "\"." << endl;
-		if(!strcmp(*argv, "--read") || !strcmp(*argv, "-r"))
+		if(!strcmp(*argv, "--get") || !strcmp(*argv, "-g"))
 		{
 			char *opt = *argv;
 			argv++;
@@ -78,6 +78,10 @@ read_args(char **argv)
 					argv--;
 				}
 			}
+			else if(!strcmp(*argv, "schedule"))
+			{
+				set_action(SCHEDULE);
+			}
 			else
 			{
 				cerr << "[WARN ] Invalid field for read action: \"" << argv << "\". Ignoring \"" << opt << "\" directive." << endl;
@@ -104,6 +108,10 @@ read_args(char **argv)
 					argv--;
 				}
 			}
+		}
+		else if(!strcmp(*argv, "--scheduler") || !strcmp(*argv, "-s"))
+		{
+			
 		}
 
 		argv++;
@@ -152,6 +160,8 @@ int main(int argc, char **argv)
 			cout << tg->findTask(task).getName() << endl;
 			
 			// This is tougher
+		break;
+		case SCHEDULE:
 		break;
 		case NONE:
 			cerr << "[ERROR] No valid action requested. Aborting." << endl;

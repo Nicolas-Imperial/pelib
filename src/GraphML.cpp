@@ -100,7 +100,7 @@ GraphML::dump(ostream& os, const StreamingAppData *data, const Platform *arch) c
   	igraph_create(graph, &edges, 0, true);
 
 	// Add graph attributes
-	SETGAS(graph,"autname", tg->getAUTName().c_str());
+	SETGAS(graph,"name", tg->getName().c_str());
 	SETGAS(graph,"target_makespan", tg->getMakespanCalculator().c_str());
 
 	// Add vertices
@@ -286,7 +286,7 @@ GraphML::parse(istream &is) const
 
 	tg->setTasks(tasks);
 
-	tg->setAUTName(GAS(the_graph, "autname"));
+	tg->setName(GAS(the_graph, "name"));
 	tg->setMakespanCalculator(GAS(the_graph, "target_makespan"));
 
 	// Cleanup

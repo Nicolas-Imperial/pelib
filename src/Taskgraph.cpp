@@ -17,14 +17,14 @@ namespace pelib
 
 	Taskgraph::Taskgraph(const Taskgraph *graph)
 	{
-		this->autName = graph->getAUTName();
+		this->name = graph->getName();
 		this->makespanCalculator = graph->getMakespanCalculator();
 		this->tasks = graph->getTasks();
 	}
 
 	Taskgraph::Taskgraph(const Algebra &algebra)
 	{
-		this->autName = "Generated_from_algebra";
+		this->Name = "Generated_from_algebra";
 		const Scalar<float> *M = algebra.find<Scalar<float> >("M");
 		const Scalar<float> *n = algebra.find<Scalar<float> >("n");
 		const Vector<int, float> *tau = algebra.find<Vector<int, float> >("Tau");
@@ -124,15 +124,15 @@ namespace pelib
 	}
 
 	string
-	Taskgraph::getAUTName() const
+	Taskgraph::getName() const
 	{
-		return this->autName;
+		return this->name;
 	}
 
 	void
-	Taskgraph::setAUTName(const string autName)
+	Taskgraph::setName(const string name)
 	{
-		this->autName = autName;
+		this->name = name;
 	}
 
 	string

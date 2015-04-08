@@ -9,7 +9,7 @@ Task.hpp Link.hpp Taskgraph.hpp Schedule.hpp Platform.hpp \
 MakespanConstant.hpp MakespanFormula.hpp MakespanCalculator.hpp \
 AmplDataParser.hpp AmplDataOutput.hpp GraphML.hpp \
 AmplInput.hpp AmplInputData.hpp AmplInputScalar.hpp AmplInputVector.hpp AmplInputSet.hpp AmplInputMatrix.hpp \
-AmplOutput.hpp AmplOutputData.hpp AmplOutputScalar.hpp AmplOutputVector.hpp AmplOutputSet.hpp AmplOutputMatrix.hpp XMLSchedule.hpp \
+AmplOutput.hpp AmplOutputData.hpp AmplOutputScalar.hpp AmplOutputVector.hpp AmplOutputSet.hpp AmplOutputMatrix.hpp XMLSchedule.hpp SnekkjaCSchedule.hpp \
 CppDataOutput.hpp \
 Cpp.hpp CppData.hpp CppScalar.hpp CppVector.hpp CppSet.hpp CppMatrix.hpp \
 RecordParser.hpp constraints.hpp RecordOutput.hpp AlgebraDataParser.hpp AlgebraDataOutput.hpp AmplInputDataParser.hpp \
@@ -18,6 +18,7 @@ GraphMLParser.hpp GraphMLOutput.hpp TaskgraphParser.hpp TaskgraphOutput.hpp Stre
 AmplPlatform.hpp AmplPlatformParser.hpp AmplPlatformOutput.hpp PlatformParser.hpp PlatformOutput.hpp \
 StreamNet.hpp StreamingAppParser.hpp StreamingAppOutput.hpp ScheduleParser.hpp ScheduleOutput.hpp \
 XMLScheduleParser.hpp XMLScheduleOutput.hpp \
+SnekkjaCScheduleOutput.hpp \
 exprtk.hpp
 
 ## Further directories to follow

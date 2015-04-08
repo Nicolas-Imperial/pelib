@@ -286,7 +286,7 @@ test_target: $(test_list)
 $(cc_pkgconfig): Makefile Makefile.in
 	@echo prefix=$(final_prefix) > $@
 	@echo exec_prefix=$(if $(call libcc_$(patsubst %.pc,%,$@)_pkg_exec_prefix),$(call libcc_$(patsubst %.pc,%,$@)_pkg_exec_prefix),'$$'\{prefix\}/bin) >> $@
-	@echo libdir=$(if $(call libcc_$(patsubst %.pc,%,$@)_pkg_libdir),$(call libcc_$(patsubst %.pc,%,$@)_pkg_libdir),'$$'\{exec_prefix\}/lib) >> $@
+	@echo libdir=$(if $(call libcc_$(patsubst %.pc,%,$@)_pkg_libdir),$(call libcc_$(patsubst %.pc,%,$@)_pkg_libdir),'$$'\{prefix\}/lib) >> $@
 	@echo includedir=$(if $(call libcc_$(patsubst %.pc,%,$@)_pkg_includedir),$(call libcc_$(patsubst %.pc,%,$@)_pkg_includedir),'$$'\{prefix\}/include) >> $@
 	@echo >> $@
 	@echo Name: $(if $(call libcc_$(patsubst %.pc,%,$@)_pkg_name),$(call libcc_$(patsubst %.pc,%,$@)_pkg_name),$(patsubst %.pc,lib%,$@)) >> $@
@@ -295,15 +295,15 @@ $(cc_pkgconfig): Makefile Makefile.in
 	@echo URL: $(call libcc_$(patsubst %.pc,%,$@)_pkg_url) >> $@
 	@echo Libs: -L'$$'\{libdir\} -l$(patsubst %.pc,%,$@) $(call libcc_$(patsubst %.pc,%,$@)_pkg_libs) >> $@
 	@echo Libs.private: $(GLOBAL_CC_LDFLAGS) $(call $2$3_$1_ldflags) $(GLOBAL_CC_LIBS) $(call libcc_$(patsubst %.pc,%,$@)_libs) $(call libcc_$(patsubst %.pc,%,$@)_pkg_libs_private) >> $@
-	@echo Require: $(call libcc_$(patsubst %.pc,%,$@)_pkg_require) >> $@
-	@echo Require.private: $(foreach var,$(CC_PKG),"$(var) $(call CC_PKG_$(var)_version)") $(foreach var,$(call libcc_$(patsubst %.pc,%,$@)_pkg),"$(var) $(call libcc_$(patsubst %.pc,%,$@)_pkg_$(var)_version)") $(call libcc_$(patsubst %.pc,%,$@)_pkg_require_private) >> $@
+	@echo Requires: $(call libcc_$(patsubst %.pc,%,$@)_pkg_require) >> $@
+	@echo Requires.private: $(foreach var,$(CC_PKG),"$(var) $(call CC_PKG_$(var)_version)") $(foreach var,$(call libcc_$(patsubst %.pc,%,$@)_pkg),"$(var) $(call libcc_$(patsubst %.pc,%,$@)_pkg_$(var)_version)") $(call libcc_$(patsubst %.pc,%,$@)_pkg_require_private) >> $@
 	@echo Conflicts: $(call libcc_$(patsubst %.pc,%,$@)_pkg_conflicts) >> $@
 	@echo Cflags: $(GLOBAL_CFLAGS_EXPORT) -I'$$'\{includedir\} $(call cflags_project_export,$(patsubst %.pc,%,$@),lib,cc) $(CPPFLAGS) $(call libcc_$(patsubst %.pc,%,$@)_pkg_ccflags) >> $@
 
 $(cxx_pkgconfig): Makefile Makefile.in
 	@echo prefix=$(final_prefix) > $@
 	@echo exec_prefix=$(if $(call libcxx_$(patsubst %.pc,%,$@)_pkg_exec_prefix),$(call libcxx_$(patsubst %.pc,%,$@)_pkg_exec_prefix),'$$'\{prefix\}/bin) >> $@
-	@echo libdir=$(if $(call libcxx_$(patsubst %.pc,%,$@)_pkg_libdir),$(call libcxx_$(patsubst %.pc,%,$@)_pkg_libdir),'$$'\{exec_prefix\}/lib) >> $@
+	@echo libdir=$(if $(call libcxx_$(patsubst %.pc,%,$@)_pkg_libdir),$(call libcxx_$(patsubst %.pc,%,$@)_pkg_libdir),'$$'\{prefix\}/lib) >> $@
 	@echo includedir=$(if $(call libcxx_$(patsubst %.pc,%,$@)_pkg_includedir),$(call libcxx_$(patsubst %.pc,%,$@)_pkg_includedir),'$$'\{prefix\}/include) >> $@
 	@echo >> $@
 	@echo Name: $(if $(call libcxx_$(patsubst %.pc,%,$@)_pkg_name),$(call libcxx_$(patsubst %.pc,%,$@)_pkg_name),$(patsubst %.pc,lib%,$@)) >> $@
@@ -312,8 +312,8 @@ $(cxx_pkgconfig): Makefile Makefile.in
 	@echo URL: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_url) >> $@
 	@echo Libs: -L'$$'\{libdir\} -l$(patsubst %.pc,%,$@) $(call libcxx_$(patsubst %.pc,%,$@)_pkg_libs) >> $@
 	@echo Libs.private: $(GLOBAL_CXX_LDFLAGS) $(call ldflags_project,$(call suffixin,$(patsubst %.pc,%,$@),$(libcxx_package),lib,cxx),lib,cxx) $(GLOBAL_CXX_LIBS) $(call libs_project,$(patsubst %.pc,%,$@),lib,cxx) $(GLOBAL_CXX_PKG) $(call pkg_project,$(patsubst %.pc,%,$@),lib,cxx) $(call libcxx_$(patsubst %.pc,%,$@)_pkg_libs_private) >> $@
-	@echo Require: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_require) >> $@
-	@echo Require.private: $(foreach var,$(CXX_PKG),"$(var) $(call CXX_PKG_$(var)_version)") $(foreach var,$(call libcxx_$(patsubst %.pc,%,$@)_pkg),"$(var) $(call libcxx_$(patsubst %.pc,%,$@)_pkg_$(var)_version)") $(call libcxx_$(patsubst %.pc,%,$@)_pkg_require_private) >> $@
+	@echo Requires: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_require) >> $@
+	@echo Requires.private: $(foreach var,$(CXX_PKG),"$(var) $(call CXX_PKG_$(var)_version)") $(foreach var,$(call libcxx_$(patsubst %.pc,%,$@)_pkg),"$(var) $(call libcxx_$(patsubst %.pc,%,$@)_pkg_$(var)_version)") $(call libcxx_$(patsubst %.pc,%,$@)_pkg_require_private) >> $@
 	@echo Conflicts: $(call libcxx_$(patsubst %.pc,%,$@)_pkg_conflicts) >> $@
 	@echo Cflags: $(GLOBAL_CXXFLAGS_EXPORT) -I'$$'\{includedir\} $(call cxxflags_project_export,$(patsubst %.pc,%,$@),lib,cxx) $(CPPFLAGS) $(call libcxx_$(patsubst %.pc,%,$@)_pkg_cxxflags) >> $@
 

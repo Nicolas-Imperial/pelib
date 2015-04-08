@@ -32,10 +32,10 @@ namespace pelib
 			virtual Algebra buildAlgebra(const Platform &arch) const;
 
 			virtual string
-			getAUTName() const;
+			getName() const;
 
 			virtual void
-			setAUTName(const string autName);
+			setName(const string autName);
 
 			virtual string
 			getMakespanCalculator() const;
@@ -62,7 +62,7 @@ namespace pelib
 			findTask(int id) const;
 				
 		protected:
-			string autName, makespanCalculator;
+			string name, makespanCalculator;
 			set<Task> tasks;
 			
 		private:		

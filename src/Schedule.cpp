@@ -14,18 +14,18 @@ using namespace std;
 
 namespace pelib
 {
-	Schedule::Schedule(const std::string &name, const std::string &autName)
+	Schedule::Schedule(const std::string &name, const std::string &appName)
 	{
 		roundTime = 0;
 		this->name = name;
-		this->autName = autName;
+		this->appName = appName;
 	}
 
 	Schedule::Schedule(const std::string &name, const Taskgraph &tg, const Algebra &data)
 	{
 		roundTime = 0;
 		this->name = name;
-		this->autName = tg.getAUTName();
+		this->appName = tg.getName();
 
 		Algebra algebra = data.merge(tg.buildAlgebra());
 		
@@ -86,7 +86,7 @@ namespace pelib
 	Schedule*
 	Schedule::clone() const
 	{
-		Schedule *clone = new Schedule(getName(), getAUTName());
+		Schedule *clone = new Schedule(getName(), getName());
 		clone->setRoundTime(getRoundTime());
 		clone->setSchedule(getSchedule());
 
@@ -176,15 +176,15 @@ namespace pelib
 	}
 
 	std::string
-	Schedule::getAUTName() const
+	Schedule::getAppName() const
 	{
-		return this->autName;
+		return this->appName;
 	}
 
 	void
-	Schedule::setAUTName(const std::string autName)
+	Schedule::setAppName(const std::string name)
 	{
-		this->autName = autName;
+		this->appName = appName;
 	}
 
 	const std::map<int, std::map<float, Task> >&

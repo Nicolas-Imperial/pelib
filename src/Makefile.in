@@ -30,15 +30,7 @@ CXX_TEST_DEPS = $(CXX_DEPS) libunitc++.a
 CXX_TEST_LDFLAGS =
 
 ## static library packages and their sources
-bincxx_package = demo streamingapp_demo demo_xmlformats graphmltoampli amplitographml duplicate_tasks graphmlfmltographmleval amplitoampli amplitoamplo amplotoampli amplotoamplo amplitocpp amplotocpp run_record amplotoschedule amplmatrixtoraw streamittographml snekkja 
-
-bincxx_snekkja_src = snekkja.cpp
-bincxx_snekkja_export = $(bincxx_snekkja_embed) $(bincxx_snekkja_src) 
-bincxx_snekkja_deps = libcppelib.a
-bincxx_snekkja_libs = -lcppelib $(libcxx_cppelib_libs)
-bincxx_snekkja_pkg = $(libcxx_cppelib_pkg)
-bincxx_snekkja_ldflags = -L.
-bincxx_snekkja_static = 1
+bincxx_package = demo streamingapp_demo demo_xmlformats graphmltoampli amplitographml duplicate_tasks graphmlfmltographmleval amplitoampli amplitoamplo amplotoampli amplotoamplo amplitocpp amplotocpp run_record amplotoschedule amplmatrixtoraw streamittographml 
 
 bincxx_demo_src = demo.cpp
 bincxx_demo_export = $(bincxx_demo_embed) $(bincxx_demo_src) 
@@ -205,7 +197,8 @@ AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp Ampl
 StreamNet.cpp XMLSchedule.cpp GraphML.cpp \
 CppDataOutput.cpp \
 Cpp.cpp CppData.cpp CppScalar.cpp CppVector.cpp CppSet.cpp CppMatrix.cpp \
-RecordParser.cpp
+RecordParser.cpp \
+SnekkjaCSchedule.cpp
 
 libcxx_cppelib_export = $(libcxx_cppelib_embed) $(libcxx_cppelib_src)
 libcxx_cppelib_libs = -lboost_regex -lboost_graph -lexpat -lpthread

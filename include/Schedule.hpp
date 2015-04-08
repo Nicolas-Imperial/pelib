@@ -29,10 +29,10 @@ namespace pelib
 			setName(const std::string name);
 
 			virtual std::string
-			getAUTName() const;
+			getAppName() const;
 
 			virtual void
-			setAUTName(const std::string autName);
+			setAppName(const std::string autName);
 
 			virtual const std::map<int, std::map<float, Task> >&
 			getSchedule() const;
@@ -42,7 +42,7 @@ namespace pelib
 
 		protected:
 			double roundTime;
-			std::string name, autName;
+			std::string name, appName;
 			std::map<int, std::map<float, Task> > schedule;
 			
 		private:		
