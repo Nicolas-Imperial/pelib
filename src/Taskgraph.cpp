@@ -24,7 +24,7 @@ namespace pelib
 
 	Taskgraph::Taskgraph(const Algebra &algebra)
 	{
-		this->Name = "Generated_from_algebra";
+		this->name = "Generated_from_algebra";
 		const Scalar<float> *M = algebra.find<Scalar<float> >("M");
 		const Scalar<float> *n = algebra.find<Scalar<float> >("n");
 		const Vector<int, float> *tau = algebra.find<Vector<int, float> >("Tau");

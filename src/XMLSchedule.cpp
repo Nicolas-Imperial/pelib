@@ -50,7 +50,7 @@ XMLSchedule::dump(ostream& os, const StreamingAppData *data) const
 	}
 
 	os << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-		<< "<schedule name=\"" << sched->getName() << "\" autname=\"" << sched->getAUTName() << "\" "
+		<< "<schedule name=\"" << sched->getName() << "\" autname=\"" << sched->getName() << "\" "
 		<< "roundtime=\"" << target_makespan << "\" "
 		<< "cores=\"" << schedule.size() << "\" "
 		<< "tasks=\"" << task_ids.size() << "\""

@@ -66,7 +66,7 @@ int main(int argc, char **argv)
 	{
 		autname = (char*)string("converted_from_streamit").c_str();
 	}
-	tg.setAUTName(autname);
+	tg.setName(autname);
 	tg.setMakespanCalculator("class:synthetic");
 	tg.setTasks(tasks);
 
