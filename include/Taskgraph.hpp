@@ -35,7 +35,7 @@ namespace pelib
 			getName() const;
 
 			virtual void
-			setName(const string autName);
+			setName(const string name);
 
 			virtual string
 			getMakespanCalculator() const;

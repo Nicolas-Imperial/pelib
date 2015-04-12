@@ -11,7 +11,7 @@ namespace pelib
 	class Schedule : public StreamingAppData
 	{
 		public:
-			Schedule(const std::string &name, const std::string &autName);
+			Schedule(const std::string &name, const std::string &name);
 			Schedule(const std::string &name, const Taskgraph &tg, const Algebra &algebra);
 			virtual Schedule* clone() const;
 			virtual Algebra buildAlgebra() const;
@@ -32,7 +32,7 @@ namespace pelib
 			getAppName() const;
 
 			virtual void
-			setAppName(const std::string autName);
+			setAppName(const std::string name);
 
 			virtual const std::map<int, std::map<float, Task> >&
 			getSchedule() const;
