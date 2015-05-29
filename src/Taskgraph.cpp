@@ -13,13 +13,91 @@ using namespace std;
 
 namespace pelib
 {
-	Taskgraph::Taskgraph() {}
+	Taskgraph::Taskgraph()
+	{
+	}
+
+	Taskgraph::Taskgraph(const set<Task> &tasks, const set<Link> &links)
+	{
+		// Check if all tasks have a unique string ID
+		set<string> task_ids;
+		for(set<Task>::const_iterator iter = tasks.begin(); iter != tasks.end(); iter++)
+		{
+			task_ids.insert(iter->getTaskId());
+		}
+
+		if(task_ids.size() != tasks.size())
+		{
+			throw ParseException("The tasks added do not have a unique taskId.");
+		}
+		
+		this->tasks = tasks;
+		this->setLinks(links);
+	}
+
+	void
+	Taskgraph::setLinks(const set<Link> &links)
+	{
+		// Add all links so their endpoints point to tasks in the local collection
+		this->links.clear();
+		for(set<Link>::const_iterator i = links.begin(); i != links.end(); i++)
+		{
+			const Task &producer = *this->tasks.find(*i->getProducer());
+			const Task &consumer = *this->tasks.find(*i->getConsumer());
+
+			Link link(producer, consumer);
+			this->links.insert(link);
+		}
+
+		// Update the tasks' producer and consumer links
+		for(set<Task>::iterator i = this->tasks.begin(); i != this->tasks.end(); i++)
+		{
+			Task &t = (Task&)*i;
+
+			// Keep a copy of the link lists
+			set<const Link*> producers = t.getProducers();
+			set<const Link*> consumers = t.getConsumers();
+
+			// Clear the link lists
+			t.getProducers().clear();
+			t.getConsumers().clear();
+		
+			// Reconstruct all links so they point to local tasks
+			for(set<const Link*>::iterator j = producers.begin(); j != producers.end(); j++)
+			{
+				Task *producer = (*j)->getProducer();
+				Task *consumer = (*j)->getConsumer();
+				Link newLink(*this->tasks.find(*producer), *this->tasks.find(*consumer));
+				const Link &link = *this->links.find(newLink);
+				t.getProducers().insert(&link);
+			}
+			
+			// Reconstruct all links so they point to local tasks
+			for(set<const Link*>::iterator j = consumers.begin(); j != consumers.end(); j++)
+			{
+				Task *producer = (*j)->getProducer();
+				Task *consumer = (*j)->getConsumer();
+				Link newLink(*this->tasks.find(*producer), *this->tasks.find(*consumer));
+				const Link &link = *this->links.find(newLink);
+				t.getConsumers().insert(&link);
+			}
+		}
+	}
 
 	Taskgraph::Taskgraph(const Taskgraph *graph)
 	{
 		this->name = graph->getName();
 		this->makespanCalculator = graph->getMakespanCalculator();
 		this->tasks = graph->getTasks();
+		this->setLinks(graph->getLinks());
+	}
+
+	Taskgraph::Taskgraph(const Taskgraph &graph)
+	{
+		this->name = graph.getName();
+		this->makespanCalculator = graph.getMakespanCalculator();
+		this->tasks = graph.getTasks();
+		this->setLinks(graph.getLinks());
 	}
 
 	Taskgraph::Taskgraph(const Algebra &algebra)
@@ -178,6 +256,7 @@ namespace pelib
 		return tasks;
 	}
 
+	/*
 	void
 	Taskgraph::setTasks(const set<Task>& tasks)
 	{
@@ -195,6 +274,7 @@ namespace pelib
 		
 		this->tasks = tasks;
 	}
+	*/
 
 	const Task&
 	Taskgraph::findTask(const string &taskId) const
@@ -225,4 +305,35 @@ namespace pelib
 		stream << "No task \"" << id << "\" exists in this taskgraph.";
 		throw ParseException(stream.str());
 	}
+
+	const set<Link>&
+	Taskgraph::getLinks() const
+	{
+		return this->links;
+	}
+
+	set<Link>&
+	Taskgraph::getLinks()
+	{
+		return this->links;
+	}
+
+	Taskgraph&
+	Taskgraph::operator=(const Taskgraph& copy)
+	{
+		this->name = copy.getName();
+		this->makespanCalculator = copy.getMakespanCalculator();
+		this->tasks = copy.getTasks();
+		this->setLinks(copy.getLinks());	
+
+		return *this;
+	}
+
+	/*
+	void
+	Taskgraph::setLinks(const set<Link>& links)
+	{
+		this->links = links;
+	}
+	*/
 }

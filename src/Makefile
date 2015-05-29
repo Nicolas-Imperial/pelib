@@ -273,7 +273,7 @@ $(libcc_list): $$(call object,$$(patsubst lib%.a,%,$$@),lib,cc) $$(call object,$
 $(libcxx_list): $$(call object,$$(patsubst lib%.a,%,$$@),lib,cxx) $$(call object,$$(patsubst lib%.a,%,$$@),lib,cc,cxx) $$(call embed,$$(patsubst lib%.a,%,$$@),lib,cxx) $$(call $$(patsubst %,libcxx_%_deps,$$(call suffixin,$$(patsubst lib%.a,%,$$@),$$(libcxx_package)))) $$(call suffixin,$$(patsubst lib%.a,%,$$@),$$(libcxx_package)).pc
 	ar rs $@ $(call object,$(patsubst lib%.a,%,$@),lib,cxx) $(call object,$(patsubst lib%.a,%,$@),lib,cc,cxx) $(call embed,$(patsubst lib%.a,%,$@),lib,cxx)
 
-lib_target: $(lib_list)
+lib_target: $(lib_list) $(shared_list)
 
 $(testcc_list): $$(call object,$$(patsubst test_%,%,$$@),test,cc) $$(call object,$$(patsubst test_%,%,$$@),test,cxx,cc) $$(call $$(patsubst %,testcc_%_deps,$$(call suffixin,$$(patsubst lib%.a,%,$$@),$$(testcc_package)))) $$(call embed,$$(call suffixin,$$@,$$(testcc_package)),test,cc)
 	$(CC) -o $@ $(if $(strip $(call testcc_$(call suffixin,$@,$(testcc_package))static)),$(if $(filter 0,$(strip $(call testcc_$(call suffixin,$@,$(testcc_package))static))),,--static),) $(GLOBAL_CC_TEST_LDFLAGS) $(call ldflags_project,$(call suffixin,$@,$(testcc_package),test,cc),test,cc) $(GLOBAL_CC_TEST_LDFLAGS) $(LDFLAGS) $(call object,$(call suffixin,$@,$(testcc_package)),test,cc) $(call object,$(call suffixin,$@,$(testcc_package)),test,cxx,cc) $(call embed,$(call suffixin,$@,$(testcc_package)),test,cc) $(call libs_project,$(call suffixin,$@,$(testcc_package)),test,cc) $(call pkg_project,$(call suffixin,$@,$(testcc_package)),test,cc) $(GLOBAL_CC_TEST_PKG) $(GLOBAL_CC_TEST_LIBS) $(LIBS)

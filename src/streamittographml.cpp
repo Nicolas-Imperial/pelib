@@ -12,6 +12,7 @@
 #include <GraphML.hpp>
 #include <Taskgraph.hpp>
 #include <Task.hpp>
+#include <Link.hpp>
 
 int main(int argc, char **argv)
 {
@@ -27,9 +28,9 @@ int main(int argc, char **argv)
 		<< std::setiosflags(std::ios::showpoint);
 
 	Algebra data = ai.parse(cin);
-	Taskgraph tg;
 	const Matrix<int, int, float> *taskworkcomm = data.find<Matrix<int, int, float> >("taskworkcomm");
 	set<Task> tasks;
+	set<Link> links;
 
 	for(map<int, map<int, float> >::const_iterator i = taskworkcomm->getValues().begin(); i != taskworkcomm->getValues().end(); i++)
 	{
@@ -66,9 +67,9 @@ int main(int argc, char **argv)
 	{
 		autname = (char*)string("converted_from_streamit").c_str();
 	}
+	Taskgraph tg(tasks, links);
 	tg.setName(autname);
 	tg.setMakespanCalculator("class:synthetic");
-	tg.setTasks(tasks);
 
 	//ampl_output.dump(cout, data);
 	tg_output.dump(cout, tg);

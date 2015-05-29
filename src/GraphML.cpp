@@ -19,6 +19,7 @@ extern "C"{
 #include <Matrix.hpp>
 #include <Set.hpp>
 #include <Task.hpp>
+#include <Link.hpp>
 
 #include <CastException.hpp>
 #include <ParseException.hpp>
@@ -170,7 +171,7 @@ GraphML::dump(ostream& os, const StreamingAppData *data, const Platform *arch) c
 	fclose(fake_fileptr);
 
 	pthread_join(thread, NULL);
-	fclose (instream);
+	//fclose (instream);
 	close(p[0]);
 
 	igraph_destroy(graph);
@@ -198,8 +199,6 @@ GraphML::dump(ostream& os, const StreamingAppData &data, const Platform &arch) c
 Taskgraph*
 GraphML::parse(istream &is) const
 {
-	Taskgraph *tg = new Taskgraph();
-
 	// Open the file and get an igraph record
 	// Initialize igraph and build a new object
 	igraph_i_set_attribute_table(&igraph_cattribute_table); //do this to enable attribute fetching
@@ -268,7 +267,7 @@ GraphML::parse(istream &is) const
 			}
 		}
 		task.setMaxWidth(max_width);
-		//task.setMaxWidth((int)VAN(the_graph, "max_width", id) != INT_MIN ?  VAN(the_graph, "max_width", id) : 1);
+		//task.setMaxWidth((int)VAN(the_graph, "max_width", id) != INT_MIN ? VAN(the_graph, "max_width", id) : 1);
 
 		if (strcmp(VAS(the_graph, "efficiency", id), "") != 0)
 		{
@@ -284,8 +283,41 @@ GraphML::parse(istream &is) const
 		tasks.insert(task);
 	}
 
-	tg->setTasks(tasks);
+	// Add edges between tasks
+	set<Link> links;
+	for(int i = 0; i < igraph_ecount(the_graph); i++)
+	{
+		//printf("[%s:%s:%d] Edge number %d.\n", __FILE__, __FUNCTION__, __LINE__, i);
+		int producer_id, consumer_id;
 
+		igraph_edge(the_graph, i, &producer_id, &consumer_id);
+		Task producer(producer_id + 1);
+		Task consumer(consumer_id + 1);
+
+		Link link(*tasks.find(producer), *tasks.find(consumer));
+		links.insert(link);
+
+
+		const Link &link_ref = *links.find(link);
+
+		// Add the link as producer and consumer links of both endpoint tasks
+		Task &producer_ref = (Task&)*tasks.find(producer);
+		producer_ref.getConsumers().insert(&link_ref);
+		Task &consumer_ref = (Task&)*tasks.find(consumer);
+		consumer_ref.getProducers().insert(&link_ref);
+
+		/*
+		trace(producer_ref.getId());
+		trace(consumer_ref.getId());
+		trace(producer_ref.getConsumers().size());
+		trace(consumer_ref.getConsumers().size());
+		trace(producer_ref.getProducers().size());
+		trace(consumer_ref.getProducers().size());
+		*/
+	}
+
+	// Finally build the taskgraph
+	Taskgraph *tg = new Taskgraph(tasks, links);
 	tg->setName(GAS(the_graph, "name"));
 	tg->setMakespanCalculator(GAS(the_graph, "target_makespan"));
 
@@ -293,7 +325,6 @@ GraphML::parse(istream &is) const
 	igraph_destroy(the_graph);
 	delete the_graph;
 
-	// TODO: parse links	
 	return tg;
 }
 

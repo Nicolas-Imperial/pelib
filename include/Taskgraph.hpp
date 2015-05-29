@@ -4,6 +4,7 @@
 #include <StreamingAppData.hpp>
 #include <Algebra.hpp>
 #include <Task.hpp>
+#include <Link.hpp>
 #include <Platform.hpp>
 
 extern "C"{
@@ -22,6 +23,8 @@ namespace pelib
 		public:
 			Taskgraph();
 			Taskgraph(const Taskgraph *graph);
+			Taskgraph(const Taskgraph &graph);
+			Taskgraph(const set<Task>&, const set<Link>&);
 			Taskgraph(const Algebra &algebra);
 
 			virtual
@@ -52,8 +55,8 @@ namespace pelib
 			virtual set<Task>&
 			getTasks();
 
-			virtual void
-			setTasks(const set<Task>&);
+			//virtual void
+			//setTasks(const set<Task>&);
 
 			virtual const Task&
 			findTask(const string &taskId) const;
@@ -61,10 +64,25 @@ namespace pelib
 			virtual const Task&
 			findTask(int id) const;
 				
+			virtual const set<Link>&
+			getLinks() const;
+
+			virtual set<Link>&
+			getLinks();
+
+			//virtual void
+			//setLinks(const set<Link>&);
+
+			virtual Taskgraph&
+			operator=(const Taskgraph& copy);
+
 		protected:
 			string name, makespanCalculator;
 			set<Task> tasks;
+			set<Link> links;
 			
+			virtual void
+			Taskgraph::setLinks(const set<Link> &link);
 		private:		
 	};
 }

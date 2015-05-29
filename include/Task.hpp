@@ -1,10 +1,14 @@
 #include <string>
+#include <set>
 
 #ifndef PELIB_TASK
 #define PELIB_TASK
 
 namespace pelib
 {
+	// Forward declaration
+	class Link;
+
 	class Task
 	{
 		public:
@@ -67,8 +71,20 @@ namespace pelib
 
 			virtual bool
 			operator<(const Task &other) const;
-    
-    		virtual bool
+
+			virtual const std::set<const Link*>&
+			getProducers() const;
+
+			virtual const std::set<const Link*>&
+			getConsumers() const;
+
+			virtual std::set<const Link*>&
+			getProducers();
+
+			virtual std::set<const Link*>&
+			getConsumers();
+
+	    		virtual bool
 			operator==(const Task &other) const;
 			
 		protected:
@@ -77,13 +93,12 @@ namespace pelib
 			float start_time;
 			int id;
 			std::string taskId, name, efficiencyString;
+			std::set<const Link*> consumers, producers;
 			
 			static const float very_small = 1e-6;
 			
 		private:
 	};
 }
-
-			
 
 #endif

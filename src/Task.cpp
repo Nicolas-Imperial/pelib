@@ -41,7 +41,7 @@ namespace pelib
 		this->width = 1;
 		this->maxWidth = 1;
 		this->workload = 1;
-		this->efficiencyString = "fml:p <= ? 1 : 1e-6";
+		this->efficiencyString = "fml:p <= 1 ? 1 : 1e-6";
 		this->start_time = 0;
 	}
 
@@ -57,7 +57,7 @@ namespace pelib
 		this->width = 1;
 		this->maxWidth = 1;
 		this->workload = 1;
-		this->efficiencyString = "fml:p <= ? 1 : 1e-6";
+		this->efficiencyString = "fml:p <= 1 ? 1 : 1e-6";
 
 		stringstream ss;
 		ss << id;
@@ -267,5 +267,29 @@ namespace pelib
 		work = work / frequency;
 		
 		return work; 
+	}
+	
+	const set<const Link*>&
+	Task::getProducers() const
+	{
+		return this->producers;
+	}
+
+	const set<const Link*>&
+	Task::getConsumers() const
+	{
+		return this->consumers;
+	}
+
+	set<const Link*>&
+	Task::getProducers()
+	{
+		return this->producers;
+	}
+
+	set<const Link*>&
+	Task::getConsumers()
+	{
+		return this->consumers;
 	}
 }
