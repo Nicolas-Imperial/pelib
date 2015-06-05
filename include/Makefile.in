@@ -22,4 +22,4 @@ SnekkjaCScheduleOutput.hpp \
 exprtk.hpp
 
 ## Further directories to follow
-subdirs =
+subdirs = pelib

@@ -77,6 +77,11 @@ namespace pelib
 		this->taskId = base + "_id";
 		this->start_time = 0;
 	}
+
+	Task::~Task()
+	{
+		/* Do nothing */
+	}
 	
 	double
 	Task::getFrequency() const

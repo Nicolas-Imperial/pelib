@@ -14,6 +14,7 @@ namespace pelib
 		public:
 			Task(const int id, const std::string taskId);
 			Task(const int id);
+			virtual ~Task();
 			
 			virtual double
 			getFrequency() const;

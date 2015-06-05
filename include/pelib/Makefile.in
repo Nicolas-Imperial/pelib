@@ -1,0 +1,5 @@
+## All files to include in a distribution package
+attach = platform_factory.h
+
+## Further directories to follow
+subdirs =

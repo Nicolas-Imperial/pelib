@@ -25,3 +25,4 @@ int main(int argc, char **argv)
 	// Return 0 if final is still one, else report an error
 	return !test_final;
 }
+

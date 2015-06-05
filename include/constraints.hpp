@@ -4,8 +4,8 @@
 // From http://www.stroustrup.com/bs_faq2.html#constraints
 
 template<class T, class B> struct Derived_from {
-	static void constraints(T* p) { B* pb = p; }
-	Derived_from() { void(*p)(T*) = constraints; }
+	static void constraints(T* p) { B* pb __attribute__((unused)); pb = p;}
+	Derived_from() { void(*p)(T*) __attribute__((unused)); p = constraints; }
 };
 
 template<class T1, class T2> struct Can_copy {

@@ -9,6 +9,7 @@ namespace pelib
 	{
 		public:
 			std::istream& getEmptyStream();
+			virtual ~RecordParser();
 		protected:
 			std::istringstream emptyStream;
 		private:

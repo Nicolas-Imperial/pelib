@@ -10,4 +10,9 @@ namespace pelib
 		istringstream &local = emptyStream;
 		return local;
 	}
+
+	RecordParser::~RecordParser()
+	{
+		/* Do nothing */
+	}
 }

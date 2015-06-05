@@ -76,7 +76,7 @@ namespace pelib
 				// Parse the rest of the matrix; catch the row index every s reads
 				iter = make_regex_token_iterator(remain, isolated_value, 1, boost::regex_constants::match_default);
 
-				int progress = 0;
+				//int progress = 0;
 				Row row;
 				Col col;
 				Value val;
