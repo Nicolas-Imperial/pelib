@@ -1,7 +1,6 @@
 #include <set>
 #include <string>
 
-#include <StreamingAppData.hpp>
 #include <Algebra.hpp>
 #include <Task.hpp>
 #include <Link.hpp>
@@ -18,7 +17,7 @@ namespace pelib
 {
 	using namespace std;
 	
-	class Taskgraph: public StreamingAppData
+	class Taskgraph: public Record
 	{
 		public:
 			Taskgraph();
@@ -26,6 +25,7 @@ namespace pelib
 			Taskgraph(const Taskgraph &graph);
 			Taskgraph(const set<Task>&, const set<Link>&);
 			Taskgraph(const Algebra &algebra);
+			virtual ~Taskgraph();
 
 			virtual
 			Taskgraph*

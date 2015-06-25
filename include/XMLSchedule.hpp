@@ -12,8 +12,8 @@ namespace pelib
 	{
 		public:
 			virtual Schedule* parse(std::istream &is, Taskgraph &tg) const;
-			virtual	void dump(std::ostream &os, const StreamingAppData *data) const;
-			virtual	void dump(std::ostream &os, const StreamingAppData &data) const;
+			virtual	void dump(std::ostream &os, const Record *data) const;
+			virtual	void dump(std::ostream &os, const Record &data) const;
 			virtual XMLSchedule* clone() const;
 	};
 }

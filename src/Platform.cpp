@@ -18,6 +18,11 @@ namespace pelib
 		coreNumber = arch->getCoreNumber();
 		frequencies = arch->getFrequencies();
 	}
+
+	Platform::~Platform()
+	{
+		// Do nothing
+	}
 	
 	Platform*
 	Platform::clone() const

@@ -10,7 +10,7 @@ extern "C"{
 }
 
 #include "Schedule.hpp"
-#include "SnekkjaCSchedule.hpp"
+#include "DrakeCSchedule.hpp"
 
 #include <Scalar.hpp>
 #include <Vector.hpp>
@@ -25,13 +25,13 @@ using namespace pelib;
 using namespace std;
 
 void
-SnekkjaCSchedule::dump(ostream& os, const StreamingAppData &data) const
+DrakeCSchedule::dump(ostream& os, const Data &data) const
 {
 	dump(os, &data);
 }
 
 void
-SnekkjaCSchedule::dump(ostream& os, const StreamingAppData *data) const
+DrakeCSchedule::dump(ostream& os, const Data *data) const
 {
 	const Schedule *sched = dynamic_cast<const Schedule* >(data);
 
@@ -44,7 +44,7 @@ SnekkjaCSchedule::dump(ostream& os, const StreamingAppData *data) const
 	//trace(sched->getTaskgraph().getTasks().begin()->getProducers().size());
 	//trace(sched->getTaskgraph().getTasks().rbegin()->getConsumers().size());
 	
-	os << "#include <snekkja/schedule.h> " << endl << endl;
+	os << "#include <drake/schedule.h> " << endl << endl;
 
 	for(set<Task>::const_iterator i = sched->getTaskgraph().getTasks().begin(); i != sched->getTaskgraph().getTasks().end(); i++)
 	{
@@ -52,76 +52,76 @@ SnekkjaCSchedule::dump(ostream& os, const StreamingAppData *data) const
 		os <<
 			"#define TASK_NAME " << t.getTaskId() << endl <<
 			"#define TASK_ID " << t.getId() << endl <<
-			"#include <snekkja/node.h>" << endl <<
+			"#include <drake/node.h>" << endl <<
 			"#define DONE_" << t.getId() << " 1" << endl << endl;
 	}
 
 	os << 
-		"size_t _snekkja_p;" << endl << 
-		"size_t _snekkja_n;" << endl << 
-		"size_t *_snekkja_tasks_in_core;" << endl << 
-		"size_t *_snekkja_consumers_in_core;" << endl << 
-		"size_t *_snekkja_producers_in_core;" << endl <<
-		"snekkja_schedule_task_t **_snekkja_schedule;" << endl <<
-		"size_t *_snekkja_tasks_in_core;" << endl <<
-		"size_t *_snekkja_consumers_in_core;" << endl <<
-		"size_t *_snekkja_producers_in_core;" << endl <<
-		"size_t *_snekkja_consumers_in_task;" << endl <<
-		"size_t *_snekkja_producers_in_task;" << endl <<
-		"size_t *_snekkja_remote_consumers_in_task;" << endl <<
-		"size_t *_snekkja_remote_producers_in_task;" << endl <<
-		"size_t **_snekkja_consumers_id;" << endl <<
-		"size_t **_snekkja_producers_id;" << endl <<
-		"int *_snekkja_task_frequency;" << endl <<
-		"double _snekkja_stage_time;" << endl << endl <<
-		"void snekkja_schedule_init()" << endl <<
+		"size_t _drake_p;" << endl << 
+		"size_t _drake_n;" << endl << 
+		"size_t *_drake_tasks_in_core;" << endl << 
+		"size_t *_drake_consumers_in_core;" << endl << 
+		"size_t *_drake_producers_in_core;" << endl <<
+		"drake_schedule_task_t **_drake_schedule;" << endl <<
+		"size_t *_drake_tasks_in_core;" << endl <<
+		"size_t *_drake_consumers_in_core;" << endl <<
+		"size_t *_drake_producers_in_core;" << endl <<
+		"size_t *_drake_consumers_in_task;" << endl <<
+		"size_t *_drake_producers_in_task;" << endl <<
+		"size_t *_drake_remote_consumers_in_task;" << endl <<
+		"size_t *_drake_remote_producers_in_task;" << endl <<
+		"size_t **_drake_consumers_id;" << endl <<
+		"size_t **_drake_producers_id;" << endl <<
+		"int *_drake_task_frequency;" << endl <<
+		"double _drake_stage_time;" << endl << endl <<
+		"void drake_schedule_init()" << endl <<
 		"{" << endl <<
-		"	_snekkja_p = " << p << ";" << endl << 
-		"	_snekkja_n = " << n << ";" << endl <<
-		"	_snekkja_stage_time = " << sched->getRoundTime() << ";" << endl << endl <<
-		"	_snekkja_tasks_in_core = malloc(sizeof(size_t) * _snekkja_p);" << endl;
+		"	_drake_p = " << p << ";" << endl << 
+		"	_drake_n = " << n << ";" << endl <<
+		"	_drake_stage_time = " << sched->getRoundTime() << ";" << endl << endl <<
+		"	_drake_tasks_in_core = malloc(sizeof(size_t) * _drake_p);" << endl;
 
 	for(Schedule::table::const_iterator i = sched->getSchedule().begin(); i != sched->getSchedule().end(); i++)
 	{
-		os << "	_snekkja_tasks_in_core[" << i->first - 1 << "] = " << sched->getTasks(i->first, tasks).size() << ";\n";
+		os << "	_drake_tasks_in_core[" << i->first - 1 << "] = " << sched->getTasks(i->first, tasks).size() << ";\n";
 	}
 
-	os << endl << "	_snekkja_consumers_in_core = malloc(sizeof(size_t) * _snekkja_p);" << endl; 
+	os << endl << "	_drake_consumers_in_core = malloc(sizeof(size_t) * _drake_p);" << endl; 
 
 	for(Schedule::table::const_iterator i = sched->getSchedule().begin(); i != sched->getSchedule().end(); i++)
 	{
-		os << "	_snekkja_consumers_in_core[" << i->first - 1 << "] = " << sched->getConsumers(i->first, consumers).size() << ";\n";
+		os << "	_drake_consumers_in_core[" << i->first - 1 << "] = " << sched->getConsumers(i->first, consumers).size() << ";\n";
 	}
 
-	os << endl << "	_snekkja_producers_in_core = malloc(sizeof(size_t) * _snekkja_p);" << endl;
+	os << endl << "	_drake_producers_in_core = malloc(sizeof(size_t) * _drake_p);" << endl;
 
 	for(Schedule::table::const_iterator i = sched->getSchedule().begin(); i != sched->getSchedule().end(); i++)
 	{
-		os << "	_snekkja_producers_in_core[" << i->first - 1 << "] = " << sched->getProducers(i->first, producers).size() << ";\n";
+		os << "	_drake_producers_in_core[" << i->first - 1 << "] = " << sched->getProducers(i->first, producers).size() << ";\n";
 	}
 
-	os << endl << "	_snekkja_task_frequency = malloc(sizeof(size_t) * _snekkja_n);" << endl;
+	os << endl << "	_drake_task_frequency = malloc(sizeof(size_t) * _drake_n);" << endl;
 
 	for(set<Task>::const_iterator i = sched->getTaskgraph().getTasks().begin(); i != sched->getTaskgraph().getTasks().end(); i++)
 	{
-		os << "	_snekkja_task_frequency[" << i->getId() - 1 << "] = " << i->getFrequency() << ";" << endl;
+		os << "	_drake_task_frequency[" << i->getId() - 1 << "] = " << i->getFrequency() << ";" << endl;
 	}
 
-	os << endl << "	_snekkja_consumers_in_task = malloc(sizeof(size_t) * _snekkja_n);" << endl;
+	os << endl << "	_drake_consumers_in_task = malloc(sizeof(size_t) * _drake_n);" << endl;
 
 	for(set<Task>::const_iterator i = sched->getTaskgraph().getTasks().begin(); i != sched->getTaskgraph().getTasks().end(); i++)
 	{
-		os << "	_snekkja_consumers_in_task[" << i->getId() - 1 << "] = " << i->getConsumers().size() << ";" << endl;
+		os << "	_drake_consumers_in_task[" << i->getId() - 1 << "] = " << i->getConsumers().size() << ";" << endl;
 	}
 
-	os << endl << "	_snekkja_producers_in_task = malloc(sizeof(size_t) * _snekkja_n);" << endl;
+	os << endl << "	_drake_producers_in_task = malloc(sizeof(size_t) * _drake_n);" << endl;
 
 	for(set<Task>::const_iterator i = sched->getTaskgraph().getTasks().begin(); i != sched->getTaskgraph().getTasks().end(); i++)
 	{
-		os << "	_snekkja_producers_in_task[" << i->getId() - 1 << "] = " << i->getProducers().size() << ";" << endl;
+		os << "	_drake_producers_in_task[" << i->getId() - 1 << "] = " << i->getProducers().size() << ";" << endl;
 	}
 
-	os << endl << "	_snekkja_remote_consumers_in_task = malloc(sizeof(size_t) * _snekkja_n);" << endl;
+	os << endl << "	_drake_remote_consumers_in_task = malloc(sizeof(size_t) * _drake_n);" << endl;
 
 	for(set<Task>::const_iterator i = sched->getTaskgraph().getTasks().begin(); i != sched->getTaskgraph().getTasks().end(); i++)
 	{
@@ -142,10 +142,10 @@ SnekkjaCSchedule::dump(ostream& os, const StreamingAppData *data) const
 			}
 		}
 
-		os << "	_snekkja_remote_consumers_in_task[" << i->getId() - 1 << "] = " << remote_consumers << ";" << endl;
+		os << "	_drake_remote_consumers_in_task[" << i->getId() - 1 << "] = " << remote_consumers << ";" << endl;
 	}
 
-	os << endl << "	_snekkja_remote_producers_in_task = malloc(sizeof(size_t) * _snekkja_n);" << endl;
+	os << endl << "	_drake_remote_producers_in_task = malloc(sizeof(size_t) * _drake_n);" << endl;
 
 	for(set<Task>::const_iterator i = sched->getTaskgraph().getTasks().begin(); i != sched->getTaskgraph().getTasks().end(); i++)
 	{
@@ -166,16 +166,16 @@ SnekkjaCSchedule::dump(ostream& os, const StreamingAppData *data) const
 			}
 		}
 
-		os << "	_snekkja_remote_producers_in_task[" << i->getId() - 1 << "] = " << remote_producers << ";\n";
+		os << "	_drake_remote_producers_in_task[" << i->getId() - 1 << "] = " << remote_producers << ";\n";
 	}
 
 	os << "\
 \n\
-	_snekkja_producers_id = malloc(sizeof(size_t*) * _snekkja_n);\n";
+	_drake_producers_id = malloc(sizeof(size_t*) * _drake_n);\n";
 
 	for(set<Task>::const_iterator i = sched->getTaskgraph().getTasks().begin(); i != sched->getTaskgraph().getTasks().end(); i++)
 	{
-		os << "	_snekkja_producers_id[" << i->getId() - 1 << "] = ";
+		os << "	_drake_producers_id[" << i->getId() - 1 << "] = ";
 		if (i->getProducers().size() == 0)
 		{
 			os << "NULL;" << endl;
@@ -186,7 +186,7 @@ SnekkjaCSchedule::dump(ostream& os, const StreamingAppData *data) const
 			size_t counter = 0;
 			for(set<const Link*>::const_iterator j = i->getProducers().begin(); j != i->getProducers().end(); j++)
 			{
-				os << "	_snekkja_producers_id[" << i->getId() - 1 << "][" << counter << "] = " << (*j)->getProducer()->getId() << ";" << endl;
+				os << "	_drake_producers_id[" << i->getId() - 1 << "][" << counter << "] = " << (*j)->getProducer()->getId() << ";" << endl;
 				counter++;
 			}
 		}
@@ -194,12 +194,12 @@ SnekkjaCSchedule::dump(ostream& os, const StreamingAppData *data) const
 
 	os << "\
 \n\
-	_snekkja_consumers_id = malloc(sizeof(size_t*) * _snekkja_n);\n";
+	_drake_consumers_id = malloc(sizeof(size_t*) * _drake_n);\n";
 
 	// TODO: iterate through all tasks
 	for(set<Task>::const_iterator i = sched->getTaskgraph().getTasks().begin(); i != sched->getTaskgraph().getTasks().end(); i++)
 	{
-		os << "	_snekkja_consumers_id[" << i->getId() - 1 << "] = ";
+		os << "	_drake_consumers_id[" << i->getId() - 1 << "] = ";
 		if (i->getConsumers().size() == 0)
 		{
 			os << "NULL;" << endl;
@@ -210,76 +210,76 @@ SnekkjaCSchedule::dump(ostream& os, const StreamingAppData *data) const
 			size_t counter = 0;
 			for(set<const Link*>::const_iterator j = i->getConsumers().begin(); j != i->getConsumers().end(); j++)
 			{
-				os << "	_snekkja_producers_id[" << i->getId() - 1 << "][" << counter << "] = " << (*j)->getConsumer()->getId() << ";" << endl;
+				os << "	_drake_producers_id[" << i->getId() - 1 << "][" << counter << "] = " << (*j)->getConsumer()->getId() << ";" << endl;
 				counter++;
 			}
 		}
 	}
-	//_snekkja_consumers_id[4][0] = 2;\n
+	//_drake_consumers_id[4][0] = 2;\n
 
 	os << "\
 \n\
-	_snekkja_schedule = malloc(sizeof(snekkja_schedule_task_t*) * _snekkja_p);\n";
+	_drake_schedule = malloc(sizeof(drake_schedule_task_t*) * _drake_p);\n";
 
 	for(Schedule::table::const_iterator i = sched->getSchedule().begin(); i != sched->getSchedule().end(); i++)
 	{
-		os << "	_snekkja_schedule[" << "0" << "] = malloc(sizeof(snekkja_schedule_task_t) * " << "1" << ");\n";
+		os << "	_drake_schedule[" << "0" << "] = malloc(sizeof(drake_schedule_task_t) * " << "1" << ");\n";
 
 		size_t counter = 0;
 		for(Schedule::sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 		{
-			os << "	_snekkja_schedule[" << "0" << "][" << counter << "].id = " << j->second.first->getId() << ";" << endl
-				<< "	_snekkja_schedule[" << "0" << "][" << counter << "].start_time = " << j->second.first->getStartTime() << ";" << endl
-				<< "	_snekkja_schedule[" << "0" << "][" << counter << "].frequency = " << j->second.first->getFrequency() << ";" << endl;
+			os << "	_drake_schedule[" << "0" << "][" << counter << "].id = " << j->second.first->getId() << ";" << endl
+				<< "	_drake_schedule[" << "0" << "][" << counter << "].start_time = " << j->second.first->getStartTime() << ";" << endl
+				<< "	_drake_schedule[" << "0" << "][" << counter << "].frequency = " << j->second.first->getFrequency() << ";" << endl;
 			counter++;
 		}
 	}
 
-	os << "}" << endl << endl << "void snekkja_schedule_destroy()" << endl << "{" << endl;
+	os << "}" << endl << endl << "void drake_schedule_destroy()" << endl << "{" << endl;
 
 	for(Schedule::table::const_iterator i = sched->getSchedule().begin(); i != sched->getSchedule().end(); i++)
 	{
 		for(size_t j = 0; j < i->second.size(); j++)
 		{
-			os << "	free(_snekkja_schedule[" << i->second.size() - j - 1 << "]);\n";
+			os << "	free(_drake_schedule[" << i->second.size() - j - 1 << "]);\n";
 		}
 	}
 
 	os << "\
-	free(_snekkja_schedule);\n\
-	free(_snekkja_task_frequency);\n";
+	free(_drake_schedule);\n\
+	free(_drake_task_frequency);\n";
 
 	for(set<Task>::const_iterator i = sched->getTaskgraph().getTasks().begin(); i != sched->getTaskgraph().getTasks().end(); i++)
 	{
 		for(size_t j = 0; j < i->getConsumers().size(); j++)
 		{
-			os << "	free(_snekkja_consumers_id[" << i->getConsumers().size() - j - 1 << "]);" << endl;
+			os << "	free(_drake_consumers_id[" << i->getConsumers().size() - j - 1 << "]);" << endl;
 		}
 	}
 
-	os << "	free(_snekkja_consumers_id);" << endl;
+	os << "	free(_drake_consumers_id);" << endl;
 	
 	for(set<Task>::const_iterator i = sched->getTaskgraph().getTasks().begin(); i != sched->getTaskgraph().getTasks().end(); i++)
 	{
 		for(size_t j = 0; j < i->getProducers().size(); j++)
 		{
-			os << "	free(_snekkja_producers_id[" << i->getProducers().size() - j - 1 << "]);" << endl;
+			os << "	free(_drake_producers_id[" << i->getProducers().size() - j - 1 << "]);" << endl;
 		}
 	}
 
 	os << "\
-	free(_snekkja_producers_id);\n\
-	free(_snekkja_remote_producers_in_task);\n\
-	free(_snekkja_remote_consumers_in_task);\n\
-	free(_snekkja_producers_in_task);\n\
-	free(_snekkja_consumers_in_task);\n\
-	free(_snekkja_producers_in_core);\n\
-	free(_snekkja_consumers_in_core);\n\
-	free(_snekkja_tasks_in_core);\n\
+	free(_drake_producers_id);\n\
+	free(_drake_remote_producers_in_task);\n\
+	free(_drake_remote_consumers_in_task);\n\
+	free(_drake_producers_in_task);\n\
+	free(_drake_consumers_in_task);\n\
+	free(_drake_producers_in_core);\n\
+	free(_drake_consumers_in_core);\n\
+	free(_drake_tasks_in_core);\n\
 }\n\
 \n\
 void*\n\
-snekkja_function(size_t id, task_status_t status)\n\
+drake_function(size_t id, task_status_t status)\n\
 {\n\
 	switch(id)\n\
 	{\n\
@@ -295,16 +295,16 @@ snekkja_function(size_t id, task_status_t status)\n\
 					return 0;\n\
 				break;\n\
 				case TASK_INIT:\n\
-					return (void*)&snekkja_init(" << i->getName() << ", " << i->getName() << ");\n\
+					return (void*)&drake_init(" << i->getName() << ", " << i->getName() << ");\n\
 				break;\n\
 				case TASK_START:\n\
-					return (void*)&snekkja_start(" << i->getName() << ", " << i->getName() << ");\n\
+					return (void*)&drake_start(" << i->getName() << ", " << i->getName() << ");\n\
 				break;\n\
 				case TASK_RUN:\n\
-					return (void*)&snekkja_run(" << i->getName() << ", " << i->getName() << ");\n\
+					return (void*)&drake_run(" << i->getName() << ", " << i->getName() << ");\n\
 				break;\n\
 				case TASK_KILLED:\n\
-					return (void*)&snekkja_destroy(" << i->getName() << ", " << i->getName() << ");\n\
+					return (void*)&drake_destroy(" << i->getName() << ", " << i->getName() << ");\n\
 				break;\n\
 				case TASK_ZOMBIE:\n\
 					return 0;\n\
@@ -368,8 +368,8 @@ snekkja_function(size_t id, task_status_t status)\n\
 	*/
 }
 
-SnekkjaCSchedule*
-SnekkjaCSchedule::clone() const
+DrakeCSchedule*
+DrakeCSchedule::clone() const
 {
-	return new SnekkjaCSchedule();
+	return new DrakeCSchedule();
 }

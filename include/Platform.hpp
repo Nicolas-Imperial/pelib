@@ -1,6 +1,5 @@
 #include <set>
 
-#include <StreamingAppData.hpp>
 #include <Algebra.hpp>
 
 #ifndef PELIB_PLATFORM
@@ -8,7 +7,7 @@
 
 namespace pelib
 {
-	class Platform : public StreamingAppData
+	class Platform : public Record
 	{
 		public:
 			Platform();
@@ -22,6 +21,7 @@ namespace pelib
 			virtual void setFrequencies(const std::set<float>& freq);
 
 			virtual Algebra buildAlgebra() const;
+			virtual	~Platform();
 
 		protected:
 			int coreNumber;

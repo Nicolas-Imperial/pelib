@@ -1,12 +1,12 @@
 #include <Platform.hpp>
-#include <StreamingAppDataParser.hpp>
+#include <DataParser.hpp>
 
 #ifndef PELIB_PLATFORMPARSER
 #define PELIB_PLATFORMPARSER
 
 namespace pelib
 {
-	class PlatformParser : public StreamingAppDataParser
+	class PlatformParser : public DataParser
 	{
 		public:
 			virtual

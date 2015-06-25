@@ -1,12 +1,12 @@
 #include <Taskgraph.hpp>
-#include <StreamingAppDataParser.hpp>
+#include <DataParser.hpp>
 
 #ifndef PELIB_TASKGRAPHPARSER
 #define PELIB_TASKGRAPHPARSER
 
 namespace pelib
 {
-	class TaskgraphParser : public StreamingAppDataParser
+	class TaskgraphParser : public DataParser
 	{
 		public:
 			virtual

@@ -32,7 +32,8 @@ CXX_TEST_DEPS = $(CXX_DEPS) libunitc++.a
 CXX_TEST_LDFLAGS =
 
 ## static library packages and their sources
-bincxx_package = demo streamingapp_demo demo_xmlformats graphmltoampli amplitographml duplicate_tasks graphmlfmltographmleval amplitoampli amplitoamplo amplotoampli amplotoamplo amplitocpp amplotocpp run_record amplotoschedule amplmatrixtoraw streamittographml cppelib
+#bincxx_package = demo streamingapp_demo demo_xmlformats graphmltoampli amplitographml duplicate_tasks graphmlfmltographmleval amplitoampli amplitoamplo amplotoampli amplotoamplo amplitocpp amplotocpp run_record amplotoschedule amplmatrixtoraw streamittographml cppelib
+bincxx_package = graphmltoampli amplitographml duplicate_tasks graphmlfmltographmleval amplitoampli amplitoamplo amplotoampli amplotoamplo amplitocpp amplotocpp run_record amplotoschedule amplmatrixtoraw streamittographml cppelib
 
 bincxx_cppelib_src = cppelib.cpp
 bin_cppelib_export = $(bincxx_cppelib_embed) $(bincxx_cppelib_src) 
@@ -192,7 +193,7 @@ lib_package = unit #cppelib
 ## Cpp hierarchy base: data output only
 ## Cpp format classes: base class, data structure base class, output data structure classes; no parser because of lack of cpp parser base class
 libcxx_cppelib_src = ParseException.cpp CastException.cpp NoDecimalFloatException.cpp Record.cpp \
-Data.cpp AlgebraData.cpp Algebra.cpp StreamingAppData.cpp StreamingApp.cpp \
+Data.cpp AlgebraData.cpp Algebra.cpp \
 AlgebraParser.cpp DataParser.cpp AlgebraDataParser.cpp \
 AlgebraOutput.cpp DataOutput.cpp AlgebraDataOutput.cpp \
 Scalar.cpp Vector.cpp Matrix.cpp Set.cpp \
@@ -204,11 +205,13 @@ AmplPlatform.cpp \
 MakespanCalculator.cpp MakespanFormula.cpp MakespanConstant.cpp \
 AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp \
 AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
-StreamNet.cpp XMLSchedule.cpp GraphML.cpp \
+XMLSchedule.cpp GraphML.cpp \
 CppDataOutput.cpp \
 Cpp.cpp CppData.cpp CppScalar.cpp CppVector.cpp CppSet.cpp CppMatrix.cpp \
 RecordParser.cpp \
-SnekkjaCSchedule.cpp
+DrakeCSchedule.cpp
+#StreamingAppData.cpp \
+#StreamNet.cpp StreamingApp.cpp \
 
 lib_cppelib_export = $(libcxx_cppelib_embed) $(libcxx_cppelib_src)
 lib_cppelib_libs = -lboost_regex -lboost_graph -lexpat -lpthread

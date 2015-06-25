@@ -1,12 +1,12 @@
 #include <Schedule.hpp>
-#include <StreamingAppDataOutput.hpp>
+#include <RecordOutput.hpp>
 
 #ifndef PELIB_SCHEDULEOUTPUT
 #define PELIB_SCHEDULEOUTPUT
 
 namespace pelib
 {
-	class ScheduleOutput : public StreamingAppDataOutput
+	class ScheduleOutput : public RecordOutput
 	{
 		public:	
 			virtual ScheduleOutput* clone() const = 0;

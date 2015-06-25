@@ -40,6 +40,11 @@ namespace pelib
 		this->setSchedule(schedule);
 	}
 
+	Schedule::~Schedule()
+	{
+		// Do nothing
+	}
+
 	void
 	Schedule::setSchedule(const table &schedule)
 	{

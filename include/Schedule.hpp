@@ -1,4 +1,3 @@
-#include <StreamingAppData.hpp>
 #include <Algebra.hpp>
 #include <Link.hpp>
 #include <Task.hpp>
@@ -9,7 +8,7 @@
 
 namespace pelib
 {	
-	class Schedule : public StreamingAppData
+	class Schedule : public Record
 	{
 		public:
 			typedef std::pair<const Task*, double> work;
@@ -19,6 +18,7 @@ namespace pelib
 			Schedule(const std::string &name, const std::string &appName);
 			Schedule(const std::string &name, const std::string &appName, const Taskgraph &taskgraph, const table &schedule, double roundTime);
 			Schedule(const std::string &name, const Taskgraph &tg, const Algebra &algebra);
+			virtual ~Schedule();
 			virtual Schedule* clone() const;
 			virtual Algebra buildAlgebra() const;
 

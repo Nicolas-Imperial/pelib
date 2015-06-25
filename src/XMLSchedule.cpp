@@ -25,13 +25,13 @@ using namespace pelib;
 using namespace std;
 using namespace xmlpp;
 void
-XMLSchedule::dump(ostream& os, const StreamingAppData &data) const
+XMLSchedule::dump(ostream& os, const Record &data) const
 {
 	dump(os, &data);
 }
 
 void
-XMLSchedule::dump(ostream& os, const StreamingAppData *data) const
+XMLSchedule::dump(ostream& os, const Record *data) const
 {
 	const Schedule *sched = dynamic_cast<const Schedule* >(data);
 	if(sched == NULL) throw CastException("parameter \"data\" was not of type \"Schedule*\".");

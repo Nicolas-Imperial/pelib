@@ -80,7 +80,7 @@ thread_writer(void* aux)
 }
 
 void
-GraphML::dump(ostream& os, const StreamingAppData *data, const Platform *arch) const
+GraphML::dump(ostream& os, const Record *data, const Platform *arch) const
 {
 	const Taskgraph *tg = dynamic_cast<const Taskgraph* >(data);
 	if(tg == NULL) throw CastException("Parameter \"data\" was not of type \"Taskgraph*\".");
@@ -179,19 +179,19 @@ GraphML::dump(ostream& os, const StreamingAppData *data, const Platform *arch) c
 }
 
 void
-GraphML::dump(ostream& os, const StreamingAppData *data) const
+GraphML::dump(ostream& os, const Record *data) const
 {
 	dump(os, data, NULL);
 }
 
 void
-GraphML::dump(ostream& os, const StreamingAppData &data) const
+GraphML::dump(ostream& os, const Record &data) const
 {
 	dump(os, &data, NULL);
 }
 
 void
-GraphML::dump(ostream& os, const StreamingAppData &data, const Platform &arch) const
+GraphML::dump(ostream& os, const Record &data, const Platform &arch) const
 {
 	dump(os, &data, &arch);
 }

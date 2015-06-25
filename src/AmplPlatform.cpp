@@ -12,13 +12,13 @@ using namespace pelib;
 using namespace std;
 
 void
-AmplPlatform::dump(ostream& os, const StreamingAppData &data) const
+AmplPlatform::dump(ostream& os, const Record &data) const
 {
 	dump(os, &data);
 }
 
 void
-AmplPlatform::dump(ostream& os, const StreamingAppData *data) const
+AmplPlatform::dump(ostream& os, const Record *data) const
 {
 	const Platform *arch = dynamic_cast<const Platform* >(data);
 	if(arch == NULL) throw CastException("parameter \"data\" was not of type \"Platform*\".");

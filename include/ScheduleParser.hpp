@@ -1,13 +1,13 @@
 #include <Schedule.hpp>
 #include <Taskgraph.hpp>
-#include <StreamingAppDataParser.hpp>
+#include <DataParser.hpp>
 
 #ifndef PELIB_SCHEDULEPARSER
 #define PELIB_SCHEDULEPARSER
 
 namespace pelib
 {
-	class ScheduleParser : public StreamingAppDataParser
+	class ScheduleParser : public DataParser
 	{
 		public:
 			virtual

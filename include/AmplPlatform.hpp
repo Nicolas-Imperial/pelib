@@ -12,8 +12,8 @@ namespace pelib
 	{
 		public:
 			virtual Platform* parse(std::istream &is) const;
-			virtual	void dump(std::ostream &os, const StreamingAppData *data) const;
-			virtual	void dump(std::ostream &os, const StreamingAppData &data) const;
+			virtual	void dump(std::ostream &os, const Record *data) const;
+			virtual	void dump(std::ostream &os, const Record &data) const;
 			virtual AmplPlatform* clone() const;
 	};
 }

@@ -35,6 +35,11 @@ namespace pelib
 		this->setLinks(links);
 	}
 
+	Taskgraph::~Taskgraph()
+	{
+		// Do nothing
+	}
+
 	void
 	Taskgraph::setLinks(const set<Link> &links)
 	{
