@@ -1,4 +1,8 @@
-#include <pelib/platform_factory.hpp>
+#include <iostream>
+
+#include <pelib/parser.h>
+#include <pelib/output.h>
+
 #include <AmplPlatform.hpp>
 
 using namespace std;
@@ -8,27 +12,27 @@ using namespace pelib;
 extern "C" {
 #endif
 
-PlatformParser*
-create_parser()
+// /!\ the content of argv is freed after this function is run
+pelib::Record*
+pelib_parse(std::istream& cin, size_t argc, char **argv)
 {
-	return new AmplPlatform();
+// We don't care about any argument here
+#if 0
+	while(*argv != NULL)
+	{
+		cout << *argv << " ";
+		argv++;
+	}
+	cout << endl;
+#endif
+
+//	cout << cin.rdbuf();
+	return AmplPlatform().parse(cin);
 }
 
 void
-delete_parser(PlatformParser *parser)
+pelib_dump(std::ostream& out, std::map<const char*, Record*> records, size_t argc, char **argv)
 {
-	delete parser;
-}
-
-PlatformOutput* create_output()
-{
-	return new AmplPlatform();
-}
-
-void
-delete_output(PlatformOutput *output)
-{
-	delete output;
 }
 
 #ifdef __cplusplus
