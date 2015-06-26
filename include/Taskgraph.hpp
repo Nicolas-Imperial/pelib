@@ -82,7 +82,7 @@ namespace pelib
 			set<Link> links;
 			
 			virtual void
-			Taskgraph::setLinks(const set<Link> &link);
+			setLinks(const set<Link> &link);
 		private:		
 	};
 }

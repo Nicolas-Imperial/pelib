@@ -2,6 +2,8 @@
 #include <string>
 #include <iostream>
 
+#include <string.h>
+
 #include <pelib/argument_parsing.hpp>
 
 using namespace std;

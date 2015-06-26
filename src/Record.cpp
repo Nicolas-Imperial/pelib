@@ -2,4 +2,8 @@
 
 namespace pelib
 {	
+	Record::~Record()
+	{
+		// Do nothing
+	}
 }
