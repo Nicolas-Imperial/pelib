@@ -13,7 +13,6 @@
 #include <AmplOutput.hpp>
 
 #include <GraphML.hpp>
-#include <AmplPlatform.hpp>
 #include <XMLSchedule.hpp>
 
 #include <AmplInputData.hpp>
@@ -134,22 +133,18 @@ int
 parse_and_convert_graphml()
 {
 	Taskgraph tg_graphml = GraphML().parse(istream_taskgraph_graphml);
-	Platform arch = AmplPlatform().parse(istream_platform);
+	Algebra ampl_arch = AmplInput(AmplInput::floatHandlers()).parse(istream_platform);
+	Platform arch(ampl_arch);
 	
 	Algebra tg_graphml_algebra = tg_graphml.buildAlgebra(arch);
 	Taskgraph tg_from_algebra(tg_graphml_algebra);
 
 	string efficiency = tg_graphml.getTasks().begin()->getEfficiencyString();
 	tg_from_algebra.setMakespanCalculator("fml:var minF := 0; for(var j := 2; j <= n[]; j += 1) { minF += tau[j - 1] / (2 * p[] * min(F)); }; var maxF := 0; for(var j := 2; j <= n[]; j += 1) { maxF += tau[j - 1] / (2 * p[] * max(F)); }; minF + maxF");
-	set<Task> &tasks = tg_from_algebra.getTasks();
-	set<Task> newtasks;
-	for(set<Task>::iterator i = tasks.begin(); i != tasks.end(); i++)
+	for(set<Task>::iterator i = (set<Task>::iterator)tg_from_algebra.getTasks().begin(); i !=  (set<Task>::iterator)tg_from_algebra.getTasks().end(); i++)
 	{
-		Task t = *i;
-		t.setEfficiencyString(efficiency);
-		newtasks.insert(t);
+		((Task)(*i)).setEfficiencyString(efficiency);
 	}
-	tg_from_algebra.setTasks(newtasks);
 	
 	stringstream reference;
 	GraphML().dump(reference, tg_from_algebra);
@@ -186,7 +181,8 @@ int
 parse_and_convert_schedule()
 {
 	Taskgraph tg_graphml = GraphML().parse(istream_taskgraph_graphml);
-	Platform arch = AmplPlatform().parse(istream_platform);
+	Algebra alg_arch = AmplInput(AmplInput::floatHandlers()).parse(istream_platform);
+	Platform arch(alg_arch);
 	Algebra ampl_schedule = AmplOutput(AmplOutput::floatHandlers()).parse(istream_schedule_amploutput);
 	Schedule schedule("converted_from_ampl", tg_graphml, ampl_schedule);
 	

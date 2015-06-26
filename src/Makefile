@@ -251,7 +251,7 @@ test_list = $(testcc_list) $(testcxx_list)
 all: submake $(bin_list) $(lib_list) $(shared_list) $(shared_linkername) $(shared_soname)
 
 ## Force rebuild upon Makefile update
-$(cc_object) $(cxx_object) $(embed_object) $(cc_pkgconfig) $(cxx_pkgconfig) $(bin_list) $(lib_list) $(shared_list) $(shared_linkername) $(shared_soname): Makefile Makefile.in
+$(cc_object) $(cxx_object) $(embed_object) $(bin_list) $(lib_list) $(shared_list) $(shared_linkername) $(shared_soname) $(lib_pkgconfig): Makefile Makefile.in
 
 ## Generate snekkja schedules
 $(snekkja_schedule_src): $$(call kkj$$(if $$(filter %.c,$$@),cc,$$(if $$(filter %.cpp,$$@),cxx))_$$(patsubst %.$$(snekkja_schedule).$$(if $$(filter %.c,$$@),c)$$(if $$(filter %.cpp,$$@),cpp),%,$$@)_graph) $$(call kkj_$$(patsubst %.$$(snekkja_schedule).$$(if $$(filter %.c,$$@),c)$$(if $$(filter %.cpp,$$@),cpp),%,$$@)_platform)
@@ -310,21 +310,21 @@ $(shared_soname): $$@.$(minor).$(release)
 	ln -sf $< $@
 
 $(lib_pkgconfig): Makefile Makefile.in
-	@echo prefix=$(final_prefix) > $@
-	@echo exec_prefix=$(if $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_exec_prefix)),$(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_exec_prefix))),'$$'\{prefix\}/bin) >> $@
-	@echo libdir=$(if $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_libdir))),$(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_libdir))),'$$'\{prefix\}/lib) >> $@
-	@echo includedir=$(if $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_includedir))),$(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_includedir))),'$$'\{prefix\}/include) >> $@
-	@echo >> $@
-	@echo Name: $(if $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_name))),$(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_name))),$(patsubst %.pc,lib%,$@)) >> $@
-	@echo Description: $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_description))) >> $@
-	@echo Version: $(version).$(minor).$(release) >> $@
-	@echo URL: $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_url))) >> $@
-	@echo Libs: -L'$$'\{libdir\} -l$(patsubst %.pc,%,$@) $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_libs))) >> $@
-	@echo Libs.private: $(GLOBAL_LDFLAGS) $(call $2_$1_ldflags) $(GLOBAL_LIBS) $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_libs))) $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_libs_private))) >> $@
-	@echo Requires: $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_require))) >> $@
-	@echo Requires.private: $(foreach var,$(PKG),"$(var) $(call PKG_$(var)_version)") $(foreach var,$(call $(var)_$(patsubst %.pc,%,$@)_pkg),"$(var) $(sort $(foreach var2,lib shared,$(call $(var2)_$(patsubst %.pc,%,$@)_pkg_$(var)_version)))") $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_require_private))) >> $@
-	@echo Conflicts: $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_conflicts))) >> $@
-	@echo Cflags: $(GLOBAL_CFLAGS_EXPORT) $() -I'$$'\{includedir\} $(foreach var,cc cxx,$(call cflags_project_export,$(patsubst %.pc,%,$@),lib,$(var))) $(CPPFLAGS) $(foreach var,cc cxx,$(sort $(foreach var,lib shared,$(call $(var2)_$(patsubst %.pc,%,$@)_pkg_$(call prefix_cflags,$(var))flags)))) >> $@
+	echo prefix=$(final_prefix) > $@
+	echo exec_prefix=$(if $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_exec_prefix)),$(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_exec_prefix))),'$$'\{prefix\}/bin) >> $@
+	echo libdir=$(if $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_libdir))),$(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_libdir))),'$$'\{prefix\}/lib) >> $@
+	echo includedir=$(if $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_includedir))),$(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_includedir))),'$$'\{prefix\}/include) >> $@
+	echo >> $@
+	echo Name: $(if $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_name))),$(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_name))),$(patsubst %.pc,lib%,$@)) >> $@
+	echo Description: $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_description))) >> $@
+	echo Version: $(version).$(minor).$(release) >> $@
+	echo URL: $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_url))) >> $@
+	echo Libs: -L'$$'\{libdir\} -l$(patsubst %.pc,%,$@) $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_libs))) >> $@
+	echo Libs.private: $(GLOBAL_LDFLAGS) $(call $2_$1_ldflags) $(GLOBAL_LIBS) $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_libs))) $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_libs_private))) >> $@
+	echo Requires: $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_require))) >> $@
+	echo Requires.private: $(foreach var,$(PKG),"$(var) $(call PKG_$(var)_version)") $(foreach var,$(call $(var)_$(patsubst %.pc,%,$@)_pkg),"$(var) $(sort $(foreach var2,lib shared,$(call $(var2)_$(patsubst %.pc,%,$@)_pkg_$(var)_version)))") $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_require_private))) >> $@
+	echo Conflicts: $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_conflicts))) >> $@
+	echo Cflags: $(GLOBAL_CFLAGS_EXPORT) $() -I'$$'\{includedir\} $(foreach var,cc cxx,$(call cflags_project_export,$(patsubst %.pc,%,$@),lib,$(var))) $(CPPFLAGS) $(foreach var,cc cxx,$(sort $(foreach var,lib shared,$(call $(var2)_$(patsubst %.pc,%,$@)_pkg_$(call prefix_cflags,$(var))flags)))) >> $@
 
 dist: submake
 	mkdir -p $(distdir)
@@ -340,7 +340,7 @@ dist: submake
 clean: submake
 	$(RM) $(cc_object) $(foreach var,$(cc_object),$(var:%.o=%.d)) $(foreach var,$(cc_object),$(var:%.o=%.e))
 	$(RM) $(cxx_object) $(foreach var,$(cxx_object),$(var:%.o=%.d)) $(foreach var,$(cxx_object),$(var:%.o=%.e))
-	$(RM) $(cc_pkgconfig) $(cxx_pkgconfig)
+	$(RM) $(lib_pkgconfig)
 	$(RM) $(snekkja_schedule_src)
 	$(RM) $(embed_object)
 	$(RM) $(test_target)
@@ -355,7 +355,7 @@ check: submake $(test_list)
 
 checkdist distcheck: dist
         
-install: submake $(bin_list) $(lib_list) $(shared_list) $(shared_linkername) $(shared_soname) $(cc_pkgconfig) $(cxx_pkgconfig)
+install: submake $(bin_list) $(lib_list) $(shared_list) $(shared_linkername) $(shared_soname) $(lib_pkgconfig)
 	$(if $(strip $(lib_list)),install -d $(DESTDIR)$(final_libdir))
 	$(if $(strip $(lib_list)),install -m 644 $(lib_list) $(DESTDIR)$(final_libdir))
 	$(if $(strip $(shared_list)),install -d $(DESTDIR)$(final_libdir))

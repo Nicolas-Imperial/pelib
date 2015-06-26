@@ -12,6 +12,7 @@ namespace pelib
 		public:
 			Platform();
 			Platform(const Platform *arch);
+			Platform(const Algebra &arch);
 			virtual Platform* clone() const;
 
 			virtual int getCoreNumber() const;

@@ -2,6 +2,7 @@
 
 #include <Scalar.hpp>
 #include <Set.hpp>
+#include <ParseException.hpp>
 
 using namespace std;
 
@@ -17,6 +18,20 @@ namespace pelib
 	{
 		coreNumber = arch->getCoreNumber();
 		frequencies = arch->getFrequencies();
+	}
+
+	Platform::Platform(const Algebra &arch)
+	{
+		const Scalar<float> *scalar_p = arch.find<Scalar<float> >("p");
+		const Set<float> *set_F = arch.find<Set<float> >("F");
+
+		if(scalar_p == NULL || set_F == NULL)
+		{
+			throw ParseException(std::string("Missing core number scalar \"p\" or frequency set \"F\" in input."));
+		}
+	
+		this->setCoreNumber((int)scalar_p->getValue());
+		this->setFrequencies(set_F->getValues());
 	}
 
 	Platform::~Platform()

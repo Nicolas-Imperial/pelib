@@ -1,5 +1,5 @@
 ## All files to include in a distribution package
-attach = parser.h output.h
+attach = parser.h output.h dl.h argument_parsing.hpp
 
 ## Further directories to follow
 subdirs =

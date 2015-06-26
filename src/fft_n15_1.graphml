@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
          http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
 <!-- Created by igraph -->
-  <key id="g_autname" for="graph" attr.name="autname" attr.type="string"/>
+  <key id="g_name" for="graph" attr.name="autname" attr.type="string"/>
   <key id="g_target_makespan" for="graph" attr.name="target_makespan" attr.type="string"/>
   <key id="v_taskid" for="node" attr.name="taskid" attr.type="string"/>
   <key id="v_taskname" for="node" attr.name="taskname" attr.type="string"/>

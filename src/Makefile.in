@@ -34,13 +34,13 @@ CXX_TEST_LDFLAGS =
 ## static library packages and their sources
 #bincxx_package = demo streamingapp_demo demo_xmlformats graphmltoampli amplitographml duplicate_tasks graphmlfmltographmleval amplitoampli amplitoamplo amplotoampli amplotoamplo amplitocpp amplotocpp run_record amplotoschedule amplmatrixtoraw streamittographml cppelib
 #bincxx_package = graphmltoampli amplitographml duplicate_tasks graphmlfmltographmleval amplitoampli amplitoamplo amplotoampli amplotoamplo amplitocpp amplotocpp run_record amplotoschedule amplmatrixtoraw streamittographml cppelib
-bincxx_package = pelib-convert
+bincxx_package = pelib-convert demo run_record amplmatrixtoraw
 
 bincxx_pelib-convert_src = pelib-convert.cpp argument_parsing.cpp dl.cpp
 bin_pelib-convert_export = $(bincxx_pelib-convert_embed) $(bincxx_pelib-convert_src) 
-bin_pelib-convert_deps = libpelib-convert.so.1
-bin_pelib-convert_libs = -lpelib-convert $(lib_pelib-convert_libs)
-bin_pelib-convert_pkg = $(lib_pelib-convert_pkg)
+bin_pelib-convert_deps = libcppelib.so.1
+bin_pelib-convert_libs = -lcppelib $(lib_cppelib_libs)
+bin_pelib-convert_pkg = $(lib_cppelib_pkg)
 bin_pelib-convert_ldflags = -L.
 bin_pelib-convert_static = 0
 
@@ -52,14 +52,6 @@ bin_demo_pkg = $(lib_cppelib_pkg)
 bin_demo_ldflags = -L.
 bin_demo_static = 0
 
-bincxx_streamingapp_demo_src = streamingapp_demo.cpp
-bin_streamingapp_demo_export = $(bincxx_streamingapp_demo_embed) $(bincxx_streamingapp_demo_src) 
-bin_streamingapp_demo_deps = libcppelib.so.1
-bin_streamingapp_demo_libs = -lcppelib $(lib_cppelib_libs)
-bin_streamingapp_demo_pkg = $(lib_cppelib_pkg)
-bin_streamingapp_demo_ldflags = -L.
-bin_streamingapp_demo_static = 0
-
 bincxx_duplicate_tasks_src =  duplicate_tasks.cpp
 bin_duplicate_tasks_export = $(bincxx_duplicate_tasks_embed) $(bincxx_duplicate_tasks_src) 
 bin_duplicate_tasks_deps = libcppelib.so.1
@@ -68,38 +60,6 @@ bin_duplicate_tasks_pkg = $(lib_cppelib_pkg)
 bin_duplicate_tasks_ldflags = -L.
 bin_duplicate_tasks_static = 0
 
-bincxx_graphmltoampli_src = graphmltoampli.cpp
-bin_graphmltoampli_export = $(bincxx_graphmltoampli_embed) $(bincxx_graphmltoampli_src) 
-bin_graphmltoampli_deps = libcppelib.so.1
-bin_graphmltoampli_libs = -lcppelib $(lib_cppelib_libs)
-bin_graphmltoampli_pkg = $(lib_cppelib_pkg)
-bin_graphmltoampli_ldflags = -L.
-bin_graphmltoampli_static = 0
-
-bincxx_amplitographml_src = amplitographml.cpp
-bin_amplitographml_export = $(bincxx_amplitographml_embed) $(bincxx_amplitographml_src) 
-bin_amplitographml_deps = libcppelib.so.1
-bin_amplitographml_libs = -lcppelib $(lib_cppelib_libs)
-bin_amplitographml_pkg = $(lib_cppelib_pkg)
-bin_amplitographml_ldflags = -L.
-bin_amplitographml_static = 0
-
-bincxx_graphmlfmltographmleval_src = graphmlfmltographmleval.cpp
-bin_graphmlfmltographmleval_export = $(bincxx_graphmlfmltographmleval_embed) $(bincxx_graphmlfmltographmleval_src) 
-bin_graphmlfmltographmleval_deps = libcppelib.so.1
-bin_graphmlfmltographmleval_libs = -lcppelib $(lib_cppelib_libs)
-bin_graphmlfmltographmleval_pkg = $(lib_cppelib_pkg)
-bin_graphmlfmltographmleval_ldflags = -L.
-bin_graphmlfmltographmleval_static = 0
-
-bincxx_amplotoschedule_src = amplotoschedule.cpp
-bin_amplotoschedule_export = $(bincxx_amplotoschedule_embed) $(bincxx_amplotoschedule_src) 
-bin_amplotoschedule_deps = libcppelib.so.1
-bin_amplotoschedule_libs = -lcppelib $(lib_cppelib_libs)
-bin_amplotoschedule_pkg = $(lib_cppelib_pkg)
-bin_amplotoschedule_ldflags = -L.
-bin_amplotoschedule_static = 0
-
 bincxx_demo_xmlformats_src = demo_xmlformats.cpp
 bin_demo_xmlformats_export = $(bincxx_demo_xmlformats_embed) $(bincxx_demo_xmlformats_src) 
 bin_demo_xmlformats_deps = libcppelib.so.1
@@ -107,54 +67,6 @@ bin_demo_xmlformats_libs = -lcppelib $(lib_cppelib_libs)
 bin_demo_xmlformats_pkg = $(lib_cppelib_pkg)
 bin_demo_xmlformats_ldflags = -L.
 bin_demo_xmlformats_static = 0
-
-bincxx_amplitoampli_src = amplitoampli.cpp
-bin_amplitoampli_export = $(bincxx_amplitoampli_embed) $(bincxx_amplitoampli_src) 
-bin_amplitoampli_deps = libcppelib.so.1
-bin_amplitoampli_libs = -lcppelib $(lib_cppelib_libs)
-bin_amplitoampli_pkg = $(lib_cppelib_pkg)
-bin_amplitoampli_ldflags = -L.
-bin_amplitoampli_static = 0
-
-bincxx_amplitoamplo_src = amplitoamplo.cpp
-bin_amplitoamplo_export = $(bincxx_amplitoamplo_embed) $(bincxx_amplitoamplo_src) 
-bin_amplitoamplo_deps = libcppelib.so.1
-bin_amplitoamplo_libs = -lcppelib $(lib_cppelib_libs)
-bin_amplitoamplo_pkg = $(lib_cppelib_pkg)
-bin_amplitoamplo_ldflags = -L.
-bin_amplitoamplo_static = 0
-
-bincxx_amplotoampli_src = amplotoampli.cpp
-bin_amplotoampli_export = $(bincxx_amplotoampli_embed) $(bincxx_amplotoampli_src) 
-bin_amplotoampli_deps = libcppelib.so.1
-bin_amplotoampli_libs = -lcppelib $(lib_cppelib_libs)
-bin_amplotoampli_pkg = $(lib_cppelib_pkg)
-bin_amplotoampli_ldflags = -L.
-bin_amplotoampli_static = 0
-
-bincxx_amplotoamplo_src = amplotoamplo.cpp
-bin_amplotoamplo_export = $(bincxx_amplotoamplo_embed) $(bincxx_amplotoamplo_src) 
-bin_amplotoamplo_deps = libcppelib.so.1
-bin_amplotoamplo_libs = -lcppelib $(lib_cppelib_libs)
-bin_amplotoamplo_pkg = $(lib_cppelib_pkg)
-bin_amplotoamplo_ldflags = -L.
-bin_amplotoamplo_static = 0
-
-bincxx_amplitocpp_src = amplitocpp.cpp
-bin_amplitocpp_export = $(bincxx_amplitocpp_embed) $(bincxx_amplitocpp_src) 
-bin_amplitocpp_deps = libcppelib.so.1
-bin_amplitocpp_libs = -lcppelib $(lib_cppelib_libs)
-bin_amplitocpp_pkg = $(lib_cppelib_pkg)
-bin_amplitocpp_ldflags = -L.
-bin_amplitocpp_static = 0
-
-bincxx_amplotocpp_src = amplotocpp.cpp
-bin_amplotocpp_export = $(bincxx_amplotocpp_embed) $(bincxx_amplotocpp_src) 
-bin_amplotocpp_deps = libcppelib.so.1
-bin_amplotocpp_libs = -lcppelib $(lib_cppelib_libs)
-bin_amplotocpp_pkg = $(lib_cppelib_pkg)
-bin_amplotocpp_ldflags = -L.
-bin_amplotocpp_static = 0
 
 bincxx_run_record_src = run_record.cpp
 bin_run_record_export = $(bincxx_run_record_embed) $(bincxx_run_record_src) make_algebra.cpp
@@ -171,14 +83,6 @@ bin_amplmatrixtoraw_libs = -lcppelib $(lib_cppelib_libs)
 bin_amplmatrixtoraw_pkg = $(lib_cppelib_pkg)
 bin_amplmatrixtoraw_ldflags = -L.
 bin_amplmatrixtoraw_static = 0
-
-bincxx_streamittographml_src = streamittographml.cpp
-bin_streamittographml_export = $(bincxx_streamittographml_embed) $(bincxx_streamittographml_src)
-bin_streamittographml_deps = libcppelib.so.1
-bin_streamittographml_libs = -lcppelib $(lib_cppelib_libs)
-bin_streamittographml_pkg = $(lib_cppelib_pkg)
-bin_streamittographml_ldflags = -L.
-bin_streamittographml_static = 0
 
 ## static library packages and their sources
 lib_package = unit #cppelib
@@ -226,7 +130,7 @@ lib_cppelib_pkg_cxxflags =
 lib_cppelib_pkg_description = General research utility library used in PELAB
 lib_cppelib_embed = 
 
-sharedcxx_package = cppelib pelib-platform-ampl_input pelib-platform-ampl_output pelib-taskgraph-graphml pelib-taskgraph-ampl_input pelib-taskgraph-ampl_output pelib-schedule-xml pelib-schedule-drake pelib-schedule-ampl_input pelib-schedule-ampl_output pelib-ampl_input pelib-ampl_output
+sharedcxx_package = cppelib pelib-platform-ampl_input pelib-platform-ampl_output pelib-taskgraph-graphml pelib-taskgraph-streamit pelib-taskgraph-ampl_input pelib-taskgraph-ampl_output pelib-schedule-xml pelib-schedule-drake pelib-schedule-ampl_input pelib-schedule-ampl_output pelib-ampl_input pelib-ampl_output
 
 sharedcxx_cppelib_src = $(libcxx_cppelib_src)
 shared_cppelib_export = $(sharedcxx_cppelib_embed) $(sharedcxx_cppelib_src)
@@ -279,6 +183,19 @@ shared_pelib-taskgraph-graphml_pkg_libs =
 shared_pelib-taskgraph-graphml_pkg_cxxflags = 
 shared_pelib-taskgraph-graphml_pkg_description = Platform parser and output in AMPL input format
 shared_pelib-taskgraph-graphml_embed = 
+
+sharedcxx_pelib-taskgraph-streamit_src = taskgraph-streamit.cpp
+shared_pelib-taskgraph-streamit_export = $(sharedcxx_pelib-taskgraph-streamit_embed) $(sharedcxx_pelib-taskgraph-streamit_src)
+shared_pelib-taskgraph-streamit_libs = $(shared_cppelib_libs)
+shared_pelib-taskgraph-streamit_ldflags = 
+shared_pelib-taskgraph-streamit_deps =
+shared_pelib-taskgraph-streamit_pkg = $(shared_cppelib_pkg) cppelib
+shared_pelib-taskgraph-streamit_pkg_url = http://www.ida.liu.se/~nicme26
+shared_pelib-taskgraph-streamit_pkg_ld = 
+shared_pelib-taskgraph-streamit_pkg_libs = 
+shared_pelib-taskgraph-streamit_pkg_cxxflags = 
+shared_pelib-taskgraph-streamit_pkg_description = Platform parser and output in AMPL input format
+shared_pelib-taskgraph-streamit_embed = 
 
 sharedcxx_pelib-taskgraph-ampl_input_src = taskgraph-ampl_input.cpp
 shared_pelib-taskgraph-ampl_input_export = $(sharedcxx_pelib-taskgraph-ampl_input_embed) $(sharedcxx_pelib-taskgraph-ampl_input_src)
@@ -389,7 +306,7 @@ lib_unit_export = $(libcxx_unit_embed) $(libcxx_unit_src)
 lib_unit_deps =
 
 ## test packages and their sources
-#testcxx_package = parser 
+testcxx_package = parser 
 
 testcxx_parser_src = test_parser.cpp 
 test_parser_export = $(testcxx_parser_embed) $(testcxx_parser_src) make_algebra.cpp
