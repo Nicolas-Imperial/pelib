@@ -24,6 +24,12 @@ extern "C"{
 using namespace pelib;
 using namespace std;
 using namespace xmlpp;
+
+XMLSchedule::~XMLSchedule()
+{
+	// Do nothing
+}
+
 void
 XMLSchedule::dump(ostream& os, const Record &data) const
 {

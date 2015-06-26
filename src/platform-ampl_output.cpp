@@ -4,7 +4,7 @@
 #include <pelib/output.h>
 
 #include <Set.hpp>
-#include <AmplInput.hpp>
+#include <AmplOutput.hpp>
 #include <Platform.hpp>
 
 using namespace std;
@@ -20,7 +20,7 @@ extern "C" {
 pelib::Record*
 pelib_parse(std::istream& cin, size_t argc, char **argv)
 {
-	AmplInput reader(AmplInput::floatHandlers());
+	AmplOutput reader(AmplOutput::floatHandlers());
 	std::string line;
 	Algebra alg_arch = reader.parse(cin);
 
@@ -46,7 +46,7 @@ pelib_dump(std::ostream& cout, std::map<const char*, Record*> records, size_t ar
 {
 	const Platform *arch = (Platform*)records.find(typeid(Platform).name())->second;
 
-	AmplInput output(AmplInput::intFloatHandlers());
+	AmplOutput output(AmplOutput::intFloatHandlers());
 	Algebra alg = arch->buildAlgebra();
 	output.dump(cout, alg);
 }

@@ -10,8 +10,9 @@ namespace pelib
 	class DrakeCSchedule : public DrakeCScheduleOutput
 	{
 		public:
-			virtual	void dump(std::ostream &os, const Data *data) const;
-			virtual	void dump(std::ostream &os, const Data &data) const;
+			virtual ~DrakeCSchedule();
+			virtual	void dump(std::ostream &os, const Record *data) const;
+			virtual	void dump(std::ostream &os, const Record &data) const;
 			virtual DrakeCSchedule* clone() const;
 	};
 }

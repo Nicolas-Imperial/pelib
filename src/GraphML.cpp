@@ -79,6 +79,11 @@ thread_writer(void* aux)
 	return NULL;
 }
 
+GraphML::~GraphML()
+{
+	// Do nothing
+}
+
 void
 GraphML::dump(ostream& os, const Record *data, const Platform *arch) const
 {

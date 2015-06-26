@@ -24,14 +24,19 @@ extern "C"{
 using namespace pelib;
 using namespace std;
 
+DrakeCSchedule::~DrakeCSchedule()
+{
+	// Do nothing
+}
+
 void
-DrakeCSchedule::dump(ostream& os, const Data &data) const
+DrakeCSchedule::dump(ostream& os, const Record &data) const
 {
 	dump(os, &data);
 }
 
 void
-DrakeCSchedule::dump(ostream& os, const Data *data) const
+DrakeCSchedule::dump(ostream& os, const Record *data) const
 {
 	const Schedule *sched = dynamic_cast<const Schedule* >(data);
 

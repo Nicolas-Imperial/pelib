@@ -12,6 +12,7 @@ namespace pelib
 	class GraphML : public GraphMLParser, public GraphMLOutput
 	{
 		public:
+			virtual ~GraphML();
 			virtual GraphML* clone() const;
 			virtual Taskgraph* parse(std::istream &is) const;
 			virtual void dump(std::ostream &str, const Record *data) const;

@@ -251,7 +251,7 @@ test_list = $(testcc_list) $(testcxx_list)
 all: submake $(bin_list) $(lib_list) $(shared_list) $(shared_linkername) $(shared_soname)
 
 ## Force rebuild upon Makefile update
-#$(cc_object) $(cxx_object) $(embed_object) $(cc_pkgconfig) $(cxx_pkgconfig) $(bin_list) $(lib_list) $(shared_list) $(shared_linkername) $(shared_soname): Makefile Makefile.in
+$(cc_object) $(cxx_object) $(embed_object) $(cc_pkgconfig) $(cxx_pkgconfig) $(bin_list) $(lib_list) $(shared_list) $(shared_linkername) $(shared_soname): Makefile Makefile.in
 
 ## Generate snekkja schedules
 $(snekkja_schedule_src): $$(call kkj$$(if $$(filter %.c,$$@),cc,$$(if $$(filter %.cpp,$$@),cxx))_$$(patsubst %.$$(snekkja_schedule).$$(if $$(filter %.c,$$@),c)$$(if $$(filter %.cpp,$$@),cpp),%,$$@)_graph) $$(call kkj_$$(patsubst %.$$(snekkja_schedule).$$(if $$(filter %.c,$$@),c)$$(if $$(filter %.cpp,$$@),cpp),%,$$@)_platform)
