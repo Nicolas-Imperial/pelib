@@ -15,7 +15,7 @@ tarname = $(package)
 distdir = $(abspath $(tarname)-$(version))
 
 ## Targets asked for running, or default target if none
-TARGETS=$(if $(MAKECMDGOALS),$(MAKECMDGOALS),$(DEFAULT))
+TARGETS = $(if $(MAKECMDGOALS),$(MAKECMDGOALS),$(DEFAULT))
 
 # Check make version
 VERSION = $(shell make --version|head -1|cut -f 1-2 -d ' ')

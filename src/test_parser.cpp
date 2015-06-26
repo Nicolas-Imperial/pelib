@@ -143,7 +143,8 @@ parse_and_convert_graphml()
 	tg_from_algebra.setMakespanCalculator("fml:var minF := 0; for(var j := 2; j <= n[]; j += 1) { minF += tau[j - 1] / (2 * p[] * min(F)); }; var maxF := 0; for(var j := 2; j <= n[]; j += 1) { maxF += tau[j - 1] / (2 * p[] * max(F)); }; minF + maxF");
 	for(set<Task>::iterator i = (set<Task>::iterator)tg_from_algebra.getTasks().begin(); i !=  (set<Task>::iterator)tg_from_algebra.getTasks().end(); i++)
 	{
-		((Task)(*i)).setEfficiencyString(efficiency);
+		Task &t = (Task&)*i;
+		t.setEfficiencyString(efficiency);
 	}
 	
 	stringstream reference;
@@ -181,11 +182,13 @@ int
 parse_and_convert_schedule()
 {
 	Taskgraph tg_graphml = GraphML().parse(istream_taskgraph_graphml);
+	//GraphML().dump(cout, tg_graphml);
 	Algebra alg_arch = AmplInput(AmplInput::floatHandlers()).parse(istream_platform);
+	//AmplOutput(AmplOutput::intFloatHandlers()).dump(cout, alg_arch);
 	Platform arch(alg_arch);
 	Algebra ampl_schedule = AmplOutput(AmplOutput::floatHandlers()).parse(istream_schedule_amploutput);
 	Schedule schedule("converted_from_ampl", tg_graphml, ampl_schedule);
-	
+
 	stringstream reference;
 	XMLSchedule().dump(reference, schedule);
 

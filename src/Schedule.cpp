@@ -56,7 +56,7 @@ namespace pelib
 			{
 				const Task *task = j->second.first;
 				Task t = *task;
-				const Task &task_ref = *this->getTaskgraph().getTasks().find(t);
+				Task &task_ref = (Task&)*this->getTaskgraph().getTasks().find(t);
 				pair<float, work> new_pair = pair<float, work>(j->first, work(&task_ref, j->second.second));
 				i->second.erase(j);
 				i->second.insert(new_pair);
@@ -103,7 +103,7 @@ namespace pelib
 						//task.setWorkload(tau->getValues().find((int)floor(j->second))->second);
 						if(task.getWorkload() > 0)
 						{
-							Task &task_tg = (Task&)*tg.getTasks().find(task);
+							Task& task_tg = (Task&)*tg.getTasks().find(task);
 
 							task_tg.setWidth(wi->getValues().find((int)floor(j->second))->second);
 							task_tg.setFrequency(freq->getValues().find((int)floor(j->second))->second);
@@ -122,8 +122,8 @@ namespace pelib
 							//cerr << "Core: " << i->first << "; Task: " << j->second << "; taskid: " << tg.findTask((int)floor(j->second)).getTaskId() << "; Start time: " << task.getStartTime() << endl;
 							//const Task &task_ref = *this->getTaskgraph().getTasks().find(task);
 							//core_schedule.insert(pair<float, Task*>(task.getStartTime(), &(this->getTasks().find(task))));
-							core_schedule.insert(pair<float, work>(task.getStartTime(), work(&task_tg, tau->getValues().find((int)floor(j->second))->second)));
-							start += task_tg.runtime(task.getWidth(), task_tg.getFrequency());
+							core_schedule.insert(pair<float, work>(task_tg.getStartTime(), work(&task_tg, tau->getValues().find((int)floor(j->second))->second)));
+							start += task_tg.runtime(task_tg.getWidth(), task_tg.getFrequency());
 						}
 					}
 				}
@@ -133,6 +133,7 @@ namespace pelib
 		}
 
 		this->taskgraph = taskgraph;
+		this->taskgraph = tg;
 		this->setSchedule(schedule);
 	}
 	

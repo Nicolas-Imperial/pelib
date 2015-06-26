@@ -39,7 +39,7 @@ XMLSchedule::dump(ostream& os, const Record &data) const
 void
 XMLSchedule::dump(ostream& os, const Record *data) const
 {
-	const Schedule *sched = dynamic_cast<const Schedule* >(data);
+	const Schedule *sched = dynamic_cast<const Schedule*>(data);
 	if(sched == NULL) throw CastException("parameter \"data\" was not of type \"Schedule*\".");
 
 	Schedule::table schedule = sched->getSchedule();
@@ -55,17 +55,17 @@ XMLSchedule::dump(ostream& os, const Record *data) const
 		}
 	}
 
-	os << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-		<< "<schedule name=\"" << sched->getName() << "\" autname=\"" << sched->getName() << "\" "
+	os << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << endl
+		<< "<schedule name=\"" << sched->getName() << "\" appname=\"" << sched->getAppName() << "\" "
 		<< "roundtime=\"" << target_makespan << "\" "
 		<< "cores=\"" << schedule.size() << "\" "
 		<< "tasks=\"" << task_ids.size() << "\""
-		<< "> \n";
+		<< ">" << endl;
 
 	for(Schedule::table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 	{
 		int p = i->first;
-		os << " <core coreid=\"" << p - 1 << "\">\n";
+		os << " <core coreid=\"" << p - 1 << "\">" << endl;
 		Schedule::sequence core_schedule = i->second;
 		int order = 0;
 
@@ -77,12 +77,12 @@ XMLSchedule::dump(ostream& os, const Record *data) const
 				<< "frequency=\"" << j->second.first->getFrequency() << "\" "
 				<< "width=\"" << j->second.first->getWidth() << "\" "
 				<< "workload=\"" << j->second.first->getWorkload() << "\" "
-				<< "/>\n";
+				<< "/>" << endl;
 		}
-		os << " </core>\n";
+		os << " </core>" << endl;
 	}
 
-	os << "</schedule>\n";
+	os << "</schedule>" << endl;
 }
 
 Schedule*
