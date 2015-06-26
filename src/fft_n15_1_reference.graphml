@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
          http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
 <!-- Created by igraph -->
-  <key id="g_name" for="graph" attr.name="autname" attr.type="string"/>
+  <key id="g_name" for="graph" attr.name="name" attr.type="string"/>
   <key id="g_target_makespan" for="graph" attr.name="target_makespan" attr.type="string"/>
   <key id="v_taskid" for="node" attr.name="taskid" attr.type="string"/>
   <key id="v_taskname" for="node" attr.name="taskname" attr.type="string"/>
@@ -12,7 +12,7 @@
   <key id="v_max_width" for="node" attr.name="max_width" attr.type="double"/>
   <key id="v_efficiency" for="node" attr.name="efficiency" attr.type="string"/>
   <graph id="G" edgedefault="directed">
-    <data key="g_autname">Generated_from_algebra</data>
+    <data key="g_name">Generated_from_algebra</data>
     <data key="g_target_makespan">class:fft</data>
     <node id="n0">
       <data key="v_taskid">task_1_id</data>
