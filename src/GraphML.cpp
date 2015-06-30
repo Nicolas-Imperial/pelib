@@ -107,19 +107,20 @@ GraphML::dump(ostream& os, const Record *data, const Platform *arch) const
 
 	// Add graph attributes
 	SETGAS(graph,"name", tg->getName().c_str());
-	SETGAS(graph,"target_makespan", tg->getMakespanCalculator().c_str());
+	SETGAS(graph,"deadline", tg->getDeadlineCalculator().c_str());
 
 	// Add vertices
 	int ret = igraph_add_vertices(graph, tg->getTasks().size(), 0);
 	if(ret == IGRAPH_EINVAL) throw CastException("Could not add vertices to igraph.");
 
-	for(set<Task>::const_iterator i = tg->getTasks().begin(); i != tg->getTasks().end(); i++)
+	size_t counter = 0;
+	for(set<Task>::const_iterator i = tg->getTasks().begin(); i != tg->getTasks().end(); i++, counter++)
 	{
 		Task task = *i;
 		
-		SETVAS(graph, "taskid", task.getId() - 1, task.getTaskId().c_str());
-		SETVAS(graph, "taskname", task.getId() - 1, task.getName().c_str());
-		SETVAN(graph, "workload", task.getId() - 1, task.getWorkload());
+		SETVAS(graph, "name", counter, task.getName().c_str());
+		SETVAS(graph, "module", counter, task.getModule().c_str());
+		SETVAN(graph, "workload", counter, task.getWorkload());
 		stringstream max_width;
 
 		// If no platform is provided, just dump efficiency and max width as is.
@@ -127,7 +128,7 @@ GraphML::dump(ostream& os, const Record *data, const Platform *arch) const
 		// replace any larger value of max_width than number of core, by number of cores 
 		if (arch == NULL)
 		{
-			SETVAS(graph, "efficiency", task.getId() - 1, task.getEfficiencyString().c_str());
+			SETVAS(graph, "efficiency", counter, task.getEfficiencyString().c_str());
 			max_width << task.getMaxWidth();
 		}
 		else
@@ -139,7 +140,7 @@ GraphML::dump(ostream& os, const Record *data, const Platform *arch) const
 				ss << task.getEfficiency(j) << " ";
 			}
 
-			SETVAS(graph, "efficiency", task.getId() - 1, ss.str().c_str());
+			SETVAS(graph, "efficiency", counter, ss.str().c_str());
 
 			if(task.getMaxWidth() >= arch->getCoreNumber())
 			{
@@ -147,7 +148,7 @@ GraphML::dump(ostream& os, const Record *data, const Platform *arch) const
 			}
 		}
 
-		SETVAS(graph, "max_width", task.getId() - 1, max_width.str().c_str());
+		SETVAS(graph, "max_width", counter, max_width.str().c_str());
 	}
 
 	// Dump data to stream os
@@ -241,8 +242,10 @@ GraphML::parse(istream &is) const
 	set<Task> tasks;
 	for(int id = 0; id < igraph_vcount(the_graph); id++)
 	{
-		Task task(id + 1, strcmp(VAS(the_graph, "taskid", id), "") != 0 ? VAS(the_graph, "taskid", id) : "UNNAMED_TASKID");
-		task.setName(strcmp(VAS(the_graph, "taskname", id),"") != 0 ? VAS(the_graph, "taskname", id) : "UNNAMED_TASKNAME");
+		stringstream estr;
+		estr << "task_" << id;
+		Task task(strcmp(VAS(the_graph, "name", id), "") != 0 ? VAS(the_graph, "name", id) : estr.str());
+		task.setModule(strcmp(VAS(the_graph, "module", id),"") != 0 ? VAS(the_graph, "module", id) : "dummy");
 		task.setWorkload(!isnan((float)VAN(the_graph, "workload", id)) ? VAN(the_graph, "workload", id): 1.0);
 		const char *str = VAS(the_graph, "max_width", id);
 		string max_width_str(str);
@@ -282,7 +285,7 @@ GraphML::parse(istream &is) const
 		{
 			stringstream ss;
 			ss << task.getMaxWidth();
-			task.setEfficiencyString(string("fml:p <= ") + ss.str() + "? 1 : 1e-6");
+			task.setEfficiencyString(string("exprtk:p <= ") + ss.str() + "? 1 : 1e-6");
 		}
 
 		tasks.insert(task);
@@ -296,12 +299,11 @@ GraphML::parse(istream &is) const
 		int producer_id, consumer_id;
 
 		igraph_edge(the_graph, i, &producer_id, &consumer_id);
-		Task producer(producer_id + 1);
-		Task consumer(consumer_id + 1);
+		Task producer(VAS(the_graph, "id", producer_id));
+		Task consumer(VAS(the_graph, "id", consumer_id));
 
 		Link link(*tasks.find(producer), *tasks.find(consumer));
 		links.insert(link);
-
 
 		const Link &link_ref = *links.find(link);
 
@@ -312,8 +314,8 @@ GraphML::parse(istream &is) const
 		consumer_ref.getProducers().insert(&link_ref);
 
 		/*
-		trace(producer_ref.getId());
-		trace(consumer_ref.getId());
+		trace(producer_ref.getName());
+		trace(consumer_ref.getName());
 		trace(producer_ref.getConsumers().size());
 		trace(consumer_ref.getConsumers().size());
 		trace(producer_ref.getProducers().size());
@@ -324,7 +326,7 @@ GraphML::parse(istream &is) const
 	// Finally build the taskgraph
 	Taskgraph *tg = new Taskgraph(tasks, links);
 	tg->setName(GAS(the_graph, "name"));
-	tg->setMakespanCalculator(GAS(the_graph, "target_makespan"));
+	tg->setDeadlineCalculator(GAS(the_graph, "deadline"));
 
 	// Cleanup
 	igraph_destroy(the_graph);

@@ -8,10 +8,10 @@ using namespace std;
 
 namespace pelib
 {
-	Platform::Platform()
+	Platform::Platform(size_t p, const set<float> &f)
 	{
-		coreNumber = 1;
-		frequencies.insert(1);
+		coreNumber = p;
+		frequencies = f;
 	}
 	
 	Platform::Platform(const Platform *arch)
@@ -30,8 +30,8 @@ namespace pelib
 			throw ParseException(std::string("Missing core number scalar \"p\" or frequency set \"F\" in input."));
 		}
 	
-		this->setCoreNumber((int)scalar_p->getValue());
-		this->setFrequencies(set_F->getValues());
+		this->coreNumber = (size_t)scalar_p->getValue();
+		this->frequencies = set_F->getValues();
 	}
 
 	Platform::~Platform()
@@ -42,11 +42,7 @@ namespace pelib
 	Platform*
 	Platform::clone() const
 	{
-		Platform *arch = new Platform();
-		arch->setCoreNumber(this->getCoreNumber());
-		arch->setFrequencies(this->getFrequencies());
-
-		return arch;
+		return new Platform(this->getCoreNumber(), this->getFrequencies());
 	}
 
 	int
@@ -55,24 +51,12 @@ namespace pelib
 		return this->coreNumber;
 	}
 	
-	void
-	Platform::setCoreNumber(int p)
-	{
-		this->coreNumber = p;
-	}
-
 	const std::set<float>&
 	Platform::getFrequencies() const
 	{
 		return this->frequencies;
 	}
 		
-	void
-	Platform::setFrequencies(const std::set<float>& freq)
-	{
-		this->frequencies = freq;
-	}
-	
 	Algebra
 	Platform::buildAlgebra() const
 	{

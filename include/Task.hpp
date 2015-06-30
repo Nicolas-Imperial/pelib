@@ -12,8 +12,7 @@ namespace pelib
 	class Task
 	{
 		public:
-			Task(const int id, const std::string taskId);
-			Task(const int id);
+			Task(const std::string id);
 			virtual ~Task();
 			
 			virtual double
@@ -29,16 +28,13 @@ namespace pelib
 			setWidth(double width);
 
 			virtual std::string
-			getName() const;
+			getModule() const;
 
 			virtual void
-			setName(const std::string name);
+			setModule(const std::string name);
 
 			virtual std::string
-			getTaskId() const;
-
-			virtual int
-			getId() const;
+			getName() const;
 
 			virtual std::string
 			getEfficiencyString() const;
@@ -92,8 +88,7 @@ namespace pelib
 			double frequency, width;
 			double workload, maxWidth;
 			float start_time;
-			int id;
-			std::string taskId, name, efficiencyString;
+			std::string name, module, efficiencyString;
 			std::set<const Link*> consumers, producers;
 			
 			static const float very_small = 1e-6;

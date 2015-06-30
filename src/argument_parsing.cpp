@@ -6,6 +6,8 @@
 
 #include <pelib/argument_parsing.hpp>
 
+#define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
+
 using namespace std;
 
 void
@@ -66,15 +68,14 @@ add_argument(pelib_argument_stream *stream, char *argv)
 			stream->argv[stream->argc] = (char*)malloc(sizeof(char) * (strlen(argv) + 1));
 			strcpy(stream->argv[stream->argc], argv);
 			stream->argc++;
+			stream->argv[stream->argc] = NULL;
 }
-
-#define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
 
 unsigned int
 pelib_argument_stream_parse(char **argv, pelib_argument_stream_t* stream)
 {
 	unsigned int parsed = 0;
-	while(*argv != NULL)
+	while((void*)argv[0] != NULL)
 	{
 		if(string(*argv).compare("--lib") == 0 || string(*argv).compare("-l") == 0)
 		{
@@ -134,10 +135,8 @@ pelib_argument_stream_parse(char **argv, pelib_argument_stream_t* stream)
 			}
 			else
 			{
-				debug(*argv);
 				stream->name = (char*)malloc(sizeof(char) * (strlen(*argv) + 1));
 				strcpy(stream->name, *argv);
-				debug(stream->name);
 
 				argv++;
 				parsed++;

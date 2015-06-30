@@ -152,7 +152,7 @@ int main(int argc, char **argv)
 		case TASKS:
 			for(set<Task>::const_iterator i = tg->getTasks().begin(); i != tg->getTasks().end(); i++)
 			{
-				cout << i->getId() << " ";
+				cout << i->getName() << " ";
 			}
 			cout << endl;
 		break;

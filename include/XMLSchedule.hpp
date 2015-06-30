@@ -1,4 +1,5 @@
-#include "Schedule.hpp"
+#include <Schedule.hpp>
+#include <Taskgraph.hpp>
 
 #include <XMLScheduleParser.hpp>
 #include <XMLScheduleOutput.hpp>
@@ -12,9 +13,9 @@ namespace pelib
 	{
 		public:
 			virtual ~XMLSchedule();
-			virtual Schedule* parse(std::istream &is, Taskgraph &tg) const;
-			virtual	void dump(std::ostream &os, const Record *data) const;
-			virtual	void dump(std::ostream &os, const Record &data) const;
+			virtual	void dump(std::ostream &os, const Schedule *data, const Taskgraph *tg, const Platform *pt) const;
+			virtual	void dump(std::ostream &os, const Schedule &data, const Taskgraph &tg, const Platform &pt) const;
+			virtual Schedule* parse(std::istream &is) const;
 			virtual XMLSchedule* clone() const;
 	};
 }

@@ -2,8 +2,8 @@
 
 #include <pelib/parser.h>
 #include <pelib/output.h>
-#include <pelib/argument_parsing.hpp>
-#include <pelib/dl.h>
+//#include <pelib/argument_parsing.hpp>
+//#include <pelib/dl.h>
 
 #include <AmplInput.hpp>
 #include <Schedule.hpp>
@@ -17,6 +17,7 @@ extern "C" {
 
 #define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
 
+#if 0
 struct parameters {
 	char* taskgraph;
 };
@@ -41,11 +42,13 @@ parse_args(size_t argc, char **argv)
 
 	return parameters;
 }
+#endif
 
 // /!\ the content of argv is freed after this function is run
 pelib::Record*
 pelib_parse(std::istream& cin, size_t argc, char **argv)
 {
+#if 0
 	pelib_argument_stream_t parameters = parse_args(argc, argv);
 	Taskgraph *tg;
 
@@ -103,9 +106,10 @@ pelib_parse(std::istream& cin, size_t argc, char **argv)
 #endif
 
 //	cout << cin.rdbuf();
+#endif
 	Algebra al = AmplInput(AmplInput::floatHandlers()).parse(cin);
-	Schedule *sched = new Schedule("Converted from Algebra", *tg, al);
-	delete tg;
+	Schedule *sched = new Schedule("Converted from Algebra", al);
+//	delete tg;
 
 	return sched;
 }

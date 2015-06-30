@@ -11,8 +11,8 @@ namespace pelib
 	{
 		public:
 			virtual ~DrakeCSchedule();
-			virtual	void dump(std::ostream &os, const Record *data) const;
-			virtual	void dump(std::ostream &os, const Record &data) const;
+			virtual	void dump(std::ostream &os, const Schedule *data, const Taskgraph *tg, const Platform *pt) const;
+			virtual	void dump(std::ostream &os, const Schedule &data, const Taskgraph &tg, const Platform &pt) const;
 			virtual DrakeCSchedule* clone() const;
 	};
 }

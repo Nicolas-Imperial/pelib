@@ -13,6 +13,7 @@
 #include <AmplOutput.hpp>
 
 #include <GraphML.hpp>
+#include <Platform.hpp>
 #include <XMLSchedule.hpp>
 
 #include <AmplInputData.hpp>
@@ -76,6 +77,8 @@ extern size_t _binary_schedule_dat_size;
 std::string string_schedule_amploutput;
 std::istringstream istream_schedule_amploutput;
 
+Platform pt(1, set<float>());
+
 void
 test_init()
 {
@@ -114,6 +117,14 @@ test_setup()
 	string_schedule_amploutput = std::string(&_binary_schedule_dat_start).substr(0, (size_t)(&_binary_schedule_dat_size));
 	istream_schedule_amploutput.clear();
 	istream_schedule_amploutput.str(string_schedule_amploutput);
+
+	set<float> f;
+	f.insert(1);
+	f.insert(2);
+	f.insert(3);
+	f.insert(4);
+	f.insert(5);
+	pt = Platform(8, f);
 }
 
 void
@@ -140,7 +151,7 @@ parse_and_convert_graphml()
 	Taskgraph tg_from_algebra(tg_graphml_algebra);
 
 	string efficiency = tg_graphml.getTasks().begin()->getEfficiencyString();
-	tg_from_algebra.setMakespanCalculator("fml:var minF := 0; for(var j := 2; j <= n[]; j += 1) { minF += tau[j - 1] / (2 * p[] * min(F)); }; var maxF := 0; for(var j := 2; j <= n[]; j += 1) { maxF += tau[j - 1] / (2 * p[] * max(F)); }; minF + maxF");
+	tg_from_algebra.setDeadlineCalculator("exprtk:var minF := 0; for(var j := 2; j <= n[]; j += 1) { minF += tau[j - 1] / (2 * p[] * min(F)); }; var maxF := 0; for(var j := 2; j <= n[]; j += 1) { maxF += tau[j - 1] / (2 * p[] * max(F)); }; minF + maxF");
 	for(set<Task>::iterator i = (set<Task>::iterator)tg_from_algebra.getTasks().begin(); i !=  (set<Task>::iterator)tg_from_algebra.getTasks().end(); i++)
 	{
 		Task &t = (Task&)*i;
@@ -182,15 +193,11 @@ int
 parse_and_convert_schedule()
 {
 	Taskgraph tg_graphml = GraphML().parse(istream_taskgraph_graphml);
-	//GraphML().dump(cout, tg_graphml);
-	Algebra alg_arch = AmplInput(AmplInput::floatHandlers()).parse(istream_platform);
-	//AmplOutput(AmplOutput::intFloatHandlers()).dump(cout, alg_arch);
-	Platform arch(alg_arch);
 	Algebra ampl_schedule = AmplOutput(AmplOutput::floatHandlers()).parse(istream_schedule_amploutput);
-	Schedule schedule("converted_from_ampl", tg_graphml, ampl_schedule);
+	Schedule schedule("Converted from AMPL", ampl_schedule);
 
 	stringstream reference;
-	XMLSchedule().dump(reference, schedule);
+	XMLSchedule().dump(reference, schedule, tg_graphml, pt);
 
 	if(reference.str().compare(string_schedule_xml) != 0)
 	{

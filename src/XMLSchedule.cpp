@@ -17,6 +17,7 @@ extern "C"{
 #include <Matrix.hpp>
 #include <Set.hpp>
 #include <Task.hpp>
+#include <Taskgraph.hpp>
 
 #include <CastException.hpp>
 #include <ParseException.hpp>
@@ -31,53 +32,54 @@ XMLSchedule::~XMLSchedule()
 }
 
 void
-XMLSchedule::dump(ostream& os, const Record &data) const
+XMLSchedule::dump(ostream& os, const Schedule &data, const Taskgraph &tg, const Platform &pt) const
 {
-	dump(os, &data);
+	dump(os, &data, &tg, &pt);
 }
 
 void
-XMLSchedule::dump(ostream& os, const Record *data) const
+XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const Platform *pt) const
 {
-	const Schedule *sched = dynamic_cast<const Schedule*>(data);
-	if(sched == NULL) throw CastException("parameter \"data\" was not of type \"Schedule*\".");
-
 	Schedule::table schedule = sched->getSchedule();
-	float target_makespan = sched->getRoundTime();
-
+	//float target_makespan = sched->getMakespan();
+	set<Task> &tasks = (set<Task>&)tg->getTasks();
 	set<string> task_ids;
 	
 	for(Schedule::table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 	{
 		for(Schedule::sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 		{
-			task_ids.insert(j->second.first->getTaskId());
+			task_ids.insert(j->second.first->getName());
 		}
 	}
 
 	os << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << endl
-		<< "<schedule name=\"" << sched->getName() << "\" appname=\"" << sched->getAppName() << "\" "
-		<< "roundtime=\"" << target_makespan << "\" "
-		<< "cores=\"" << schedule.size() << "\" "
-		<< "tasks=\"" << task_ids.size() << "\""
+		<< "<schedule name=\"" << sched->getName() << "\" appname=\"" << sched->getAppName() << "\""
+		//<< "makespan=\"" << target_makespan << "\" "
 		<< ">" << endl;
 
 	for(Schedule::table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 	{
 		int p = i->first;
-		os << " <core coreid=\"" << p - 1 << "\">" << endl;
+		os << " <core coreid=\"" << p << "\">" << endl;
 		Schedule::sequence core_schedule = i->second;
 		int order = 0;
+		double start = 0;
 
 		for(Schedule::sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++, order++)
 		{
-			string taskid = j->second.first->getTaskId();
-			os << "   <task taskid=\"" << taskid << "\" "
-				<< "starting_time=\"" << j->second.first->getStartTime() << "\" "
-				<< "frequency=\"" << j->second.first->getFrequency() << "\" "
-				<< "width=\"" << j->second.first->getWidth() << "\" "
-				<< "workload=\"" << j->second.first->getWorkload() << "\" "
+			string taskid = j->second.first->getName();
+			Task t = *j->second.first;
+			os << "   <task name=\"" << taskid << "\" "
+				<< "start=\"" << (t.getStartTime() > 0 ? t.getStartTime() : start) << "\" "
+				<< "frequency=\"" << t.getFrequency() << "\" "
+				<< "width=\"" << t.getWidth() << "\" "
+				<< "workload=\"" << t.getWorkload() << "\""
 				<< "/>" << endl;
+
+				t.setMaxWidth(tasks.find(t)->getMaxWidth());
+				t.setEfficiencyString(tasks.find(t)->getEfficiencyString());
+				start += t.runtime(t.getWidth(), t.getFrequency());
 		}
 		os << " </core>" << endl;
 	}
@@ -86,12 +88,12 @@ XMLSchedule::dump(ostream& os, const Record *data) const
 }
 
 Schedule*
-XMLSchedule::parse(istream &is, Taskgraph &taskgraph) const
+XMLSchedule::parse(istream &is) const
 {
 	DomParser* theSchedule = new DomParser();
 	//theSchedule->set_throw_messages(false);
 	//igraph_set_error_handler(igraph_error_handler_t* new_handler);
-	Taskgraph tg = taskgraph;
+	//Taskgraph tg = taskgraph;
 	
 	try
 	{
@@ -116,9 +118,9 @@ XMLSchedule::parse(istream &is, Taskgraph &taskgraph) const
 
 	try
 	{
-		float M = atof(root->get_attribute_value("roundtime").c_str());
 		std::string name = root->get_attribute_value("name");
-		std::string aut_name = root->get_attribute_value("autname");
+		std::string aut_name = root->get_attribute_value("appname");
+		set<Task> tasks;
 
 		Schedule::table schedule;
 		for(xmlpp::Node::NodeList::iterator iter = processors.begin(); iter != processors.end(); ++iter) //for each core
@@ -134,32 +136,34 @@ XMLSchedule::parse(istream &is, Taskgraph &taskgraph) const
 			std::list<xmlpp::Node*> itasks = (*iter)->get_children();
 			for(std::list<xmlpp::Node*>::iterator taskiter = itasks.begin(); taskiter != itasks.end(); ++taskiter)
 			{
-				if((*taskiter)->get_name().compare("task")) //skip indentation characters et cetera
+				if((*taskiter)->get_name().compare("task") != 0) //skip indentation characters et cetera
 				{
 					continue;
 				}
 
 				Element *igraph_task = dynamic_cast<Element*>(*taskiter);
 
-				Task &task = (Task&) tg.findTask(igraph_task->get_attribute_value("taskid"));
-				//Task task(igraph_task->get_attribute_value("taskid"));
-				//cout << "Counter = " << task_id << ", tg_task.getId() = " << tg_task.getId() << ", tg_task.getTaskId() = \"" << tg_task.getTaskId() << "." << endl; 
+				//Task &task = (Task&) tg.findTask(igraph_task->get_attribute_value("taskid"));
+				Task task(igraph_task->get_attribute_value("name"));
+				//cout << "Counter = " << task_id << ", tg_task.getName() = " << tg_task.getName() << ", tg_task.getTaskId() = \"" << tg_task.getTaskId() << "." << endl; 
 
-				//Task task(tg_task.getId(), tg_task.getTaskId());
+				//Task task(tg_task.getName(), tg_task.getTaskId());
 				//Task& task_tg = (Task&)*tg.getTasks().find(task);
 
 				task.setFrequency(atof(igraph_task->get_attribute_value("frequency").c_str()));
 				task.setWidth(atof(igraph_task->get_attribute_value("width").c_str()));
 				//task.setWorkload(atof(igraph_task->get_attribute_value("workload").c_str()));
-				task.setStartTime(atof(igraph_task->get_attribute_value("starting_time").c_str()));
+				task.setStartTime(atof(igraph_task->get_attribute_value("start").c_str()));
+				tasks.insert(task);
+				const Task &t = *tasks.find(task);
 
-				core_schedule_map.insert(std::pair<float, Schedule::work>(task.getStartTime(), pair<Task*, double>(&task, atof(igraph_task->get_attribute_value("workload").c_str()))));
+				core_schedule_map.insert(std::pair<float, Schedule::work>(task.getStartTime(), pair<const Task*, double>(&t, atof(igraph_task->get_attribute_value("workload").c_str()))));
 			}
 
 			schedule.insert(std::pair<int, Schedule::sequence>(core_id, core_schedule_map));
 		}
 		
-		Schedule *sched = new Schedule(name, aut_name, tg, schedule, M);
+		Schedule *sched = new Schedule(name, aut_name, schedule);
 
 		return sched;
 	}

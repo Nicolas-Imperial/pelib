@@ -14,10 +14,44 @@ extern "C" {
 
 #define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
 
+typedef struct
+{
+	vector<string> include;
+	vector<string> exclude;
+} filter_t;
+
+static filter_t
+parse_args(char **argv)
+{
+	filter_t filter;
+	while((void*)argv[0] != NULL)
+	{
+		if(string(*argv).compare("--include") == 0)
+		{
+			while(string(*argv).compare("--") != 0 && (void*)argv != NULL)
+			{
+				filter.include.insert(filter.include.begin(), string(*argv));
+				argv++;
+			}
+		}
+
+		if(string(*argv).compare("--include") == 0)
+		{
+			while(string(*argv).compare("--") != 0 && (void*)argv != NULL)
+			{
+				filter.include.insert(filter.exclude.begin(), string(*argv));
+			}
+		}
+	}
+
+	return filter;
+}
+
 // /!\ the content of argv is freed after this function is run
 pelib::Record*
 pelib_parse(std::istream& cin, size_t argc, char **argv)
 {
+	
 // We don't care about any argument here
 #if 0
 	while(*argv != NULL)

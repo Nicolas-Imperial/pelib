@@ -24,19 +24,16 @@ namespace pelib
 {
 	Schedule::Schedule(const std::string &name, const std::string &appName)
 	{
-		roundTime = 0;
 		this->name = name;
 		this->appName = appName;
 	}
 
-	Schedule::Schedule(const std::string &name, const std::string &appName, const Taskgraph &taskgraph, const table &schedule, double roundTime)
+	Schedule::Schedule(const std::string &name, const std::string &appName, const table &schedule)
 	{
 		this->name = name;
 		this->appName = appName;
-		roundTime = roundTime;
 	
 		// Copy taskgraph	
-		this->taskgraph = taskgraph;
 		this->setSchedule(schedule);
 	}
 
@@ -49,81 +46,94 @@ namespace pelib
 	Schedule::setSchedule(const table &schedule)
 	{
 		this->schedule = schedule;
+		this->tasks.clear();
+		this->core_tasks.clear();
 
 		for(table::iterator i = this->schedule.begin(); i != this->schedule.end(); i++)
 		{
+			set<const Task*> this_core_tasks;
 			for(sequence::iterator j = i->second.begin(); j != i->second.end(); j++)
 			{
 				const Task *task = j->second.first;
 				Task t = *task;
-				Task &task_ref = (Task&)*this->getTaskgraph().getTasks().find(t);
+				this->tasks.insert(t);
+				Task &task_ref = (Task&)*this->getTasks().find(t);
 				pair<float, work> new_pair = pair<float, work>(j->first, work(&task_ref, j->second.second));
 				i->second.erase(j);
 				i->second.insert(new_pair);
+
+				// Insert a reference to this task in the core's task list
+				this_core_tasks.insert(&t);
 			}
+			this->core_tasks.insert(pair<int, set<const Task*> >(i->first, this_core_tasks));
 		}
 	}
 
-	Schedule::Schedule(const std::string &name, const Taskgraph &taskgraph, const Algebra &data)
+#define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
+	Schedule::Schedule(const std::string &name, const Algebra &algebra)
 	{
-		Taskgraph tg = taskgraph;
-		roundTime = 0;
 		this->name = name;
-		this->appName = tg.getName();
+		this->appName = string("Generated from Algebra");
 
-		Algebra algebra = data.merge(tg.buildAlgebra());
-		
-		const Scalar<float> *M = algebra.find<Scalar<float> >("M");
+		//const Scalar<float> *M = algebra.find<Scalar<float> >("M");
 		const Vector<int, float> *tau = algebra.find<Vector<int, float> >("Tau");
-		const Vector<int, float> *starting_time = algebra.find<Vector<int, float> >("starting_time");
+		const Vector<int, float> *start = algebra.find<Vector<int, float> >("start");
 		const Vector<int, float> *wi = algebra.find<Vector<int, float> >("wi");
+		//const Vector<int, float> *Wi = algebra.find<Vector<int, float> >("Wi");
 		const Matrix<int, int, float> *sched = algebra.find<Matrix<int, int, float> >("schedule");
+		//const Matrix<int, int, float> *e = algebra.find<Matrix<int, int, float> >("e");
 		const Vector<int, float> *freq = algebra.find<Vector<int, float> >("frequency");
 
 		table schedule;
-		
-		if(M == NULL || tau == NULL || wi == NULL || sched == NULL || freq == NULL)
+		set<Task> tasks;
+	
+		if(start == NULL || tau == NULL || wi == NULL || sched == NULL || freq == NULL)
 		{
 			throw CastException("Missing parameter");
 		}
 		else
 		{
-			this->roundTime = M->getValue();
-
 			for(map<int, map<int, float> >::const_iterator i = sched->getValues().begin(); i != sched->getValues().end(); i++)
 			{
 				sequence core_schedule;
-				float start = 0;
 				
 				for(map<int, float>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 				{
 					if(floor(j->second) > 0)
 					{
-						Task task((int)j->second, tg.findTask((int)floor(j->second)).getTaskId());
+						stringstream estr;
+						estr << "task_" << j->second;
+						tasks.insert(Task(estr.str()));
+						Task &task = (Task&)*tasks.find(estr.str());
+						task.setModule("dummy");
+						//Task task((int)j->second, tg.findTask((int)floor(j->second)).getTaskId());
+
 						//task.setWorkload(tau->getValues().find((int)floor(j->second))->second);
 						if(task.getWorkload() > 0)
 						{
-							Task& task_tg = (Task&)*tg.getTasks().find(task);
+							//Task& task_tg = (Task&)*tg.getTasks().find(task);
+							task.setWidth(wi->getValues().find((int)floor(j->second))->second);
+							task.setFrequency(freq->getValues().find((int)floor(j->second))->second);
+							task.setWorkload(tau->getValues().find((int)floor(j->second))->second);
+							//task_tg.setMaxWidth(tg.getTasks().find(task)->getMaxWidth());
+							//task_tg.setMaxWidth(Wi->getValues().find((int)floor(j->second))->second);
 
-							task_tg.setWidth(wi->getValues().find((int)floor(j->second))->second);
-							task_tg.setFrequency(freq->getValues().find((int)floor(j->second))->second);
-							task_tg.setMaxWidth(tg.getTasks().find(task)->getMaxWidth());
-							task_tg.setEfficiencyString(tg.getTasks().find(task)->getEfficiencyString());
+							/*
+							stringstream estr;
+							for(Matrix<int, int, float>::RowType::const_iterator k = e->getValues().find((int)j->second)->second.begin(); k != e->getValues().find((int)j->second)->second.end(); k++)
+							{
+								estr << k->second << " ";
+							}
+							task_tg.setEfficiencyString(estr.str());
+							*/
+							//task_tg.setEfficiencyString(tg.getTasks().find(task)->getEfficiencyString());
 
-							if(starting_time == NULL)
-							{
-								task_tg.setStartTime(start);
-							}
-							else
-							{
-								task_tg.setStartTime(starting_time->getValues().find((int)j->second)->second);
-							}
+							task.setStartTime(start->getValues().find((int)j->second)->second);
 
 							//cerr << "Core: " << i->first << "; Task: " << j->second << "; taskid: " << tg.findTask((int)floor(j->second)).getTaskId() << "; Start time: " << task.getStartTime() << endl;
 							//const Task &task_ref = *this->getTaskgraph().getTasks().find(task);
 							//core_schedule.insert(pair<float, Task*>(task.getStartTime(), &(this->getTasks().find(task))));
-							core_schedule.insert(pair<float, work>(task_tg.getStartTime(), work(&task_tg, tau->getValues().find((int)floor(j->second))->second)));
-							start += task_tg.runtime(task_tg.getWidth(), task_tg.getFrequency());
+							core_schedule.insert(pair<float, work>(task.getStartTime(), work(&task, tau->getValues().find((int)floor(j->second))->second)));
 						}
 					}
 				}
@@ -132,15 +142,14 @@ namespace pelib
 			}
 		}
 
-		this->taskgraph = taskgraph;
-		this->taskgraph = tg;
+		this->tasks = tasks;
 		this->setSchedule(schedule);
 	}
 	
 	Schedule*
 	Schedule::clone() const
 	{
-		Schedule *clone = new Schedule(getName(), getName(), getTaskgraph(), getSchedule(), getRoundTime());
+		Schedule *clone = new Schedule(getName(), getName(), getSchedule());
 
 		return clone;
 	}
@@ -150,17 +159,17 @@ namespace pelib
 	{
 		Algebra algebra;
 		
-		map<string, int>taskid2id; 
+		map<string, int> taskid2id; 
 		for(table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 		{
 			for(sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 			{
-				taskid2id.insert(pair<string, int>(j->second.first->getTaskId(), j->second.first->getId()));
+				taskid2id.insert(pair<string, int>(j->second.first->getName(), std::distance(this->getTasks().begin(), this->getTasks().find(*j->second.first)) + 1));
 			}
 		}
 
 		map<int, map<int, float> > sched;
-		map<int, float> frequencies;
+		map<int, float> frequencies, start;
 		table schedule = getSchedule();
 
 		size_t ordering, max_tasks = 0;
@@ -172,11 +181,12 @@ namespace pelib
 			ordering = 0;
 			for(sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++, ordering++)
 			{
-				int id = taskid2id.find(j->second.first->getTaskId())->second;
+				int id = taskid2id.find(j->second.first->getName())->second;
 				schedule_row.insert(pair<int, int>(ordering, id));
 				frequencies.insert(pair<int, float>(id, j->second.first->getFrequency()));
 
-				max_tasks = ordering > max_tasks ? ordering : max_tasks; 
+				max_tasks = ordering > max_tasks ? ordering : max_tasks;
+				start.insert(pair<int, float>(std::distance(this->getTasks().begin(), this->getTasks().find(j->second.first->getName())), j->second.first->getStartTime())); 
 			}
 
 			sched.insert(pair<int, map<int, float> >(core + 1, schedule_row));
@@ -194,19 +204,13 @@ namespace pelib
 
 		Matrix<int, int, float> ampl_schedule("schedule", sched);
 		Vector<int, float> ampl_frequencies("frequency", frequencies);
-		Scalar<float> ampl_M("M", getRoundTime());
+		Vector<int, float> ampl_start("start", start);
 
-		algebra.insert(&ampl_M);
 		algebra.insert(&ampl_schedule);
 		algebra.insert(&ampl_frequencies);
+		algebra.insert(&ampl_start);
 
 		return algebra;
-	}
-
-	double
-	Schedule::getRoundTime() const
-	{
-		return roundTime;
 	}
 
 	std::string
@@ -227,10 +231,10 @@ namespace pelib
 		return schedule;
 	}
 	
-	const Taskgraph&
-	Schedule::getTaskgraph() const
+	const set<Task>&
+	Schedule::getTasks() const
 	{
-		return this->taskgraph;
+		return this->tasks;
 	}
 
 	Schedule&
@@ -238,18 +242,18 @@ namespace pelib
 	{
 		this->name = name;
 		this->appName = appName;
-		roundTime = roundTime;
 	
 		// Copy taskgraph	
-		this->taskgraph = taskgraph;
 		this->setSchedule(schedule);
 
 		return *this;
 	}
 
 	const set<const Task*>&
-	Schedule::getTasks(int core, std::map<int, std::set<const Task*> >& tasks) const
+	Schedule::getTasks(int core) const
 	{
+		return this->core_tasks.find(core)->second;
+		/*
 		if(tasks.find(core) == tasks.end())
 		{
 			set<const Task*> core_tasks;
@@ -262,11 +266,13 @@ namespace pelib
 		}
 
 		return tasks.find(core)->second;
+		*/
 	}
 
 	const set<const Task*>&
-	Schedule::getProducers(int core, std::map<int, set<const Task*> > &producers) const
+	Schedule::getProducers(int core, const pelib::Taskgraph &tg) const
 	{
+		/*
 		map<int, set<const Task*> > tasks;
 		this->getTasks(core, tasks);
 		
@@ -288,11 +294,13 @@ namespace pelib
 		}
 
 		return producers.find(core)->second;
+		*/
 	}
 
 	const set<const Task*>&
-	Schedule::getConsumers(int core, std::map<int, set<const Task*> > &consumers) const
+	Schedule::getConsumers(int core, const pelib::Taskgraph &tg) const
 	{
+		/*
 		map<int, set<const Task*> > tasks;
 		this->getTasks(core, tasks);
 
@@ -314,24 +322,7 @@ namespace pelib
 		}
 
 		return consumers.find(core)->second;
-	}
-
-	const set<const Task*>&
-	Schedule::getProducers(int core)
-	{
-		return this->getProducers(core, this->producers);
-	}
-
-	const set<const Task*>&
-	Schedule::getConsumers(int core)
-	{
-		return this->getConsumers(core, this->consumers);
-	}
-
-	const set<const Task*>&
-	Schedule::getTasks(int core)
-	{
-		return this->getTasks(core, this->tasks);
+		*/
 	}
 
 	const set<int>

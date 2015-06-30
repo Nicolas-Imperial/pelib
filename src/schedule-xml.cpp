@@ -2,10 +2,11 @@
 
 #include <pelib/parser.h>
 #include <pelib/output.h>
-#include <pelib/argument_parsing.hpp>
-#include <pelib/dl.h>
+//#include <pelib/argument_parsing.hpp>
+//#include <pelib/dl.h>
 
 #include <XMLSchedule.hpp>
+#include <Taskgraph.hpp>
 
 using namespace std;
 using namespace pelib;
@@ -16,6 +17,7 @@ extern "C" {
 
 #define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
 
+#if 0
 struct parameters {
 	char* taskgraph;
 };
@@ -27,12 +29,12 @@ parse_args(size_t argc, char **argv)
 	pelib_argument_stream_t parameters;
 	pelib_argument_stream_init(&parameters);
 
-	while(*argv != NULL)
+	while((void*)argv[0] != NULL)
 	{
 		if(string(*argv).compare("--taskgraph") == 0)
 		{
 			argv++;
-			argv += pelib_argument_stream_parse(argv, &parameters) + 1;
+			argv += pelib_argument_stream_parse(argv, &parameters);
 		}
 
 		argv++;
@@ -40,11 +42,13 @@ parse_args(size_t argc, char **argv)
 
 	return parameters;
 }
+#endif
 
 // /!\ the content of argv is freed after this function is run
 pelib::Record*
 pelib_parse(std::istream& cin, size_t argc, char **argv)
 {
+#if 0	
 	pelib_argument_stream_t parameters = parse_args(argc, argv);
 	Taskgraph *tg;
 
@@ -72,8 +76,8 @@ pelib_parse(std::istream& cin, size_t argc, char **argv)
 				{
 					ifstream myfile(parameters.filename);
 					tg = (Taskgraph*)parse(myfile, parameters.argc, parameters.argv);
-						myfile.close();
-					}
+					myfile.close();
+				}
 				break;
 			case STREAM_NOTHING:
 			default:
@@ -85,12 +89,14 @@ pelib_parse(std::istream& cin, size_t argc, char **argv)
 	}
 	else
 	{
-		cerr << "[WARNING] No parser library specified for taskgraph input of schedule. Skipping." << endl;
+		cerr << "[WARNING] No parser library specified for taskgraph input of schedule. Aborting." << endl;
+		pelib_argument_stream_destroy(parameters);
+		return NULL;
 	}
-
 
 	// We don't use the name parameter so we can destroy the structure now.
 	pelib_argument_stream_destroy(parameters);
+#endif
 // We don't care about any argument here
 #if 0
 	while(*argv != NULL)
@@ -102,8 +108,8 @@ pelib_parse(std::istream& cin, size_t argc, char **argv)
 #endif
 
 //	cout << cin.rdbuf();
-	Schedule* sched = XMLSchedule().parse(cin, *tg);
-	delete tg;
+	Schedule* sched = XMLSchedule().parse(cin);
+//	delete tg;
 	return sched;
 }
 

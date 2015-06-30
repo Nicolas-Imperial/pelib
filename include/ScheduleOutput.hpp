@@ -10,6 +10,8 @@ namespace pelib
 	{
 		public:	
 			virtual ScheduleOutput* clone() const = 0;
+			virtual	void dump(std::ostream &os, const Schedule *data, const Taskgraph *tg, const Platform *pt) const = 0;
+			virtual	void dump(std::ostream &os, const Schedule &data, const Taskgraph &tg, const Platform &pt) const = 0;
 
 		protected:
 		private:		

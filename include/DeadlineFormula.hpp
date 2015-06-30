@@ -1,15 +1,15 @@
-#include "MakespanCalculator.hpp"
+#include "DeadlineCalculator.hpp"
 #include "Algebra.hpp"
 
-#ifndef MAKESPAN_FORMULA
-#define MAKESPAN_FORMULA
+#ifndef DEADLINE_FORMULA
+#define DEADLINE_FORMULA
 
 namespace pelib
 {
-  class MakespanFormula : public MakespanCalculator
+  class DeadlineFormula : public DeadlineCalculator
   {
 	public:
-		MakespanFormula(string formula);
+		DeadlineFormula(string formula);
 		virtual double calculate(const Taskgraph& tg,const Platform& arch) const;
 		  
 	private:

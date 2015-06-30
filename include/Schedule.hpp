@@ -16,17 +16,14 @@ namespace pelib
 			typedef std::map<int, sequence> table;
 
 			Schedule(const std::string &name, const std::string &appName);
-			Schedule(const std::string &name, const std::string &appName, const Taskgraph &taskgraph, const table &schedule, double roundTime);
-			Schedule(const std::string &name, const Taskgraph &tg, const Algebra &algebra);
+			Schedule(const std::string &name, const std::string &appName, const table &schedule);
+			Schedule(const std::string &name, const Algebra &algebra);
 			virtual ~Schedule();
 			virtual Schedule* clone() const;
 			virtual Algebra buildAlgebra() const;
 
-			virtual double
-			getRoundTime() const;
-
 			//virtual void
-			//setRoundTime(double roundTime);
+			//setMakespan(double makespan);
 
 			virtual std::string
 			getName() const;
@@ -43,41 +40,29 @@ namespace pelib
 			virtual const table&
 			getSchedule() const;
 
-			virtual const Taskgraph&
-			getTaskgraph() const;
+			virtual const set<Task>&
+			getTasks() const;
 
 			virtual Schedule&
 			operator=(const Schedule &);
 
 			virtual const set<const Task*>&
-			getProducers(int core);
+			getTasks(int core) const;
 
 			virtual const set<const Task*>&
-			getConsumers(int core);
+			getProducers(int core, const Taskgraph &tg) const;
 
 			virtual const set<const Task*>&
-			getTasks(int core);
-
-			virtual const set<const Task*>&
-			getProducers(int core, std::map<int, std::set<const Task*> >&) const;
-
-			virtual const set<const Task*>&
-			getConsumers(int core, std::map<int, std::set<const Task*> >&) const;
-
-			virtual const set<const Task*>&
-			getTasks(int core, std::map<int, std::set<const Task*> >&) const;
+			getConsumers(int core, const Taskgraph &tg) const;
 
 			virtual const set<int>
 			getCores(const Task*) const;
 
 		protected:
-			double roundTime;
 			std::string name, appName;
 			table schedule;
-			Taskgraph taskgraph;
-			std::map<int, set<const Task*> > producers;
-			std::map<int, set<const Task*> > consumers;
-			std::map<int, set<const Task*> > tasks;
+			set<Task> tasks;
+			std::map<int, set<const Task*> > core_tasks;
 			
 			virtual void
 			setSchedule(const table&);

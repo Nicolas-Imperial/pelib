@@ -1,6 +1,6 @@
 #include <cmath>
 
-#include <MakespanFormula.hpp>
+#include <DeadlineFormula.hpp>
 #include <Scalar.hpp>
 #include <Set.hpp>
 #include <Matrix.hpp>
@@ -12,16 +12,16 @@
 using namespace pelib;
 using namespace std;
 
-struct e : public exprtk::ifunction<double>
+struct e: public exprtk::ifunction<double>
 {
 	public:
 		e(const set<Task> &tasks, const Platform &arch)
 			: exprtk::ifunction<double>(2), tasks(tasks), arch(arch)
 		{}  
 
-		inline double operator()(const double &id, const double &p) 
+		inline double operator()(const string &id, const double &p) 
 		{   
-			Task key((int)id, "key");
+			Task key(id);
 			return tasks.find(key)->getEfficiency((int)p);
 		}   
 
@@ -30,7 +30,7 @@ struct e : public exprtk::ifunction<double>
 		const Platform &arch;
 };
 
-struct print : public exprtk::ifunction<double>
+struct print: public exprtk::ifunction<double>
 {
 	public:
 		print(ostream &stream)
@@ -47,10 +47,10 @@ struct print : public exprtk::ifunction<double>
 		ostream &stream;
 };
 
-MakespanFormula::MakespanFormula(string formula) : formula(formula) {}
+DeadlineFormula::DeadlineFormula(string formula) : formula(formula) {}
 
 double
-MakespanFormula::calculate(const Taskgraph &tg, const Platform &arch) const
+DeadlineFormula::calculate(const Taskgraph &tg, const Platform &arch) const
 {
 	e matrix_e(tg.getTasks(), arch);
 	print print_cout(cout);
@@ -63,7 +63,7 @@ MakespanFormula::calculate(const Taskgraph &tg, const Platform &arch) const
 	vector<double> n, p, F, tau, W;
 	for(set<Task>::const_iterator iter = tg.getTasks().begin(); iter != tg.getTasks().end(); iter++)
 	{
-		n.push_back((double)iter->getId());
+		n.push_back((double)std::distance(tg.getTasks().begin(), iter));
 		tau.push_back((double)iter->getWorkload());
 		W.push_back((double)iter->getMaxWidth());
 	}
@@ -99,7 +99,7 @@ MakespanFormula::calculate(const Taskgraph &tg, const Platform &arch) const
 
 	if(std::isnan(output))
 	{
-		throw ParseException("Makespan type not recognized: " + formula);
+		throw ParseException("Deadline type not recognized: " + formula);
 	}	
 
 	return output;

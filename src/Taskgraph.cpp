@@ -1,7 +1,7 @@
 #include <sstream>
 
 #include <Taskgraph.hpp>
-#include <MakespanCalculator.hpp>
+#include <DeadlineCalculator.hpp>
 #include <ParseException.hpp>
 #include <CastException.hpp>
 
@@ -23,11 +23,12 @@ namespace pelib
 		set<string> task_ids;
 		for(set<Task>::const_iterator iter = tasks.begin(); iter != tasks.end(); iter++)
 		{
-			task_ids.insert(iter->getTaskId());
+			task_ids.insert(iter->getName());
 		}
 
 		if(task_ids.size() != tasks.size())
 		{
+			// This should never happen as tasks are indexed with their id
 			throw ParseException("The tasks added do not have a unique taskId.");
 		}
 		
@@ -92,7 +93,7 @@ namespace pelib
 	Taskgraph::Taskgraph(const Taskgraph *graph)
 	{
 		this->name = graph->getName();
-		this->makespanCalculator = graph->getMakespanCalculator();
+		this->deadlineCalculator = graph->getDeadlineCalculator();
 		this->tasks = graph->getTasks();
 		this->setLinks(graph->getLinks());
 	}
@@ -100,14 +101,14 @@ namespace pelib
 	Taskgraph::Taskgraph(const Taskgraph &graph)
 	{
 		this->name = graph.getName();
-		this->makespanCalculator = graph.getMakespanCalculator();
+		this->deadlineCalculator = graph.getDeadlineCalculator();
 		this->tasks = graph.getTasks();
 		this->setLinks(graph.getLinks());
 	}
 
 	Taskgraph::Taskgraph(const Algebra &algebra)
 	{
-		this->name = "Generated_from_algebra";
+		this->name = "Converted from AMPL";
 		const Scalar<float> *M = algebra.find<Scalar<float> >("M");
 		const Scalar<float> *n = algebra.find<Scalar<float> >("n");
 		const Vector<int, float> *tau = algebra.find<Vector<int, float> >("Tau");
@@ -122,7 +123,7 @@ namespace pelib
 		{
 			stringstream ss;
 			ss << M->getValue();
-			this->makespanCalculator = ss.str(); 
+			this->deadlineCalculator = ss.str(); 
 		}
 
 		for(map<int, float>::const_iterator i = tau->getValues().begin(); i != tau->getValues().end(); i++)
@@ -136,8 +137,10 @@ namespace pelib
 			{
 				ss << j->second << " ";
 			}
-			
-			Task t((int)id);
+		
+			stringstream estr;
+			estr << "task_" << id;	
+			Task t(estr.str());
 			t.setWorkload(work);
 			t.setMaxWidth(max_wi);
 			t.setEfficiencyString(ss.str());
@@ -155,7 +158,9 @@ namespace pelib
 	Algebra
 	Taskgraph::buildAlgebra() const
 	{
-		return buildAlgebra(Platform());
+		set<float> f;
+		f.insert(1);
+		return buildAlgebra(Platform(1, f));
 	}
 	
 	Algebra
@@ -170,7 +175,7 @@ namespace pelib
 
 		for(set<Task>::const_iterator i = getTasks().begin(); i != getTasks().end(); i++)
 		{
-			map_tau.insert(pair<int, float>(i->getId(), i->getWorkload()));
+			map_tau.insert(pair<int, float>(std::distance(this->getTasks().begin(), i) + 1, i->getWorkload()));
 			float max_width = 0;
 			if(i->getMaxWidth() > arch.getCoreNumber())
 			{
@@ -180,7 +185,7 @@ namespace pelib
 			{
 				max_width = i->getMaxWidth();
 			}
-			map_Wi.insert(pair<int, float>(i->getId(), max_width));
+			map_Wi.insert(pair<int, float>(std::distance(this->getTasks().begin(), i) + 1, max_width));
 
 			map<int, float> task_e;
 			for(int j = 1; j <= arch.getCoreNumber(); j++)
@@ -188,14 +193,14 @@ namespace pelib
 				task_e.insert(pair<int, float>(j, i->getEfficiency(j)));
 			}
 			
-			map_e.insert(pair<int, map<int, float> >(i->getId(), task_e));
+			map_e.insert(pair<int, map<int, float> >(std::distance(this->getTasks().begin(), i) + 1, task_e));
 		}
 
 		Vector<int, float> tau("Tau", map_tau);
 		Vector<int, float> Wi("Wi", map_Wi);
 		Matrix<int, int, float> e("e", map_e);
 
-		Scalar<float> M("M", getRoundTime(arch));
+		Scalar<float> M("M", getDeadline(arch));
 
 		out.insert(&n);
 		out.insert(&tau);
@@ -219,30 +224,30 @@ namespace pelib
 	}
 
 	string
-	Taskgraph::getMakespanCalculator() const
+	Taskgraph::getDeadlineCalculator() const
 	{
-		return this->makespanCalculator;
+		return this->deadlineCalculator;
 	}
 
 	void
-	Taskgraph::setMakespanCalculator(const string makespanCalculator)
+	Taskgraph::setDeadlineCalculator(const string deadlineCalculator)
 	{
 		try{
-			MakespanCalculator *calculator = MakespanCalculator::getMakespanCalculator(makespanCalculator);
+			DeadlineCalculator *calculator = DeadlineCalculator::getDeadlineCalculator(deadlineCalculator);
 			delete calculator;
 		} catch (ParseException &e)
 		{
 			throw e;
 		}
 		
-		this->makespanCalculator = makespanCalculator;
+		this->deadlineCalculator = deadlineCalculator;
 	}
 
 	double
-	Taskgraph::getRoundTime(const Platform &arch) const
+	Taskgraph::getDeadline(const Platform &arch) const
 	{
 		//cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] getTasks().size() = " << getTasks().size() << endl;
-		MakespanCalculator *calculator = MakespanCalculator::getMakespanCalculator(this->getMakespanCalculator());
+		DeadlineCalculator *calculator = DeadlineCalculator::getDeadlineCalculator(this->getDeadlineCalculator());
 		double time = calculator->calculate(*this, arch);
 		delete calculator;
 		
@@ -286,7 +291,7 @@ namespace pelib
 	{
 		for(set<Task>::const_iterator iter = this->tasks.begin(); iter != this->tasks.end(); iter++)
 		{
-			if(strcmp(iter->getTaskId().c_str(), taskId.c_str()) == 0)
+			if(iter->getName().compare(taskId) == 0)
 			{
 				return *iter;
 			}
@@ -295,12 +300,13 @@ namespace pelib
 		throw ParseException("No task \"" + taskId + "\" exists in this taskgraph.");
 	}
 
+	/*
 	const Task&
-	Taskgraph::findTask(int id) const
+	Taskgraph::findTask(string id) const
 	{
 		for(set<Task>::const_iterator iter = this->tasks.begin(); iter != this->tasks.end(); iter++)
 		{
-			if(iter->getId() == id)
+			if(iter->getName() == id)
 			{
 				return *iter;
 			}
@@ -310,6 +316,7 @@ namespace pelib
 		stream << "No task \"" << id << "\" exists in this taskgraph.";
 		throw ParseException(stream.str());
 	}
+	*/
 
 	const set<Link>&
 	Taskgraph::getLinks() const
@@ -327,7 +334,7 @@ namespace pelib
 	Taskgraph::operator=(const Taskgraph& copy)
 	{
 		this->name = copy.getName();
-		this->makespanCalculator = copy.getMakespanCalculator();
+		this->deadlineCalculator = copy.getDeadlineCalculator();
 		this->tasks = copy.getTasks();
 		this->setLinks(copy.getLinks());	
 

@@ -40,7 +40,9 @@ pelib_parse(std::istream& cin, size_t argc, char **argv)
 
 	for(map<int, map<int, float> >::const_iterator i = taskworkcomm->getValues().begin(); i != taskworkcomm->getValues().end(); i++)
 	{
-		Task t(i->first);
+		stringstream estr;
+		estr << "task_" << i->first;
+		Task t(estr.str());
 		stringstream efficiency;
 
 		float work = i->second.find(1)->second;
@@ -75,7 +77,7 @@ pelib_parse(std::istream& cin, size_t argc, char **argv)
 	}
 	Taskgraph *tg = new Taskgraph(tasks, links);
 	tg->setName(autname);
-	tg->setMakespanCalculator("class:synthetic");
+	tg->setDeadlineCalculator("class:synthetic");
 // We don't care about any argument here
 #if 0
 	while(*argv != NULL)

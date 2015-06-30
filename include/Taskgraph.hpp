@@ -41,13 +41,13 @@ namespace pelib
 			setName(const string name);
 
 			virtual string
-			getMakespanCalculator() const;
+			getDeadlineCalculator() const;
 
 			virtual double
-			getRoundTime(const Platform &arch) const;
+			getDeadline(const Platform &arch) const;
 
 			virtual void
-			setMakespanCalculator(const string makespanCalculator);
+			setDeadlineCalculator(const string deadlineCalculator);
 
 			virtual const set<Task>&
 			getTasks() const;
@@ -61,9 +61,6 @@ namespace pelib
 			virtual const Task&
 			findTask(const string &taskId) const;
 
-			virtual const Task&
-			findTask(int id) const;
-				
 			virtual const set<Link>&
 			getLinks() const;
 
@@ -77,7 +74,7 @@ namespace pelib
 			operator=(const Taskgraph& copy);
 
 		protected:
-			string name, makespanCalculator;
+			string name, deadlineCalculator;
 			set<Task> tasks;
 			set<Link> links;
 			

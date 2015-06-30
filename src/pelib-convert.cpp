@@ -8,6 +8,8 @@
 #include <pelib/argument_parsing.hpp>
 #include <pelib/dl.h>
 
+#define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
+
 using namespace std;
 using namespace pelib;
 
@@ -60,7 +62,7 @@ main(int argc, char **argv)
 
 	map<const char*, Record*> inputs;
 	size_t counter = 0;
-	for(vector<pelib_argument_stream_t>::const_iterator i = conversion.inputs.begin(); i != conversion.inputs.end(); i++)
+	for(vector<pelib_argument_stream_t>::const_iterator i = conversion.inputs.begin(); i != conversion.inputs.end(); i++, counter++)
 	{
 		/* Load functions from shared libraries */
 		void *libParser;
@@ -82,13 +84,20 @@ main(int argc, char **argv)
 			case STREAM_STDIN:
 				{
 					Record* rec = parse(cin, i->argc, i->argv);
-					if(i->name != NULL)
+					if(rec != NULL)
 					{
-						inputs.insert(pair<const char*, Record*>(i->name, rec));
+						if(i->name != NULL)
+						{
+							inputs.insert(pair<const char*, Record*>(i->name, rec));
+						}
+						else
+						{
+							inputs.insert(pair<const char*, Record*>(typeid(*rec).name(), rec));
+						}
 					}
 					else
 					{
-						inputs.insert(pair<const char*, Record*>(typeid(*rec).name(), rec));
+						cerr << "[WARNING] Parser \"" << i->library << "\" failed to parse input on stdin for input #" << counter << ". Skipping." << endl;
 					}
 				}
 			break;
@@ -101,15 +110,22 @@ main(int argc, char **argv)
 					ifstream myfile(i->filename);
 					Record *rec = parse(myfile, i->argc, i->argv);
 					
-					if(i->name != NULL)
+					if(rec != NULL)
 					{
-						inputs.insert(pair<const char*, Record*>(i->name, rec));
+						if(i->name != NULL)
+						{
+							inputs.insert(pair<const char*, Record*>(i->name, rec));
+						}
+						else
+						{
+							inputs.insert(pair<const char*, Record*>(typeid(*rec).name(), rec));
+						}
+						myfile.close();
 					}
 					else
 					{
-						inputs.insert(pair<const char*, Record*>(typeid(*rec).name(), rec));
+						cerr << "[WARNING] Parser \"" << i->library << "\" failed to parse input on stdin for input #" << counter << ". Skipping." << endl;
 					}
-					myfile.close();
 				}
 			break;
 			case STREAM_NOTHING:
@@ -121,13 +137,10 @@ main(int argc, char **argv)
 		destroy_lib(libParser);
 
 		// Don̈́'t destroy the pelib_argument_stream descriptor yet as we still need input names
-
-		// Count the number of parser being processed
-		counter++;
 	}
 
 	counter = 0;
-	for(vector<pelib_argument_stream_t>::const_iterator i = conversion.outputs.begin(); i != conversion.outputs.end(); i++)
+	for(vector<pelib_argument_stream_t>::const_iterator i = conversion.outputs.begin(); i != conversion.outputs.end() && inputs.size() > 0; i++, counter++)
 	{
 		/* Load functions from shared libraries */
 		void *libParser;
@@ -171,9 +184,6 @@ main(int argc, char **argv)
 
 		// Destroy the stream descriptor
 		pelib_argument_stream_destroy(*i);
-
-		// Count the number of parser being processed
-		counter++;
 	}
 
 	for(vector<pelib_argument_stream_t>::const_iterator i = conversion.inputs.begin(); i != conversion.inputs.end(); i++)
