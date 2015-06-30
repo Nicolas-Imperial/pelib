@@ -4,6 +4,7 @@
 #include <pelib/output.h>
 
 #include <Set.hpp>
+#include <DummyCore.hpp>
 #include <AmplOutput.hpp>
 #include <Platform.hpp>
 
@@ -24,7 +25,6 @@ pelib_parse(std::istream& cin, size_t argc, char **argv)
 	std::string line;
 	Algebra alg_arch = reader.parse(cin);
 
-	Platform *arch = new Platform();
 
 	const Scalar<float> *scalar_p = alg_arch.find<Scalar<float> >("p");
 	const Set<float> *set_F = alg_arch.find<Set<float> >("F");
@@ -33,9 +33,14 @@ pelib_parse(std::istream& cin, size_t argc, char **argv)
 	{
 		throw ParseException(std::string("Missing core number scalar \"p\" or frequency set \"F\" in input."));
 	}
-	
-	arch->setCoreNumber((int)scalar_p->getValue());
-	arch->setFrequencies(set_F->getValues());
+
+	set<const Core*> cores;
+	for(size_t i = 0; i < (size_t)scalar_p->getValue(); i++)
+	{
+		cores.insert(new DummyCore(set_F->getValues()));
+	}
+
+	Platform *arch = new Platform(cores);
 	
 	return arch;
 }

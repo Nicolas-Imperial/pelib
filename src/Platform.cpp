@@ -1,23 +1,30 @@
 #include <Platform.hpp>
+#include <Core.hpp>
+#include <DummyCore.hpp>
 
 #include <Scalar.hpp>
 #include <Set.hpp>
 #include <ParseException.hpp>
+#include <CastException.hpp>
 
 using namespace std;
 
 namespace pelib
 {
-	Platform::Platform(size_t p, const set<float> &f)
+	Platform::Platform(const set<const Core*>& cores)
 	{
-		coreNumber = p;
-		frequencies = f;
+		for(set<const Core*>::const_iterator i = cores.begin(); i != cores.end(); i++)
+		{
+			this->cores.insert((*i)->clone());
+		}
 	}
 	
 	Platform::Platform(const Platform *arch)
 	{
-		coreNumber = arch->getCoreNumber();
-		frequencies = arch->getFrequencies();
+		for(set<const Core*>::const_iterator i = arch->getCores().begin(); i != arch->getCores().end(); i++)
+		{
+			this->cores.insert((*i)->clone());
+		}
 	}
 
 	Platform::Platform(const Algebra &arch)
@@ -29,41 +36,68 @@ namespace pelib
 		{
 			throw ParseException(std::string("Missing core number scalar \"p\" or frequency set \"F\" in input."));
 		}
-	
-		this->coreNumber = (size_t)scalar_p->getValue();
-		this->frequencies = set_F->getValues();
+
+		for(size_t i = 0; i < scalar_p->getValue(); i++)
+		{
+			this->cores.insert(new DummyCore(set_F->getValues()));
+		}
 	}
 
 	Platform::~Platform()
 	{
-		// Do nothing
+		for(set<const Core*>::const_iterator i = this->getCores().begin(); i != this->getCores().end(); i++)
+		{
+			delete *i;
+		}
 	}
 	
 	Platform*
 	Platform::clone() const
 	{
-		return new Platform(this->getCoreNumber(), this->getFrequencies());
+		return new Platform(this);
 	}
 
-	int
-	Platform::getCoreNumber() const
+	const std::set<const Core*>&
+	Platform::getCores() const
 	{
-		return this->coreNumber;
-	}
-	
-	const std::set<float>&
-	Platform::getFrequencies() const
-	{
-		return this->frequencies;
+		return this->cores;
 	}
 		
+	bool
+	Platform::isHomogeneous() const
+	{
+		const char* type = NULL;
+		
+		this->cores.size() == 1;
+		for(set<const Core*>::const_iterator i = this->getCores().begin(); i != this->getCores().end(); i++)
+		{
+			if(type != NULL)
+			{
+				if(string(type).compare(typeid(**i).name()) != 0)
+				{
+					return false;
+				}
+			}
+
+			type = typeid(**i).name();
+		}
+
+		// If we reach this point having read at least one string, then this is homogeneous
+		return type != NULL;
+	}
+
 	Algebra
 	Platform::buildAlgebra() const
 	{
 		Algebra record;
 
-		Scalar<float> scalar_p("p", coreNumber);
-		Set<float> set_F("F", frequencies);
+		if(!this->isHomogeneous())
+		{
+			throw CastException(std::string("Missing core number scalar \"p\" or frequency set \"F\" in input."));
+		}
+
+		Scalar<float> scalar_p("p", this->getCores().size());
+		Set<float> set_F("F", (*this->getCores().begin())->getFrequencies());
 
 		record.insert(&scalar_p);
 		record.insert(&set_F);

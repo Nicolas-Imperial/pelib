@@ -109,9 +109,9 @@ namespace pelib
 	double
 	Task::getEfficiency(int p, double def) const
 	{
-		if(getEfficiencyString().substr(0, 4) == "fml:")
+		if(getEfficiencyString().find("exprtk") == 0)
 		{
-			string formula = getEfficiencyString().substr(4);
+			string formula = getEfficiencyString().substr(string("exprtk").size() + 1);
 
 			print print_cout(cout);
 			print print_cerr(cerr);

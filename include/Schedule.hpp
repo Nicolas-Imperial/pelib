@@ -15,7 +15,6 @@ namespace pelib
 			typedef std::map<float, work> sequence;
 			typedef std::map<int, sequence> table;
 
-			Schedule(const std::string &name, const std::string &appName);
 			Schedule(const std::string &name, const std::string &appName, const table &schedule);
 			Schedule(const std::string &name, const Algebra &algebra);
 			virtual ~Schedule();
@@ -49,10 +48,10 @@ namespace pelib
 			virtual const set<const Task*>&
 			getTasks(int core) const;
 
-			virtual const set<const Task*>&
+			virtual set<const Task*>
 			getProducers(int core, const Taskgraph &tg) const;
 
-			virtual const set<const Task*>&
+			virtual set<const Task*>
 			getConsumers(int core, const Taskgraph &tg) const;
 
 			virtual const set<int>

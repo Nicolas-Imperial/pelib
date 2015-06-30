@@ -92,7 +92,8 @@ Scalar.cpp Vector.cpp Matrix.cpp Set.cpp \
 AmplDataParser.cpp AmplDataOutput.cpp \
 AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp GraphML.cpp Schedule.cpp \
 AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
-Task.cpp Link.cpp Taskgraph.cpp Schedule.cpp Platform.cpp \
+Task.cpp Link.cpp Taskgraph.cpp Schedule.cpp \
+Platform.cpp Core.cpp DummyCore.cpp \
 DeadlineCalculator.cpp DeadlineFormula.cpp DeadlineConstant.cpp \
 AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp \
 AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \

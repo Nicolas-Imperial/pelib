@@ -1,5 +1,6 @@
 #include <set>
 
+#include <Core.hpp>
 #include <Algebra.hpp>
 
 #ifndef PELIB_PLATFORM
@@ -7,24 +8,20 @@
 
 namespace pelib
 {
-	class Platform : public Record
+	class Platform: public Record
 	{
 		public:
-			Platform(size_t p, const std::set<float> &f);
+			Platform(const std::set<const Core*>&);
 			Platform(const Platform *arch);
 			Platform(const Algebra &arch);
 			virtual Platform* clone() const;
-
-			virtual int getCoreNumber() const;
-
-			virtual const std::set<float>& getFrequencies() const;
+			virtual const std::set<const Core*>& getCores() const;
+			virtual bool isHomogeneous() const;
 
 			virtual Algebra buildAlgebra() const;
 			virtual	~Platform();
-
 		protected:
-			size_t coreNumber;
-			std::set<float> frequencies;
+			std::set<const Core*> cores;
 		private:		
 	};
 }

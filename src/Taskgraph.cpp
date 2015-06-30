@@ -4,6 +4,7 @@
 #include <DeadlineCalculator.hpp>
 #include <ParseException.hpp>
 #include <CastException.hpp>
+#include <DummyCore.hpp>
 
 #include <Scalar.hpp>
 #include <Vector.hpp>
@@ -160,7 +161,9 @@ namespace pelib
 	{
 		set<float> f;
 		f.insert(1);
-		return buildAlgebra(Platform(1, f));
+		set<const Core*> cores;
+		cores.insert(new DummyCore(f));
+		return buildAlgebra(Platform(cores));
 	}
 	
 	Algebra
@@ -173,13 +176,18 @@ namespace pelib
 		map<int, float> map_tau;
 		map<int, float> map_Wi;
 
+		if(!arch.isHomogeneous())
+		{
+			throw CastException("Cannot output discretive efficiency function for a heterogeneous platform.");
+		}
+
 		for(set<Task>::const_iterator i = getTasks().begin(); i != getTasks().end(); i++)
 		{
 			map_tau.insert(pair<int, float>(std::distance(this->getTasks().begin(), i) + 1, i->getWorkload()));
 			float max_width = 0;
-			if(i->getMaxWidth() > arch.getCoreNumber())
+			if(i->getMaxWidth() > arch.getCores().size())
 			{
-				max_width = arch.getCoreNumber();
+				max_width = arch.getCores().size();
 			}
 			else
 			{
@@ -188,9 +196,9 @@ namespace pelib
 			map_Wi.insert(pair<int, float>(std::distance(this->getTasks().begin(), i) + 1, max_width));
 
 			map<int, float> task_e;
-			for(int j = 1; j <= arch.getCoreNumber(); j++)
+			for(size_t j = 1; j <= arch.getCores().size(); j++)
 			{
-				task_e.insert(pair<int, float>(j, i->getEfficiency(j)));
+				task_e.insert(pair<int, float>((int)j, i->getEfficiency(j)));
 			}
 			
 			map_e.insert(pair<int, map<int, float> >(std::distance(this->getTasks().begin(), i) + 1, task_e));

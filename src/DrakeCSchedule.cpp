@@ -55,7 +55,8 @@ DrakeCSchedule::dump(ostream& os, const Schedule *data, const Taskgraph *tg, con
 	{
 		const Task &t = *i;
 		os <<
-			"#define TASK_MODULE " << t.getName() << endl <<
+			"#define TASK_NAME " << t.getName() << endl <<
+			"#define TASK_MODULE " << t.getModule() << endl <<
 			"#include <drake/node.h>" << endl <<
 			"#define DONE_" << t.getName() << " 1" << endl << endl;
 	}
@@ -214,7 +215,7 @@ DrakeCSchedule::dump(ostream& os, const Schedule *data, const Taskgraph *tg, con
 			size_t counter = 0;
 			for(set<const Link*>::const_iterator j = i->getConsumers().begin(); j != i->getConsumers().end(); j++)
 			{
-				os << "	_drake_producers_id[" << std::distance(tg->getTasks().begin(), i) << "][" << counter << "] = " << (*j)->getConsumer()->getName() << ";" << endl;
+				os << "	_drake_consumers_id[" << std::distance(tg->getTasks().begin(), i) << "][" << counter << "] = " << (*j)->getConsumer()->getName() << ";" << endl;
 				counter++;
 			}
 		}
@@ -299,16 +300,16 @@ drake_function(size_t id, task_status_t status)\n\
 					return 0;\n\
 				break;\n\
 				case TASK_INIT:\n\
-					return (void*)&drake_init(" << i->getModule() << ", " << i->getModule() << ");\n\
+					return (void*)&drake_init(" << i->getName() << ", " << i->getModule() << ");\n\
 				break;\n\
 				case TASK_START:\n\
-					return (void*)&drake_start(" << i->getModule() << ", " << i->getModule() << ");\n\
+					return (void*)&drake_start(" << i->getName() << ", " << i->getModule() << ");\n\
 				break;\n\
 				case TASK_RUN:\n\
-					return (void*)&drake_run(" << i->getModule() << ", " << i->getModule() << ");\n\
+					return (void*)&drake_run(" << i->getName() << ", " << i->getModule() << ");\n\
 				break;\n\
 				case TASK_KILLED:\n\
-					return (void*)&drake_destroy(" << i->getModule() << ", " << i->getModule() << ");\n\
+					return (void*)&drake_destroy(" << i->getName() << ", " << i->getModule() << ");\n\
 				break;\n\
 				case TASK_ZOMBIE:\n\
 					return 0;\n\

@@ -6,6 +6,7 @@
 #include <Matrix.hpp>
 #include <Vector.hpp>
 #include <ParseException.hpp>
+#include <CastException.hpp>
 
 #include <exprtk.hpp>
 
@@ -49,6 +50,7 @@ struct print: public exprtk::ifunction<double>
 
 DeadlineFormula::DeadlineFormula(string formula) : formula(formula) {}
 
+#define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
 double
 DeadlineFormula::calculate(const Taskgraph &tg, const Platform &arch) const
 {
@@ -59,21 +61,26 @@ DeadlineFormula::calculate(const Taskgraph &tg, const Platform &arch) const
 	typedef exprtk::expression<double> expression_t;
 	typedef exprtk::parser<double>         parser_t;
 
+	if(!arch.isHomogeneous())
+	{
+		throw CastException("Cannot compute a deadline for a taskgraph with a heterogeneous platform.");
+	}
+
 	// Vector of tasks ids, vector of task workloads tau, vector of task max load
 	vector<double> n, p, F, tau, W;
 	for(set<Task>::const_iterator iter = tg.getTasks().begin(); iter != tg.getTasks().end(); iter++)
 	{
-		n.push_back((double)std::distance(tg.getTasks().begin(), iter));
+		n.push_back((double)std::distance(tg.getTasks().begin(), iter) + 1);
 		tau.push_back((double)iter->getWorkload());
 		W.push_back((double)iter->getMaxWidth());
 	}
 
-	for(double i = 1; i <= (double)arch.getCoreNumber(); i++)
+	for(double i = 1; i <= (double)arch.getCores().size(); i++)
 	{
 		p.push_back(i);
 	}
 
-	for(set<float>::const_iterator i = arch.getFrequencies().begin(); i !=arch.getFrequencies().end(); i++)
+	for(set<float>::const_iterator i = (*arch.getCores().begin())->getFrequencies().begin(); i != (*arch.getCores().begin())->getFrequencies().end(); i++)
 	{
 		F.push_back(*i);
 	}

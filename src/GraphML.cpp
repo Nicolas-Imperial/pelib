@@ -85,7 +85,7 @@ GraphML::~GraphML()
 }
 
 void
-GraphML::dump(ostream& os, const Record *data, const Platform *arch) const
+GraphML::dump(ostream& os, const Taskgraph *data, const Platform *arch) const
 {
 	const Taskgraph *tg = dynamic_cast<const Taskgraph* >(data);
 	if(tg == NULL) throw CastException("Parameter \"data\" was not of type \"Taskgraph*\".");
@@ -112,6 +112,10 @@ GraphML::dump(ostream& os, const Record *data, const Platform *arch) const
 	// Add vertices
 	int ret = igraph_add_vertices(graph, tg->getTasks().size(), 0);
 	if(ret == IGRAPH_EINVAL) throw CastException("Could not add vertices to igraph.");
+	if(arch != NULL && !(arch->isHomogeneous()))
+	{
+		throw CastException("Cannot output discretive efficiency function for a heterogeneous platform.");
+	}
 
 	size_t counter = 0;
 	for(set<Task>::const_iterator i = tg->getTasks().begin(); i != tg->getTasks().end(); i++, counter++)
@@ -134,17 +138,19 @@ GraphML::dump(ostream& os, const Record *data, const Platform *arch) const
 		else
 		{
 			stringstream ss;
-			
-			for(int j = 1; j <= arch->getCoreNumber(); j++)
+			for(size_t j = 1; j <= arch->getCores().size(); j++)
 			{
 				ss << task.getEfficiency(j) << " ";
 			}
 
 			SETVAS(graph, "efficiency", counter, ss.str().c_str());
-
-			if(task.getMaxWidth() >= arch->getCoreNumber())
+			if(task.getMaxWidth() >= arch->getCores().size())
 			{
-				max_width << arch->getCoreNumber();
+				max_width << arch->getCores().size();
+			}
+			else
+			{
+				max_width << task.getMaxWidth();
 			}
 		}
 
@@ -185,19 +191,19 @@ GraphML::dump(ostream& os, const Record *data, const Platform *arch) const
 }
 
 void
-GraphML::dump(ostream& os, const Record *data) const
+GraphML::dump(ostream& os, const Taskgraph *data) const
 {
 	dump(os, data, NULL);
 }
 
 void
-GraphML::dump(ostream& os, const Record &data) const
+GraphML::dump(ostream& os, const Taskgraph &data) const
 {
 	dump(os, &data, NULL);
 }
 
 void
-GraphML::dump(ostream& os, const Record &data, const Platform &arch) const
+GraphML::dump(ostream& os, const Taskgraph &data, const Platform &arch) const
 {
 	dump(os, &data, &arch);
 }
@@ -233,7 +239,7 @@ GraphML::parse(istream &is) const
 //	while( ( ch = fgetc(fake_fileptr) ) != EOF )
 //      		printf("%c",ch);
 	// Parse input file
-	igraph_read_graph_graphml(the_graph,fake_fileptr,0);
+	igraph_read_graph_graphml(the_graph, fake_fileptr, 0);
 
 	// Clone the file and wait for the pipe to finish
 	close(p[0]);

@@ -15,10 +15,10 @@ namespace pelib
 			virtual ~GraphML();
 			virtual GraphML* clone() const;
 			virtual Taskgraph* parse(std::istream &is) const;
-			virtual void dump(std::ostream &str, const Record *data) const;
-			virtual void dump(std::ostream &str, const Record &data) const;
-			virtual	void dump(std::ostream &os, const Record &data, const Platform &arch) const;
-			virtual void dump(std::ostream &os, const Record *data, const Platform *arch) const;
+			virtual void dump(std::ostream &str, const Taskgraph *data) const;
+			virtual void dump(std::ostream &str, const Taskgraph &data) const;
+			virtual	void dump(std::ostream &os, const Taskgraph &data, const Platform &arch) const;
+			virtual void dump(std::ostream &os, const Taskgraph *data, const Platform *arch) const;
 		protected:
 	};
 }

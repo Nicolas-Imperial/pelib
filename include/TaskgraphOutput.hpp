@@ -11,8 +11,8 @@ namespace pelib
 	{
 		public:	
 			virtual TaskgraphOutput* clone() const = 0;
-			virtual	void dump(std::ostream &os, const Record &data, const Platform &arch) const = 0;
-			virtual	void dump(std::ostream &os, const Record *data, const Platform *arch) const = 0;
+			virtual	void dump(std::ostream &os, const Taskgraph &data, const Platform &arch) const = 0;
+			virtual	void dump(std::ostream &os, const Taskgraph *data, const Platform *arch) const = 0;
 
 		protected:
 		private:		

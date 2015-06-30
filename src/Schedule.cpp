@@ -19,15 +19,10 @@ using namespace std;
 #define trace(var)
 #endif
 */
+#define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
 
 namespace pelib
 {
-	Schedule::Schedule(const std::string &name, const std::string &appName)
-	{
-		this->name = name;
-		this->appName = appName;
-	}
-
 	Schedule::Schedule(const std::string &name, const std::string &appName, const table &schedule)
 	{
 		this->name = name;
@@ -45,31 +40,43 @@ namespace pelib
 	void
 	Schedule::setSchedule(const table &schedule)
 	{
-		this->schedule = schedule;
+		this->schedule = Schedule::table();
 		this->tasks.clear();
 		this->core_tasks.clear();
 
-		for(table::iterator i = this->schedule.begin(); i != this->schedule.end(); i++)
+		for(table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 		{
 			set<const Task*> this_core_tasks;
-			for(sequence::iterator j = i->second.begin(); j != i->second.end(); j++)
+			sequence new_sequence;
+			for(sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 			{
 				const Task *task = j->second.first;
 				Task t = *task;
+				debug(t.getName());
 				this->tasks.insert(t);
 				Task &task_ref = (Task&)*this->getTasks().find(t);
 				pair<float, work> new_pair = pair<float, work>(j->first, work(&task_ref, j->second.second));
-				i->second.erase(j);
-				i->second.insert(new_pair);
+				new_sequence.insert(new_pair);
 
 				// Insert a reference to this task in the core's task list
-				this_core_tasks.insert(&t);
+				this_core_tasks.insert(&task_ref);
 			}
+
+			this->schedule.insert(pair<int, sequence>(i->first, new_sequence));
+
+			// Add the tasks list to the list of lists of tasks
 			this->core_tasks.insert(pair<int, set<const Task*> >(i->first, this_core_tasks));
 		}
+
+			for(map<int, set<const Task*> >::const_iterator j = this->core_tasks.begin(); j != this->core_tasks.end(); j++)
+			{
+				for(set<const Task*>::const_iterator k = j->second.begin(); k != j->second.end(); k++)
+				{
+					debug((*k)->getName());
+				}
+			}
 	}
 
-#define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
 	Schedule::Schedule(const std::string &name, const Algebra &algebra)
 	{
 		this->name = name;
@@ -252,77 +259,64 @@ namespace pelib
 	const set<const Task*>&
 	Schedule::getTasks(int core) const
 	{
-		return this->core_tasks.find(core)->second;
 		/*
-		if(tasks.find(core) == tasks.end())
+		debug(core);
+		for(map<int, set<const Task*> >::const_iterator i = core_tasks.begin(); i != core_tasks.end(); i++)
 		{
-			set<const Task*> core_tasks;
-			for(sequence::const_iterator i = this->schedule.find(core)->second.begin(); i != this->schedule.find(core)->second.end(); i++)
+			for(set<const Task*>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 			{
-				core_tasks.insert(i->second.first);
+				debug((*j)->getName());
 			}
-
-			tasks.insert(pair<int, set<const Task*> >(core, core_tasks));
 		}
-
-		return tasks.find(core)->second;
 		*/
+
+		return this->core_tasks.find(core)->second;
 	}
 
-	const set<const Task*>&
+	set<const Task*>
 	Schedule::getProducers(int core, const pelib::Taskgraph &tg) const
 	{
-		/*
-		map<int, set<const Task*> > tasks;
-		this->getTasks(core, tasks);
-		
-		if(producers.find(core) == producers.end())
+		set<const Task*> producers;
+
+		// Look for all task mapped to this core
+		for(set<const Task*>::const_iterator i = this->getTasks(core).begin(); i != this->getTasks(core).end(); i++)
 		{
-			set<const Task*> prods;
-			for(set<const Task*>::const_iterator i = this->getTasks(core, tasks).begin(); i != this->getTasks(core, tasks).end(); i++)
+			// Look for all producers of these tasks
+			Task t = **i;
+			for(set<const Link*>::const_iterator j = tg.getTasks().find(**i)->getProducers().begin(); j != tg.getTasks().find(**i)->getProducers().end(); j++)
 			{
-				for(set<const Link*>::const_iterator j = (*i)->getProducers().begin(); j != (*i)->getProducers().end(); j++)
+				// If the producer is not mapped to this core, then it is a producer of a core
+				if(this->getTasks(core).find(((*j)->getProducer())) == this->getTasks(core).end())
 				{
-					if(this->getTasks(core, tasks).find((*j)->getProducer()) == this->getTasks(core, tasks).end())
-					{
-						prods.insert((*j)->getProducer());
-					}
+						producers.insert((*j)->getProducer());
 				}
-			}
-	
-			producers.insert(pair<int, set<const Task*> >(core, prods));
+			}	
 		}
 
-		return producers.find(core)->second;
-		*/
+		return producers;
 	}
 
-	const set<const Task*>&
+	set<const Task*>
 	Schedule::getConsumers(int core, const pelib::Taskgraph &tg) const
 	{
-		/*
-		map<int, set<const Task*> > tasks;
-		this->getTasks(core, tasks);
+		set<const Task*> consumers;
 
-		if(consumers.find(core) == consumers.end())
+		// Look for all task mapped to this core
+		for(set<const Task*>::const_iterator i = this->getTasks(core).begin(); i != this->getTasks(core).end(); i++)
 		{
-			set<const Task*> prods;
-			for(set<const Task*>::const_iterator i = this->getTasks(core, tasks).begin(); i != this->getTasks(core, tasks).end(); i++)
+			// Look for all consumers of these tasks
+			Task t = **i;
+			for(set<const Link*>::const_iterator j = tg.getTasks().find(**i)->getConsumers().begin(); j != tg.getTasks().find(**i)->getConsumers().end(); j++)
 			{
-				for(set<const Link*>::const_iterator j = (*i)->getConsumers().begin(); j != (*i)->getConsumers().end(); j++)
+				// If the consumer is not mapped to this core, then it is a consumer of a core
+				if(this->getTasks(core).find(((*j)->getConsumer())) == this->getTasks(core).end())
 				{
-					if(this->getTasks(core, tasks).find((*j)->getConsumer()) == this->getTasks(core, tasks).end())
-					{
-						prods.insert((*j)->getConsumer());
-					}
+						consumers.insert((*j)->getConsumer());
 				}
-			}
-	
-			consumers.insert(pair<int, set<const Task*> >(core, prods));
+			}	
 		}
 
-		return consumers.find(core)->second;
-		*/
+		return consumers;
 	}
 
 	const set<int>
