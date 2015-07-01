@@ -115,6 +115,7 @@ namespace pelib
 		const Vector<int, float> *tau = algebra.find<Vector<int, float> >("Tau");
 		const Vector<int, float> *Wi = algebra.find<Vector<int, float> >("Wi");
 		const Matrix<int, int, float> *e = algebra.find<Matrix<int, int, float> >("e");
+		const Matrix<int, int, float> *c = algebra.find<Matrix<int, int, float> >("c");
 		
 		if(M == NULL || n == NULL || tau == NULL || Wi == NULL || e == NULL)
 		{
@@ -148,12 +149,29 @@ namespace pelib
 
 			this->tasks.insert(t);
 		}
+		
+		if(c != NULL)
+		{
+			for(map<int, map<int, float> >::const_iterator i = c->getValues().begin(); i != c->getValues().end(); i++)
+			{
+				for(map<int, float>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
+				{
+					if(j->second > 0)
+					{
+						set<Task>::const_iterator from = this->getTasks().begin(), to = this->getTasks().begin();
+						std::advance(from, (size_t)i->first - 1);
+						std::advance(to, (size_t)j->first - 1);
+						this->links.insert(Link(*from, *to));
+					}
+				}
+			}
+		}
 	}
 
 	Taskgraph*
 	Taskgraph::clone() const
 	{
-		return new Taskgraph();
+		return new Taskgraph(this->getTasks(), this->getLinks());
 	}
 
 	Algebra
@@ -173,6 +191,7 @@ namespace pelib
 
 		Scalar<float> n("n", getTasks().size());
 		map<int, map<int, float> > map_e;
+		map<int, map<int, float> > map_c;
 		map<int, float> map_tau;
 		map<int, float> map_Wi;
 
@@ -202,11 +221,27 @@ namespace pelib
 			}
 			
 			map_e.insert(pair<int, map<int, float> >(std::distance(this->getTasks().begin(), i) + 1, task_e));
+
+			map<int, float> task_c;
+			for(set<Task>::const_iterator j = getTasks().begin(); j != getTasks().end(); j++)
+			{
+				if(this->getLinks().find(Link(*i, *j)) != this->getLinks().end())
+				{
+					task_c.insert(pair<int, float>((int)std::distance(this->getTasks().begin(), j) + 1, 1));
+				}
+				else
+				{
+					task_c.insert(pair<int, float>((int)std::distance(this->getTasks().begin(), j) + 1, 0));
+				}
+			}
+			
+			map_c.insert(pair<int, map<int, float> >(std::distance(this->getTasks().begin(), i) + 1, task_c));
 		}
 
 		Vector<int, float> tau("Tau", map_tau);
 		Vector<int, float> Wi("Wi", map_Wi);
 		Matrix<int, int, float> e("e", map_e);
+		Matrix<int, int, float> c("c", map_c);
 
 		Scalar<float> M("M", getDeadline(arch));
 
@@ -214,6 +249,7 @@ namespace pelib
 		out.insert(&tau);
 		out.insert(&Wi);
 		out.insert(&e);
+		out.insert(&c);
 		out.insert(&M);
 
 		return out;

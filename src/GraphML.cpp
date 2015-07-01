@@ -24,6 +24,8 @@ extern "C"{
 #include <CastException.hpp>
 #include <ParseException.hpp>
 
+#define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
+
 using namespace pelib;
 using namespace std;
 using namespace xmlpp;
@@ -155,6 +157,12 @@ GraphML::dump(ostream& os, const Taskgraph *data, const Platform *arch) const
 		}
 
 		SETVAS(graph, "max_width", counter, max_width.str().c_str());
+	}
+
+	for(set<Link>::const_iterator i = tg->getLinks().begin(); i != tg->getLinks().end(); i++)
+	{
+		int ret = igraph_add_edge(graph, std::distance(tg->getTasks().begin(), tg->getTasks().find(*i->getProducer())), std::distance(tg->getTasks().begin(), tg->getTasks().find(*i->getConsumer())));
+		if(ret == IGRAPH_EINVAL) throw CastException("Could not add vertices to igraph.");
 	}
 
 	// Dump data to stream os
@@ -305,8 +313,8 @@ GraphML::parse(istream &is) const
 		int producer_id, consumer_id;
 
 		igraph_edge(the_graph, i, &producer_id, &consumer_id);
-		Task producer(VAS(the_graph, "id", producer_id));
-		Task consumer(VAS(the_graph, "id", consumer_id));
+		Task producer(VAS(the_graph, "name", producer_id));
+		Task consumer(VAS(the_graph, "name", consumer_id));
 
 		Link link(*tasks.find(producer), *tasks.find(consumer));
 		links.insert(link);

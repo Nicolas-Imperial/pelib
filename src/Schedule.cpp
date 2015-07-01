@@ -52,7 +52,6 @@ namespace pelib
 			{
 				const Task *task = j->second.first;
 				Task t = *task;
-				debug(t.getName());
 				this->tasks.insert(t);
 				Task &task_ref = (Task&)*this->getTasks().find(t);
 				pair<float, work> new_pair = pair<float, work>(j->first, work(&task_ref, j->second.second));
@@ -67,14 +66,6 @@ namespace pelib
 			// Add the tasks list to the list of lists of tasks
 			this->core_tasks.insert(pair<int, set<const Task*> >(i->first, this_core_tasks));
 		}
-
-			for(map<int, set<const Task*> >::const_iterator j = this->core_tasks.begin(); j != this->core_tasks.end(); j++)
-			{
-				for(set<const Task*>::const_iterator k = j->second.begin(); k != j->second.end(); k++)
-				{
-					debug((*k)->getName());
-				}
-			}
 	}
 
 	Schedule::Schedule(const std::string &name, const Algebra &algebra)

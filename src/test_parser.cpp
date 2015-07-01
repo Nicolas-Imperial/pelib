@@ -12,6 +12,7 @@
 #include <AmplInput.hpp>
 #include <AmplOutput.hpp>
 
+#include <DummyCore.hpp>
 #include <GraphML.hpp>
 #include <Platform.hpp>
 #include <XMLSchedule.hpp>
@@ -77,7 +78,10 @@ extern size_t _binary_schedule_dat_size;
 std::string string_schedule_amploutput;
 std::istringstream istream_schedule_amploutput;
 
-Platform pt(1, set<float>());
+extern char _binary_platform_dat_start;
+extern size_t _binary_platform_dat_size;
+std::string string_platform_amplinput;
+std::istringstream istream_platform_amplinput;
 
 void
 test_init()
@@ -118,13 +122,19 @@ test_setup()
 	istream_schedule_amploutput.clear();
 	istream_schedule_amploutput.str(string_schedule_amploutput);
 
+	string_platform_amplinput = std::string(&_binary_platform_dat_start).substr(0, (size_t)(&_binary_platform_dat_size));
+	istream_platform_amplinput.clear();
+	istream_platform_amplinput.str(string_platform_amplinput);
+
+/*
 	set<float> f;
 	f.insert(1);
 	f.insert(2);
 	f.insert(3);
 	f.insert(4);
 	f.insert(5);
-	pt = Platform(8, f);
+	pt = Platform(8, new DummyCore(f));
+*/
 }
 
 void
@@ -194,6 +204,9 @@ parse_and_convert_schedule()
 {
 	Taskgraph tg_graphml = GraphML().parse(istream_taskgraph_graphml);
 	Algebra ampl_schedule = AmplOutput(AmplOutput::floatHandlers()).parse(istream_schedule_amploutput);
+	Algebra alg_arch = AmplInput(AmplInput::floatHandlers()).parse(istream_platform_amplinput);
+	Platform pt(alg_arch);
+
 	Schedule schedule("Converted from AMPL", ampl_schedule);
 
 	stringstream reference;

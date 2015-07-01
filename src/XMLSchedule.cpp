@@ -70,7 +70,7 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 		{
 			string taskid = j->second.first->getName();
 			Task t = *j->second.first;
-			os << "   <task name=\"" << taskid << "\" "
+			os << "  <task name=\"" << taskid << "\" "
 				<< "start=\"" << (t.getStartTime() > 0 ? t.getStartTime() : start) << "\" "
 				<< "frequency=\"" << t.getFrequency() << "\" "
 				<< "width=\"" << t.getWidth() << "\" "

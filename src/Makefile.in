@@ -283,7 +283,7 @@ test_parser_deps = libcppelib.so.1 libunit.a
 test_parser_libs = -lunit -lcppelib $(shared_cppelib_libs)
 test_parser_pkg = $(shared_cppelib_pkg)
 test_parser_ldflags = -L.
-test_parser_embed = fft_n15_1.graphml fft_n15_1_input.dat fft_n15_1_output.dat p8.dat schedule.xml crown.dat schedule.dat
+test_parser_embed = fft_n15_1.graphml fft_n15_1_input.dat fft_n15_1_output.dat p8.dat schedule.xml crown.dat schedule.dat platform.dat
 
 #FIRST = first
 
