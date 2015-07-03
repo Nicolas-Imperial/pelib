@@ -11,6 +11,8 @@ namespace pelib
 	class Platform: public Record
 	{
 		public:
+			typedef std::set<const Core*> island;
+
 			Platform();
 			Platform(size_t p, const Core* ref);
 			Platform(const std::set<const Core*>&);
@@ -20,23 +22,27 @@ namespace pelib
 			virtual Platform* clone() const;
 			virtual const std::set<const Core*>& getCores() const;
 			virtual bool isHomogeneous() const;
-			virtual const std::set<std::set<const Core*> >& getSharedMemoryIslands() const;
-			virtual const std::set<const Core*>& getSharedMemoryIslands(size_t id) const;
-			virtual const std::set<std::set<const Core*> >& getMainMemoryIslands() const;
-			virtual const std::set<const Core*>& getMainMemoryIslands(size_t id) const;
-			virtual const std::set<std::set<const Core*> >& getPrivateMemoryIslands() const;
-			virtual const std::set<const Core*>& getPrivateMemoryIslands(size_t id) const;
-			virtual const std::set<std::set<const Core*> >& getVoltageIslands() const;
-			virtual const std::set<const Core*>& getVoltageIslands(size_t id) const;
-			virtual const std::set<std::set<const Core*> >& getFrequencyIslands() const;
-			virtual const std::set<const Core*>& getFrequencyIslands(size_t id) const;
+
+			virtual const std::set<island>& getSharedMemoryIslands() const;
+			virtual const std::set<island> getSharedMemoryIslands(size_t core_id) const;
+			virtual const std::set<island> getSharedmemoryIslands(const std::set<int>& islands) const;
+			virtual const std::set<int> getSharedMemoryIslands(const std::set<island>& islands) const;
+			virtual const std::set<island>& getMainMemoryIslands() const;
+			virtual const std::set<island> getMainMemoryIslands(size_t core_id) const;
+			virtual const std::set<island>& getPrivateMemoryIslands() const;
+			virtual const std::set<island> getPrivateMemoryIslands(size_t core_id) const;
+			virtual const std::set<island>& getVoltageIslands() const;
+			virtual const island& getVoltageIsland(size_t core_id) const;
+			virtual const std::set<island>& getFrequencyIslands() const;
+			virtual const island& getFrequencyIsland(size_t core_id) const;
+
 			virtual const Core* getCore(size_t id) const;
 			virtual size_t getCoreId(const Core*) const;
 			virtual Algebra buildAlgebra() const;
 			virtual	~Platform();
 		protected:
 			std::set<const Core*> cores;
-			std::set<std::set <const Core*> > shared, main, priv, voltage, freq;
+			std::set<island> shared, main, priv, voltage, freq;
 		private:		
 	};
 }

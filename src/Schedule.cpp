@@ -235,6 +235,14 @@ namespace pelib
 		return this->tasks;
 	}
 
+	const Task&
+	Schedule::getTask(int id) const
+	{
+		set<Task>::const_iterator it = this->getTasks().begin();
+		std::advance(it, id - 1);
+		return *it;
+	}
+
 	Schedule&
 	Schedule::operator=(const Schedule &copy)
 	{
@@ -250,76 +258,263 @@ namespace pelib
 	const set<const Task*>&
 	Schedule::getTasks(int core) const
 	{
-		/*
-		debug(core);
-		for(map<int, set<const Task*> >::const_iterator i = core_tasks.begin(); i != core_tasks.end(); i++)
-		{
-			for(set<const Task*>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
-			{
-				debug((*j)->getName());
-			}
-		}
-		*/
-
 		return this->core_tasks.find(core)->second;
 	}
 
 	set<const Task*>
-	Schedule::getProducers(int core, const pelib::Taskgraph &tg) const
+	Schedule::getTasksSharedMemoryIsland(const set<int>& islands, const Platform &pt) const
+	{
+		set<const Task*> tasks;
+
+		for(set<int>::const_iterator i = islands.begin(); i != islands.end(); i++)
+		{
+			set<Platform::island>::const_iterator ii = pt.getSharedMemoryIslands().begin();
+			std::advance(ii, *i);
+
+			for(Platform::island::const_iterator j = ii->begin(); j != ii->end(); j++)
+			{
+				size_t core_id = std::distance(pt.getCores().begin(), pt.getCores().find(*j)) + 1;
+				for(set<const Task*>::const_iterator k = this->getTasks((int)core_id).begin(); k !=  this->getTasks((int)core_id).end(); k++)
+				{
+					tasks.insert(*k);
+				}
+			}
+		}
+
+		return tasks;
+	}
+
+	set<const Task*>
+	Schedule::getRemoteSharedMemoryIslandProducers(const set<int> &islands, const Taskgraph &tg, const Platform &pt) const
 	{
 		set<const Task*> producers;
-
-		// Look for all task mapped to this core
-		for(set<const Task*>::const_iterator i = this->getTasks(core).begin(); i != this->getTasks(core).end(); i++)
+		for(set<int>::const_iterator i = islands.begin(); i != islands.end(); i++)
 		{
-			// Look for all producers of these tasks
-			Task t = **i;
-			for(set<const Link*>::const_iterator j = tg.getTasks().find(**i)->getProducers().begin(); j != tg.getTasks().find(**i)->getProducers().end(); j++)
+			if(*i > (int)pt.getSharedMemoryIslands().size())
 			{
-				// If the producer is not mapped to this core, then it is a producer of a core
-				if(this->getTasks(core).find(((*j)->getProducer())) == this->getTasks(core).end())
+				throw CastException("Requested shared memory islands not existing in platform.");
+			}
+		}
+
+		set<const Task*> tasks_in_islands = this->getTasksSharedMemoryIsland(islands, pt);
+		for(set<const Task*>::const_iterator i = tasks_in_islands.begin(); i != tasks_in_islands.end(); i++)
+		{
+			const Task *task_p = *i;
+			const Task &task_tg = *tg.getTasks().find(*task_p);
+			set<int> consumer_cores = this->getCores(task_tg);
+			set<int>::const_iterator j = consumer_cores.begin();
+			// TODO: investigate why this happens
+			//if(*j == 0) debug(*j);
+			set<Platform::island> consumer_core_islands = pt.getSharedMemoryIslands(*j);
+			for(; j != consumer_cores.end(); j++)
+			{
+				if(pt.getSharedMemoryIslands(*j) != consumer_core_islands)
 				{
-						producers.insert((*j)->getProducer());
+					throw CastException("Task mapped to cores that belong to different shared memory islands.");
+				}	
+			}
+			
+			for(set<const Link*>::const_iterator j = task_tg.getProducers().begin(); j != task_tg.getProducers().end(); j++)
+			{
+				const Link *l = *j;
+				const Task *producer = l->getProducer();
+				set<int> producer_cores = this->getCores(*this->getTasks().find(*producer));
+				set<int>::const_iterator k = producer_cores.begin();
+				// TODO: investigate why this happens
+				/*
+				if(*k == 0)
+				{
+					debug(*k);
+					debug(producer->getName());
 				}
-			}	
+				*/
+				set<Platform::island> producer_core_islands = pt.getSharedMemoryIslands(*k);
+				for(; k != producer_cores.end(); k++)
+				{
+					// TODO: investigate why this happens
+					//if(*k == 0) debug(*k);
+					if(pt.getSharedMemoryIslands(*k) != producer_core_islands)
+					{
+						throw CastException("Task mapped to cores that belong to different shared memory islands.");
+					}	
+				}
+
+				if(consumer_core_islands != producer_core_islands)
+				{
+					producers.insert(producer);
+				}
+			}
 		}
 
 		return producers;
 	}
 
 	set<const Task*>
-	Schedule::getConsumers(int core, const pelib::Taskgraph &tg) const
+	Schedule::getRemoteSharedMemoryIslandTaskProducers(const Task &t, const Taskgraph &tg, const Platform &pt) const
+	{
+		set<const Task*> producers;
+		const Task &task_tg = *tg.getTasks().find(t);
+		set<int> consumer_cores = this->getCores(task_tg);
+		set<int>::const_iterator j = consumer_cores.begin();
+		// TODO: investigate why this happens
+		//if(*j == 0) debug(*j);
+		set<Platform::island> consumer_core_islands = pt.getSharedMemoryIslands(*j);
+		for(; j != consumer_cores.end(); j++)
+		{
+			if(pt.getSharedMemoryIslands(*j) != consumer_core_islands)
+			{
+				throw CastException("Task mapped to cores that belong to different shared memory islands.");
+			}	
+		}
+		
+		for(set<const Link*>::const_iterator j = task_tg.getProducers().begin(); j != task_tg.getProducers().end(); j++)
+		{
+			const Link *l = *j;
+			const Task *producer = l->getProducer();
+			set<int> producer_cores = this->getCores(*this->getTasks().find(*producer));
+			set<int>::const_iterator k = producer_cores.begin();
+			// TODO: investigate why this happens
+			/*
+			if (*k == 0)
+			{
+				debug(*k);
+				debug(producer->getName());
+			}
+			*/
+
+			set<Platform::island> producer_core_islands = pt.getSharedMemoryIslands(*k);
+			for(; k != producer_cores.end(); k++)
+			{
+				// TODO: investigate why this happens
+				//if(*k == 0) debug(*k);
+				if(pt.getSharedMemoryIslands(*k) != producer_core_islands)
+				{
+					throw CastException("Task mapped to cores that belong to different shared memory islands.");
+				}	
+			}
+
+			if(consumer_core_islands != producer_core_islands)
+			{
+				producers.insert(producer);
+			}
+		}
+
+		return producers;
+	}
+
+	set<const Task*>
+	Schedule::getRemoteSharedMemoryIslandConsumers(const set<int> &islands, const Taskgraph &tg, const Platform &pt) const
 	{
 		set<const Task*> consumers;
-
-		// Look for all task mapped to this core
-		for(set<const Task*>::const_iterator i = this->getTasks(core).begin(); i != this->getTasks(core).end(); i++)
+		for(set<int>::const_iterator i = islands.begin(); i != islands.end(); i++)
 		{
-			// Look for all consumers of these tasks
-			Task t = **i;
-			for(set<const Link*>::const_iterator j = tg.getTasks().find(**i)->getConsumers().begin(); j != tg.getTasks().find(**i)->getConsumers().end(); j++)
+			if(*i > (int)pt.getSharedMemoryIslands().size())
 			{
-				// If the consumer is not mapped to this core, then it is a consumer of a core
-				if(this->getTasks(core).find(((*j)->getConsumer())) == this->getTasks(core).end())
+				throw CastException("Requested shared memory islands not existing in platform.");
+			}
+		}
+
+		set<const Task*> tasks_in_islands = this->getTasksSharedMemoryIsland(islands, pt);
+		for(set<const Task*>::const_iterator i = tasks_in_islands.begin(); i != tasks_in_islands.end(); i++)
+		{
+			const Task *task_p = *i;
+			const Task &task_tg = *tg.getTasks().find(*task_p);
+			set<int> producer_cores = this->getCores(task_tg);
+			set<int>::const_iterator j = producer_cores.begin();
+			// TODO: investigate why this happens
+			//if(*j == 0) debug(*j);
+			set<Platform::island> producer_core_islands = pt.getSharedMemoryIslands(*j);
+			for(; j != producer_cores.end(); j++)
+			{
+				if(pt.getSharedMemoryIslands(*j) != producer_core_islands)
 				{
-						consumers.insert((*j)->getConsumer());
+					throw CastException("Task mapped to cores that belong to different shared memory islands.");
+				}	
+			}
+			
+			for(set<const Link*>::const_iterator j = task_tg.getConsumers().begin(); j != task_tg.getConsumers().end(); j++)
+			{
+				const Link *l = *j;
+				const Task *consumer = l->getConsumer();
+				set<int> consumer_cores = this->getCores(*this->getTasks().find(*consumer));
+				set<int>::const_iterator k = consumer_cores.begin();
+				set<Platform::island> consumer_core_islands = pt.getSharedMemoryIslands(*k);
+				for(; k != consumer_cores.end(); k++)
+				{
+					// TODO: investigate why this happens
+					//if(*k == 0) debug(*k);
+					if(pt.getSharedMemoryIslands(*k) != consumer_core_islands)
+					{
+						throw CastException("Task mapped to cores that belong to different shared memory islands.");
+					}	
 				}
+
+				if(producer_core_islands != consumer_core_islands)
+				{
+					consumers.insert(consumer);
+				}
+			}
+		}
+
+		return consumers;
+	}
+
+	set<const Task*>
+	Schedule::getRemoteSharedMemoryIslandTaskConsumers(const Task &t, const Taskgraph &tg, const Platform &pt) const
+	{
+		set<const Task*> consumers;
+		const Task &task_tg = *tg.getTasks().find(t);
+		set<int> producer_cores = this->getCores(task_tg);
+		set<int>::const_iterator j = producer_cores.begin();
+		// TODO: investigate why this happens
+		//if(*j == 0) debug(*j);
+		set<Platform::island> producer_core_islands = pt.getSharedMemoryIslands(*j);
+		for(; j != producer_cores.end(); j++)
+		{
+			if(pt.getSharedMemoryIslands(*j) != producer_core_islands)
+			{
+				throw CastException("Task mapped to cores that belong to different shared memory islands.");
 			}	
+		}
+		
+		for(set<const Link*>::const_iterator j = task_tg.getConsumers().begin(); j != task_tg.getConsumers().end(); j++)
+		{
+			const Link *l = *j;
+			const Task *consumer = l->getConsumer();
+			set<int> consumer_cores = this->getCores(*this->getTasks().find(*consumer));
+			set<int>::const_iterator k = consumer_cores.begin();
+			set<Platform::island> consumer_core_islands = pt.getSharedMemoryIslands(*k);
+			for(; k != consumer_cores.end(); k++)
+			{
+				// TODO: investigate why this happens
+				//if(*k == 0) debug(*k);
+				if(pt.getSharedMemoryIslands(*k) != consumer_core_islands)
+				{
+					throw CastException("Task mapped to cores that belong to different shared memory islands.");
+				}	
+			}
+
+			if(producer_core_islands != consumer_core_islands)
+			{
+				consumers.insert(consumer);
+			}
 		}
 
 		return consumers;
 	}
 
 	const set<int>
-	Schedule::getCores(const Task* t) const
+	Schedule::getCores(const Task t) const
 	{
 		set<int> cores;
 		for(table::const_iterator i = this->getSchedule().begin(); i != this->getSchedule().end(); i++)
 		{
 			for(sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 			{
-				if(j->second.first == t)
+				if(*j->second.first == t)
 				{
+					// TODO: investigate why this happens
+					//if(i->first == 0) debug(i->first);
 					cores.insert(i->first);
 				}
 			}

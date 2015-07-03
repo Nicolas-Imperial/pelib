@@ -21,20 +21,11 @@ namespace pelib
 			virtual Schedule* clone() const;
 			virtual Algebra buildAlgebra() const;
 
-			//virtual void
-			//setMakespan(double makespan);
-
 			virtual std::string
 			getName() const;
 
-			//virtual void
-			//setName(const std::string name);
-
 			virtual std::string
 			getAppName() const;
-
-			//virtual void
-			//setAppName(const std::string name);
 
 			virtual const table&
 			getSchedule() const;
@@ -48,14 +39,26 @@ namespace pelib
 			virtual const set<const Task*>&
 			getTasks(int core) const;
 
-			virtual set<const Task*>
-			getProducers(int core, const Taskgraph &tg) const;
+			virtual const Task&
+			getTask(int id) const;
 
 			virtual set<const Task*>
-			getConsumers(int core, const Taskgraph &tg) const;
+			getTasksSharedMemoryIsland(const set<int>& islands, const Platform &pt) const;
+
+			virtual set<const Task*>
+			getRemoteSharedMemoryIslandProducers(const set<int> &islands, const Taskgraph &tg, const Platform &pt) const;
+
+			virtual set<const Task*>
+			getRemoteSharedMemoryIslandTaskProducers(const Task &t, const Taskgraph &tg, const Platform &pt) const;
+
+			virtual set<const Task*>
+			getRemoteSharedMemoryIslandConsumers(const set<int> &islands, const Taskgraph &tg, const Platform &pt) const;
+
+			virtual set<const Task*>
+			getRemoteSharedMemoryIslandTaskConsumers(const Task &t, const Taskgraph &tg, const Platform &pt) const;
 
 			virtual const set<int>
-			getCores(const Task*) const;
+			getCores(const Task) const;
 
 		protected:
 			std::string name, appName;

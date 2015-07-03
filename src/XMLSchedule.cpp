@@ -22,6 +22,8 @@ extern "C"{
 #include <CastException.hpp>
 #include <ParseException.hpp>
 
+#define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
+
 using namespace pelib;
 using namespace std;
 using namespace xmlpp;
@@ -164,6 +166,17 @@ XMLSchedule::parse(istream &is) const
 		}
 		
 		Schedule *sched = new Schedule(name, aut_name, schedule);
+
+		/*
+		for(set<const Task*>::const_iterator j = sched->getTasks(1).begin(); j != sched->getTasks(1).end(); j++)
+		{
+			const Task *jj = *j;
+			debug(jj);
+			Task jjj = *jj;
+			debug(jjj.getName());
+		}
+		debug("Out from XML Schedule parser");
+		*/
 
 		return sched;
 	}

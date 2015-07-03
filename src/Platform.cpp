@@ -27,7 +27,7 @@ namespace pelib
 			set<const Core*> island;
 			island.insert(core);
 
-			// Each core is its own island of anything
+			// Each core is its own Platform::island of anything
 			this->shared.insert(set<const Core*>(island));
 			this->main.insert(set<const Core*>(island));
 			this->priv.insert(set<const Core*>(island));
@@ -55,7 +55,7 @@ namespace pelib
 			set<const Core*> island;
 			island.insert(core);
 
-			// Each core is its own island of anything
+			// Each core is its own Platform::island of anything
 			this->shared.insert(set<const Core*>(island));
 			this->main.insert(set<const Core*>(island));
 			this->priv.insert(set<const Core*>(island));
@@ -79,7 +79,7 @@ namespace pelib
 
 		for(set<set<const Core*> >::const_iterator i = arch->getSharedMemoryIslands().begin(); i != arch->getSharedMemoryIslands().end(); i++)
 		{
-			set<const Core*>  island;
+			set<const Core*> island;
 			for(set<const Core*>::const_iterator j = i->begin(); j != i->end(); j++)
 			{
 				island.insert(this->getCore(arch->getCoreId(*arch->getCores().find(*j))));
@@ -150,7 +150,7 @@ namespace pelib
 			set<const Core*> island;
 			island.insert(core);
 
-			// Each core is its own island of anything
+			// Each core is its own Platform::island of anything
 			this->shared.insert(set<const Core*>(island));
 			this->main.insert(set<const Core*>(island));
 			this->priv.insert(set<const Core*>(island));
@@ -224,9 +224,16 @@ namespace pelib
 	const Core*
 	Platform::getCore(size_t id) const
 	{
-		std::set<const Core*>::iterator it = this->cores.begin();
-		std::advance(it, id - 1);
-		return *it;
+		if(id > 0) // TODO This is duck-tape fixing: better investigate why we get id = 0
+		{
+			std::set<const Core*>::iterator it = this->cores.begin();
+			std::advance(it, id - 1);
+			return *it;
+		}
+		else
+		{
+			return NULL;
+		}
 	}
 
 	size_t
@@ -235,80 +242,118 @@ namespace pelib
 		return std::distance(this->cores.begin(), this->cores.find(core)) + 1;
 	}
 
-	const std::set<std::set<const Core*> >&
+	const std::set<Platform::island>&
 	Platform::getSharedMemoryIslands() const
 	{
 		return this->shared;
 	}
 
-	const std::set<const Core*>&
+	const std::set<Platform::island>
 	Platform::getSharedMemoryIslands(size_t id) const
 	{
+		set<Platform::island> islands;
 		const Core* core = this->getCore(id);
-		for(set<set<const Core*> >::const_iterator i = this->getSharedMemoryIslands().begin(); i != this->getSharedMemoryIslands().end(); i++)
+		// TODO: investigate why this happens
+		//if(id == 0) debug(id);
+		for(set<Platform::island >::const_iterator i = this->getSharedMemoryIslands().begin(); i != this->getSharedMemoryIslands().end(); i++)
 		{
 			if(i->find(core) != i->end())
 			{
-				return *i;
+				islands.insert(*i);
 			}
 		}
 
-		throw CastException("Cannot find core in any island of the platform.");
+		return islands;
 	}
 
-	const std::set<std::set<const Core*> >&
+	const std::set<int>
+	Platform::getSharedMemoryIslands(const std::set<Platform::island>& islands) const
+	{
+		set<int> indexes;
+		for(set<Platform::island>::const_iterator i = islands.begin(); i != islands.end(); i++)
+		{
+			if(this->getSharedMemoryIslands().find(*i) != this->getSharedMemoryIslands().end())
+			{
+				indexes.insert((int)std::distance(this->getSharedMemoryIslands().begin(), this->getSharedMemoryIslands().find(*i)));
+			}
+			else
+			{
+				throw CastException("Could not find island in platform.");
+			}
+		}
+
+		return indexes;
+	}
+
+	const std::set<Platform::island>
+	Platform::getSharedmemoryIslands(const std::set<int>& islands) const
+	{
+		std::set<island> out;
+		for(std::set<int>::const_iterator i = islands.begin(); i != islands.end(); i++)
+		{
+			set<island>::const_iterator ii = this->getSharedMemoryIslands().begin();
+			std::advance(ii, *i);
+			out.insert(*ii);
+		} 
+
+		return out;
+	}
+
+	const std::set<Platform::island>&
 	Platform::getMainMemoryIslands() const
 	{
 		return this->main;
 	}
 
-	const std::set<const Core*>&
+	const std::set<Platform::island>
 	Platform::getMainMemoryIslands(size_t id) const
 	{
+		set<Platform::island> islands;
 		const Core* core = this->getCore(id);
-		for(set<set<const Core*> >::const_iterator i = this->getMainMemoryIslands().begin(); i != this->getMainMemoryIslands().end(); i++)
+		for(set<Platform::island>::const_iterator i = this->getMainMemoryIslands().begin(); i != this->getMainMemoryIslands().end(); i++)
 		{
 			if(i->find(core) != i->end())
 			{
-				return *i;
+				islands.insert(*i);
 			}
 		}
 
-		throw CastException("Cannot find core in any island of the platform.");
+		return islands;
 	}
 
-	const std::set<std::set<const Core*> >&
+	const std::set<Platform::island>&
 	Platform::getPrivateMemoryIslands() const
 	{
 		return this->priv;
 	}
 
-	const std::set<const Core*>&
+	const std::set<Platform::island>
 	Platform::getPrivateMemoryIslands(size_t id) const
 	{
+		set<Platform::island> islands;
 		const Core* core = this->getCore(id);
-		for(set<set<const Core*> >::const_iterator i = this->getPrivateMemoryIslands().begin(); i != this->getPrivateMemoryIslands().end(); i++)
+		for(set<Platform::island>::const_iterator i = this->getPrivateMemoryIslands().begin(); i != this->getPrivateMemoryIslands().end(); i++)
 		{
 			if(i->find(core) != i->end())
 			{
-				return *i;
+				islands.insert(*i);
 			}
 		}
 
-		throw CastException("Cannot find core in any island of the platform.");
+		return islands;
 	}
 
-	const std::set<std::set<const Core*> >&
+	const std::set<Platform::island>&
 	Platform::getVoltageIslands() const
 	{
 		return this->voltage;
 	}
 
-	const std::set<const Core*>&
-	Platform::getVoltageIslands(size_t id) const
+	const Platform::island&
+	Platform::getVoltageIsland(size_t id) const
 	{
 		const Core* core = this->getCore(id);
-		for(set<set<const Core*> >::const_iterator i = this->getVoltageIslands().begin(); i != this->getVoltageIslands().end(); i++)
+		for(set<Platform::island>::const_iterator i = this->getVoltageIslands().begin(); i != this->getVoltageIslands().end(); i++)
 		{
 			if(i->find(core) != i->end())
 			{
@@ -316,20 +361,20 @@ namespace pelib
 			}
 		}
 
-		throw CastException("Cannot find core in any island of the platform.");
+		throw CastException("Cannot find core in any Platform::island of the platform.");
 	}
 
-	const std::set<std::set<const Core*> >&
+	const std::set<Platform::island>&
 	Platform::getFrequencyIslands() const
 	{
 		return this->freq;
 	}
 
-	const std::set<const Core*>&
-	Platform::getFrequencyIslands(size_t id) const
+	const Platform::island&
+	Platform::getFrequencyIsland(size_t id) const
 	{
 		const Core* core = this->getCore(id);
-		for(set<set<const Core*> >::const_iterator i = this->getFrequencyIslands().begin(); i != this->getFrequencyIslands().end(); i++)
+		for(set<Platform::island>::const_iterator i = this->getFrequencyIslands().begin(); i != this->getFrequencyIslands().end(); i++)
 		{
 			if(i->find(core) != i->end())
 			{
@@ -337,6 +382,6 @@ namespace pelib
 			}
 		}
 
-		throw CastException("Cannot find core in any island of the platform.");
+		throw CastException("Cannot find core in any Platform::island of the platform.");
 	}
 }
