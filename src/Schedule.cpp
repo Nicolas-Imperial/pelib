@@ -10,6 +10,8 @@
 #include <Set.hpp>
 #include <CastException.hpp>
 
+#define debug(expr) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
+
 using namespace std;
 
 namespace pelib
@@ -385,6 +387,12 @@ namespace pelib
 		for(set<const Task*>::const_iterator i = tasks_in_islands.begin(); i != tasks_in_islands.end(); i++)
 		{
 			const Task *task_p = *i;
+			if(tg.getTasks().find(*task_p) == tg.getTasks().end())
+			{
+				stringstream ss;
+				ss << "Trying to schedule task \"" << task_p->getName() << "\" that does not figure in taskgraph.";
+				throw CastException(ss.str());
+			}
 			const Task &task_tg = *tg.getTasks().find(*task_p);
 			set<int> producer_cores = this->getCores(task_tg);
 			set<int>::const_iterator j = producer_cores.begin();
@@ -401,7 +409,7 @@ namespace pelib
 			{
 				const Link *l = *j;
 				const Task *consumer = l->getConsumer();
-				set<int> consumer_cores = this->getCores(*this->getTasks().find(*consumer));
+				set<int> consumer_cores = this->getCores(*consumer);
 				set<int>::const_iterator k = consumer_cores.begin();
 
 				set<Platform::island> consumer_core_islands = pt.getSharedMemoryIslands(*k);
@@ -465,14 +473,22 @@ namespace pelib
 	}
 
 	const set<int>
-	Schedule::getCores(const Task t) const
+	Schedule::getCores(const Task &t) const
 	{
+		if(this->getTasks().find(t) == this->getTasks().end())
+		{
+			stringstream ss;
+			ss << "Task \"" << t.getName() << "\" does not figure in schedule.";
+			throw CastException(ss.str());
+		}
+		const Task &tt = *this->getTasks().find(t);
+
 		set<int> cores;
 		for(table::const_iterator i = this->getSchedule().begin(); i != this->getSchedule().end(); i++)
 		{
 			for(sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 			{
-				if(*(j->second.first) == *(this->getTasks().find(t)))
+				if(*(j->second.first) == tt)
 				{
 					cores.insert(i->first);
 				}

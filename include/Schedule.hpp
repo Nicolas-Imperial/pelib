@@ -58,7 +58,7 @@ namespace pelib
 			getRemoteSharedMemoryIslandTaskConsumers(const Task &t, const Taskgraph &tg, const Platform &pt) const;
 
 			virtual const set<int>
-			getCores(const Task) const;
+			getCores(const Task&) const;
 
 		protected:
 			std::string name, appName;

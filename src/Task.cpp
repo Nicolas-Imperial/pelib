@@ -6,7 +6,7 @@
 #include <Task.hpp>
 #include <ParseException.hpp>
 
-#define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
+#define debug(expr) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
 
 using namespace std;
 
@@ -197,15 +197,18 @@ namespace pelib
 	static size_t
 	scan_for_number(const char *str, const char **number)
 	{
+		// Make sure the number part is initialized correctly, just in case we start the string with a number.
+		*number = str;
+
 		// Iterate until finding 0-9, + or -
-		while((*str < '0' || *str > '9') && *str != '-' && *str != '+' && *str != '\0')
+		while((*str < '0' || *str > '9') && !((*str == '-' || *str == '+') && ((*(str + 1) >= '0' && *(str + 1) <= '9') || *(str + 1) == 'e' || *(str + 1) == 'E' || *(str + 1) == '.')) && *str != '\0')
 		{
 			str++;
 			*number = str;
 		}
 
 		// Iterate until finding a dot or a e
-		while(*str != '.' && *str != 'e' && *str != 'E' && *str != '\0')
+		while(*str != '.' && *str != 'e' && *str != 'E' && *str != '\0' && *str >= '0' && *str <= '9')
 		{
 			str++;
 		}
@@ -257,7 +260,9 @@ namespace pelib
 		// This may be an exponent
 		if(*str == 'e' || *str == 'E')
 		{
+			// Go to next character
 			str++;
+
 			// The exponent part can begin with a + or a -
 			if(*str == '+' || *str == '-')
 			{
@@ -280,15 +285,15 @@ namespace pelib
 				}
 
 				// Returns an integer number with a decimal exponent
-				return ((size_t)str - (size_t)number) / sizeof(char);
+				return ((size_t)str - (size_t)*number) / sizeof(char);
 			}
 
 			// Returns an integer number with an integer exponent
-			return ((size_t)str - (size_t)number) / sizeof(char);
+			return ((size_t)str - (size_t)*number) / sizeof(char);
 		}
 
 		// Returns a integer number with no exponent, or no number at all of *str == '\0'
-		return ((size_t)str - (size_t)number) / sizeof(char);
+		return ((size_t)str - (size_t)*number) / sizeof(char);
 	}
 
 	bool
@@ -296,7 +301,6 @@ namespace pelib
 	{
 		const char* me = this->getName().c_str();
 		const char* ot = other.getName().c_str();
-
 		
 		if(string(me).compare(string(ot)) == 0)
 		{
@@ -327,15 +331,15 @@ namespace pelib
 				double me_double, ot_double;
 				std::istringstream(string(me_num).substr(0, me_num_length)) >> me_double;
 				std::istringstream(string(ot_num).substr(0, ot_num_length)) >> ot_double;
+				
+				// Go check if there is more text to parse
+				me = me_num + me_num_length;
+				ot = ot_num + ot_num_length;
 
 				if(me_double != ot_double)
 				{
+					
 					return me_double < ot_double;
-				}
-				else
-				{
-					me = me_num + me_num_length;
-					ot = ot_num + ot_num_length;
 				}
 			}
 		}
@@ -343,15 +347,10 @@ namespace pelib
 		// If one of the string is found empty, just perform a classic string comparison
 		return string(me).compare(string(ot)) < 0;
 	}
-
     
 	bool
 	Task::operator==(const Task &other) const
 	{
-		const char *this_name = this->getName().c_str();
-		const char *other_name = other.getName().c_str();
-		//debug(this_name);
-		//debug(other_name);
 		return getName() == other.getName();
 	}
 
