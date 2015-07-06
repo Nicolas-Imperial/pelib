@@ -334,7 +334,14 @@ namespace pelib
 	Schedule::getRemoteSharedMemoryIslandTaskProducers(const Task &t, const Taskgraph &tg, const Platform &pt) const
 	{
 		set<const Task*> producers;
-		const Task &task_tg = *tg.getTasks().find(t);
+		if(this->getTasks().find(t) == this->getTasks().end())
+		{
+			stringstream ss;
+			ss << "Task \"" << t.getName() << "\" does not figure in schedule.";
+			throw CastException(ss.str());
+		}
+
+		const Task &task_tg = *this->getTasks().find(t);
 		set<int> consumer_cores = this->getCores(task_tg);
 		set<int>::const_iterator j = consumer_cores.begin();
 		set<Platform::island> consumer_core_islands = pt.getSharedMemoryIslands(*j);
@@ -435,6 +442,13 @@ namespace pelib
 	Schedule::getRemoteSharedMemoryIslandTaskConsumers(const Task &t, const Taskgraph &tg, const Platform &pt) const
 	{
 		set<const Task*> consumers;
+		if(this->getTasks().find(t) == this->getTasks().end())
+		{
+			stringstream ss;
+			ss << "Task \"" << t.getName() << "\" does not figure in schedule.";
+			throw CastException(ss.str());
+		}
+
 		const Task &task_tg = *tg.getTasks().find(t);
 		set<int> producer_cores = this->getCores(task_tg);
 		set<int>::const_iterator j = producer_cores.begin();

@@ -222,6 +222,10 @@ namespace pelib
 	const Core*
 	Platform::getCore(size_t id) const
 	{
+		if(id > this->getCores().size())
+		{
+			throw CastException("Requesting core beyond the number of core in the platform.");
+		}
 		std::set<const Core*>::iterator it = this->cores.begin();
 		std::advance(it, id - 1);
 		return *it;
@@ -230,6 +234,11 @@ namespace pelib
 	size_t
 	Platform::getCoreId(const Core* core) const
 	{
+		if(this->getCores().find(core) == this->getCores().end())
+		{
+			throw CastException("Core is not part of the platform.");
+		}
+
 		return std::distance(this->cores.begin(), this->cores.find(core)) + 1;
 	}
 
@@ -242,6 +251,10 @@ namespace pelib
 	const std::set<Platform::island>
 	Platform::getSharedMemoryIslands(size_t id) const
 	{
+		if(id > this->getCores().size())
+		{
+			throw CastException("Requesting shared memory island beyond the number of islands in the platform.");
+		}
 		set<Platform::island> islands;
 		const Core* core = this->getCore(id);
 		for(set<Platform::island >::const_iterator i = this->getSharedMemoryIslands().begin(); i != this->getSharedMemoryIslands().end(); i++)
@@ -275,12 +288,16 @@ namespace pelib
 	}
 
 	const std::set<Platform::island>
-	Platform::getSharedmemoryIslands(const std::set<int>& islands) const
+	Platform::getSharedMemoryIslands(const std::set<int>& islands) const
 	{
 		std::set<island> out;
 		for(std::set<int>::const_iterator i = islands.begin(); i != islands.end(); i++)
 		{
 			set<island>::const_iterator ii = this->getSharedMemoryIslands().begin();
+			if(*i > this->getSharedMemoryIslands().size())
+			{
+				throw CastException("Trying to get shared memory island beyond the capacity of the platform.");
+			}
 			std::advance(ii, *i);
 			out.insert(*ii);
 		} 

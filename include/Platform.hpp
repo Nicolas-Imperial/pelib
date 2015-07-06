@@ -25,7 +25,7 @@ namespace pelib
 
 			virtual const std::set<island>& getSharedMemoryIslands() const;
 			virtual const std::set<island> getSharedMemoryIslands(size_t core_id) const;
-			virtual const std::set<island> getSharedmemoryIslands(const std::set<int>& islands) const;
+			virtual const std::set<island> getSharedMemoryIslands(const std::set<int>& islands) const;
 			virtual const std::set<int> getSharedMemoryIslands(const std::set<island>& islands) const;
 			virtual const std::set<island>& getMainMemoryIslands() const;
 			virtual const std::set<island> getMainMemoryIslands(size_t core_id) const;
