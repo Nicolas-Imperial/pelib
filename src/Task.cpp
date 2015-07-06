@@ -6,6 +6,8 @@
 #include <Task.hpp>
 #include <ParseException.hpp>
 
+#define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
+
 using namespace std;
 
 struct print : public exprtk::ifunction<double>
@@ -346,6 +348,10 @@ namespace pelib
 	bool
 	Task::operator==(const Task &other) const
 	{
+		const char *this_name = this->getName().c_str();
+		const char *other_name = other.getName().c_str();
+		//debug(this_name);
+		//debug(other_name);
 		return getName() == other.getName();
 	}
 

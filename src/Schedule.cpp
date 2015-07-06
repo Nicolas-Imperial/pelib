@@ -12,15 +12,6 @@
 
 using namespace std;
 
-/*
-#if DEBUG
-#define trace(var) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"." << endl
-#else
-#define trace(var)
-#endif
-*/
-#define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
-
 namespace pelib
 {
 	Schedule::Schedule(const std::string &name, const std::string &appName, const table &schedule)
@@ -269,7 +260,7 @@ namespace pelib
 		for(set<int>::const_iterator i = islands.begin(); i != islands.end(); i++)
 		{
 			set<Platform::island>::const_iterator ii = pt.getSharedMemoryIslands().begin();
-			std::advance(ii, *i);
+			std::advance(ii, *i - 1);
 
 			for(Platform::island::const_iterator j = ii->begin(); j != ii->end(); j++)
 			{
@@ -303,8 +294,6 @@ namespace pelib
 			const Task &task_tg = *tg.getTasks().find(*task_p);
 			set<int> consumer_cores = this->getCores(task_tg);
 			set<int>::const_iterator j = consumer_cores.begin();
-			// TODO: investigate why this happens
-			//if(*j == 0) debug(*j);
 			set<Platform::island> consumer_core_islands = pt.getSharedMemoryIslands(*j);
 			for(; j != consumer_cores.end(); j++)
 			{
@@ -320,19 +309,9 @@ namespace pelib
 				const Task *producer = l->getProducer();
 				set<int> producer_cores = this->getCores(*this->getTasks().find(*producer));
 				set<int>::const_iterator k = producer_cores.begin();
-				// TODO: investigate why this happens
-				/*
-				if(*k == 0)
-				{
-					debug(*k);
-					debug(producer->getName());
-				}
-				*/
 				set<Platform::island> producer_core_islands = pt.getSharedMemoryIslands(*k);
 				for(; k != producer_cores.end(); k++)
 				{
-					// TODO: investigate why this happens
-					//if(*k == 0) debug(*k);
 					if(pt.getSharedMemoryIslands(*k) != producer_core_islands)
 					{
 						throw CastException("Task mapped to cores that belong to different shared memory islands.");
@@ -356,8 +335,6 @@ namespace pelib
 		const Task &task_tg = *tg.getTasks().find(t);
 		set<int> consumer_cores = this->getCores(task_tg);
 		set<int>::const_iterator j = consumer_cores.begin();
-		// TODO: investigate why this happens
-		//if(*j == 0) debug(*j);
 		set<Platform::island> consumer_core_islands = pt.getSharedMemoryIslands(*j);
 		for(; j != consumer_cores.end(); j++)
 		{
@@ -373,20 +350,10 @@ namespace pelib
 			const Task *producer = l->getProducer();
 			set<int> producer_cores = this->getCores(*this->getTasks().find(*producer));
 			set<int>::const_iterator k = producer_cores.begin();
-			// TODO: investigate why this happens
-			/*
-			if (*k == 0)
-			{
-				debug(*k);
-				debug(producer->getName());
-			}
-			*/
 
 			set<Platform::island> producer_core_islands = pt.getSharedMemoryIslands(*k);
 			for(; k != producer_cores.end(); k++)
 			{
-				// TODO: investigate why this happens
-				//if(*k == 0) debug(*k);
 				if(pt.getSharedMemoryIslands(*k) != producer_core_islands)
 				{
 					throw CastException("Task mapped to cores that belong to different shared memory islands.");
@@ -421,8 +388,6 @@ namespace pelib
 			const Task &task_tg = *tg.getTasks().find(*task_p);
 			set<int> producer_cores = this->getCores(task_tg);
 			set<int>::const_iterator j = producer_cores.begin();
-			// TODO: investigate why this happens
-			//if(*j == 0) debug(*j);
 			set<Platform::island> producer_core_islands = pt.getSharedMemoryIslands(*j);
 			for(; j != producer_cores.end(); j++)
 			{
@@ -438,11 +403,10 @@ namespace pelib
 				const Task *consumer = l->getConsumer();
 				set<int> consumer_cores = this->getCores(*this->getTasks().find(*consumer));
 				set<int>::const_iterator k = consumer_cores.begin();
+
 				set<Platform::island> consumer_core_islands = pt.getSharedMemoryIslands(*k);
 				for(; k != consumer_cores.end(); k++)
 				{
-					// TODO: investigate why this happens
-					//if(*k == 0) debug(*k);
 					if(pt.getSharedMemoryIslands(*k) != consumer_core_islands)
 					{
 						throw CastException("Task mapped to cores that belong to different shared memory islands.");
@@ -466,8 +430,6 @@ namespace pelib
 		const Task &task_tg = *tg.getTasks().find(t);
 		set<int> producer_cores = this->getCores(task_tg);
 		set<int>::const_iterator j = producer_cores.begin();
-		// TODO: investigate why this happens
-		//if(*j == 0) debug(*j);
 		set<Platform::island> producer_core_islands = pt.getSharedMemoryIslands(*j);
 		for(; j != producer_cores.end(); j++)
 		{
@@ -483,11 +445,10 @@ namespace pelib
 			const Task *consumer = l->getConsumer();
 			set<int> consumer_cores = this->getCores(*this->getTasks().find(*consumer));
 			set<int>::const_iterator k = consumer_cores.begin();
+
 			set<Platform::island> consumer_core_islands = pt.getSharedMemoryIslands(*k);
 			for(; k != consumer_cores.end(); k++)
 			{
-				// TODO: investigate why this happens
-				//if(*k == 0) debug(*k);
 				if(pt.getSharedMemoryIslands(*k) != consumer_core_islands)
 				{
 					throw CastException("Task mapped to cores that belong to different shared memory islands.");
@@ -511,10 +472,8 @@ namespace pelib
 		{
 			for(sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 			{
-				if(*j->second.first == t)
+				if(*(j->second.first) == *(this->getTasks().find(t)))
 				{
-					// TODO: investigate why this happens
-					//if(i->first == 0) debug(i->first);
 					cores.insert(i->first);
 				}
 			}

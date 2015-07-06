@@ -9,8 +9,6 @@
 
 using namespace std;
 
-#define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
-
 namespace pelib
 {
 	Platform::Platform()
@@ -224,16 +222,9 @@ namespace pelib
 	const Core*
 	Platform::getCore(size_t id) const
 	{
-		if(id > 0) // TODO This is duck-tape fixing: better investigate why we get id = 0
-		{
-			std::set<const Core*>::iterator it = this->cores.begin();
-			std::advance(it, id - 1);
-			return *it;
-		}
-		else
-		{
-			return NULL;
-		}
+		std::set<const Core*>::iterator it = this->cores.begin();
+		std::advance(it, id - 1);
+		return *it;
 	}
 
 	size_t
@@ -253,8 +244,6 @@ namespace pelib
 	{
 		set<Platform::island> islands;
 		const Core* core = this->getCore(id);
-		// TODO: investigate why this happens
-		//if(id == 0) debug(id);
 		for(set<Platform::island >::const_iterator i = this->getSharedMemoryIslands().begin(); i != this->getSharedMemoryIslands().end(); i++)
 		{
 			if(i->find(core) != i->end())
@@ -274,7 +263,7 @@ namespace pelib
 		{
 			if(this->getSharedMemoryIslands().find(*i) != this->getSharedMemoryIslands().end())
 			{
-				indexes.insert((int)std::distance(this->getSharedMemoryIslands().begin(), this->getSharedMemoryIslands().find(*i)));
+				indexes.insert((int)std::distance(this->getSharedMemoryIslands().begin(), this->getSharedMemoryIslands().find(*i)) + 1);
 			}
 			else
 			{
