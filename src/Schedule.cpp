@@ -1,14 +1,14 @@
 #include <set>
 #include <string>
 
-#include <AmplOutput.hpp>
+#include <pelib/AmplOutput.hpp>
 
-#include <Schedule.hpp>
-#include <Scalar.hpp>
-#include <Vector.hpp>
-#include <Matrix.hpp>
-#include <Set.hpp>
-#include <CastException.hpp>
+#include <pelib/Schedule.hpp>
+#include <pelib/Scalar.hpp>
+#include <pelib/Vector.hpp>
+#include <pelib/Matrix.hpp>
+#include <pelib/Set.hpp>
+#include <pelib/CastException.hpp>
 
 #define debug(expr) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
 
@@ -66,13 +66,10 @@ namespace pelib
 		this->name = name;
 		this->appName = string("Generated from Algebra");
 
-		//const Scalar<float> *M = algebra.find<Scalar<float> >("M");
 		const Vector<int, float> *tau = algebra.find<Vector<int, float> >("Tau");
 		const Vector<int, float> *start = algebra.find<Vector<int, float> >("start");
 		const Vector<int, float> *wi = algebra.find<Vector<int, float> >("wi");
-		//const Vector<int, float> *Wi = algebra.find<Vector<int, float> >("Wi");
 		const Matrix<int, int, float> *sched = algebra.find<Matrix<int, int, float> >("schedule");
-		//const Matrix<int, int, float> *e = algebra.find<Matrix<int, int, float> >("e");
 		const Vector<int, float> *freq = algebra.find<Vector<int, float> >("frequency");
 
 		table schedule;
@@ -97,33 +94,13 @@ namespace pelib
 						tasks.insert(Task(estr.str()));
 						Task &task = (Task&)*tasks.find(estr.str());
 						task.setModule("dummy");
-						//Task task((int)j->second, tg.findTask((int)floor(j->second)).getTaskId());
 
-						//task.setWorkload(tau->getValues().find((int)floor(j->second))->second);
 						if(task.getWorkload() > 0)
 						{
-							//Task& task_tg = (Task&)*tg.getTasks().find(task);
 							task.setWidth(wi->getValues().find((int)floor(j->second))->second);
 							task.setFrequency(freq->getValues().find((int)floor(j->second))->second);
 							task.setWorkload(tau->getValues().find((int)floor(j->second))->second);
-							//task_tg.setMaxWidth(tg.getTasks().find(task)->getMaxWidth());
-							//task_tg.setMaxWidth(Wi->getValues().find((int)floor(j->second))->second);
-
-							/*
-							stringstream estr;
-							for(Matrix<int, int, float>::RowType::const_iterator k = e->getValues().find((int)j->second)->second.begin(); k != e->getValues().find((int)j->second)->second.end(); k++)
-							{
-								estr << k->second << " ";
-							}
-							task_tg.setEfficiencyString(estr.str());
-							*/
-							//task_tg.setEfficiencyString(tg.getTasks().find(task)->getEfficiencyString());
-
 							task.setStartTime(start->getValues().find((int)j->second)->second);
-
-							//cerr << "Core: " << i->first << "; Task: " << j->second << "; taskid: " << tg.findTask((int)floor(j->second)).getTaskId() << "; Start time: " << task.getStartTime() << endl;
-							//const Task &task_ref = *this->getTaskgraph().getTasks().find(task);
-							//core_schedule.insert(pair<float, Task*>(task.getStartTime(), &(this->getTasks().find(task))));
 							core_schedule.insert(pair<float, work>(task.getStartTime(), work(&task, tau->getValues().find((int)floor(j->second))->second)));
 						}
 					}
@@ -293,6 +270,12 @@ namespace pelib
 		for(set<const Task*>::const_iterator i = tasks_in_islands.begin(); i != tasks_in_islands.end(); i++)
 		{
 			const Task *task_p = *i;
+			if(tg.getTasks().find(*task_p) == tg.getTasks().end())
+			{
+				stringstream ss;
+				ss << "Cannot find task \"" << task_p->getName() << "\" in taskgraph.";
+				throw CastException(ss.str());
+			}
 			const Task &task_tg = *tg.getTasks().find(*task_p);
 			set<int> consumer_cores = this->getCores(task_tg);
 			set<int>::const_iterator j = consumer_cores.begin();
@@ -309,7 +292,7 @@ namespace pelib
 			{
 				const Link *l = *j;
 				const Task *producer = l->getProducer();
-				set<int> producer_cores = this->getCores(*this->getTasks().find(*producer));
+				set<int> producer_cores = this->getCores(*producer);
 				set<int>::const_iterator k = producer_cores.begin();
 				set<Platform::island> producer_core_islands = pt.getSharedMemoryIslands(*k);
 				for(; k != producer_cores.end(); k++)
@@ -357,7 +340,7 @@ namespace pelib
 		{
 			const Link *l = *j;
 			const Task *producer = l->getProducer();
-			set<int> producer_cores = this->getCores(*this->getTasks().find(*producer));
+			set<int> producer_cores = this->getCores(*producer);
 			set<int>::const_iterator k = producer_cores.begin();
 
 			set<Platform::island> producer_core_islands = pt.getSharedMemoryIslands(*k);

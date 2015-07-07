@@ -1,4 +1,4 @@
-#include <AmplDataOutput.hpp>
+#include <pelib/AmplDataOutput.hpp>
 
 namespace pelib
 {

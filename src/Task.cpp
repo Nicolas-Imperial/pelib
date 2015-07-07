@@ -1,10 +1,10 @@
 #include <iostream>
 #include <sstream>
 
-#include <exprtk.hpp>
+#include <pelib/exprtk.hpp>
 
-#include <Task.hpp>
-#include <ParseException.hpp>
+#include <pelib/Task.hpp>
+#include <pelib/ParseException.hpp>
 
 #define debug(expr) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
 

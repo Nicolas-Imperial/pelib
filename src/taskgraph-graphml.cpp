@@ -3,7 +3,7 @@
 #include <pelib/parser.h>
 #include <pelib/output.h>
 
-#include <GraphML.hpp>
+#include <pelib/GraphML.hpp>
 
 using namespace std;
 using namespace pelib;

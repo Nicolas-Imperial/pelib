@@ -5,8 +5,8 @@
 //#include <pelib/argument_parsing.hpp>
 //#include <pelib/dl.h>
 
-#include <XMLSchedule.hpp>
-#include <Taskgraph.hpp>
+#include <pelib/XMLSchedule.hpp>
+#include <pelib/Taskgraph.hpp>
 
 using namespace std;
 using namespace pelib;

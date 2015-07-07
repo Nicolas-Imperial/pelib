@@ -3,7 +3,7 @@
 #include <pelib/parser.h>
 #include <pelib/output.h>
 
-#include <AmplInput.hpp>
+#include <pelib/AmplInput.hpp>
 
 using namespace std;
 using namespace pelib;

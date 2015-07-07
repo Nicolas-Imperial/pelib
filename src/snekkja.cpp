@@ -4,11 +4,11 @@
 #include <string>
 #include <iomanip>
 
-#include <AmplInput.hpp>
-#include <AmplOutput.hpp>
-#include <Platform.hpp>
-#include <AmplPlatform.hpp>
-#include <GraphML.hpp>
+#include <pelib/AmplInput.hpp>
+#include <pelib/AmplOutput.hpp>
+#include <pelib/Platform.hpp>
+#include <pelib/AmplPlatform.hpp>
+#include <pelib/GraphML.hpp>
 
 using namespace std;
 using namespace pelib;

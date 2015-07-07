@@ -7,31 +7,31 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <Scalar.hpp>
+#include <pelib/Scalar.hpp>
 
-#include <AmplInput.hpp>
-#include <AmplOutput.hpp>
+#include <pelib/AmplInput.hpp>
+#include <pelib/AmplOutput.hpp>
 
-#include <DummyCore.hpp>
-#include <GraphML.hpp>
-#include <Platform.hpp>
-#include <XMLSchedule.hpp>
+#include <pelib/DummyCore.hpp>
+#include <pelib/GraphML.hpp>
+#include <pelib/Platform.hpp>
+#include <pelib/XMLSchedule.hpp>
 
-#include <AmplInputData.hpp>
-#include <AmplInputScalar.hpp>
-#include <AmplInputVector.hpp>
-#include <AmplInputMatrix.hpp>
+#include <pelib/AmplInputData.hpp>
+#include <pelib/AmplInputScalar.hpp>
+#include <pelib/AmplInputVector.hpp>
+#include <pelib/AmplInputMatrix.hpp>
 
-#include <AmplOutputScalar.hpp>
-#include <AmplOutputVector.hpp>
-#include <AmplOutputMatrix.hpp>
+#include <pelib/AmplOutputScalar.hpp>
+#include <pelib/AmplOutputVector.hpp>
+#include <pelib/AmplOutputMatrix.hpp>
 
-#include <Scalar.hpp>
-#include <Set.hpp>
-#include <Vector.hpp>
-#include <Matrix.hpp>
+#include <pelib/Scalar.hpp>
+#include <pelib/Set.hpp>
+#include <pelib/Vector.hpp>
+#include <pelib/Matrix.hpp>
 
-#include <unit_test.h>
+#include "unit_test.h"
 
 using namespace pelib;
 using namespace std;

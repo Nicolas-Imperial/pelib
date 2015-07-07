@@ -6,9 +6,9 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <CastException.hpp>
-#include <CppData.hpp>
-#include <Data.hpp>
+#include <pelib/CastException.hpp>
+#include <pelib/CppData.hpp>
+#include <pelib/Data.hpp>
 
 namespace pelib
 {

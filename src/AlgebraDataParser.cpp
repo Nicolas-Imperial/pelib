@@ -5,7 +5,7 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <AlgebraDataParser.hpp>
+#include <pelib/AlgebraDataParser.hpp>
 
 namespace pelib
 {

@@ -5,15 +5,15 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <AmplOutput.hpp>
-#include <AmplOutputScalar.hpp>
-#include <AmplOutputVector.hpp>
-#include <AmplOutputSet.hpp>
-#include <AmplOutputMatrix.hpp>
-#include <AmplDataParser.hpp>
+#include <pelib/AmplOutput.hpp>
+#include <pelib/AmplOutputScalar.hpp>
+#include <pelib/AmplOutputVector.hpp>
+#include <pelib/AmplOutputSet.hpp>
+#include <pelib/AmplOutputMatrix.hpp>
+#include <pelib/AmplDataParser.hpp>
 
-#include <ParseException.hpp>
-#include <CastException.hpp>
+#include <pelib/ParseException.hpp>
+#include <pelib/CastException.hpp>
 
 namespace pelib
 {

@@ -9,17 +9,17 @@ extern "C"{
 #include <igraph.h>
 }
 
-#include "Schedule.hpp"
-#include "DrakeCSchedule.hpp"
+#include <pelib/Schedule.hpp>
+#include <pelib/DrakeCSchedule.hpp>
 
-#include <Scalar.hpp>
-#include <Vector.hpp>
-#include <Matrix.hpp>
-#include <Set.hpp>
-#include <Task.hpp>
+#include <pelib/Scalar.hpp>
+#include <pelib/Vector.hpp>
+#include <pelib/Matrix.hpp>
+#include <pelib/Set.hpp>
+#include <pelib/Task.hpp>
 
-#include <CastException.hpp>
-#include <ParseException.hpp>
+#include <pelib/CastException.hpp>
+#include <pelib/ParseException.hpp>
 
 #define debug(expr) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
 

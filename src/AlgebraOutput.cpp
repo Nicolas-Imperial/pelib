@@ -1,5 +1,5 @@
-#include <AlgebraOutput.hpp>
-#include <DataOutput.hpp>
+#include <pelib/AlgebraOutput.hpp>
+#include <pelib/DataOutput.hpp>
 
 namespace pelib
 {

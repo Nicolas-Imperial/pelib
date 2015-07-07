@@ -1,4 +1,4 @@
-#include <AmplInputSet.hpp>
+#include <pelib/AmplInputSet.hpp>
 
 namespace pelib
 {

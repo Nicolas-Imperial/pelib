@@ -3,12 +3,12 @@
 #include <pelib/parser.h>
 #include <pelib/output.h>
 
-#include <AmplOutput.hpp>
-#include <AmplInput.hpp>
-#include <Matrix.hpp>
-#include <Task.hpp>
-#include <Link.hpp>
-#include <Taskgraph.hpp>
+#include <pelib/AmplOutput.hpp>
+#include <pelib/AmplInput.hpp>
+#include <pelib/Matrix.hpp>
+#include <pelib/Task.hpp>
+#include <pelib/Link.hpp>
+#include <pelib/Taskgraph.hpp>
 
 using namespace std;
 using namespace pelib;

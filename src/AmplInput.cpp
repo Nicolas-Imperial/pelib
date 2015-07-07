@@ -5,15 +5,15 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <AmplInput.hpp>
-#include <AmplInputScalar.hpp>
-#include <AmplInputVector.hpp>
-#include <AmplInputSet.hpp>
-#include <AmplInputMatrix.hpp>
-#include <AmplDataParser.hpp>
+#include <pelib/AmplInput.hpp>
+#include <pelib/AmplInputScalar.hpp>
+#include <pelib/AmplInputVector.hpp>
+#include <pelib/AmplInputSet.hpp>
+#include <pelib/AmplInputMatrix.hpp>
+#include <pelib/AmplDataParser.hpp>
 
-#include <ParseException.hpp>
-#include <CastException.hpp>
+#include <pelib/ParseException.hpp>
+#include <pelib/CastException.hpp>
 
 using namespace std;
 

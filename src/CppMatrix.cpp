@@ -1,4 +1,4 @@
-#include <CppMatrix.hpp>
+#include <pelib/CppMatrix.hpp>
 
 namespace pelib
 {

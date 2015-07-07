@@ -1,4 +1,4 @@
-#include <AmplOutputScalar.hpp>
+#include <pelib/AmplOutputScalar.hpp>
 
 namespace pelib
 {

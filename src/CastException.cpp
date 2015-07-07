@@ -5,7 +5,7 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <CastException.hpp>
+#include <pelib/CastException.hpp>
 
 namespace pelib
 {

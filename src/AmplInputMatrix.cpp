@@ -1,4 +1,4 @@
-#include <AmplInputMatrix.hpp>
+#include <pelib/AmplInputMatrix.hpp>
 
 namespace pelib
 {

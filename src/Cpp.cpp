@@ -5,14 +5,14 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <Cpp.hpp>
-#include <CppScalar.hpp>
-#include <CppVector.hpp>
-#include <CppSet.hpp>
-#include <CppMatrix.hpp>
+#include <pelib/Cpp.hpp>
+#include <pelib/CppScalar.hpp>
+#include <pelib/CppVector.hpp>
+#include <pelib/CppSet.hpp>
+#include <pelib/CppMatrix.hpp>
 
-#include <ParseException.hpp>
-#include <CastException.hpp>
+#include <pelib/ParseException.hpp>
+#include <pelib/CastException.hpp>
 
 namespace pelib
 {

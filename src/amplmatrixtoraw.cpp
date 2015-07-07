@@ -1,6 +1,6 @@
-#include <Matrix.hpp>
-#include <Algebra.hpp>
-#include <AmplOutput.hpp>
+#include <pelib/Matrix.hpp>
+#include <pelib/Algebra.hpp>
+#include <pelib/AmplOutput.hpp>
 
 using namespace pelib;
 using namespace std;

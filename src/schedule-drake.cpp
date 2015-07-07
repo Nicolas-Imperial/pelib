@@ -2,8 +2,8 @@
 
 #include <pelib/output.h>
 
-#include <DrakeCSchedule.hpp>
-#include <Schedule.hpp>
+#include <pelib/DrakeCSchedule.hpp>
+#include <pelib/Schedule.hpp>
 
 using namespace std;
 using namespace pelib;

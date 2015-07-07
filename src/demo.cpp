@@ -5,17 +5,17 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <AmplInput.hpp>
-#include <AmplOutput.hpp>
+#include <pelib/AmplInput.hpp>
+#include <pelib/AmplOutput.hpp>
 
-#include <AmplInputData.hpp>
-#include <AmplInputScalar.hpp>
-#include <AmplInputVector.hpp>
-#include <AmplInputMatrix.hpp>
+#include <pelib/AmplInputData.hpp>
+#include <pelib/AmplInputScalar.hpp>
+#include <pelib/AmplInputVector.hpp>
+#include <pelib/AmplInputMatrix.hpp>
 
-#include <AmplOutputScalar.hpp>
-#include <AmplOutputVector.hpp>
-#include <AmplOutputMatrix.hpp>
+#include <pelib/AmplOutputScalar.hpp>
+#include <pelib/AmplOutputVector.hpp>
+#include <pelib/AmplOutputMatrix.hpp>
 
 using namespace pelib;
 

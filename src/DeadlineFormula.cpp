@@ -1,14 +1,14 @@
 #include <cmath>
 
-#include <DeadlineFormula.hpp>
-#include <Scalar.hpp>
-#include <Set.hpp>
-#include <Matrix.hpp>
-#include <Vector.hpp>
-#include <ParseException.hpp>
-#include <CastException.hpp>
+#include <pelib/DeadlineFormula.hpp>
+#include <pelib/Scalar.hpp>
+#include <pelib/Set.hpp>
+#include <pelib/Matrix.hpp>
+#include <pelib/Vector.hpp>
+#include <pelib/ParseException.hpp>
+#include <pelib/CastException.hpp>
 
-#include <exprtk.hpp>
+#include <pelib/exprtk.hpp>
 
 using namespace pelib;
 using namespace std;

@@ -3,10 +3,10 @@
 #include <pelib/parser.h>
 #include <pelib/output.h>
 
-#include <Set.hpp>
-#include <DummyCore.hpp>
-#include <AmplOutput.hpp>
-#include <Platform.hpp>
+#include <pelib/Set.hpp>
+#include <pelib/DummyCore.hpp>
+#include <pelib/AmplOutput.hpp>
+#include <pelib/Platform.hpp>
 
 using namespace std;
 using namespace pelib;

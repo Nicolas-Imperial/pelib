@@ -5,8 +5,8 @@
 //#include <pelib/argument_parsing.hpp>
 //#include <pelib/dl.h>
 
-#include <AmplOutput.hpp>
-#include <Schedule.hpp>
+#include <pelib/AmplOutput.hpp>
+#include <pelib/Schedule.hpp>
 
 using namespace std;
 using namespace pelib;

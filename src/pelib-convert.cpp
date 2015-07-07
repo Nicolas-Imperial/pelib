@@ -3,7 +3,7 @@
 #include <vector>
 #include <map>
 
-#include <Record.hpp>
+#include <pelib/Record.hpp>
 
 #include <pelib/argument_parsing.hpp>
 #include <pelib/dl.h>

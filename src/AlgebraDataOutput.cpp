@@ -1,4 +1,4 @@
-#include <AlgebraDataOutput.hpp>
+#include <pelib/AlgebraDataOutput.hpp>
 
 namespace pelib
 {

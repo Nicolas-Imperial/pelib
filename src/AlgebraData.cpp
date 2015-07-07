@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <AlgebraData.hpp>
+#include <pelib/AlgebraData.hpp>
 
 namespace pelib
 {

@@ -1,11 +1,11 @@
-#include <Platform.hpp>
-#include <Core.hpp>
-#include <DummyCore.hpp>
+#include <pelib/Platform.hpp>
+#include <pelib/Core.hpp>
+#include <pelib/DummyCore.hpp>
 
-#include <Scalar.hpp>
-#include <Set.hpp>
-#include <ParseException.hpp>
-#include <CastException.hpp>
+#include <pelib/Scalar.hpp>
+#include <pelib/Set.hpp>
+#include <pelib/ParseException.hpp>
+#include <pelib/CastException.hpp>
 
 using namespace std;
 
@@ -294,7 +294,7 @@ namespace pelib
 		for(std::set<int>::const_iterator i = islands.begin(); i != islands.end(); i++)
 		{
 			set<island>::const_iterator ii = this->getSharedMemoryIslands().begin();
-			if(*i > this->getSharedMemoryIslands().size())
+			if(*i > (ptrdiff_t)this->getSharedMemoryIslands().size())
 			{
 				throw CastException("Trying to get shared memory island beyond the capacity of the platform.");
 			}

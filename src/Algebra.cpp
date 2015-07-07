@@ -6,9 +6,9 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <Algebra.hpp>
-#include <AmplDataParser.hpp>
-#include <AlgebraData.hpp>
+#include <pelib/Algebra.hpp>
+#include <pelib/AmplDataParser.hpp>
+#include <pelib/AlgebraData.hpp>
 
 namespace pelib
 {	

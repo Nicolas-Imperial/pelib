@@ -6,8 +6,8 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
-#include <AmplOutputData.hpp>
-#include <Data.hpp>
+#include <pelib/AmplOutputData.hpp>
+#include <pelib/Data.hpp>
 
 namespace pelib
 {

@@ -3,8 +3,8 @@
 #include <pelib/parser.h>
 #include <pelib/output.h>
 
-#include <AmplInput.hpp>
-#include <Taskgraph.hpp>
+#include <pelib/AmplInput.hpp>
+#include <pelib/Taskgraph.hpp>
 
 using namespace std;
 using namespace pelib;

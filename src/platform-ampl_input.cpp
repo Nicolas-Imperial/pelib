@@ -3,9 +3,9 @@
 #include <pelib/parser.h>
 #include <pelib/output.h>
 
-#include <Set.hpp>
-#include <AmplInput.hpp>
-#include <Platform.hpp>
+#include <pelib/Set.hpp>
+#include <pelib/AmplInput.hpp>
+#include <pelib/Platform.hpp>
 
 using namespace std;
 using namespace pelib;

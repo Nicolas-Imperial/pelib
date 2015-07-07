@@ -1,14 +1,14 @@
 #include <sstream>
 
-#include <Taskgraph.hpp>
-#include <DeadlineCalculator.hpp>
-#include <ParseException.hpp>
-#include <CastException.hpp>
-#include <DummyCore.hpp>
+#include <pelib/Taskgraph.hpp>
+#include <pelib/DeadlineCalculator.hpp>
+#include <pelib/ParseException.hpp>
+#include <pelib/CastException.hpp>
+#include <pelib/DummyCore.hpp>
 
-#include <Scalar.hpp>
-#include <Vector.hpp>
-#include <Matrix.hpp>
+#include <pelib/Scalar.hpp>
+#include <pelib/Vector.hpp>
+#include <pelib/Matrix.hpp>
 
 using namespace std;
 

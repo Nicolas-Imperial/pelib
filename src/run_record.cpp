@@ -1,9 +1,9 @@
-#include <AmplInput.hpp>
-#include <Scalar.hpp>
-#include <Vector.hpp>
-#include <Set.hpp>
-#include <Matrix.hpp>
-#include <Algebra.hpp>
+#include <pelib/AmplInput.hpp>
+#include <pelib/Scalar.hpp>
+#include <pelib/Vector.hpp>
+#include <pelib/Set.hpp>
+#include <pelib/Matrix.hpp>
+#include <pelib/Algebra.hpp>
 
 #include "make_algebra.cpp"
 
