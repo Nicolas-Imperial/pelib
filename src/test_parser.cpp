@@ -31,7 +31,7 @@
 #include <pelib/Vector.hpp>
 #include <pelib/Matrix.hpp>
 
-#include "unit_test.h"
+#include <pelib/unit.h>
 
 using namespace pelib;
 using namespace std;
@@ -84,7 +84,7 @@ std::string string_platform_amplinput;
 std::istringstream istream_platform_amplinput;
 
 void
-test_init()
+setup()
 {
 	std::cout << std::setprecision(6)
  		<< std::setiosflags(std::ios::fixed)
@@ -92,7 +92,7 @@ test_init()
 }
 
 void
-test_setup()
+init()
 {
 	string_taskgraph_graphml = std::string(&_binary_fft_n15_1_graphml_start).substr(0, (size_t)(&_binary_fft_n15_1_graphml_size));
 	istream_taskgraph_graphml.clear();
@@ -138,19 +138,19 @@ test_setup()
 }
 
 void
-test_teardown()
+teardown()
 {
   // Do not forget to free your stacks after each test
   // to avoid memory leaks as now
 }
 
 void
-test_finalize()
+cleanup()
 {
   // Destroy properly your test batch
 }
 
-int
+void
 parse_and_convert_graphml()
 {
 	Taskgraph tg_graphml = GraphML().parse(istream_taskgraph_graphml);
@@ -177,7 +177,7 @@ parse_and_convert_graphml()
 		cout << "Obtained: " << reference.str() << endl;
 	}
 	
-	return reference.str().compare(string_taskgraph_graphml) == 0;
+	assert(reference.str().compare(string_taskgraph_graphml) == 0);
 
 //	Algebra taskgraph_algebra = AmplInput(AmplInput::floatHandlers()).parse(istream_taskgraph_amplinput);
 
@@ -199,7 +199,7 @@ parse_and_convert_graphml()
 #endif
 }
 
-int
+void
 parse_and_convert_schedule()
 {
 	Taskgraph tg_graphml = GraphML().parse(istream_taskgraph_graphml);
@@ -218,12 +218,13 @@ parse_and_convert_schedule()
 		cout << "Obtained: " << reference.str() << endl;
 	}
 	
-	return reference.str().compare(string_schedule_xml) == 0;
+	assert(reference.str().compare(string_schedule_xml) == 0);
 }
 
 void
-test_run()
+run()
 {
 	test(parse_and_convert_graphml);
 	test(parse_and_convert_schedule);
 }
+

@@ -1,5 +1,5 @@
 ## All files to include in a distribution package
-attach = parser.h output.h dl.h argument_parsing.hpp \
+text = parser.h output.h dl.h argument_parsing.hpp \
 ParseException.hpp CastException.hpp NoDecimalFloatException.hpp Record.hpp \
 Data.hpp AlgebraData.hpp Algebra.hpp \
 AlgebraParser.hpp DataParser.hpp \
@@ -21,6 +21,10 @@ ScheduleParser.hpp ScheduleOutput.hpp \
 XMLScheduleParser.hpp XMLScheduleOutput.hpp \
 DrakeCScheduleOutput.hpp \
 exprtk.hpp
+
+cstruct = array.h fifo_array.h integer.h monitor.h printf.h sort.h structure.h complex.h fifo.h pelib.h size_t.h stack.h template.h array.c fifo.c fifo_array.c stack.c
+
+attach = $(text) $(cstruct)
 
 ## Further directories to follow
 subdirs =

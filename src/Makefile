@@ -58,24 +58,24 @@ define pkg-config
 $(if $(strip $1),$(if $(shell PKG_CONFIG_PATH="$(PKG_CONFIG_PATH)" pkg-config --$2 $(foreach pkg,$1,"$(pkg) $(call $3$(pkg)_version)")),$(shell PKG_CONFIG_PATH="$(PKG_CONFIG_PATH)" pkg-config --$2 $(foreach pkg,$1,"$(pkg) $(call $3$(pkg)_version)")),$(error Missing library $3)),)
 endef
 
-## Gives all source files of projects $1 of type $2 (bin|lib|test) with language $3 (cc|cxx)
+## Gives all source files of projects $1 of type $2 (bin|lib|test|shared) with language $3 (cc|cxx)
 define src
 $(foreach type,cc cxx,$(foreach var,$1,$(call $2$(type)_$(var)_src)))
 endef
 
-## Gives source files of projects $1 of type $2 (bin|lib|test) with language $3 (cc|cxx), prefixed with their file variant
+## Gives source files of projects $1 of type $2 (bin|lib|test|shared) with language $3 (cc|cxx), prefixed with their file variant
 define src_file_var
 $(foreach var,$1,$(foreach src,$(call $2$3_$(var)_src),$(call VARIANT_$(src))$(src)))
 endef
 
-## Gives source files of projects $1 of type $2 (bin|lib|test) with language $3 (cc|cxx), prefixed with their project and file variant
+## Gives source files of projects $1 of type $2 (bin|lib|test|shared) with language $3 (cc|cxx), prefixed with their project and file variant
 define src_project_file_var
 $(foreach var,$(call src_file_var,$1,$2,$3),$(call VARIANT_$1_$(call source,$(patsubst %.$(call typeof,$1),%.o,$(var)),$1,$2,$3))$(var))
 endef
 
-## Gives object files of projects in list $1, of type $2 (bin|lib|test) with language $3 (cc|cxx), prefixed with their project name, project type, language $4 (if any, otherwise $3) and source file variant
+## Gives object files of projects in list $1, of type $2 (bin|lib|test|shared) with language $3 (cc|cxx), prefixed with their project name, project type, language $4 (if any, otherwise $3) and source file variant
 define object
-$(foreach proj,$1,$(patsubst %.$(call ext,$3),$2$3_$(proj)_%.o,$(call src_project_file_var,$(proj),$2,$3)))
+$(foreach proj,$1,$(patsubst %.$(call ext,$3),$2$(if $4,$4,$3)_$(proj)_%.o,$(call src_project_file_var,$(proj),$2,$3)))
 endef
 
 ## Same as above, for snekkja projects
@@ -193,8 +193,8 @@ GLOBAL_CC_TEST_LIBS=$(CC_TEST_LIBS)
 GLOBAL_CXX_TEST_LIBS=$(CXX_TEST_LIBS)
 GLOBAL_CC_PKG=$(call pkg-config,$(CC_PKG),libs-only-l,CC_PKG_)
 GLOBAL_CXX_PKG=$(call pkg-config,$(CXX_PKG),libs-only-l,CXX_PKG_)
-GLOBAL_CC_TEST_PKG=$(call pkg-config,$(CC_PKG_TEST),libs-only-l,CC_TEST_PKG_)
-GLOBAL_CXX_TEST_PKG=$(call pkg-config,$(CXX_PKG_TEST),libs-only-l,CXX_TEST_PKG_)
+GLOBAL_CC_TEST_PKG=$(call pkg-config,$(CC_TEST_PKG),libs-only-l,CC_TEST_PKG_)
+GLOBAL_CXX_TEST_PKG=$(call pkg-config,$(CXX_TEST_PKG),libs-only-l,CXX_TEST_PKG_)
 
 ## Gives all library switches of project $1 of type $2 (bin|lib|test) in language $3
 ## pkg-config provided switches from _pkg variable
@@ -215,8 +215,8 @@ endef
 
 ## All C and C++ objects, eliminating duplicates
 snekkja_schedule_src = $(foreach proj,$(kkj_package),$(foreach lang,cc cxx,$(call kkj_schedule_src,$(proj),$(lang))))
-cc_object = $(sort $(call object,$(bincc_package),bin,cc) $(call object,$(lib_package),lib,cc) $(call object,$(testcc_package),test,cc) $(call object,$(testcc_package),test,cc,cxx) $(call kkj_object,$(kkj_package),kkj,cc) $(call object,$(sharedcc_package),shared,cc))
-cxx_object = $(sort $(call object,$(bincxx_package),bin,cxx) $(call object,$(lib_package),lib,cxx) $(call object,$(testcxx_package),test,cxx) $(call object,$(testcc_package),test,cxx,cc) $(call kkj_object,$(kkj_package),kkj,cxx) $(call object,$(sharedcxx_package),shared,cxx))
+cc_object = $(sort $(call object,$(bincc_package),bin,cc) $(call object,$(bincxx_package),bin,cc,cxx) $(call object,$(lib_package),lib,cc) $(call object,$(testcc_package),test,cc) $(call object,$(testcc_package),test,cc,cxx) $(call kkj_object,$(kkj_package),kkj,cc) $(call object,$(sharedcc_package),shared,cc) $(call object,$(sharedcxx_package),shared,cc,cxx))
+cxx_object = $(sort $(call object,$(bincxx_package),bin,cxx) $(call object,$(bincx_package),bin,cxx,cx) $(call object,$(lib_package),lib,cxx) $(call object,$(testcxx_package),test,cxx) $(call object,$(testcc_package),test,cxx,cc) $(call kkj_object,$(kkj_package),kkj,cc) $(call object,$(sharedcxx_package),shared,cxx) $(call object,$(sharedcc_package),shared,cxx,ccx))
 lib_pkgconfig = $(sort $(foreach var,$(lib_package) $(kkj_package) $(sharedcxx_package) $(sharedcc_package),$(patsubst %,%.pc,$(var))))
 embed_object = $(sort $(call embed,$(bincc_package),bin) $(call embed,$(testcc_package),test) $(call embed,$(bincxx_package),bin) $(call embed,$(testcxx_package),test) $(call embed,$(lib_package),lib) $(call embed,$(kkj_package),kkj) $(call embed,$(sharedcc_package),shared) $(call embed,$(sharedcxx_package),shared))
 
