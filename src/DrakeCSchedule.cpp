@@ -201,10 +201,13 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 
 	for(Schedule::table::const_iterator i = sched->getSchedule().begin(); i != sched->getSchedule().end(); i++)
 	{
+		os << "	free(_drake_schedule[" << i->first - 1 << "]);" << endl;
+		/*
 		for(size_t j = 0; j < i->second.size(); j++)
 		{
-			os << "	free(_drake_schedule[" << i->first - 1 << "][" << i->second.size() - j - 1 << "]);\n";
+			os << "	free(_drake_schedule[" << i->first - 1 << "][" << i->second.size() - j - 1 << "]);" << endl;
 		}
+		*/
 	}
 
 	os << endl << "	free(_drake_schedule);" << endl
@@ -212,10 +215,13 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 
 	for(set<Task>::const_iterator i = tg->getTasks().begin(); i != tg->getTasks().end(); i++)
 	{
+		os << "	free(_drake_consumers_id[" << std::distance(tg->getTasks().begin(), i) << "]);" << endl; 
+		/*
 		for(size_t j = 0; j < i->getConsumers().size(); j++)
 		{
 			os << "	free(_drake_consumers_id[" << std::distance(tg->getTasks().begin(), i) << "][" << i->getConsumers().size() - j - 1 << "]);" << endl;
 		}
+		*/
 	}
 
 	os << "	free(_drake_consumers_id);"
@@ -224,10 +230,13 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 	
 	for(set<Task>::const_iterator i = tg->getTasks().begin(); i != tg->getTasks().end(); i++)
 	{
+		os << "	free(_drake_producers_id[" << std::distance(tg->getTasks().begin(), i) << "]);" << endl; 
+		/*
 		for(size_t j = 0; j < i->getProducers().size(); j++)
 		{
 			os << "	free(_drake_producers_id[" << std::distance(tg->getTasks().begin(), i) << "][" << i->getProducers().size() - j - 1 << "]);" << endl;
 		}
+		*/
 	}
 
 	os << "	free(_drake_producers_id);" << endl
@@ -258,16 +267,16 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 			<< "					return 0;" << endl
 			<< "				break;" << endl
 			<< "				case TASK_INIT:" << endl
-			<< "					return (void*)&drake_init(" << i->getModule() << ", " << std::distance(tg->getTasks().begin(), tg->getTasks().find(*i)) + 1 << ");" << endl
+			<< "					return (void*)&drake_init(" << i->getModule() << ", " << i->getName() << ");" << endl
 			<< " 				break;" << endl
 			<< "  				case TASK_START:" << endl
-			<< "  					return (void*)&drake_start(" << i->getModule() << ", " << std::distance(tg->getTasks().begin(), tg->getTasks().find(*i)) + 1 << ");" << endl
+			<< "  					return (void*)&drake_start(" << i->getModule() << ", " << i->getName() << ");" << endl
 			<< "  				break;" << endl
 			<< "  				case TASK_RUN:" << endl
-			<< "  					return (void*)&drake_run(" << i->getModule() << ", " << std::distance(tg->getTasks().begin(), tg->getTasks().find(*i)) + 1 << ");" << endl
+			<< "  					return (void*)&drake_run(" << i->getModule() << ", " << i->getName() << ");" << endl
 			<< "  				break;" << endl
 			<< "  				case TASK_KILLED:" << endl
-			<< "  					return (void*)&drake_destroy(" << i->getModule() << ", " << std::distance(tg->getTasks().begin(), tg->getTasks().find(*i)) + 1 << ");" << endl
+			<< "  					return (void*)&drake_destroy(" << i->getModule() << ", " << i->getName() << ");" << endl
 			<< "  				break;" << endl
 			<< "  				case TASK_ZOMBIE:" << endl
 			<< "  					return 0;" << endl

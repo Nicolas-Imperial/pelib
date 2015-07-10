@@ -310,26 +310,6 @@ namespace pelib
 		return tasks;
 	}
 
-	/*
-	void
-	Taskgraph::setTasks(const set<Task>& tasks)
-	{
-		set<string> task_ids;
-
-		for(set<Task>::const_iterator iter = tasks.begin(); iter != tasks.end(); iter++)
-		{
-			task_ids.insert(iter->getTaskId());
-		}
-
-		if(task_ids.size() != tasks.size())
-		{
-			throw ParseException("The tasks added do not have a unique taskId.");
-		}
-		
-		this->tasks = tasks;
-	}
-	*/
-
 	const Task&
 	Taskgraph::findTask(const string &taskId) const
 	{
@@ -343,24 +323,6 @@ namespace pelib
 
 		throw ParseException("No task \"" + taskId + "\" exists in this taskgraph.");
 	}
-
-	/*
-	const Task&
-	Taskgraph::findTask(string id) const
-	{
-		for(set<Task>::const_iterator iter = this->tasks.begin(); iter != this->tasks.end(); iter++)
-		{
-			if(iter->getName() == id)
-			{
-				return *iter;
-			}
-		}
-
-		std::ostringstream stream;
-		stream << "No task \"" << id << "\" exists in this taskgraph.";
-		throw ParseException(stream.str());
-	}
-	*/
 
 	const set<Link>&
 	Taskgraph::getLinks() const
@@ -384,12 +346,4 @@ namespace pelib
 
 		return *this;
 	}
-
-	/*
-	void
-	Taskgraph::setLinks(const set<Link>& links)
-	{
-		this->links = links;
-	}
-	*/
 }
