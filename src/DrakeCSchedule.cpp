@@ -43,6 +43,7 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 	size_t p = sched->getSchedule().size();
 	size_t n = tg->getTasks().size();
 	map<int, set<const Task*> > tasks, producers, consumers;
+	os << "#include <stdlib.h> " << endl << endl;
 	os << "#include <drake/schedule.h> " << endl << endl;
 
 	for(set<Task>::const_iterator i = tg->getTasks().begin(); i != tg->getTasks().end(); i++)

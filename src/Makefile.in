@@ -1,7 +1,5 @@
 subdirs = 
 
-CONFIG = RELEASE
-
 ## C global parameters
 CFLAGS_BASE =  
 CFLAGS_PRIVATE = -I../include 
