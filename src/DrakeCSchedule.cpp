@@ -72,7 +72,6 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		"size_t *_drake_remote_producers_in_task;" << endl <<
 		"size_t **_drake_consumers_id;" << endl <<
 		"size_t **_drake_producers_id;" << endl <<
-		"int *_drake_task_frequency;" << endl <<
 		"double _drake_stage_time;" << endl << endl <<
 		"void drake_schedule_init()" << endl <<
 		"{" << endl <<
@@ -102,13 +101,6 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		const set<Platform::island> i1 = pt->getSharedMemoryIslands(i->first);
 		const set<int> islands = pt->getSharedMemoryIslands(i1);
 		os << "	_drake_producers_in_core[" << i->first - 1 << "] = " << sched->getRemoteSharedMemoryIslandProducers(islands, *tg, *pt).size() << ";" << endl;
-	}
-
-	os << endl << "	_drake_task_frequency = malloc(sizeof(size_t) * _drake_n);" << endl;
-
-	for(set<Task>::const_iterator i = tg->getTasks().begin(); i != tg->getTasks().end(); i++)
-	{
-		os << "	_drake_task_frequency[" << std::distance(tg->getTasks().begin(), i) << "] = " << i->getFrequency() << ";" << endl;
 	}
 
 	os << endl << "	_drake_consumers_in_task = malloc(sizeof(size_t) * _drake_n);" << endl;
@@ -211,8 +203,7 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		*/
 	}
 
-	os << endl << "	free(_drake_schedule);" << endl
-		<< "	free(_drake_task_frequency);" << endl;
+	os << endl << "	free(_drake_schedule);" << endl;
 
 	for(set<Task>::const_iterator i = tg->getTasks().begin(); i != tg->getTasks().end(); i++)
 	{
