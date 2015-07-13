@@ -10,7 +10,11 @@
 #include <pelib/Set.hpp>
 #include <pelib/CastException.hpp>
 
+#if 1
 #define debug(expr) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
+#else
+#define debug(var)
+#endif
 
 using namespace std;
 
@@ -324,7 +328,14 @@ namespace pelib
 			throw CastException(ss.str());
 		}
 
-		const Task &task_tg = *this->getTasks().find(t);
+		if(tg.getTasks().find(t) == tg.getTasks().end())
+		{
+			stringstream ss;
+			ss << "Task \"" << t.getName() << "\" does not figure in taskgraph.";
+			throw CastException(ss.str());
+		}
+
+		const Task &task_tg = *tg.getTasks().find(t);
 		set<int> consumer_cores = this->getCores(task_tg);
 		set<int>::const_iterator j = consumer_cores.begin();
 		set<Platform::island> consumer_core_islands = pt.getSharedMemoryIslands(*j);
@@ -335,7 +346,7 @@ namespace pelib
 				throw CastException("Task mapped to cores that belong to different shared memory islands.");
 			}	
 		}
-		
+	
 		for(set<const Link*>::const_iterator j = task_tg.getProducers().begin(); j != task_tg.getProducers().end(); j++)
 		{
 			const Link *l = *j;
@@ -429,6 +440,13 @@ namespace pelib
 		{
 			stringstream ss;
 			ss << "Task \"" << t.getName() << "\" does not figure in schedule.";
+			throw CastException(ss.str());
+		}
+
+		if(tg.getTasks().find(t) == tg.getTasks().end())
+		{
+			stringstream ss;
+			ss << "Task \"" << t.getName() << "\" does not figure in taskgraph.";
 			throw CastException(ss.str());
 		}
 
