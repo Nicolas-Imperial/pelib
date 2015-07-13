@@ -3,7 +3,7 @@ version = 1
 minor = 0
 release = 0
 
-prefix = $(HOME)/.local/debug
+prefix = $(HOME)/.local
 exec_prefix = $(prefix)
 bindir = $(exec_prefix)/bin
 libdir = $(exec_prefix)/lib
