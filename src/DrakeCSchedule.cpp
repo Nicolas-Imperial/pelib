@@ -21,7 +21,11 @@ extern "C"{
 #include <pelib/CastException.hpp>
 #include <pelib/ParseException.hpp>
 
+#if 0
 #define debug(expr) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
+#else
+#define debug(var)
+#endif
 
 using namespace pelib;
 using namespace std;
