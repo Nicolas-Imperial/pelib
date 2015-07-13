@@ -322,7 +322,7 @@ $(shared_linkername): $$@.$(version)
 $(shared_soname): $$@.$(minor).$(release)
 	ln -sf $(patsubst %,%.$(minor).$(release),$@) $@
 
-$(lib_pkgconfig): $$(patsubst %,lib%.a,$$(filter $$(patsubst %.pc,%,$$@),$(lib_package))) $$(if $$(strip $$(if $(sharedcxx_package),$$(filter $$(patsubst %.pc,%,$$@),$(sharedcxx_package))) $$(if $(sharedcc_package),$$(filter $$(patsubst %.pc,%,$$@)),$(sharedcc_package))),$$(patsubst %.pc,lib%.so,$$@))
+$(lib_pkgconfig): $$(patsubst %,lib%.a,$$(filter $$(patsubst %.pc,%,$$@),$(lib_package))) $$(patsubst %,lib%.a,$$(filter $$(patsubst %.pc,%,$$@),$(drake_package))) $$(if $$(strip $$(if $(sharedcxx_package),$$(filter $$(patsubst %.pc,%,$$@),$(sharedcxx_package))) $$(if $(sharedcc_package),$$(filter $$(patsubst %.pc,%,$$@)),$(sharedcc_package))),$$(patsubst %.pc,lib%.so,$$@))
 	echo prefix=$(final_prefix) > $@
 	echo exec_prefix=$(if $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_exec_prefix)),$(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_exec_prefix))),'$$'\{prefix\}/bin) >> $@
 	echo libdir=$(if $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_libdir))),$(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_libdir))),'$$'\{prefix\}/lib) >> $@
@@ -335,7 +335,7 @@ $(lib_pkgconfig): $$(patsubst %,lib%.a,$$(filter $$(patsubst %.pc,%,$$@),$(lib_p
 	echo Libs: -L'$$'\{libdir\} -l$(patsubst %.pc,%,$@) $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_libs))) >> $@
 	echo Libs.private: $(GLOBAL_LDFLAGS) $(call $2_$1_ldflags) $(GLOBAL_LIBS) $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_libs))) $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_libs_private))) >> $@
 	echo Requires: $(shell echo "$(patsubst %$(comma),%,$(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_requires),)))" | rev | cut -f 1 -d ',' --complement | rev) >> $@
-	echo Requires.private: $(shell echo "$(foreach var,$(sort $(foreach var,lib shared,$(foreach var2,$(call $(var)_$(patsubst %.pc,%,$@)_pkg),$(var2) ))),\"$(strip $(var)) $(strip $(call reverse,$(sort $(foreach var2,lib shared,$(call $(var2)_$(patsubst %.pc,%,$@)_pkg_$(var)_version)))))\",)" | rev | cut -f 1 -d ',' --complement | rev) >> $@
+	echo Requires.private: $(sort $(CC_PKG) $(CXX_PKG)) $(shell echo "$(foreach var,$(sort $(foreach var,lib shared,$(foreach var2,$(call $(var)_$(patsubst %.pc,%,$@)_pkg),$(var2) ))),\"$(strip $(var)) $(strip $(call reverse,$(sort $(foreach var2,lib shared,$(call $(var2)_$(patsubst %.pc,%,$@)_pkg_$(var)_version)))))\",)" | rev | cut -f 1 -d ',' --complement | rev) >> $@
 	echo Conflicts: $(sort $(foreach var,lib shared,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_conflicts))) >> $@
 	echo Cflags: $(GLOBAL_CFLAGS_EXPORT) $() -I'$$'\{includedir\} $(foreach var,cc cxx,$(call cflags_project_export,$(patsubst %.pc,%,$@),lib,$(var))) $(CPPFLAGS) $(foreach var,cc cxx,$(sort $(foreach var,lib shared,$(call $(var2)_$(patsubst %.pc,%,$@)_pkg_$(call prefix_cflags,$(var))flags)))) >> $@
 
