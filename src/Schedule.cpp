@@ -258,10 +258,10 @@ namespace pelib
 		return tasks;
 	}
 
-	set<const Task*>
+	multiset<const Task*>
 	Schedule::getRemoteSharedMemoryIslandProducers(const set<int> &islands, const Taskgraph &tg, const Platform &pt) const
 	{
-		set<const Task*> producers;
+		multiset<const Task*> producers;
 		for(set<int>::const_iterator i = islands.begin(); i != islands.end(); i++)
 		{
 			if(*i > (int)pt.getSharedMemoryIslands().size())
@@ -317,10 +317,10 @@ namespace pelib
 		return producers;
 	}
 
-	set<const Task*>
+	multiset<const Task*>
 	Schedule::getRemoteSharedMemoryIslandTaskProducers(const Task &t, const Taskgraph &tg, const Platform &pt) const
 	{
-		set<const Task*> producers;
+		multiset<const Task*> producers;
 		if(this->getTasks().find(t) == this->getTasks().end())
 		{
 			stringstream ss;
@@ -372,10 +372,10 @@ namespace pelib
 		return producers;
 	}
 
-	set<const Task*>
+	multiset<const Task*>
 	Schedule::getRemoteSharedMemoryIslandConsumers(const set<int> &islands, const Taskgraph &tg, const Platform &pt) const
 	{
-		set<const Task*> consumers;
+		multiset<const Task*> consumers;
 		for(set<int>::const_iterator i = islands.begin(); i != islands.end(); i++)
 		{
 			if(*i > (int)pt.getSharedMemoryIslands().size())
@@ -432,10 +432,10 @@ namespace pelib
 		return consumers;
 	}
 
-	set<const Task*>
+	multiset<const Task*>
 	Schedule::getRemoteSharedMemoryIslandTaskConsumers(const Task &t, const Taskgraph &tg, const Platform &pt) const
 	{
-		set<const Task*> consumers;
+		multiset<const Task*> consumers;
 		if(this->getTasks().find(t) == this->getTasks().end())
 		{
 			stringstream ss;

@@ -1,3 +1,5 @@
+#include <set>
+
 #include <pelib/Algebra.hpp>
 #include <pelib/Link.hpp>
 #include <pelib/Task.hpp>
@@ -45,16 +47,16 @@ namespace pelib
 			virtual set<const Task*>
 			getTasksSharedMemoryIsland(const set<int>& islands, const Platform &pt) const;
 
-			virtual set<const Task*>
+			virtual multiset<const Task*>
 			getRemoteSharedMemoryIslandProducers(const set<int> &islands, const Taskgraph &tg, const Platform &pt) const;
 
-			virtual set<const Task*>
+			virtual multiset<const Task*>
 			getRemoteSharedMemoryIslandTaskProducers(const Task &t, const Taskgraph &tg, const Platform &pt) const;
 
-			virtual set<const Task*>
+			virtual multiset<const Task*>
 			getRemoteSharedMemoryIslandConsumers(const set<int> &islands, const Taskgraph &tg, const Platform &pt) const;
 
-			virtual set<const Task*>
+			virtual multiset<const Task*>
 			getRemoteSharedMemoryIslandTaskConsumers(const Task &t, const Taskgraph &tg, const Platform &pt) const;
 
 			virtual const set<int>
