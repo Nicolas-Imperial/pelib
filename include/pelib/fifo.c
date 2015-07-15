@@ -214,7 +214,7 @@ pelib_printf_detail(cfifo_t(CFIFO_T))(cfifo_t(CFIFO_T) fifo, int level)
 	return PELIB_SUCCESS;
 }
 
-/*
+#if 0
 #define check_memory(elem) PELIB_CONCAT_3(check_, elem, _memory)
 static
 int
@@ -234,7 +234,9 @@ check_memory(CFIFO_T)(CFIFO_T* ptr, size_t length)
 
 	return PELIB_SUCCESS;
 }
-*/
+#else
+#define check_memory(elem)
+#endif
 
 #define cfifo_state(elem) PELIB_CONCAT_3(cfifo_, cfifo(elem), _state)
 static cfifo_state_t

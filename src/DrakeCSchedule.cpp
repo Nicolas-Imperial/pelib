@@ -77,6 +77,10 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		"size_t **_drake_consumers_id;" << endl <<
 		"size_t **_drake_producers_id;" << endl <<
 		"double _drake_stage_time;" << endl << endl <<
+		"int drake_task_number()" << endl <<
+		"{" << endl <<
+		"	return " << n << ";" << endl <<
+		"}" << endl << endl <<
 		"void drake_schedule_init()" << endl <<
 		"{" << endl <<
 		"	_drake_p = " << p << ";" << endl << 

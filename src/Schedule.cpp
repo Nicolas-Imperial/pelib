@@ -10,7 +10,7 @@
 #include <pelib/Set.hpp>
 #include <pelib/CastException.hpp>
 
-#if 1
+#if 0
 #define debug(expr) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
 #else
 #define debug(var)
