@@ -59,7 +59,7 @@ pelib_alloc_buffer(STRUCT_T)(STRUCT_T*, size_t);
 int
 pelib_set_buffer(STRUCT_T)(STRUCT_T*, void*, size_t, void*);
 STRUCT_T *
-pelib_alloc(STRUCT_T)(void*);
+pelib_alloc(STRUCT_T)();
 STRUCT_T *
 pelib_alloc_collection(STRUCT_T)(size_t);
 STRUCT_T *
