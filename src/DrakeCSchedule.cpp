@@ -63,6 +63,7 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 	os << 
 		"size_t _drake_p;" << endl << 
 		"size_t _drake_n;" << endl << 
+		"char **_drake_task_name;" << endl << 
 		"size_t *_drake_tasks_in_core;" << endl << 
 		"size_t *_drake_consumers_in_core;" << endl << 
 		"size_t *_drake_producers_in_core;" << endl <<
@@ -81,12 +82,24 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		"{" << endl <<
 		"	return " << n << ";" << endl <<
 		"}" << endl << endl <<
+		"char* drake_task_name(size_t index)" << endl <<
+		"{" << endl <<
+		"	return _drake_task_name[index];" << endl <<
+		"}" << endl << endl <<
 		"void drake_schedule_init()" << endl <<
 		"{" << endl <<
 		"	_drake_p = " << p << ";" << endl << 
 		"	_drake_n = " << n << ";" << endl <<
 		"	_drake_stage_time = " << tg->getDeadline(*pt) << ";" << endl << endl <<
 		"	_drake_tasks_in_core = malloc(sizeof(size_t) * _drake_p);" << endl;
+
+	os << endl << "	_drake_task_name = malloc(sizeof(size_t*) * _drake_n);" << endl;
+
+	for(set<Task>::const_iterator i = tg->getTasks().begin(); i != tg->getTasks().end(); i++)
+	{
+		os << "	_drake_task_name[" << std::distance(tg->getTasks().begin(), i) << "] = \"" << i->getName() << "\";" << endl;
+	}
+	os << endl << endl;
 
 	for(Schedule::table::const_iterator i = sched->getSchedule().begin(); i != sched->getSchedule().end(); i++)
 	{
@@ -247,6 +260,7 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		<< "	free(_drake_producers_in_core);" << endl
 		<< "	free(_drake_consumers_in_core);" << endl
 		<< "	free(_drake_tasks_in_core);" << endl
+		<< "	free(_drake_task_name);" << endl
 		<< "}" << endl
 		<< endl
 		<< "void*" << endl
@@ -276,10 +290,13 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 			<< "  					return (void*)&drake_run(" << i->getModule() << ", " << i->getName() << ");" << endl
 			<< "  				break;" << endl
 			<< "  				case TASK_KILLED:" << endl
-			<< "  					return (void*)&drake_destroy(" << i->getModule() << ", " << i->getName() << ");" << endl
+			<< "  					return (void*)&drake_kill(" << i->getModule() << ", " << i->getName() << ");" << endl
 			<< "  				break;" << endl
 			<< "  				case TASK_ZOMBIE:" << endl
 			<< "  					return 0;" << endl
+			<< "  				break;" << endl
+			<< "  				case TASK_DESTROY:" << endl
+			<< "  					return (void*)&drake_destroy(" << i->getModule() << ", " << i->getName() << ");" << endl
 			<< "  				break;" << endl
 			<< "  				default:" << endl
 			<< "  					return 0;" << endl
