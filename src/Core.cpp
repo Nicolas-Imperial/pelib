@@ -4,4 +4,8 @@ using namespace std;
 
 namespace pelib
 {	
+	Core::~Core()
+	{
+		// Do nothing
+	}
 }

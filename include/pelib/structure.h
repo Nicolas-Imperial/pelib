@@ -44,6 +44,7 @@
 #define pelib_free_buffer(elem) PELIB_CONCAT_3(pelib_,elem,_free_buffer)
 #define pelib_free_struct(elem) PELIB_CONCAT_3(pelib_,elem,_free_struct)
 #define pelib_free(elem) PELIB_CONCAT_3(pelib_,elem,_free)
+#define pelib_destroy(elem) PELIB_CONCAT_3(pelib_,elem,_destroy)
 #define pelib_compare(elem) PELIB_CONCAT_3(pelib_,elem,_compare)
 #define pelib_printf(elem) PELIB_CONCAT_3(pelib_,elem,_printf)
 #define pelib_printf_detail(elem) PELIB_CONCAT_3(pelib_,elem,_printf_detail)
@@ -75,11 +76,13 @@ pelib_free_buffer(STRUCT_T)(STRUCT_T *);
 int
 pelib_free(STRUCT_T)(STRUCT_T *);
 int
+pelib_destroy(STRUCT_T)(STRUCT_T);
+int
 pelib_compare(STRUCT_T)(STRUCT_T, STRUCT_T);
-int
-pelib_printf(STRUCT_T)(STRUCT_T);
-int
-pelib_printf_detail(STRUCT_T)(STRUCT_T, int);
+FILE*
+pelib_printf(STRUCT_T)(FILE*, STRUCT_T);
+FILE*
+pelib_printf_detail(STRUCT_T)(FILE*, STRUCT_T, int);
 size_t
 pelib_fwrite(STRUCT_T)(STRUCT_T, size_t, size_t, FILE*);
 size_t

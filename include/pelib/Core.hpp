@@ -9,6 +9,7 @@ namespace pelib
 	{
 		public:
 			virtual Core* clone() const = 0;
+			virtual ~Core();
 			virtual const std::set<float>& getFrequencies() const = 0;
 		protected:
 		private:

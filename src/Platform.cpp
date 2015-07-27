@@ -182,7 +182,6 @@ namespace pelib
 	{
 		const char* type = NULL;
 		
-		this->cores.size() == 1;
 		for(set<const Core*>::const_iterator i = this->getCores().begin(); i != this->getCores().end(); i++)
 		{
 			if(type != NULL)

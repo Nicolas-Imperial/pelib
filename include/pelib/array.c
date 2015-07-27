@@ -378,28 +378,28 @@ pelib_string_detail(array_t(ARRAY_T))(array_t(ARRAY_T) array, int level)
 	}
 }
 
-int
-pelib_printf(array_t(ARRAY_T))(array_t(ARRAY_T) array)
+FILE*
+pelib_printf(array_t(ARRAY_T))(FILE* stream, array_t(ARRAY_T) array)
 {
 	char * str;
 	str = pelib_string(array_t(ARRAY_T))(array);
 
-	printf("%s\n", str);
+	fprintf(stream, "%s\n", str);
 	free(str);
 
-	return 0;
+	return stream;
 }
 
-int
-pelib_printf_detail(array_t(ARRAY_T))(array_t(ARRAY_T) array, int level)
+FILE*
+pelib_printf_detail(array_t(ARRAY_T))(FILE* stream, array_t(ARRAY_T) array, int level)
 {
 	char * str;
 	str = pelib_string_detail(array_t(ARRAY_T))(array, level);
 
-	printf("%s\n", str);
+	fprintf(stream, "%s\n", str);
 	free(str);
 
-	return 0;
+	return stream;
 }
 
 int

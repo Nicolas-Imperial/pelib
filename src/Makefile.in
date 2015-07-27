@@ -5,7 +5,7 @@ CFLAGS_BASE =
 CFLAGS_PRIVATE = -I../include 
 CFLAGS_CONFIG_RELEASE = -O3 -DNDEBUG
 CFLAGS_CONFIG_DEBUG = -g -O0 -DDEBUG=1
-CFLAGS_SHARED = -fPIC -DPIC
+CFLAGS_SHARED = -fPIC
 CC_PKG = 
 CC_DEPS =
 CC_LIBS =
@@ -20,7 +20,7 @@ CXXFLAGS_BASE =
 CXXFLAGS_PRIVATE = -I../include -Wall
 CXXFLAGS_CONFIG_RELEASE = -O3 -DNDEBUG
 CXXFLAGS_CONFIG_DEBUG = -g -O0 -DDEBUG=1
-CXXFLAGS_SHARED = -fPIC -DPIC
+CXXFLAGS_SHARED = -fPIC
 CXX_PKG = 
 CXX_PKG_igraph_version = >= 0.7.1
 CXX_DEPS =
@@ -57,7 +57,7 @@ CppDataOutput.cpp \
 Cpp.cpp CppData.cpp CppScalar.cpp CppVector.cpp CppSet.cpp CppMatrix.cpp \
 RecordParser.cpp \
 DrakeCSchedule.cpp 
-cstruct_src = sort.c complex.c integer.c monitor.c printf.c size_t.c
+cstruct_src = sort.c complex.c integer.c monitor.c printf.c size_t.c pelib_string.c
 
 ## executables
 bincxx_project = pelib-convert demo run_record amplmatrixtoraw

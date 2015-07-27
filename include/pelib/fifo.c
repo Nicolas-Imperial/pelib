@@ -192,26 +192,26 @@ pelib_free_buffer(cfifo_t(CFIFO_T))(cfifo_t(CFIFO_T)* fifo)
 	return PELIB_SUCCESS;
 }
 
-int
-pelib_printf(cfifo_t(CFIFO_T))(cfifo_t(CFIFO_T) fifo)
+FILE*
+pelib_printf(cfifo_t(CFIFO_T))(FILE* stream, cfifo_t(CFIFO_T) fifo)
 {
 	char* str;
 	str = pelib_string(cfifo_t(CFIFO_T))(fifo);
 	fprintf(pelib_get_stdout(), "%s\n", str);
 	free(str);
 
-	return PELIB_SUCCESS;
+	return stream;
 }
 
-int
-pelib_printf_detail(cfifo_t(CFIFO_T))(cfifo_t(CFIFO_T) fifo, int level)
+FILE*
+pelib_printf_detail(cfifo_t(CFIFO_T))(FILE* stream, cfifo_t(CFIFO_T) fifo, int level)
 {
 	char* str;
 	str = pelib_string_detail(cfifo_t(CFIFO_T))(fifo, level);
 	fprintf(pelib_get_stdout(), "%s\n", str);
 	free(str);
 
-	return PELIB_SUCCESS;
+	return stream;
 }
 
 #if 0
@@ -394,7 +394,7 @@ pelib_string_detail(cfifo_t(CFIFO_T))(cfifo_t(CFIFO_T) fifo, int level)
             sprintf(str, "%s:", str);
           }
 
-        free(elem);
+        //free(elem);
       }
     sprintf(str, "%s]", str);
 
