@@ -143,7 +143,12 @@ namespace pelib
 			if(std::isnan(output))
 			{
 				throw new ParseException("Could not parse efficiency formula \"" + getEfficiencyString() + "\"");
-			}	
+			}
+
+			if(output < very_small)
+			{
+				output = very_small;
+			}
 
 			return output;		
 		}
