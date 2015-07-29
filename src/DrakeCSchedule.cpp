@@ -84,7 +84,7 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		"}" << endl << endl <<
 		"char* drake_task_name(size_t index)" << endl <<
 		"{" << endl <<
-		"	return _drake_task_name[index];" << endl <<
+		"	return _drake_task_name[index - 1];" << endl <<
 		"}" << endl << endl <<
 		"void drake_schedule_init()" << endl <<
 		"{" << endl <<

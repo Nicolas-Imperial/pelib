@@ -167,7 +167,17 @@ pelib_array_loadfilename(ARRAY_T)(char * filename)
 
   pelib_init(ARRAY_T)(&num);
   h = fopen(filename, "r");
-  pelib_fread(size_t)(&size, 0, 1, h);
+  if(h == NULL)
+  {
+    return NULL;
+  }
+
+  int ret = pelib_fread(size_t)(&size, 0, 1, h);
+  if(ret != 1)
+  {
+    return NULL;
+  }
+
   res = pelib_alloc_collection(array_t(ARRAY_T))(size);
 
   for (i = 0; i < size; i++)
@@ -210,8 +220,16 @@ pelib_array_preloadfilenamebinary(ARRAY_T)(char *filename)
   size_t size;
 
   h = fopen(filename, "r");
+  if(h == NULL)
+  {
+    return NULL;
+  }
 
   ret = fread(&size, sizeof(int), 1, h);
+  if(ret != 1)
+  {
+    return NULL;
+  }
   fclose(h);
   if(ret != 1)
   {
@@ -240,9 +258,16 @@ pelib_array_loadfilenamewindowbinary(ARRAY_T)(char *filename, size_t offset, siz
   size_t ret, size;
 
   h = fopen(filename, "r");
+  if(h == NULL)
+  {
+    return NULL;
+  }
 
   ret = fread(&size, sizeof(int), 1, h);
-  assert(ret == 1);
+  if(ret != 1)
+  {
+    return NULL;
+  }
 
   if (ret == 1 && (ptrdiff_t)size - (ptrdiff_t)offset > 0)
     {
