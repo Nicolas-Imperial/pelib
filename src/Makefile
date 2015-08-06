@@ -260,7 +260,7 @@ test_list = $(testcc_list) $(testcxx_list)
 all: submake $(bin_list) $(lib_pkgconfig)
 
 ## Force rebuild upon Makefile update
-$(cc_object) $(cxx_object) $(embed_object) $(bin_list) $(lib_list) $(shared_list) $(shared_linkername) $(shared_soname) $(lib_pkgconfig) $(drake_schedule_src) $(drake_schedule_text) $(drake_taskgraph_text)): Makefile Makefile.in
+#$(cc_object) $(cxx_object) $(embed_object) $(bin_list) $(lib_list) $(shared_list) $(shared_linkername) $(shared_soname) $(lib_pkgconfig) $(drake_schedule_src) $(drake_schedule_text) $(drake_taskgraph_text)): Makefile Makefile.in
 
 $(drake_taskgraph_text): $$(call drake_$$(patsubst %.$(drake_taskgraph).$(drake_taskgraph_extension),%,$$@)_platform) $$(sort $$(foreach ext,cc cxx,$$(call drake$$(ext)_$$(patsubst %.$(drake_taskgraph).$(drake_taskgraph_extension),%,$$@)_graph))) $$(call drake_$$(patsubst %.$(drake_taskgraph).$(drake_taskgraph_extension),%,$$@)_platform)
 $(drake_schedule_text): $$(call drake_$$(patsubst %.$(drake_schedule).$(drake_schedule_extension),%,$$@)_platform) $$(sort $$(foreach ext,cc cxx,$$(call drake$$(ext)_$$(patsubst %.$(drake_schedule).$(drake_schedule_extension),%,$$@)_graph))) $$(call drake_$$(patsubst %.$(drake_schedule).$(drake_schedule_extension),%,$$@)_platform)
@@ -365,8 +365,8 @@ clean: submake
 	$(RM) $(clean)
 
 check: submake $(test_list)
-	@$(shell echo for i in "$(foreach var,$(testcc_list),$(var))"\; do eval echo Running \$$i...\; eval LD_LIBRARY_PATH=.:$(LD_LIBRARY_PATH) ./\$$i\; done)
-	@$(shell echo for i in "$(foreach var,$(testcxx_list),$(var))"\; do eval echo Running \$$i...\; eval LD_LIBRARY_PATH=.:$(LD_LIBRARY_PATH) ./\$$i\; done)
+	@$(shell echo for i in "$(foreach var,$(testcc_list),$(var))"\; do eval echo Running \$$i...\; eval LD_LIBRARY_PATH=.:$(LD_LIBRARY_PATH) ./\$$i \|\| exit 1\; done)
+	@$(shell echo for i in "$(foreach var,$(testcxx_list),$(var))"\; do eval echo Running \$$i...\; eval LD_LIBRARY_PATH=.:$(LD_LIBRARY_PATH) ./\$$i \|\| exit 1\; done)
 
 checkdist distcheck: dist
 
