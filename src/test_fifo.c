@@ -44,7 +44,7 @@ init()
 {
 	unsigned int i;
 
-	cfifo = pelib_alloc(cfifo_t(size_t))((void*)CAPACITY);
+	cfifo = pelib_alloc_collection(cfifo_t(size_t))(CAPACITY);
 	pelib_init(cfifo_t(size_t))(cfifo);
 	value = VALUE;
 
@@ -161,7 +161,7 @@ test_string()
 
 	// Full fifo with read_ptr and write_ptr at the edge [>>10:11:12:13:14:15:16:17:18:19]
 	str = pelib_string(cfifo_t(size_t))(*cfifo);
-	assert(strcmp(str, "[>>10:11:12:13:14:15:16:17:18:19]") == 0);
+	assert_equals_str(str, "[>>10:11:12:13:14:15:16:17:18:19]");
 	free(str);
 
 	pelib_cfifo_pop(size_t)(cfifo);
@@ -173,7 +173,7 @@ test_string()
 
 	// Not full fifo, reverse mode with read_ptr in the middle [>.:.:.:.:.:.:>16:17:18:19]
 	str = pelib_string(cfifo_t(size_t))(*cfifo);
-	assert(strcmp(str, "[>.:.:.:.:.:.:>16:17:18:19]") == 0);
+	assert_equals_str(str, "[>.:.:.:.:.:.:>16:17:18:19]");
 	free(str);
 
 	pelib_cfifo_push(size_t)(cfifo, 2);
@@ -181,7 +181,7 @@ test_string()
 
 	// Not full fifo, reverse mode with write_ptr and read_ptr in the middle [2:5:>.:.:.:.:>16:17:18:19]
 	str = pelib_string(cfifo_t(size_t))(*cfifo);
-	assert(strcmp(str, "[2:5:>.:.:.:.:>16:17:18:19]") == 0);
+	assert_equals_str(str, "[2:5:>.:.:.:.:>16:17:18:19]");
 	free(str);
 
 	pelib_cfifo_push(size_t)(cfifo, 2);
@@ -191,7 +191,7 @@ test_string()
 
 	// Full fifo with write_ptr and read_ptr in the middle [2:5:2:5:7:4:>>16:17:18:19]
 	str = pelib_string(cfifo_t(size_t))(*cfifo);
-	assert(strcmp(str, "[2:5:2:5:7:4:>>16:17:18:19]") == 0);
+	assert_equals_str(str, "[2:5:2:5:7:4:>>16:17:18:19]");
 	free(str);
 
 	pelib_cfifo_pop(size_t)(cfifo);
@@ -201,7 +201,7 @@ test_string()
 
 	// Not full fifo with read_ptr at the edge and write_ptr in the middle [>2:5:2:5:7:4:>.:.:.:.]
 	str = pelib_string(cfifo_t(size_t))(*cfifo);
-	assert(strcmp(str, "[>2:5:2:5:7:4:>.:.:.:.]") == 0);
+	assert_equals_str(str, "[>2:5:2:5:7:4:>.:.:.:.]");
 	free(str);
 
 	pelib_cfifo_pop(size_t)(cfifo);
@@ -213,7 +213,7 @@ test_string()
 
 	// Empty fifo with write_ptr and read_ptr in the middle [.:.:.:.:.:.:>>.:.:.:.]
 	str = pelib_string(cfifo_t(size_t))(*cfifo);
-	assert(strcmp(str, "[.:.:.:.:.:.:>>.:.:.:.]") == 0);
+	assert_equals_str(str, "[.:.:.:.:.:.:>>.:.:.:.]");
 	free(str);
 
 	pelib_cfifo_push(size_t)(cfifo, 1);
@@ -223,7 +223,7 @@ test_string()
 
 	// Not full fifo, normal mode with write_ptr and read_ptr in the middle [>.:.:.:.:.:.:>1:6:9:8]
 	str = pelib_string(cfifo_t(size_t))(*cfifo);
-	assert(strcmp(str, "[>.:.:.:.:.:.:>1:6:9:8]") == 0);
+	assert_equals_str(str, "[>.:.:.:.:.:.:>1:6:9:8]");
 	free(str);
 
 	pelib_cfifo_pop(size_t)(cfifo);
@@ -233,7 +233,7 @@ test_string()
 
 	// Empty fifo with write_ptr and read_ptr in edge [>>.:.:.:.:.:.:.:.:.:.]
 	str = pelib_string(cfifo_t(size_t))(*cfifo);
-	assert(strcmp(str, "[>>.:.:.:.:.:.:.:.:.:.]") == 0);
+	assert_equals_str(str, "[>>.:.:.:.:.:.:.:.:.:.]");
 	free(str);
 
 	pelib_cfifo_push(size_t)(cfifo, 1);
@@ -243,7 +243,7 @@ test_string()
 
 	// Not full fifo, normal mode with write_ptr in the middle amd and read_ptr at the edge [>1:6:9:8<:.:.:.:.:.:.]
 	str = pelib_string(cfifo_t(size_t))(*cfifo);
-	assert(strcmp(str, "[>1:6:9:8:>.:.:.:.:.:.]") == 0);
+	assert_equals_str(str, "[>1:6:9:8:>.:.:.:.:.:.]");
 	free(str);
 }
 
@@ -591,7 +591,7 @@ test_peekmem_partial()
 void
 test_peekmem_reverse()
 {
-	int i;
+	size_t i;
 
 	for(i = 0; i < TO_TAIL; i++)
 	{
@@ -603,22 +603,19 @@ test_peekmem_reverse()
 		pelib_cfifo_push(size_t)(cfifo, i + VALUE + CAPACITY);
 	}
 
-	pelib_printf(cfifo_t(size_t))(*cfifo);
-
 	pelib_cfifo_peekmem(size_t)(cfifo, different, CAPACITY - TO_TAIL + FROM_HEAD, 0);
-
 	assert(pelib_cfifo_length(size_t)(*cfifo) == CAPACITY - TO_TAIL + FROM_HEAD);
 	
 	for(i = 0; i < CAPACITY - TO_TAIL + FROM_HEAD; i++)
 	{
-		assert(different[i] == i + VALUE + TO_TAIL);
+		assert_equals_size_t(different[i], i + VALUE + TO_TAIL);
 	}
 }
 
 void
 test_peekmem_too_much()
 {	
-	int ret, i;
+	size_t ret, i;
 
 	for(i = 0; i < TO_TAIL; i++)
 	{
@@ -627,8 +624,8 @@ test_peekmem_too_much()
 
 	ret = pelib_cfifo_peekmem(size_t)(cfifo, different, CAPACITY, 0);
 
-	assert(pelib_cfifo_length(size_t)(*cfifo) == CAPACITY - TO_TAIL);
-	assert(ret == CAPACITY - TO_TAIL);
+	assert_equals_size_t(pelib_cfifo_length(size_t)(*cfifo), (size_t)(CAPACITY - TO_TAIL));
+	assert_equals_size_t(ret, (size_t)(CAPACITY - TO_TAIL));
 
 	for(i = 0; i < CAPACITY - TO_TAIL; i++)
 	{
@@ -772,7 +769,7 @@ test_popfifo_simple()
 	int i;
 
 	cfifo_t(size_t) *recipient;
-	recipient = pelib_alloc(cfifo_t(size_t))((void*)CAPACITY);
+	recipient = pelib_alloc_collection(cfifo_t(size_t))(CAPACITY);
 	pelib_init(cfifo_t(size_t))(recipient);
 
 	// Pop nothing
@@ -831,7 +828,7 @@ test_popfifo_complex()
 
 	// Make a recipient fifo in reverse state, but less free space
 	cfifo_t(size_t) *recipient;
-	recipient = pelib_alloc(cfifo_t(size_t))((void*)CAPACITY);
+	recipient = pelib_alloc_collection(cfifo_t(size_t))(CAPACITY);
 	pelib_init(cfifo_t(size_t))(recipient);
 
 	for(i = 0; i < CAPACITY; i++)

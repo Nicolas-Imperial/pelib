@@ -80,11 +80,11 @@ setup()
 void
 init()
 {
-  stack = pelib_alloc(stack_t(complex_t))(0);
+  stack = pelib_alloc_collection(stack_t(complex_t))(0);
   pelib_init(stack_t(complex_t))(stack);
   assert(pelib_stack_check(complex_t)(stack) == 0);
 
-  pool = pelib_alloc(stack_t(complex_t))(0);
+  pool = pelib_alloc_collection(stack_t(complex_t))(0);
   pelib_init(stack_t(complex_t))(pool);
   assert(pelib_stack_check(complex_t)(pool) == 0);
 

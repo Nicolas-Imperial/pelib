@@ -105,15 +105,6 @@ pelib_set_buffer(array_t(ARRAY_T))(array_t(ARRAY_T)* array, void *buffer, size_t
 }
 
 array_t(ARRAY_T)*
-pelib_alloc(array_t(ARRAY_T))()
-{
-	// Not implemented
-	fprintf(pelib_get_stderr(), "Not implemented: pelib_alloc(array_t(ARRAY_T))()\n");
-	abort();
-	return NULL;
-}
-
-array_t(ARRAY_T)*
 pelib_alloc_collection(array_t(ARRAY_T))(size_t aux)
   {
     array_t(ARRAY_T) *array;
@@ -435,7 +426,7 @@ pelib_array_storefilename(ARRAY_T)(array_t(ARRAY_T)* array, char* filename)
 
   h = fopen(filename, "w");
 
-  fprintf(h, "%i ", array->length);
+  fprintf(h, "%zu ", array->length);
   for (i = 0; i < array->length; i++)
     {
       fprintf(h, "%s ", pelib_string(ARRAY_T)(array->data[i]));

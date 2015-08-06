@@ -66,7 +66,7 @@ bincxx_package = $(if $(filter text,$(packages)),$(if $(filter 1,$(STATIC) $(SHA
 bincxx_pelib-convert_src = pelib-convert.cpp argument_parsing.cpp dl.cpp
 bin_pelib-convert_export = $(bincxx_pelib-convert_embed) $(bincxx_pelib-convert_src) 
 bin_pelib-convert_deps = pelib.pc
-bin_pelib-convert_libs = -lpelib $(shared_pelib_libs)
+bin_pelib-convert_libs = -ldl -lpelib $(shared_pelib_libs)
 bin_pelib-convert_pkg = $(shared_pelib_pkg)
 bin_pelib-convert_ldflags = -L.
 bin_pelib-convert_static = 0
@@ -330,49 +330,49 @@ testcc_sort-test_src = test_sort.c
 test_sort-test_export = $(testcc_sort-test_src)
 test_sort-test_deps = pelib.pc
 test_sort-test_pkg = pelib
-test_sort-test_libs = 
-test_sort-test_ldflags = 
-test_sort-test_static = 1
+test_sort-test_libs = -lm
+test_sort-test_ldflags = -L. 
+test_sort-test_static = 0
 
 testcc_mapping-test_src = test_mapping.c
 test_mapping-test_export = $(testcc_mapping-test_src) 
 test_mapping-test_deps = pelib.pc
 test_mapping-test_pkg = pelib
 test_mapping-test_libs = 
-test_mapping-test_ldflags =
-test_mapping-test_static = 1
+test_mapping-test_ldflags = -L.
+test_mapping-test_static = 0
 
 testcc_array-test_src = test_array.c
 test_array-test_export = $(testcc_array-test_src)
 test_array-test_deps = pelib.pc
 test_array-test_pkg = pelib
 test_array-test_libs = 
-test_array-test_ldflags =
-test_array-test_static = 1
+test_array-test_ldflags = -L.
+test_array-test_static = 0
 
 testcc_fifo-test_src = test_fifo.c
 test_fifo-test_export = $(testcc_fifo-test_src)
 test_fifo-test_deps = pelib.pc
 test_fifo-test_pkg = pelib
 test_fifo-test_libs = 
-test_fifo-test_ldflags =
-test_fifo-test_static = 1
+test_fifo-test_ldflags = -L.
+test_fifo-test_static = 0
 
 testcc_stack-test_src = test_stack.c
 test_stack-test_export = $(testcc_stack-test_src) 
 test_stack-test_deps = pelib.pc
 test_stack-test_pkg = pelib
 test_stack-test_libs = 
-test_stack-test_ldflags =
-test_stack-test_static = 1
+test_stack-test_ldflags = -L. -pthread
+test_stack-test_static = 0
 
 testcc_fifo_array-test_src = test_fifo_array.c
 test_fifo_array-test_export = $(testcc_fifo_array-test_src) 
 test_fifo_array-test_deps = pelib.pc
 test_fifo_array-test_pkg = pelib
 test_fifo_array-test_libs = 
-test_fifo_array-test_ldflags =
-test_fifo_array-test_static = 1
+test_fifo_array-test_ldflags = -L.
+test_fifo_array-test_static = 0
 
 ## Uncomment this to run target "first" before any target explicetly called
 #FIRST = first

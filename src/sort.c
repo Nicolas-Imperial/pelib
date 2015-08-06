@@ -142,7 +142,7 @@ pelib_sample(array_t(int)* array, int ratio, int start, int stop)
   pivot = 0;
   if (stop - start >= ratio)
     {
-      array_t(int)* sample = pelib_alloc(array_t(int))((void*)ratio);
+      array_t(int)* sample = pelib_alloc_collection(array_t(int))(ratio);
       for (i = start; i < stop; i += (int)((float) (stop - start) / ratio))
         {
 	  read = pelib_array_read(int)(array, (int)i);
@@ -338,7 +338,7 @@ pelib_quicksort_tune(array_t(int)* array, qsort_tune_t p)
   qsort_bound_t start;
   stack_t(qsort_bound_t) * stack;
 
-  stack = pelib_alloc(stack_t(qsort_bound_t))(0);
+  stack = pelib_alloc_collection(stack_t(qsort_bound_t))(0);
   pelib_init(stack_t(qsort_bound_t))(stack);
 
   param.array = array;

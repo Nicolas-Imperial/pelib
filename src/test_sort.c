@@ -66,21 +66,21 @@ init()
 
 	// Initialize pseudo-random array
 	srandom(RANDOM_SEED);
-	prand = pelib_alloc(array_t(int))((void*)LENGTH);
+	prand = pelib_alloc_collection(array_t(int))(LENGTH);
 	for (i = 0; i < LENGTH; i++)
 	{
 		pelib_array_append(int)(prand, random() % MAX_VALUE);
 	}
 
 	// Initialize increasing sorted array
-	increasing = pelib_alloc(array_t(int))((void*)LENGTH);
+	increasing = pelib_alloc_collection(array_t(int))(LENGTH);
 	for (i = 0; i < LENGTH; i++)
 	{
 		pelib_array_append(int)(increasing, i);
 	}
 
 	// Initialize increasing sorted array
-	unsorted = pelib_alloc(array_t(int))((void*)LENGTH);
+	unsorted = pelib_alloc_collection(array_t(int))(LENGTH);
 	for (i = 0; i < LENGTH; i++)
 	{
 		pelib_array_append(int)(unsorted, pseudo_randomize(i, MAX_VALUE));

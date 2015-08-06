@@ -365,8 +365,8 @@ clean: submake
 	$(RM) $(clean)
 
 check: submake $(test_list)
-	@$(shell echo for i in "$(foreach var,$(testcc_list),$(var))"\; do eval echo Running \$$i...\; eval ./\$$i\; done)
-	@$(shell echo for i in "$(foreach var,$(testcxx_list),$(var))"\; do eval echo Running \$$i...\; eval ./\$$i\; done)
+	@$(shell echo for i in "$(foreach var,$(testcc_list),$(var))"\; do eval echo Running \$$i...\; eval LD_LIBRARY_PATH=.:$(LD_LIBRARY_PATH) ./\$$i\; done)
+	@$(shell echo for i in "$(foreach var,$(testcxx_list),$(var))"\; do eval echo Running \$$i...\; eval LD_LIBRARY_PATH=.:$(LD_LIBRARY_PATH) ./\$$i\; done)
 
 checkdist distcheck: dist
 

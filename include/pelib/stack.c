@@ -78,7 +78,7 @@ pelib_stackelem_check(STACK_T)(stackelem_t(STACK_T) *elem)
   }
 
 stack_t(STACK_T) *
-pelib_alloc(stack_t(STACK_T))(void* aux)
+pelib_alloc_collection(stack_t(STACK_T))(size_t aux)
   {
     stack_t(STACK_T) *res;
 

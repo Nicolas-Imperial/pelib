@@ -20,6 +20,7 @@ typedef struct
 	vector<string> exclude;
 } filter_t;
 
+#if 0
 static filter_t
 parse_args(char **argv)
 {
@@ -46,6 +47,7 @@ parse_args(char **argv)
 
 	return filter;
 }
+#endif
 
 // /!\ the content of argv is freed after this function is run
 pelib::Record*

@@ -39,7 +39,7 @@ void
 init()
 {
   unsigned int i;
-  array = pelib_alloc(array_t(int))((void*)LENGTH);
+  array = pelib_alloc_collection(array_t(int))(LENGTH);
   value = VALUE;
 
   for (i = 0; i < LENGTH; i++)
@@ -62,7 +62,7 @@ test_compare()
 {
   unsigned int i;
   array_t(int)* another_array;
-  another_array = pelib_alloc(array_t(int))((void*)LENGTH);
+  another_array = pelib_alloc_collection(array_t(int))(LENGTH);
 
   for (i = 0; i < LENGTH; i++)
     {

@@ -64,7 +64,7 @@ pelib_string(size_t)(size_t a)
 		size = 1;
 	}
     str = malloc(sizeof(char) * (size + 2));
-    sprintf(str, "%i", a);
+    sprintf(str, "%zu", a);
 
     return str;
   }

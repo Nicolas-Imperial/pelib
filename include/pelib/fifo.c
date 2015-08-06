@@ -120,15 +120,6 @@ pelib_alloc_struct(cfifo_t(CFIFO_T))()
 }
 
 cfifo_t(CFIFO_T)*
-pelib_alloc(cfifo_t(CFIFO_T))()
-{
-	// Not implemented
-	fprintf(pelib_get_stderr(), "Not implemented: pelib_alloc(cfifo_t(CFIFO_T))()\n");
-	abort();
-	return NULL;
-}
-
-cfifo_t(CFIFO_T)*
 pelib_alloc_collection(cfifo_t(CFIFO_T))(size_t size)
 {
 	cfifo_t(CFIFO_T) *fifo;
@@ -368,9 +359,9 @@ pelib_string_detail(cfifo_t(CFIFO_T))(cfifo_t(CFIFO_T) fifo, int level)
     sprintf(str, "[");
     for (i = 0; i < fifo.capacity; i++)
       {
-        //elem = pelib_string_detail(CFIFO_T)(fifo.buffer[i], level);
-	char a = 'A';
-	elem = &a; //temporary workaround, TODO:fix
+        elem = pelib_string_detail(CFIFO_T)(fifo.buffer[i], level);
+	//char a = 'A';
+	//elem = &a; //temporary workaround, TODO:fix
         status = is_in_content(CFIFO_T)(&fifo, i);
 
         if (abs(status) & 2)
@@ -887,36 +878,25 @@ debug
 size_t
 pelib_cfifo_peekmem(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, CFIFO_T* mem, size_t num, size_t offset)
 {
-  //int i;
-	size_t left, length, read;
-	//CFIFO_T* end;
-	switch(cfifo_state(CFIFO_T)(fifo))
+	size_t left, length;
+	cfifo_t(CFIFO_T) copy = *fifo;
+	copy.read = (copy.read + offset) % copy.capacity;
+
+	switch(cfifo_state(CFIFO_T)(&copy))
 	{
 		case FULL:
 		case REVERSE:
 			// Copy from write to end of buffer
-			left = fifo->capacity - fifo->read;
+			left = copy.capacity - copy.read;
 			length = left < num ? left : num;
-			read = (fifo->read + offset) % fifo->capacity;
 
-/*
-debug
-			while(!check_memory(CFIFO_T)((CFIFO_T*)&(fifo->buffer[fifo->read]), length))
-			{
-debug
-				
-debug
-			}
-debug
-*/
-
-			memcpy(mem, (void*)&(fifo->buffer[read]), length * sizeof(CFIFO_T));
+			memcpy(mem, (void*)&(copy.buffer[copy.read]), length * sizeof(CFIFO_T));
 
 			// If left was not enough to accomodate the memory buffer to write
-			if(left < num)
+			if((left) < num && left > 0)
 			{
 				// Now we are in the reverse mode, just call the function again
-				length += pelib_cfifo_peekmem(CFIFO_T)(fifo, mem + length, num - length, length + offset);
+				length += pelib_cfifo_peekmem(CFIFO_T)(&copy, mem + length, num - length, length);
 			}
 
 			return length;
@@ -925,22 +905,10 @@ debug
 		case EMPTY:
 		case NORMAL:
 			// Copy from write to read
-			left = fifo->write - fifo->read;
+			left = copy.write - copy.read;
 			length = left < num ? left : num;
-			read = (fifo->read + offset) % fifo->capacity;
 
-/*
-debug
-			while(!check_memory(CFIFO_T)((CFIFO_T*)&(fifo->buffer[fifo->read]), length))
-			{
-debug
-				
-debug
-			}
-debug
-*/
-
-			memcpy(mem, (void*)&(fifo->buffer[read]), length * sizeof(CFIFO_T));
+			memcpy(mem, (void*)&(copy.buffer[copy.read]), length * sizeof(CFIFO_T));
 
 			return length;
 		break;
