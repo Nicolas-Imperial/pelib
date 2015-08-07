@@ -119,176 +119,166 @@ shared_pelib_deps =
 shared_pelib_pkg = igraph libxml++-2.6
 shared_pelib_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib_pkg_ld = 
-shared_pelib_pkg_libs = -lboost_regex -lboost_graph 
+shared_pelib_pkg_libs = 
 shared_pelib_pkg_igraph_version = >= 0.7.1
+shared_pelib_pkg_requires = 
+shared_pelib_pkg_requires_igraph_version = >= 0.7.1
 shared_pelib_pkg_cxxflags = 
 shared_pelib_pkg_description = General research utility library used in PELAB
 shared_pelib_embed = 
 
 sharedcxx_pelib-platform-ampl_input_src = platform-ampl_input.cpp
 shared_pelib-platform-ampl_input_export = $(sharedcxx_pelib-platform-ampl_input_embed) $(sharedcxx_pelib-platform-ampl_input_src)
-shared_pelib-platform-ampl_input_libs = $(shared_pelib_libs)
+shared_pelib-platform-ampl_input_libs = 
 shared_pelib-platform-ampl_input_ldflags = -L. 
 shared_pelib-platform-ampl_input_deps = pelib.pc
-shared_pelib-platform-ampl_input_pkg = $(shared_pelib_pkg) pelib
+shared_pelib-platform-ampl_input_pkg = pelib
 shared_pelib-platform-ampl_input_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-platform-ampl_input_pkg_ld = 
-shared_pelib-platform-ampl_input_pkg_libs = $(shared_pelib_pkg_libs) 
-shared_pelib-platform-ampl_input_pkg_igraph_version = >= 0.7.1
+shared_pelib-platform-ampl_input_pkg_libs =  
 shared_pelib-platform-ampl_input_pkg_cxxflags = 
 shared_pelib-platform-ampl_input_pkg_description = Platform parser and output in AMPL input format
 shared_pelib-platform-ampl_input_embed = 
 
 sharedcxx_pelib-platform-ampl_output_src = platform-ampl_output.cpp
 shared_pelib-platform-ampl_output_export = $(sharedcxx_pelib-platform-ampl_output_embed) $(sharedcxx_pelib-platform-ampl_output_src)
-shared_pelib-platform-ampl_output_libs = $(shared_pelib_libs)
+shared_pelib-platform-ampl_output_libs = 
 shared_pelib-platform-ampl_output_ldflags = -L.
 shared_pelib-platform-ampl_output_deps = pelib.pc
-shared_pelib-platform-ampl_output_pkg = $(shared_pelib_pkg) pelib
+shared_pelib-platform-ampl_output_pkg = pelib
 shared_pelib-platform-ampl_output_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-platform-ampl_output_pkg_ld = 
-shared_pelib-platform-ampl_output_pkg_libs = $(shared_pelib_pkg_libs)
-shared_pelib-platform-ampl_output_pkg_igraph_version = >= 0.7.1
+shared_pelib-platform-ampl_output_pkg_libs = 
 shared_pelib-platform-ampl_output_pkg_cxxflags = 
 shared_pelib-platform-ampl_output_pkg_description = Platform parser and output in AMPL output format
 shared_pelib-platform-ampl_output_embed = 
 
 sharedcxx_pelib-taskgraph-graphml_src = taskgraph-graphml.cpp
 shared_pelib-taskgraph-graphml_export = $(sharedcxx_pelib-taskgraph-graphml_embed) $(sharedcxx_pelib-taskgraph-graphml_src)
-shared_pelib-taskgraph-graphml_libs = $(shared_pelib_libs)
+shared_pelib-taskgraph-graphml_libs = 
 shared_pelib-taskgraph-graphml_ldflags = -L.
 shared_pelib-taskgraph-graphml_deps = pelib.pc
-shared_pelib-taskgraph-graphml_pkg = $(shared_pelib_pkg) pelib
+shared_pelib-taskgraph-graphml_pkg = pelib
 shared_pelib-taskgraph-graphml_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-taskgraph-graphml_pkg_ld = 
-shared_pelib-taskgraph-graphml_pkg_libs = $(shared_pelib_pkg_libs)
-shared_pelib-taskgraph-graphml_pkg_igraph_version = >= 0.7.1
+shared_pelib-taskgraph-graphml_pkg_libs = 
 shared_pelib-taskgraph-graphml_pkg_cxxflags = 
 shared_pelib-taskgraph-graphml_pkg_description = Platform parser and output in AMPL input format
 shared_pelib-taskgraph-graphml_embed = 
 
 sharedcxx_pelib-taskgraph-streamit_src = taskgraph-streamit.cpp
 shared_pelib-taskgraph-streamit_export = $(sharedcxx_pelib-taskgraph-streamit_embed) $(sharedcxx_pelib-taskgraph-streamit_src)
-shared_pelib-taskgraph-streamit_libs = $(shared_pelib_libs)
+shared_pelib-taskgraph-streamit_libs = 
 shared_pelib-taskgraph-streamit_ldflags = -L.
 shared_pelib-taskgraph-streamit_deps = pelib.pc
-shared_pelib-taskgraph-streamit_pkg = $(shared_pelib_pkg) pelib
+shared_pelib-taskgraph-streamit_pkg = pelib
 shared_pelib-taskgraph-streamit_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-taskgraph-streamit_pkg_ld = 
-shared_pelib-taskgraph-streamit_pkg_libs = $(shared_pelib_pkg_libs)
-shared_pelib-taskgraph-streamit_pkg_igraph_version = >= 0.7.1
+shared_pelib-taskgraph-streamit_pkg_libs = 
 shared_pelib-taskgraph-streamit_pkg_cxxflags = 
 shared_pelib-taskgraph-streamit_pkg_description = Platform parser and output in AMPL input format
 shared_pelib-taskgraph-streamit_embed = 
 
 sharedcxx_pelib-taskgraph-ampl_input_src = taskgraph-ampl_input.cpp
 shared_pelib-taskgraph-ampl_input_export = $(sharedcxx_pelib-taskgraph-ampl_input_embed) $(sharedcxx_pelib-taskgraph-ampl_input_src)
-shared_pelib-taskgraph-ampl_input_libs = $(shared_pelib_libs)
+shared_pelib-taskgraph-ampl_input_libs = 
 shared_pelib-taskgraph-ampl_input_ldflags = -L.
 shared_pelib-taskgraph-ampl_input_deps = pelib.pc
-shared_pelib-taskgraph-ampl_input_pkg = $(shared_pelib_pkg) pelib
+shared_pelib-taskgraph-ampl_input_pkg = pelib
 shared_pelib-taskgraph-ampl_input_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-taskgraph-ampl_input_pkg_ld = 
-shared_pelib-taskgraph-ampl_input_pkg_libs = $(shared_pelib_pkg_libs)
-shared_pelib-taskgraph-ampl_input_pkg_igraph_version = >= 0.7.1
+shared_pelib-taskgraph-ampl_input_pkg_libs = 
 shared_pelib-taskgraph-ampl_input_pkg_cxxflags = 
 shared_pelib-taskgraph-ampl_input_pkg_description = Platform parser and output in AMPL input format
 shared_pelib-taskgraph-ampl_input_embed = 
 
 sharedcxx_pelib-taskgraph-ampl_output_src = taskgraph-ampl_output.cpp
 shared_pelib-taskgraph-ampl_output_export = $(sharedcxx_pelib-taskgraph-ampl_output_embed) $(sharedcxx_pelib-taskgraph-ampl_output_src)
-shared_pelib-taskgraph-ampl_output_libs = $(shared_pelib_libs)
+shared_pelib-taskgraph-ampl_output_libs = 
 shared_pelib-taskgraph-ampl_output_ldflags = -L.
 shared_pelib-taskgraph-ampl_output_deps = pelib.pc
-shared_pelib-taskgraph-ampl_output_pkg = $(shared_pelib_pkg) pelib
+shared_pelib-taskgraph-ampl_output_pkg = pelib
 shared_pelib-taskgraph-ampl_output_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-taskgraph-ampl_output_pkg_ld = 
-shared_pelib-taskgraph-ampl_output_pkg_libs = $(shared_pelib_pkg_libs)
-shared_pelib-taskgraph-ampl_output_pkg_igraph_version = >= 0.7.1
+shared_pelib-taskgraph-ampl_output_pkg_libs = 
 shared_pelib-taskgraph-ampl_output_pkg_cxxflags = 
 shared_pelib-taskgraph-ampl_output_pkg_description = Platform parser and output in AMPL input format
 shared_pelib-taskgraph-ampl_output_embed = 
 
 sharedcxx_pelib-ampl_output_src = ampl_output.cpp
 shared_pelib-ampl_output_export = $(sharedcxx_pelib-ampl_output_embed) $(sharedcxx_pelib-ampl_output_src)
-shared_pelib-ampl_output_libs = $(shared_pelib_libs)
+shared_pelib-ampl_output_libs = 
 shared_pelib-ampl_output_ldflags = -L.
 shared_pelib-ampl_output_deps = pelib.pc
-shared_pelib-ampl_output_pkg = $(shared_pelib_pkg) pelib
+shared_pelib-ampl_output_pkg = pelib
 shared_pelib-ampl_output_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-ampl_output_pkg_ld = 
-shared_pelib-ampl_output_pkg_libs = $(shared_pelib_pkg_libs)
-shared_pelib-ampl_output_pkg_igraph_version = >= 0.7.1
+shared_pelib-ampl_output_pkg_libs = 
 shared_pelib-ampl_output_pkg_cxxflags = 
 shared_pelib-ampl_output_pkg_description = Platform parser and output in AMPL input format
 shared_pelib-ampl_output_embed = 
 
 sharedcxx_pelib-ampl_input_src = ampl_input.cpp
 shared_pelib-ampl_input_export = $(sharedcxx_pelib-ampl_input_embed) $(sharedcxx_pelib-ampl_input_src)
-shared_pelib-ampl_input_libs = $(shared_pelib_libs)
+shared_pelib-ampl_input_libs = 
 shared_pelib-ampl_input_ldflags = -L.
 shared_pelib-ampl_input_deps = pelib.pc
-shared_pelib-ampl_input_pkg = $(shared_pelib_pkg) pelib
+shared_pelib-ampl_input_pkg = pelib
 shared_pelib-ampl_input_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-ampl_input_pkg_ld = 
-shared_pelib-ampl_input_pkg_libs = $(shared_pelib_pkg_libs)
-shared_pelib-ampl_input_pkg_igraph_version = >= 0.7.1
+shared_pelib-ampl_input_pkg_libs = 
 shared_pelib-ampl_input_pkg_cxxflags = 
 shared_pelib-ampl_input_pkg_description = Platform parser and input in AMPL input format
 shared_pelib-ampl_input_embed =
 
 sharedcxx_pelib-schedule-xml_src = schedule-xml.cpp argument_parsing.cpp dl.cpp
 shared_pelib-schedule-xml_export = $(sharedcxx_pelib-schedule-xml_embed) $(sharedcxx_pelib-schedule-xml_src)
-shared_pelib-schedule-xml_libs = $(shared_pelib_libs)
+shared_pelib-schedule-xml_libs = 
 shared_pelib-schedule-xml_ldflags = -L.
 shared_pelib-schedule-xml_deps = pelib.pc
-shared_pelib-schedule-xml_pkg = $(shared_pelib_pkg) pelib
+shared_pelib-schedule-xml_pkg = pelib
 shared_pelib-schedule-xml_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-schedule-xml_pkg_ld = 
-shared_pelib-schedule-xml_pkg_libs = $(shared_pelib_pkg_libs)
-shared_pelib-schedule-xml_pkg_igraph_version = >= 0.7.1
+shared_pelib-schedule-xml_pkg_libs = 
 shared_pelib-schedule-xml_pkg_cxxflags = 
 shared_pelib-schedule-xml_pkg_description = Platform parser and input in AMPL input format
 shared_pelib-schedule-xml_embed =
 
 sharedcxx_pelib-schedule-drake_src = schedule-drake.cpp argument_parsing.cpp dl.cpp
 shared_pelib-schedule-drake_export = $(sharedcxx_pelib-schedule-drake_embed) $(sharedcxx_pelib-schedule-drake_src)
-shared_pelib-schedule-drake_libs = $(shared_pelib_libs)
+shared_pelib-schedule-drake_libs = 
 shared_pelib-schedule-drake_ldflags = -L.
 shared_pelib-schedule-drake_deps = pelib.pc
-shared_pelib-schedule-drake_pkg = $(shared_pelib_pkg) pelib
+shared_pelib-schedule-drake_pkg = pelib
 shared_pelib-schedule-drake_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-schedule-drake_pkg_ld = 
-shared_pelib-schedule-drake_pkg_libs = $(shared_pelib_pkg_libs)
-shared_pelib-schedule-drake_pkg_igraph_version = >= 0.7.1
+shared_pelib-schedule-drake_pkg_libs = 
 shared_pelib-schedule-drake_pkg_cxxflags = 
 shared_pelib-schedule-drake_pkg_description = Platform parser and input in AMPL input format
 shared_pelib-schedule-drake_embed =
 
 sharedcxx_pelib-schedule-ampl_input_src = schedule-ampl_input.cpp argument_parsing.cpp dl.cpp
 shared_pelib-schedule-ampl_input_export = $(sharedcxx_pelib-schedule-ampl_input_embed) $(sharedcxx_pelib-schedule-ampl_input_src)
-shared_pelib-schedule-ampl_input_libs = $(shared_pelib_libs)
+shared_pelib-schedule-ampl_input_libs = 
 shared_pelib-schedule-ampl_input_ldflags = -L.
 shared_pelib-schedule-ampl_input_deps = pelib.pc
-shared_pelib-schedule-ampl_input_pkg = $(shared_pelib_pkg) pelib
+shared_pelib-schedule-ampl_input_pkg = pelib
 shared_pelib-schedule-ampl_input_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-schedule-ampl_input_pkg_ld = 
-shared_pelib-schedule-ampl_input_pkg_libs = $(shared_pelib_pkg_libs)
-shared_pelib-schedule-ampl_input_pkg_igraph_version = >= 0.7.1
+shared_pelib-schedule-ampl_input_pkg_libs = 
 shared_pelib-schedule-ampl_input_pkg_cxxflags = 
 shared_pelib-schedule-ampl_input_pkg_description = Platform parser and output in AMPL input format
 shared_pelib-schedule-ampl_input_embed = 
 
 sharedcxx_pelib-schedule-ampl_output_src = schedule-ampl_output.cpp argument_parsing.cpp dl.cpp
 shared_pelib-schedule-ampl_output_export = $(sharedcxx_pelib-schedule-ampl_output_embed) $(sharedcxx_pelib-schedule-ampl_output_src)
-shared_pelib-schedule-ampl_output_libs = $(shared_pelib_libs)
+shared_pelib-schedule-ampl_output_libs = 
 shared_pelib-schedule-ampl_output_ldflags = -L.
 shared_pelib-schedule-ampl_output_deps = pelib.pc
-shared_pelib-schedule-ampl_output_pkg = $(shared_pelib_pkg) pelib
+shared_pelib-schedule-ampl_output_pkg = pelib
 shared_pelib-schedule-ampl_output_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-schedule-ampl_output_pkg_ld = 
-shared_pelib-schedule-ampl_output_pkg_libs = $(shared_pelib_pkg_libs)
-shared_pelib-schedule-ampl_output_pkg_igraph_version = >= 0.7.1
+shared_pelib-schedule-ampl_output_pkg_libs = 
 shared_pelib-schedule-ampl_output_pkg_cxxflags = 
 shared_pelib-schedule-ampl_output_pkg_description = Platform parser and output in AMPL input format
 shared_pelib-schedule-ampl_output_embed = 
@@ -318,10 +308,11 @@ testcxx_package = $(if $(filter 1,$(SHARED)),$(if $(filter text,$(packages)),$(t
 testcxx_parser_src = test_parser.cpp 
 test_parser_export = $(testcxx_parser_embed) $(testcxx_parser_src) make_algebra.cpp unit_test.h
 test_parser_deps = pelib.pc
-test_parser_libs = -lpelib $(shared_pelib_libs)
-test_parser_pkg = $(shared_pelib_pkg)
+test_parser_libs = -lpelib 
+test_parser_pkg = pelib
 test_parser_ldflags = -L.
 test_parser_embed = fft_n15_1.graphml fft_n15_1_input.dat fft_n15_1_output.dat p8.dat schedule.xml crown.dat schedule.dat platform.dat
+test_parser_static = 1
 
 testcc_project = sort-test array-test fifo-test stack-test fifo_array-test
 testcc_package = $(if $(filter 1,$(SHARED)),$(if $(filter cstruct,$(packages)),$(testcc_project)),$(if $(filter 1,$(STATIC)),$(if $(filter text,$(packages)),$(testcc_project))))
@@ -379,4 +370,5 @@ test_fifo_array-test_static = 0
 
 first:
 	@# Display some basic variable content here and call "make all"
+	@echo $(testcxx_list)
 	@/bin/false
