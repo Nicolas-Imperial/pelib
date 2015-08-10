@@ -13,25 +13,37 @@ namespace pelib
 {
 	Platform::Platform()
 	{
-		// Do nothing and leave all collections empty
+		set<float> f;
+		f.insert(1);
+		Core *core = new DummyCore(f);
+		this->cores.insert(core);
+		set<const Core*> island;
+		island.insert(core);
+		main.insert(set<const Core*>(island));
+		shared.insert(set<const Core*>(island));
+		priv.insert(set<const Core*>(island));
+		voltage.insert(set<const Core*>(island));
+		freq.insert(set<const Core*>(island));
 	}
 
 	Platform::Platform(const set<const Core*>& cores)
 	{
+		set<const Core*> shared;
 		for(set<const Core*>::const_iterator i = cores.begin(); i != cores.end(); i++)
 		{
 			Core *core = (*i)->clone();
 			this->cores.insert(core);
 			set<const Core*> island;
 			island.insert(core);
+			shared.insert(core);
 
 			// Each core is its own Platform::island of anything
-			this->shared.insert(set<const Core*>(island));
 			this->main.insert(set<const Core*>(island));
 			this->priv.insert(set<const Core*>(island));
 			this->voltage.insert(set<const Core*>(island));
 			this->freq.insert(set<const Core*>(island));
 		}
+		this->shared.insert(set<const Core*>(shared));
 	}
 	
 	Platform::Platform(const std::set<const Core*>& cores, const std::set<std::set <const Core*> >& shared, const std::set<std::set <const Core*> >& main, const std::set<std::set <const Core*> >& priv, const std::set<std::set <const Core*> >& voltage, const std::set<std::set <const Core*> >& freq)
@@ -46,20 +58,22 @@ namespace pelib
 
 	Platform::Platform(size_t p, const Core* ref)
 	{
+		set<const Core*> shared;
 		for(size_t i = 0; i < p; i++)
 		{
 			Core *core = ref->clone();
 			this->cores.insert(core);
 			set<const Core*> island;
 			island.insert(core);
+			shared.insert(core);
 
 			// Each core is its own Platform::island of anything
-			this->shared.insert(set<const Core*>(island));
 			this->main.insert(set<const Core*>(island));
 			this->priv.insert(set<const Core*>(island));
 			this->voltage.insert(set<const Core*>(island));
 			this->freq.insert(set<const Core*>(island));
 		}
+		this->shared.insert(shared);
 	}
 
 	Platform::Platform(const Platform *arch)
@@ -141,20 +155,20 @@ namespace pelib
 			throw ParseException(std::string("Missing core number scalar \"p\" or frequency set \"F\" in input."));
 		}
 
+		set<const Core*> shared;
 		for(size_t i = 0; i < scalar_p->getValue(); i++)
 		{
 			const Core *core = new DummyCore(set_F->getValues());
 			this->cores.insert(core);
 			set<const Core*> island;
-			island.insert(core);
+			shared.insert(core);
 
-			// Each core is its own Platform::island of anything
-			this->shared.insert(set<const Core*>(island));
 			this->main.insert(set<const Core*>(island));
 			this->priv.insert(set<const Core*>(island));
 			this->voltage.insert(set<const Core*>(island));
 			this->freq.insert(set<const Core*>(island));
 		}
+		this->shared.insert(shared);
 	}
 
 	Platform::~Platform()

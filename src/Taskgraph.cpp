@@ -10,6 +10,12 @@
 #include <pelib/Vector.hpp>
 #include <pelib/Matrix.hpp>
 
+#if 0
+#define debug(var) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << endl;
+#else
+#define debug(var)
+#endif
+
 using namespace std;
 
 namespace pelib
@@ -181,6 +187,8 @@ namespace pelib
 		f.insert(1);
 		set<const Core*> cores;
 		cores.insert(new DummyCore(f));
+		Platform arch(cores);
+		
 		return buildAlgebra(Platform(cores));
 	}
 	

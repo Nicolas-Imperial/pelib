@@ -10,6 +10,12 @@
 
 #include <pelib/exprtk.hpp>
 
+#if 0
+#define debug(var) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << endl;
+#else
+#define debug(var)
+#endif
+
 using namespace pelib;
 using namespace std;
 
@@ -50,7 +56,6 @@ struct print: public exprtk::ifunction<double>
 
 DeadlineFormula::DeadlineFormula(string formula) : formula(formula) {}
 
-#define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
 double
 DeadlineFormula::calculate(const Taskgraph &tg, const Platform &arch) const
 {
@@ -80,7 +85,7 @@ DeadlineFormula::calculate(const Taskgraph &tg, const Platform &arch) const
 		p.push_back(i);
 	}
 
-	for(set<float>::const_iterator i = (*arch.getCores().begin())->getFrequencies().begin(); i != (*arch.getCores().begin())->getFrequencies().end(); i++)
+	for(set<float>::const_iterator i = (*(arch.getCores().begin()))->getFrequencies().begin(); i != (*(arch.getCores().begin()))->getFrequencies().end(); i++)
 	{
 		F.push_back(*i);
 	}

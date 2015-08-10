@@ -6,19 +6,20 @@
 
 namespace pelib
 {
-	class ParseException: std::exception // or std::runtime_error?
+	class ParseException: public std::exception // or std::runtime_error?
 	{
 		public:
-			ParseException(std::string message) throw();
+			explicit ParseException(const std::string &msg);
+			explicit ParseException(const char *msg);
 
 			virtual
 			~ParseException() throw();
 
-			const char*
-			what();
+			virtual const char*
+			what() const throw();
 
 		protected:
-			std::string message;
+			std::string msg;
 	};
 }
 

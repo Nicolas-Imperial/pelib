@@ -8,8 +8,9 @@ namespace pelib
 	class DummyCore: public Core
 	{
 		public:
-			DummyCore(std::set<float> f);
+			DummyCore(const std::set<float> &f);
 			DummyCore(const DummyCore*);
+			DummyCore(const DummyCore&);
 			virtual ~DummyCore();
 			virtual Core* clone() const;
 			virtual const std::set<float>& getFrequencies() const;

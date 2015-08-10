@@ -6,19 +6,20 @@
 
 namespace pelib
 {
-	class CastException: std::exception
+	class CastException: public std::exception
 	{
 		public:
-			CastException(std::string message) throw();
+			explicit CastException(const std::string &message);
+			explicit CastException(const char *message);
 
 			virtual
 			~CastException() throw();
 
-			const char*
-			what();
+			virtual const char*
+			what() const throw();
 
 		protected:
-			std::string message;
+			std::string msg;
 	};
 }
 

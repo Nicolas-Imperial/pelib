@@ -9,16 +9,24 @@
 
 namespace pelib
 {
-	CastException::CastException(std::string message) throw()
+	CastException::CastException(const std::string &message): msg(message)
 	{
-		this->message = message;
+		// Do nothing else
 	}
 
-	CastException::~CastException() throw() {}
+	CastException::CastException(const char *message): msg(message)
+	{
+		// Do nothing else
+	}
+
+	CastException::~CastException() throw()
+	{
+		// Do nothing
+	}
 
 	const char*
-	CastException::what()
+	CastException::what() const throw()
 	{
-		return std::string("Casting exception: ").append(this->message).c_str();
+		return std::string("Casting exception: ").append(this->msg).c_str();
 	}
 }

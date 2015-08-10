@@ -9,16 +9,21 @@
 
 namespace pelib
 {
-	ParseException::ParseException(std::string message) throw()
+	ParseException::ParseException(const std::string &message): msg(message) 
 	{
-		this->message = message;
+		// Do nothing else
+	}
+
+	ParseException::ParseException(const char *message): msg(message) 
+	{
+		// Do nothing else
 	}
 
 	ParseException::~ParseException() throw() {}
 
 	const char*
-	ParseException::what()
+	ParseException::what() const throw()
 	{
-		return std::string("Parsing exception: ").append(this->message).c_str();
+		return std::string("Parsing exception: ").append(this->msg).c_str();
 	}
 }
