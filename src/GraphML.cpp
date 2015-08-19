@@ -24,7 +24,7 @@ extern "C"{
 #include <pelib/CastException.hpp>
 #include <pelib/ParseException.hpp>
 
-#define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
+#define debug(expr) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
 
 using namespace pelib;
 using namespace std;
@@ -302,7 +302,7 @@ GraphML::parse(istream &is) const
 			task.setEfficiencyString(string("exprtk:p <= ") + ss.str() + "? 1 : 1e-6");
 		}
 
-		tasks.insert(task);
+		tasks.insert(task).second;
 	}
 
 	// Add edges between tasks

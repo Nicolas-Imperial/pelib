@@ -325,7 +325,7 @@ namespace pelib
 			size_t me_non_number_length = ((ptrdiff_t)me_num - (ptrdiff_t)me) / sizeof(char);
 			size_t ot_non_number_length = ((ptrdiff_t)ot_num - (ptrdiff_t)ot) / sizeof(char);
 			
-			size_t diff = string(me).substr(0, me_non_number_length).compare(string(ot).substr(0, ot_non_number_length));
+			int diff = string(me).substr(0, me_non_number_length).compare(string(ot).substr(0, ot_non_number_length));
 			if(diff != 0)
 			{
 				return diff < 0;
@@ -343,7 +343,6 @@ namespace pelib
 
 				if(me_double != ot_double)
 				{
-					
 					return me_double < ot_double;
 				}
 			}
@@ -356,7 +355,7 @@ namespace pelib
 	bool
 	Task::operator==(const Task &other) const
 	{
-		return getName() == other.getName();
+		return getName().compare(other.getName()) == 0;
 	}
 
 	std::string
