@@ -53,6 +53,8 @@ namespace pelib
 			static std::vector<AmplOutputDataOutput*> intFloatOutputs();
 			static std::pair<std::vector<AmplOutputDataParser*>, std::vector<AmplOutputDataOutput*> > intFloatHandlers();
 
+			static std::vector<AmplOutputDataParser*> stringParsers();
+			static std::vector<AmplOutputDataOutput*> stringOutputs();
 		protected:
 			std::vector<AmplOutputDataParser*> parsers;
 			std::vector<AmplOutputDataOutput*> outputs;

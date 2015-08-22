@@ -104,7 +104,10 @@ namespace pelib
 						} catch(NoDecimalFloatException &e)
 						{
 							float float_value = e.getValue();
-							val = (Value) float_value;
+							std::stringstream ss;
+							ss << float_value;
+							ss >> val;
+
 							integer_values++;
 						}
 						col = cols[i];

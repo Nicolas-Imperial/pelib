@@ -21,8 +21,8 @@
  * 
  */
 
-#ifndef INTEGER_H_
-#define INTEGER_H_
+#ifndef FLOAT_H_
+#define FLOAT_H_
 
 #define STRUCT_T float
 #include <pelib/structure.h>

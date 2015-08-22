@@ -15,6 +15,8 @@
 #include <pelib/ParseException.hpp>
 #include <pelib/CastException.hpp>
 
+using namespace std;
+
 namespace pelib
 {
 	/*
@@ -199,6 +201,30 @@ namespace pelib
 		outputs.push_back(new AmplOutputVector<int, float>(false));
 		outputs.push_back(new AmplOutputSet<float>(false));
 		outputs.push_back(new AmplOutputMatrix<int, int, float>(false));
+
+		return outputs;
+	}
+
+	std::vector<AmplOutputDataParser*> AmplOutput::stringParsers()
+	{
+		std::vector<AmplOutputDataParser*> parsers;
+		
+		parsers.push_back(new AmplOutputScalar<string>(false));
+		parsers.push_back(new AmplOutputVector<int, string>(false));
+		parsers.push_back(new AmplOutputSet<string>(false));
+		parsers.push_back(new AmplOutputMatrix<int, int, string>(false));
+
+		return parsers;
+	}
+		
+	std::vector<AmplOutputDataOutput*> AmplOutput::stringOutputs()
+	{
+		std::vector<AmplOutputDataOutput*> outputs;
+
+		outputs.push_back(new AmplOutputScalar<string>(false));
+		outputs.push_back(new AmplOutputVector<int, string>(false));
+		outputs.push_back(new AmplOutputSet<string>(false));
+		outputs.push_back(new AmplOutputMatrix<int, int, string>(false));
 
 		return outputs;
 	}

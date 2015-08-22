@@ -360,8 +360,6 @@ pelib_string_detail(cfifo_t(CFIFO_T))(cfifo_t(CFIFO_T) fifo, int level)
     for (i = 0; i < fifo.capacity; i++)
       {
         elem = pelib_string_detail(CFIFO_T)(fifo.buffer[i], level);
-	//char a = 'A';
-	//elem = &a; //temporary workaround, TODO:fix
         status = is_in_content(CFIFO_T)(&fifo, i);
 
         if (abs(status) & 2)

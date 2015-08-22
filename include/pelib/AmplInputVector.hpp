@@ -62,7 +62,9 @@ namespace pelib
 						value = AlgebraDataParser::convert<Value>(*iter, strict);
 					} catch(NoDecimalFloatException &e)
 					{
-						value = (Value)e.getValue();
+						std::stringstream ss;
+						ss << e.getValue();
+						ss >> value;
 						integer_values++;
 					}
 

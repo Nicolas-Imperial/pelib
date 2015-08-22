@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <boost/regex.hpp>
+#include <boost/algorithm/string.hpp>
 #include <iomanip>
 
 #include <pelib/AmplInput.hpp>
@@ -15,7 +16,14 @@
 #include <pelib/ParseException.hpp>
 #include <pelib/CastException.hpp>
 
+#if 0
+#define debug(var) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << endl;
+#else
+#define debug(var)
+#endif
+
 using namespace std;
+using namespace boost::algorithm;
 
 namespace pelib
 {
@@ -113,6 +121,7 @@ namespace pelib
 		// Parse input
 		while(!getline(noComment, line, ';').fail())
 		{
+			trim(line);	
 			boost::regex surrounding_space("^[\\n\\s]*([^\\s\\n].*?)[\\s\\n]*$");
 			line = boost::regex_replace(line, surrounding_space, first_only, boost::match_default | boost::format_all);
 
@@ -141,7 +150,27 @@ namespace pelib
 
 			if(iter == parsers.end())
 			{
-				//throw ParseException(std::string("No parser was suitable to the token \"").append(line).append("\"."));
+				for(iter = stringParsers().begin(); iter != stringParsers().end(); iter++)
+				{
+					AmplInputDataParser *parser = *iter;
+					try {
+						std::istringstream istr(line);
+						std::istream &str = istr;
+						AlgebraData *data = parser->parse(str);
+						record.insert(data);
+
+						// No need to try another parser; proceed with the next token
+						break;
+					} catch (ParseException &e)
+					{
+						//std::cerr << e.what() << "Trying next parser." << std::endl;
+					}
+				}
+
+				if(iter == parsers.end())
+				{
+					//throw ParseException(std::string("No parser was suitable to the token \"").append(line).append("\"."));
+				}
 			}
 		}
 		
@@ -161,7 +190,8 @@ namespace pelib
 	void
 	AmplInput::dump(std::ostream& o, const AlgebraData *data) const
 	{
-		for (std::vector<AmplInputDataOutput*>::const_iterator out = outputs.begin(); out != outputs.end(); out++)
+		std::vector<AmplInputDataOutput*>::const_iterator out;
+		for (out = outputs.begin(); out != outputs.end(); out++)
 		{
 			const AmplInputDataOutput *output = *out;
 			try
@@ -172,6 +202,28 @@ namespace pelib
 			{
 				// No suitable element to output
 				// Couldn't cast the element to record: just let that go and try again with next element
+			}
+		}
+
+		if(out == outputs.end())
+		{
+			for (out = stringOutputs().begin(); out != stringOutputs().end(); out++)
+			{
+				const AmplInputDataOutput *output = *out;
+				try
+				{
+					output->dump(o, data);
+					break;
+				} catch(CastException &e)
+				{
+					// No suitable element to output
+					// Couldn't cast the element to record: just let that go and try again with next element
+				}
+			}
+
+			if(out == stringOutputs().end())
+			{
+				// Throw an exception?
 			}
 		}
 	}
@@ -202,6 +254,30 @@ namespace pelib
 		outputs.push_back(new AmplInputVector<int, float>(false));
 		outputs.push_back(new AmplInputSet<float>(false));
 		outputs.push_back(new AmplInputMatrix<int, int, float>(false));
+
+		return outputs;
+	}
+
+	std::vector<AmplInputDataParser*> AmplInput::stringParsers()
+	{
+		std::vector<AmplInputDataParser*> parsers;
+		
+		parsers.push_back(new AmplInputScalar<string>(false));
+		parsers.push_back(new AmplInputVector<int, string>(false));
+		parsers.push_back(new AmplInputSet<string>(false));
+		parsers.push_back(new AmplInputMatrix<int, int, string>(false));
+
+		return parsers;
+	}
+		
+	std::vector<AmplInputDataOutput*> AmplInput::stringOutputs()
+	{
+		std::vector<AmplInputDataOutput*> outputs;
+
+		outputs.push_back(new AmplInputScalar<string>(false));
+		outputs.push_back(new AmplInputVector<int, string>(false));
+		outputs.push_back(new AmplInputSet<string>(false));
+		outputs.push_back(new AmplInputMatrix<int, int, string>(false));
 
 		return outputs;
 	}

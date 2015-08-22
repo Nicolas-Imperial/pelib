@@ -75,6 +75,7 @@ namespace pelib
 		const Vector<int, float> *wi = algebra.find<Vector<int, float> >("wi");
 		const Matrix<int, int, float> *sched = algebra.find<Matrix<int, int, float> >("schedule");
 		const Vector<int, float> *freq = algebra.find<Vector<int, float> >("frequency");
+		const Vector<int, string> *task_name = algebra.find<Vector<int, string> >("name");
 
 		table schedule;
 		set<Task> tasks;
@@ -93,10 +94,20 @@ namespace pelib
 				{
 					if(floor(j->second) > 0)
 					{
-						stringstream estr;
-						estr << "task_" << j->second;
-						tasks.insert(Task(estr.str()));
-						Task &task = (Task&)*tasks.find(estr.str());
+						string task_str;
+						if(task_name == NULL)
+						{
+							stringstream estr;
+							estr << "task_" << j->second;
+							task_str = string(estr.str());
+						}
+						else
+						{
+							task_str = string(task_name->getValues().find(j->second)->second);
+						}
+
+						tasks.insert(Task(task_str));
+						Task &task = (Task&)*tasks.find(task_str);
 						task.setModule("dummy");
 
 						if(task.getWorkload() > 0)
