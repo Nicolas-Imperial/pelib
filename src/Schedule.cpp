@@ -103,7 +103,7 @@ namespace pelib
 						}
 						else
 						{
-							task_str = string(task_name->getValues().find(j->second)->second);
+							task_str = string(task_name->getValues().find((int)j->second)->second);
 						}
 
 						tasks.insert(Task(task_str));
