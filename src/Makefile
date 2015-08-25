@@ -164,7 +164,7 @@ endef
 
 ## Gives cflags for project $1 of type $2 (bin|lib|test) in language $3 (cc|cxx), that will be exported in pkg-config
 define cflags_project_export
-$(call $2_$1_cflags)
+$(call $2_$1_cflags) $(call $2_$1_cxxflags)
 endef
 
 ## Gives cflags for project $1 of type $2 (bin|lib|test) in language $3 (cc|cxx)
@@ -183,6 +183,8 @@ endef
 
 GLOBAL_CC_LDFLAGS=$(CC_LDFLAGS_PRIVATE) $(CC_LDFLAGS) $(call pkg-config,$(CC_PKG),libs-only-L,CC_PKG_)
 GLOBAL_CXX_LDFLAGS=$(CXX_LDFLAGS_PRIVATE) $(CXX_LDFLAGS) $(call pkg-config,$(CXX_PKG),libs-only-L,CXX_PKG_)
+GLOBAL_CC_SHARED_LDFLAGS=$(CC_SHARED_LDFLAGS_PRIVATE) $(CC_SHARED_LDFLAGS) $(call pkg-config,$(CC_PKG),libs-only-L,CC_PKG_)
+GLOBAL_CXX_SHARED_LDFLAGS=$(CXX_SHARED_LDFLAGS_PRIVATE) $(CXX_SHARED_LDFLAGS) $(call pkg-config,$(CXX_PKG),libs-only-L,CXX_PKG_)
 
 define ldflags_project
 $(call $2_$1_ldflags)
@@ -190,12 +192,12 @@ endef
 
 ## Gives all cflags the object file $1 is ought to receive for this project of $2 (bin|lib|test) in language "cc"
 define cflags_file
-$(call CFLAGS_$(call source,$1,$(call projectof,$1,$2,cc),$2,cc)) $(call $2cc_$(call projectof,$1,$2,cc)_cflags_$(call source,$1,$(call projectof,$1,$2,cc),$2,cc))
+$(call CFLAGS_$(call source,$1,$(call projectof,$1,$2,cc),$2,cc)) $(call $2_$(call projectof,$1,$2,cc)_cflags_$(call source,$1,$(call projectof,$1,$2,cc),$2,cc))
 endef
 
 ## Same as above for C++ projects
 define cxxflags_file
-$(call CXXFLAGS_$(call source,$1,$(call projectof,$1,$2,cxx),$2,cxx)) $(call $2cxx_$(call projectof,$1,$2,cxx)_cxxflags_$(call source,$1,$(call projectof,$1,$2,cxx),$2,cxx))
+$(call CXXFLAGS_$(call source,$1,$(call projectof,$1,$2,cxx),$2,cxx)) $(call $2_$(call projectof,$1,$2,cxx)_cxxflags_$(call source,$1,$(call projectof,$1,$2,cxx),$2,cxx))
 endef
 
 ## Returns the list $1 in reverse order
@@ -333,7 +335,7 @@ $(shared_linkername): $$@.$(version)
 $(shared_soname): $$@.$(minor).$(release)
 	ln -sf $(patsubst %,%.$(minor).$(release),$@) $@
 
-$(lib_pkgconfig): $$(if $$(filter $$(patsubst %.pc,%,$$@),$(lib_package)),$$(patsubst %,lib%.a,$$(patsubst %.pc,%,$$@))) $$(if $$(strip $$(if $(sharedcxx_package),$$(filter $$(patsubst %.pc,%,$$@),$(sharedcxx_package))) $$(if $(sharedcc_package),$$(filter $$(patsubst %.pc,%,$$@)),$(sharedcc_package))),$$(patsubst %.pc,lib%.so,$$@)) $$(if $$(filter $$(patsubst %.pc,%,$$@),$(drake_package)),$$(patsubst %,lib%.a,$$(patsubst %.pc,%,$$@)))
+$(lib_pkgconfig): $$(if $$(filter $$(patsubst %.pc,%,$$@),$(lib_package)),$$(patsubst %,lib%.a,$$(patsubst %.pc,%,$$@))) $$(if $$(strip $$(if $(sharedcxx_package),$$(filter $$(patsubst %.pc,%,$$@),$(sharedcxx_package))) $$(if $(sharedcc_package),$$(filter $$(patsubst %.pc,%,$$@),$(sharedcc_package)))),$$(patsubst %.pc,lib%.so,$$@)) $$(if $$(filter $$(patsubst %.pc,%,$$@),$(drake_package)),$$(patsubst %,lib%.a,$$(patsubst %.pc,%,$$@)))
 	echo prefix=$(final_prefix) > $@
 	echo exec_prefix=$(if $(foreach var,lib shared drake,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_exec_prefix)),$(sort $(foreach var,lib shared drake,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_exec_prefix))),'$$'\{prefix\}/bin) >> $@
 	echo libdir=$(if $(sort $(foreach var,lib shared drake,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_libdir))),$(sort $(foreach var,lib shared drake,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_libdir))),'$$'\{prefix\}/lib) >> $@
@@ -343,15 +345,16 @@ $(lib_pkgconfig): $$(if $$(filter $$(patsubst %.pc,%,$$@),$(lib_package)),$$(pat
 	echo Description: $(sort $(foreach var,lib shared drake,$(call $(var)_$(call longest,$(call suffixin,$(patsubst %.pc,%,$@),$(call $(var)_package)))_pkg_description))) >> $@
 	echo Version: $(version).$(minor).$(release) >> $@
 	echo URL: $(sort $(foreach var,lib shared drake,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_url))) >> $@
-	echo Libs: -L'$$'\{libdir\} -l$(patsubst %.pc,%,$@) $(sort $(foreach var,lib shared drake,$(call $(var)_$(call longest,$(call suffixin,$(patsubst %.pc,%,$@),$(call $(var)_package)))_pkg_libs))) >> $@
+	echo Libs: -L'$$'\{libdir\} -l$(patsubst %.pc,%,$@) $(call drake_$(patsubst %.pc,%,$@)_ldflags) $(if $(filter $(patsubst %.pc,%,$@),$(drake_package)),$(GLOBAL_LIBS)) $(sort $(foreach var,lib shared,$(call $(var)_$(call longest,$(call suffixin,$(patsubst %.pc,%,$@),$(call $(var)_package)))_pkg_libs))) $(call drake_$(patsubst %.pc,%,$@)_libs) $(call drake_$(patsubst %.pc,%,$@)_pkg_libs_private) >> $@
 	echo Libs.private: $(sort $(CC_LDFLAGS) $(CXX_LDFLAGS) $(foreach var,lib shared drake,$(call $(var)_$(call longest,$(call suffixin,$(patsubst %.pc,%,$@),$(call $(var)_package)))_ldflags)) $(GLOBAL_LIBS) $(foreach var,lib shared drake,$(call $(var)_$(call longest,$(call suffixin,$(patsubst %.pc,%,$@),$(call $(var)_package)))_libs)) $(foreach var,lib shared drake,$(call $(var)_$(call longest,$(call suffixin,$(patsubst %.pc,%,$@),$(call $(var)_package)))_pkg_libs_private))) >> $@
-	echo Requires: $(shell echo "$(patsubst %$(comma),%,$(sort $(foreach var,lib shared drake,$(call $(var)_$(call longest,$(call suffixin,$(patsubst %.pc,%,$@),$(call $(var)_package)))_pkg_requires),)))" | rev | cut -f 1 -d ',' --complement | rev) >> $@
-	@#echo Requires: $(sort $(CC_PKG) $(CXX_PKG)) $(shell echo "$(foreach var,$(sort $(foreach var,lib shared drake,$(foreach var2,$(call $(var)_$(call longest,$(call suffixin,$(patsubst %.pc,%,$@),$(call $(var)_package)))_pkg),$(var2)))),\"$(strip $(var)) $(strip $(call reverse,$(sort $(foreach var2,lib shared drake,$(call $(var2)_$(call longest,$(call suffixin,$(patsubst %.pc,%,$@),$(call $(var2)_package)))_pkg_$(var)_version)))))\",)" | rev | cut -f 1 -d ',' --complement | rev) >> $@
+	echo Requires: $(shell echo "$(foreach var,$(sort $(foreach var,lib shared drake,$(foreach var2,$(call $(var)_$(call longest,$(call suffixin,$(patsubst %.pc,%,$@),$(call $(var)_package)))_pkg_requires),$(var2)))),\"$(strip $(var)) $(strip $(call reverse,$(sort $(foreach var2,lib shared drake,$(call $(var2)_$(call longest,$(call suffixin,$(patsubst %.pc,%,$@),$(call $(var2)_package)))_pkg_$(var)_version)))))\",)" | rev | cut -f 1 -d ',' --complement | rev) $(shell echo "$(foreach var,$(sort $(foreach var,drake,$(foreach var2,$(call $(var)_$(call longest,$(call suffixin,$(patsubst %.pc,%,$@),$(call $(var)_package)))_pkg),$(var2)))),\"$(strip $(var)) $(strip $(call reverse,$(sort $(foreach var2,drake,$(call $(var2)_$(call longest,$(call suffixin,$(patsubst %.pc,%,$@),$(call $(var2)_package)))_pkg_$(var)_version)))))\",)" | rev | cut -f 1 -d ',' --complement | rev) >> $@
 	echo Requires.private: $(sort $(CC_PKG) $(CXX_PKG)) $(shell echo "$(foreach var,$(sort $(foreach var,lib shared drake,$(foreach var2,$(call $(var)_$(call longest,$(call suffixin,$(patsubst %.pc,%,$@),$(call $(var)_package)))_pkg),$(var2)))),\"$(strip $(var)) $(strip $(call reverse,$(sort $(foreach var2,lib shared drake,$(call $(var2)_$(call longest,$(call suffixin,$(patsubst %.pc,%,$@),$(call $(var2)_package)))_pkg_$(var)_version)))))\",)" | rev | cut -f 1 -d ',' --complement | rev) >> $@
 	echo Conflicts: $(sort $(foreach var,lib shared drake,$(call $(var)_$(patsubst %.pc,%,$@)_pkg_conflicts))) >> $@
 	echo Cflags: $(GLOBAL_CFLAGS_EXPORT) $() -I'$$'\{includedir\} $(foreach var,cc cxx,$(call cflags_project_export,$(patsubst %.pc,%,$@),lib,$(var))) $(CPPFLAGS) $(foreach var,cc cxx,$(sort $(foreach var,lib shared drake,$(call $(var2)_$(patsubst %.pc,%,$@)_pkg_$(call prefix_cflags,$(var))flags)))) >> $@
 
-dist: submake-dist
+dist: pre-dist submake-dist do-dist post-dist
+
+do-dist:
 	mkdir -p $(distdir)
 	cp Makefile $(distdir)
 	cp Makefile.in $(distdir)
@@ -363,7 +366,7 @@ dist: submake-dist
 	$(if $(strip $(testcxx_package:%=test_%_export)),cp $(sort $(foreach var,$(testcxx_package:%=test_%_export),$(call $(var)))) $(distdir),)
 	$(if $(strip $(sharedcc_package:%=shared_%_export)),cp $(sort $(foreach var,$(sharedcc_package:%=shared_%_export),$(call $(var)))) $(distdir),)
 	$(if $(strip $(sharedcxx_package:%=shared_%_export)),cp $(sort $(foreach var,$(sharedcxx_package:%=shared_%_export),$(call $(var)))) $(distdir),)
-	$(foreach proj,$(drake_package),cp $(sort $(foreach lang,cc cxx,$(if $(call drake$(lang)_$(proj)_graph),$(call drake$(lang)_$(proj)_graph) $(foreach task,$(shell drake --taskgraph $(call drake$(lang)_$(proj)_graph) --tasks),$(shell drake --taskgraph $(call drake$(lang)_$(proj)_graph) --module $(task)).$(call ext,$(lang)))))) $(call drake_$(proj)_platform) $(distdir))
+	$(foreach proj,$(drake_package),cp $(sort $(foreach var,$(drake_package:%=drake_%_export),$(call $(var)))) $(sort $(foreach lang,cc cxx,$(if $(call drake$(lang)_$(proj)_graph),$(call drake$(lang)_$(proj)_graph) $(foreach task,$(shell drake --taskgraph $(call drake$(lang)_$(proj)_graph) --tasks),$(shell drake --taskgraph $(call drake$(lang)_$(proj)_graph) --module $(task)).$(call ext,$(lang)))))) $(call drake_$(proj)_platform) $(distdir))
         
 clean: submake-clean
 	$(RM) $(cc_object) $(foreach var,$(cc_object),$(var:%.o=%.d)) $(foreach var,$(cc_object),$(var:%.o=%.e))
@@ -383,7 +386,7 @@ check: submake-check $(test_list)
 
 checkdist distcheck: dist
 
-install: submake-install pre-install do-install post-install
+install: pre-install submake-install do-install post-install
    
 pre-install:
      
@@ -414,4 +417,4 @@ submake-all submake-dist submake-check submake-clean submake-install submake-uni
 	@$(shell echo for i in "$(foreach var,$(subdirs),$(var))"\; do $(MAKE) -C \$$i $(patsubst submake-%,%,$@) distdir=$(distdir)/\$$i subdir=$(subdir)/\$$i\|\|exit 1\; done)
 
 FORCE:
-.PHONY: all clean check install pre-install do-install post-install uninstall dist FORCE submake-all submake-dist submake-check submake-clean submake-install submake-uninstall
+.PHONY: all clean check install pre-install do-install post-install uninstall dist FORCE submake-all submake-dist submake-check submake-clean submake-install submake-uninstall pre-dist do-dist post-dist
