@@ -107,7 +107,7 @@ bin_amplmatrixtoraw_static = 0
 ## Cpp format classes: base class, data structure base class, output data structure classes; no parser because of lack of cpp parser base class
 
 ## dynamic library packages and their sources
-sharedcxx_project = #pelib-platform-ampl_input pelib-platform-ampl_output pelib-taskgraph-graphml pelib-taskgraph-streamit pelib-taskgraph-ampl_input pelib-taskgraph-ampl_output pelib-schedule-xml pelib-schedule-drake pelib-schedule-ampl_input pelib-schedule-ampl_output pelib-ampl_input pelib-ampl_output
+sharedcxx_project = pelib-platform-ampl_input pelib-platform-ampl_output pelib-taskgraph-graphml pelib-taskgraph-streamit pelib-taskgraph-ampl_input pelib-taskgraph-ampl_output pelib-schedule-xml pelib-schedule-drake pelib-schedule-ampl_input pelib-schedule-ampl_output pelib-ampl_input pelib-ampl_output
 sharedcxx_package = $(if $(filter 1,$(SHARED)),pelib $(if $(filter text,$(packages)),$(sharedcxx_project)),$(if $(filter 1,$(STATIC)),$(if $(filter text,$(packages)),$(sharedcxx_project))))
 
 sharedcxx_pelib_src = $(if $(filter text,$(packages)),$(text_src))
