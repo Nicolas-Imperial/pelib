@@ -12,7 +12,13 @@ using namespace pelib;
 extern "C" {
 #endif
 
+#ifndef debug
+#if 0
 #define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
+#else
+#define debug(var)
+#endif
+#endif
 
 typedef struct
 {

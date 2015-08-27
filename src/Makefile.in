@@ -5,7 +5,7 @@ CFLAGS_BASE =
 CFLAGS_PRIVATE = -I../include 
 CFLAGS_CONFIG_RELEASE = -O3 -DNDEBUG
 CFLAGS_CONFIG_DEBUG = -g -O0 -DDEBUG=1
-CFLAGS_SHARED = #-fPIC
+CFLAGS_SHARED = 
 CC_PKG = 
 CC_DEPS =
 CC_LIBS =
@@ -20,7 +20,7 @@ CXXFLAGS_BASE =
 CXXFLAGS_PRIVATE = -I../include -Wall
 CXXFLAGS_CONFIG_RELEASE = -O3 -DNDEBUG
 CXXFLAGS_CONFIG_DEBUG = -g -O0 -DDEBUG=1
-CXXFLAGS_SHARED = #-fPIC
+CXXFLAGS_SHARED = 
 CXX_PKG = 
 CXX_PKG_igraph_version = >= 0.7.1
 CXX_DEPS =
@@ -107,7 +107,7 @@ bin_amplmatrixtoraw_static = 0
 ## Cpp format classes: base class, data structure base class, output data structure classes; no parser because of lack of cpp parser base class
 
 ## dynamic library packages and their sources
-sharedcxx_project = pelib-platform-ampl_input pelib-platform-ampl_output pelib-taskgraph-graphml pelib-taskgraph-streamit pelib-taskgraph-ampl_input pelib-taskgraph-ampl_output pelib-schedule-xml pelib-schedule-drake pelib-schedule-ampl_input pelib-schedule-ampl_output pelib-ampl_input pelib-ampl_output
+sharedcxx_project = #pelib-platform-ampl_input pelib-platform-ampl_output pelib-taskgraph-graphml pelib-taskgraph-streamit pelib-taskgraph-ampl_input pelib-taskgraph-ampl_output pelib-schedule-xml pelib-schedule-drake pelib-schedule-ampl_input pelib-schedule-ampl_output pelib-ampl_input pelib-ampl_output
 sharedcxx_package = $(if $(filter 1,$(SHARED)),pelib $(if $(filter text,$(packages)),$(sharedcxx_project)),$(if $(filter 1,$(STATIC)),$(if $(filter text,$(packages)),$(sharedcxx_project))))
 
 sharedcxx_pelib_src = $(if $(filter text,$(packages)),$(text_src))
@@ -116,6 +116,7 @@ shared_pelib_export = $(sharedcxx_pelib_embed) $(sharedcxx_pelib_src)
 shared_pelib_libs = -lboost_regex -lboost_graph -lexpat
 shared_pelib_ldflags = -pthread
 shared_pelib_cxxflags = -fPIC
+shared_pelib_cflags = -fPIC
 shared_pelib_deps =
 shared_pelib_pkg = igraph libxml++-2.6
 shared_pelib_pkg_url = http://www.ida.liu.se/~nicme26

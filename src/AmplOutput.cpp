@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <boost/regex.hpp>
+#include <boost/algorithm/string.hpp>
 #include <iomanip>
 
 #include <pelib/AmplOutput.hpp>
@@ -15,7 +16,14 @@
 #include <pelib/ParseException.hpp>
 #include <pelib/CastException.hpp>
 
+#if 0
+#define debug(var) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << endl;
+#else
+#define debug(var)
+#endif
+
 using namespace std;
+using namespace boost::algorithm;
 
 namespace pelib
 {
@@ -138,8 +146,42 @@ namespace pelib
 				// There was no parser for this section; drop it and go to next
 				if(iter == parsers.end())
 				{
-					// Break this loop and read another text section
-					break;
+					std::vector<AmplOutputDataParser*>::const_iterator iter;
+					std::vector<AmplOutputDataParser*> parsers = stringParsers();
+					for(iter = parsers.begin(); iter != parsers.end(); iter++)
+					{
+						AmplOutputDataParser *parser = *iter;
+						try {
+							// If any non-blank prefix to be discarded, it must be separated by a new line
+							std::string regex = std::string("(.*?\\n|)\\s*(")
+								.append(parser->getGlobalPattern())
+								.append(")(?:\\s*)");
+							
+							boost::cmatch match = AlgebraDataParser::match(regex, line);
+
+							std::stringstream token;
+							token.str(match[2]);
+
+							//std::cerr << "Discarded =\"" << match[1] << "\"." << std::endl;
+							//std::cerr << "Token =\"" << match[2] << "\"." << std::endl;
+							AlgebraData *data = parser->parse(token);
+							record.insert(data);
+
+							// Keep only the part we have not parsed
+							line = match[1];
+							
+							// Feed the remaining Output line to parsers Output is more useful information are available
+							section.str(line);
+							section.seekp(std::ios_base::beg);
+							section.clear();
+
+							// No need to try another parser; proceed with the next token in section
+							break;
+						} catch (ParseException &e)
+						{
+							// Try next parser
+						}
+					}
 				}
 			}
 		}
@@ -205,6 +247,11 @@ namespace pelib
 		return outputs;
 	}
 
+	std::pair<std::vector<AmplOutputDataParser*>, std::vector<AmplOutputDataOutput*> > AmplOutput::floatHandlers()
+	{
+		return std::pair<std::vector<AmplOutputDataParser*>, std::vector<AmplOutputDataOutput*> >(AmplOutput::floatParsers(), AmplOutput::floatOutputs());
+	}
+
 	std::vector<AmplOutputDataParser*> AmplOutput::stringParsers()
 	{
 		std::vector<AmplOutputDataParser*> parsers;
@@ -229,9 +276,9 @@ namespace pelib
 		return outputs;
 	}
 
-	std::pair<std::vector<AmplOutputDataParser*>, std::vector<AmplOutputDataOutput*> > AmplOutput::floatHandlers()
+	std::pair<std::vector<AmplOutputDataParser*>, std::vector<AmplOutputDataOutput*> > AmplOutput::stringHandlers()
 	{
-		return std::pair<std::vector<AmplOutputDataParser*>, std::vector<AmplOutputDataOutput*> >(AmplOutput::floatParsers(), AmplOutput::floatOutputs());
+		return std::pair<std::vector<AmplOutputDataParser*>, std::vector<AmplOutputDataOutput*> >(AmplOutput::stringParsers(), AmplOutput::stringOutputs());
 	}
 
 	std::vector<AmplOutputDataParser*> AmplOutput::intFloatParsers()

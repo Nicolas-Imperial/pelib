@@ -150,7 +150,8 @@ namespace pelib
 
 			if(iter == parsers.end())
 			{
-				for(iter = stringParsers().begin(); iter != stringParsers().end(); iter++)
+				std::vector<AmplInputDataParser*> parsers = stringParsers();
+				for(iter = parsers.begin(); iter != parsers.end(); iter++)
 				{
 					AmplInputDataParser *parser = *iter;
 					try {
@@ -258,6 +259,11 @@ namespace pelib
 		return outputs;
 	}
 
+	std::pair<std::vector<AmplInputDataParser*>, std::vector<AmplInputDataOutput*> > AmplInput::floatHandlers()
+	{
+		return std::pair<std::vector<AmplInputDataParser*>, std::vector<AmplInputDataOutput*> >(AmplInput::floatParsers(), AmplInput::floatOutputs());
+	}
+
 	std::vector<AmplInputDataParser*> AmplInput::stringParsers()
 	{
 		std::vector<AmplInputDataParser*> parsers;
@@ -282,9 +288,9 @@ namespace pelib
 		return outputs;
 	}
 
-	std::pair<std::vector<AmplInputDataParser*>, std::vector<AmplInputDataOutput*> > AmplInput::floatHandlers()
+	std::pair<std::vector<AmplInputDataParser*>, std::vector<AmplInputDataOutput*> > AmplInput::stringHandlers()
 	{
-		return std::pair<std::vector<AmplInputDataParser*>, std::vector<AmplInputDataOutput*> >(AmplInput::floatParsers(), AmplInput::floatOutputs());
+		return std::pair<std::vector<AmplInputDataParser*>, std::vector<AmplInputDataOutput*> >(AmplInput::stringParsers(), AmplInput::stringOutputs());
 	}
 
 	std::vector<AmplInputDataParser*> AmplInput::intFloatParsers()

@@ -16,6 +16,12 @@
 #ifndef PELIB_ALGEBRADATAPARSER
 #define PELIB_ALGEBRADATAPARSER
 
+#if 0
+#define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << std::endl;
+#else
+#define debug(var)
+#endif
+
 namespace pelib
 {
 	class AlgebraDataParser : public DataParser
@@ -28,10 +34,10 @@ namespace pelib
 			{
 				Target out;
 				bool infinity, positive;
-				boost::algorithm::to_lower(element);
 
-				if(is_integer(out) || is_decimal(out))
+				if(is_integer(typeid(out)) || is_decimal(typeid(out)))
 				{
+					boost::algorithm::to_lower(element);
 					if(element.compare("+inf") == 0 || element.compare("inf") == 0)
 					{
 						out = std::numeric_limits<Target>::max();
@@ -91,7 +97,7 @@ namespace pelib
 #endif
 					// We asked a floating-point conversion, but provided a integer
 					//if(strcmp(typeid(out).name(), "f") == 0 || strcmp(typeid(out).name(), "d") == 0)
-					if(is_decimal<Target>(out) && ! is_integer<Target>(out))
+					if(is_decimal(typeid(out)) && ! is_integer(typeid(out)))
 					{
 #if TRACE
 						std::cerr << "So we are asking for a decimal conversion" << std::endl;
@@ -151,7 +157,7 @@ namespace pelib
 						
 					// We asked an integer conversion, but provided a float
 					//if(strcmp(typeid(out).name(), "f") != 0 && strcmp(typeid(out).name(), "d") != 0)
-					if(! is_decimal<Target>(out) && is_integer<Target>(out))
+					if(! is_decimal(typeid(out)) && is_integer(typeid(out)))
 					{
 #if TRACE
 						std::cerr << "So we are asking for a integer conversion" << std::endl;
@@ -224,7 +230,7 @@ namespace pelib
 					{
 						std::stringstream ss;
 					
-						if(is_decimal(out))
+						if(is_decimal(typeid(out)))
 						{
 							long double val;
 							ss << std::numeric_limits<Target>::infinity();
@@ -271,16 +277,14 @@ namespace pelib
 			AlgebraData*
 			parse(std::istream &in) = 0;
 		protected:
-			template <class Target>
-			static bool is_decimal(Target var)
+			static bool is_decimal(const std::type_info &var)
 			{
-				return (std::string(typeid(var).name()).compare(std::string(typeid(float).name())) == 0) ||
-					(std::string(typeid(var).name()).compare(std::string(typeid(double).name())) == 0) ||
-					(std::string(typeid(var).name()).compare(std::string(typeid(long double).name())) == 0);
+				return (std::string(var.name()).compare(std::string(typeid(float).name())) == 0) ||
+					(std::string(var.name()).compare(std::string(typeid(double).name())) == 0) ||
+					(std::string(var.name()).compare(std::string(typeid(long double).name())) == 0);
 			}
 
-			template <class Target>
-			static bool is_integer(Target var)
+			static bool is_integer(const std::type_info &var)
 			{
 				/*
 					List obtained by running the following C program
@@ -320,12 +324,12 @@ namespace pelib
 					./test | rev | sort -k 1 | uniq -w 1 | cut -f 1 -d ' ' --complement | rev
 				*/
 
-				return (std::string(typeid(var).name()).compare(std::string(typeid(int).name())) == 0) ||
-					(std::string(typeid(var).name()).compare(std::string(typeid(unsigned int).name())) == 0) ||
-					(std::string(typeid(var).name()).compare(std::string(typeid(long size_t).name())) == 0) ||
-					(std::string(typeid(var).name()).compare(std::string(typeid(size_t).name())) == 0) ||
-					(std::string(typeid(var).name()).compare(std::string(typeid(long long size_t).name())) == 0) ||
-					(std::string(typeid(var).name()).compare(std::string(typeid(long long unsigned int).name())) == 0);
+				return (std::string(var.name()).compare(std::string(typeid(int).name())) == 0) ||
+					(std::string(var.name()).compare(std::string(typeid(unsigned int).name())) == 0) ||
+					(std::string(var.name()).compare(std::string(typeid(long size_t).name())) == 0) ||
+					(std::string(var.name()).compare(std::string(typeid(size_t).name())) == 0) ||
+					(std::string(var.name()).compare(std::string(typeid(long long size_t).name())) == 0) ||
+					(std::string(var.name()).compare(std::string(typeid(long long unsigned int).name())) == 0);
 			}			
 		private:
 			// Nothing private

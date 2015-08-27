@@ -55,6 +55,7 @@ namespace pelib
 
 			static std::vector<AmplOutputDataParser*> stringParsers();
 			static std::vector<AmplOutputDataOutput*> stringOutputs();
+			static std::pair<std::vector<AmplOutputDataParser*>, std::vector<AmplOutputDataOutput*> > stringHandlers();
 		protected:
 			std::vector<AmplOutputDataParser*> parsers;
 			std::vector<AmplOutputDataOutput*> outputs;

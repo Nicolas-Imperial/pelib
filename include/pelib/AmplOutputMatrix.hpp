@@ -5,6 +5,13 @@
 #ifndef PELIB_AMPLOUTPUTMATRIX
 #define PELIB_AMPLOUTPUTMATRIX
 
+#if 0
+#include <iostream>
+#define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << std::endl;
+#else
+#define debug(var)
+#endif
+
 namespace pelib
 {
 	template <class Col, class Row, class Value>		
@@ -47,7 +54,6 @@ namespace pelib
 				MatrixType values;
 				
 				std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-				//std::cerr << str << std::endl;
 				boost::cmatch match = AlgebraDataParser::match(getDetailedPattern(), str);
 				std::string indexes = match[2];
 				std::string remain = match[3];
@@ -76,7 +82,6 @@ namespace pelib
 				// Parse the rest of the matrix; catch the row index every s reads
 				iter = make_regex_token_iterator(remain, isolated_value, 1, boost::regex_constants::match_default);
 
-				//int progress = 0;
 				Row row;
 				Col col;
 				Value val;

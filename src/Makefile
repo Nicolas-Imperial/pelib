@@ -116,7 +116,7 @@ define projectof_no-obj
 $(if $(filter $1,$(call $2$(if $(filter lib,$2),,$3)_package)),$1,$(call longest,$(call suffixin,$1,$(call $2$(if $(filter lib,$2),,$3)_package))))
 endef
 
-## Gives the type of project (bin|lib|test) the object file $1 is part of
+## Gives the type of project (bin|lib|test|drake|shared) the object file $1 is part of
 define typeof
 $(if $(filter bin%,$1),bin,$(if $(filter lib%,$1),lib,$(if $(filter test%,$1),test,$(if $(filter drake%,$1),drake,$(if $(filter shared%,$1),shared,)))))
 endef
@@ -287,9 +287,9 @@ $(embed_object): $$(call embed_src,$$@)
 	$(LD) -r -b binary -o $@ $(patsubst %.o,%,$@)
 
 $(cc_object): $$(call source,$$@,$$(sort $$(foreach lang,cc cxx,$$(call projectof,$$@,$$(call typeof,$$@),$$(lang)))),$$(call typeof,$$@),cc)
-	$(CC) -E $(GLOBAL_CFLAGS) $(call cflags_project,$(call projectof,$@,$(call typeof,$@),cc),$(call typeof,$@),cc) $(call cflags_private_object,$@) $(call cflags_file,$@,$(call typeof,$@)) $(CPPFLAGS) -o $(patsubst %.o,%.e,$@) $<
-	$(CC) -c $(GLOBAL_CFLAGS) $(call cflags_project,$(call projectof,$@,$(call typeof,$@),cc),$(call typeof,$@),cc) $(call cflags_private_object,$@) $(call cflags_file,$@,$(call typeof,$@)) $(CPPFLAGS) -o $@ $<
-	$(CC) -M $(GLOBAL_CFLAGS) $(call cflags_project,$(call projectof,$@,$(call typeof,$@),cc),$(call typeof,$@),cc) $(call cflags_private_object,$@) $(call cflags_file,$@,$(call typeof,$@)) $(CPPFLAGS) $< -MF $(patsubst %.o,%.d,$@)
+	$(CC) -E $(GLOBAL_CFLAGS) $(call cflags_project,$(call projectof,$@,$(call typeof,$@),$(strip $(foreach var,cc cxx,$(if $(filter $(call typeof,$@)$(var)_%,$@),$(var))))),$(call typeof,$@),cc) $(call cflags_private_object,$@) $(call cflags_file,$@,$(call typeof,$@)) $(CPPFLAGS) -o $(patsubst %.o,%.e,$@) $<
+	$(CC) -c $(GLOBAL_CFLAGS) $(call cflags_project,$(call projectof,$@,$(call typeof,$@),$(strip $(foreach var,cc cxx,$(if $(filter $(call typeof,$@)$(var)_%,$@),$(var))))),$(call typeof,$@),cc) $(call cflags_private_object,$@) $(call cflags_file,$@,$(call typeof,$@)) $(CPPFLAGS) -o $@ $<
+	$(CC) -M $(GLOBAL_CFLAGS) $(call cflags_project,$(call projectof,$@,$(call typeof,$@),$(strip $(foreach var,cc cxx,$(if $(filter $(call typeof,$@)$(var)_%,$@),$(var))))),$(call typeof,$@),cc) $(call cflags_private_object,$@) $(call cflags_file,$@,$(call typeof,$@)) $(CPPFLAGS) $< -MF $(patsubst %.o,%.d,$@)
 	@# Generate dependencies to header files
 	@# More tricks to manage header renaming stored in different folders (http://scottmcpeak.com/autodepend/autodepend.html)
 	@mv -f $(patsubst %.o,%.d,$@) $(patsubst %o,%d,$@).tmp
@@ -298,9 +298,9 @@ $(cc_object): $$(call source,$$@,$$(sort $$(foreach lang,cc cxx,$$(call projecto
 	@rm -f $(patsubst %.o,%.d,$@).tmp
 
 $(cxx_object): $$(call source,$$@,$$(sort $$(foreach lang,cc cxx,$$(call projectof,$$@,$$(call typeof,$$@),$$(lang)))) ,$$(call typeof,$$@),cxx)
-	$(CXX) -E $(GLOBAL_CXXFLAGS) $(call cflags_project,$(call projectof,$@,$(call typeof,$@),cxx),$(call typeof,$@),cxx) $(call cflags_private_object,$@) $(call cxxflags_file,$@,$(call typeof,$@)) $(CPPFLAGS) -o $(patsubst %.o,%.e,$@) $<
-	$(CXX) -c $(GLOBAL_CXXFLAGS) $(call cflags_project,$(call projectof,$@,$(call typeof,$@),cxx),$(call typeof,$@),cxx) $(call cflags_private_object,$@) $(call cxxflags_file,$@,$(call typeof,$@)) $(CPPFLAGS) -o $@ $<
-	$(CXX) -M $(GLOBAL_CXXFLAGS) $(call cflags_project,$(call projectof,$@,$(call typeof,$@),cxx),$(call typeof,$@),cxx) $(call cflags_private_object,$@) $(call cxxflags_file,$@,$(call typeof,$@)) $(CPPFLAGS) $< -MF $(patsubst %.o,%.d,$@)
+	$(CXX) -E $(GLOBAL_CXXFLAGS) $(call cflags_project,$(call projectof,$@,$(call typeof,$@),$(strip $(foreach var,cc cxx,$(if $(filter $(call typeof,$@)$(var)_%,$@),$(var))))),$(call typeof,$@),cxx) $(call cflags_private_object,$@) $(call cxxflags_file,$@,$(call typeof,$@)) $(CPPFLAGS) -o $(patsubst %.o,%.e,$@) $<
+	$(CXX) -c $(GLOBAL_CXXFLAGS) $(call cflags_project,$(call projectof,$@,$(call typeof,$@),$(strip $(foreach var,cc cxx,$(if $(filter $(call typeof,$@)$(var)_%,$@),$(var))))),$(call typeof,$@),cxx) $(call cflags_private_object,$@) $(call cxxflags_file,$@,$(call typeof,$@)) $(CPPFLAGS) -o $@ $<
+	$(CXX) -M $(GLOBAL_CXXFLAGS) $(call cflags_project,$(call projectof,$@,$(call typeof,$@),$(strip $(foreach var,cc cxx,$(if $(filter $(call typeof,$@)$(var)_%,$@),$(var))))),$(call typeof,$@),cxx) $(call cflags_private_object,$@) $(call cxxflags_file,$@,$(call typeof,$@)) $(CPPFLAGS) $< -MF $(patsubst %.o,%.d,$@)
 	@# Generate dependencies to header files
 	@# More tricks to manage header renaming stored in different folders (http://scottmcpeak.com/autodepend/autodepend.html)
 	@mv -f $(patsubst %.o,%.d,$@) $(patsubst %o,%d,$@).tmp
