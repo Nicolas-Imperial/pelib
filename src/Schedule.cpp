@@ -10,10 +10,12 @@
 #include <pelib/Set.hpp>
 #include <pelib/CastException.hpp>
 
+#ifndef debug
 #if 0
 #define debug(expr) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
 #else
 #define debug(var)
+#endif
 #endif
 
 using namespace std;

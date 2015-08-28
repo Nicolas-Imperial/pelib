@@ -8,7 +8,9 @@
 #include <pelib/argument_parsing.hpp>
 #include <pelib/dl.h>
 
+#ifndef debug
 #define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
+#endif
 
 using namespace std;
 using namespace pelib;

@@ -2,10 +2,12 @@
 #include <pelib/Algebra.hpp>
 #include <pelib/AmplOutput.hpp>
 
+#ifndef debug
 #if 0
 #define debug(var) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << endl;
 #else
 #define debug(var)
+#endif
 #endif
 
 using namespace pelib;

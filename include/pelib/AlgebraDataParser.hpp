@@ -16,10 +16,12 @@
 #ifndef PELIB_ALGEBRADATAPARSER
 #define PELIB_ALGEBRADATAPARSER
 
+#ifndef debug
 #if 0
 #define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << std::endl;
 #else
 #define debug(var)
+#endif
 #endif
 
 namespace pelib

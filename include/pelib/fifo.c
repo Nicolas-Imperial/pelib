@@ -40,6 +40,7 @@
 #define CFIFO_BEGIN "["
 #define CFIFO_END "]"
 
+#ifndef debug
 #if DEBUG
 #define printf_addr(addr) printf("[%s:%s:%d] @%s: %08X\n", __FILE__, __FUNCTION__, __LINE__, #addr, addr);
 #define printf_int(addr) printf("[%s:%s:%d] %s: %d (signed) = %u (unsigned)\n", __FILE__, __FUNCTION__, __LINE__, #addr, addr, addr);
@@ -49,6 +50,7 @@
 #define printf_int(var)
 //#define printf_int(addr) printf("[%s:%s:%d] %s: %d (signed) = %u (unsigned)\n", __FILE__, __FUNCTION__, __LINE__, #addr, addr, addr);
 #define debug
+#endif
 #endif
 
 enum cfifo_state

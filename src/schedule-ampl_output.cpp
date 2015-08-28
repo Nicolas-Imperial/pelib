@@ -15,7 +15,9 @@ using namespace pelib;
 extern "C" {
 #endif
 
+#ifndef debug
 #define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
+#endif
 
 #if 0
 struct parameters {

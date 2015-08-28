@@ -5,11 +5,13 @@
 #ifndef PELIB_AMPLOUTPUTMATRIX
 #define PELIB_AMPLOUTPUTMATRIX
 
+#ifndef debug
 #if 0
 #include <iostream>
 #define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << std::endl;
 #else
 #define debug(var)
+#endif
 #endif
 
 namespace pelib
