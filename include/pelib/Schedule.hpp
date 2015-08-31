@@ -62,6 +62,9 @@ namespace pelib
 			virtual const set<int>
 			getCores(const Task&) const;
 
+			static
+			Algebra addStartTime(const Algebra &data, const Taskgraph &tg, const Platform &platform);
+
 		protected:
 			std::string name, appName;
 			table schedule;

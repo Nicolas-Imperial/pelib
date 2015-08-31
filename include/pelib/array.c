@@ -89,6 +89,10 @@ pelib_alloc_buffer(array_t(ARRAY_T))(array_t(ARRAY_T)* array, size_t size)
     if(array->capacity > 0)
     {
       array->data = calloc(array->capacity, sizeof(ARRAY_T));
+      if(array->data == NULL)
+      {
+        return PELIB_FAILURE;
+      }
       assert(array->data != NULL && size > 0 || array->data == NULL && size <= 0);
     }
 
@@ -109,7 +113,14 @@ pelib_alloc_collection(array_t(ARRAY_T))(size_t aux)
   {
     array_t(ARRAY_T) *array;
     array = pelib_alloc_struct(array_t(ARRAY_T))();
-    pelib_alloc_buffer(array_t(ARRAY_T))(array, aux);
+    if(array != NULL)
+    {
+      if(pelib_alloc_buffer(array_t(ARRAY_T))(array, aux) == PELIB_FAILURE)
+      {
+        pelib_free_struct(array_t(ARRAY_T))(array);        
+        return NULL;
+      }
+    }
 
     return array;
   }
@@ -119,9 +130,13 @@ pelib_alloc_from(array_t(ARRAY_T))(void* buffer, size_t size, void* aux)
 {
     array_t(ARRAY_T) *array;
     array = pelib_alloc_struct(array_t(ARRAY_T))();
-    pelib_set_buffer(array_t(ARRAY_T))(array, buffer, size, aux);
+    if(array != NULL)
+    {
+      pelib_set_buffer(array_t(ARRAY_T))(array, buffer, size, aux);
+      return array;
+    }
 
-    return array;
+   return NULL;
 }
 
 int

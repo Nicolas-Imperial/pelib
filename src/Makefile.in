@@ -308,7 +308,7 @@ testcxx_project = parser
 testcxx_package = $(if $(filter 1,$(SHARED)),$(if $(filter text,$(packages)),$(testcxx_project)),$(if $(filter 1,$(STATIC)),$(if $(filter text,$(packages)),$(testcxx_project))))
 
 testcxx_parser_src = test_parser.cpp 
-test_parser_export = $(testcxx_parser_embed) $(testcxx_parser_src) make_algebra.cpp unit_test.h
+test_parser_export = $(testcxx_parser_embed) $(testcxx_parser_src) make_algebra.cpp 
 test_parser_deps = pelib.pc
 test_parser_libs = -lpelib 
 test_parser_pkg = pelib

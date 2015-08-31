@@ -126,6 +126,9 @@ pelib_alloc_collection(cfifo_t(CFIFO_T))(size_t size)
 {
 	cfifo_t(CFIFO_T) *fifo;
 	fifo = pelib_alloc_struct(cfifo_t(CFIFO_T))();
+	if(fifo != NULL)
+	{
+		
 	//fifo->id = init.core;
 
 //	if(init.core >= 0)
@@ -137,7 +140,13 @@ pelib_alloc_collection(cfifo_t(CFIFO_T))(size_t size)
 //		printf("[%s:%s:%d] Fifo @%X: Allocate write to MPB@ %X\n", __FILE__, __FUNCTION__, __LINE__, fifo, pelib_scc_local_offset((void*)fifo->write, init.core));
 //	}
 
-	pelib_alloc_buffer(cfifo_t(CFIFO_T))(fifo, size);
+		if(pelib_alloc_buffer(cfifo_t(CFIFO_T))(fifo, size) == PELIB_FAILURE)
+		{
+			pelib_free_struct(cfifo_t(CFIFO_T))(fifo);
+			return NULL;
+		}
+	}
+		
 
 	return fifo;
 }

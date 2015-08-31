@@ -17,7 +17,9 @@ using namespace pelib;
 extern "C" {
 #endif
 
+#ifndef debug
 #define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
+#endif
 
 // /!\ the content of argv is freed after this function is run
 pelib::Record*

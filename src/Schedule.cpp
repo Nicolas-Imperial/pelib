@@ -525,4 +525,68 @@ namespace pelib
 
 		return cores;
 	}
+
+	Algebra
+	Schedule::addStartTime(const Algebra &data, const Taskgraph &tg, const Platform &platform)
+	{
+		// Now browse all tasks in all cores and compute a starting time matrix
+		Algebra sched = data;
+		Algebra input = tg.buildAlgebra(platform);
+		input = input.merge(platform.buildAlgebra());
+		input = input.merge(sched);
+
+		map<int, float> start_time = input.find<Vector<int, float> >("Tau")->getValues();
+		map<int, float> frequency = input.find<Vector<int, float> >("frequency")->getValues();
+		map<int, float> workload = input.find<Vector<int, float> >("Tau")->getValues();
+		map<int, float> width = input.find<Vector<int, float> >("wi")->getValues();
+		map<int, float> max_width = input.find<Vector<int, float> >("Wi")->getValues();
+		map<int, map<int, float> > efficiency = input.find<Matrix<int, int, float> >("e")->getValues();
+		map<int, map<int, float> > map_sched = input.find<Matrix<int, int, float> >("schedule")->getValues();
+
+		for(map<int, float>::iterator i = start_time.begin(); i != start_time.end(); i++)
+		{
+			i->second = 0;
+		}
+
+		for(map<int, map<int, float> >::const_iterator i = map_sched.begin(); i != map_sched.end(); i++)
+		{
+			double start = 0;
+			for(map<int, float>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
+			{
+				int n = (int)j->second;
+				if(n > 0)
+				{
+					if(start_time.find((int)n)->second < start)
+					{
+						start_time.find((int)n)->second = start;
+					}
+
+					double tau = workload.find((int)n)->second;
+					size_t wi = (size_t)width.find((int)n)->second;
+					size_t Wi = (size_t)max_width.find((int)n)->second;
+					double e = wi <= Wi ? efficiency.find((int)n)->second.find((int)wi)->second : 1e-06;
+					double f = frequency.find((int)n)->second;
+					start += tau / (wi * e) / f;
+				}
+			}
+		}
+
+		const Vector<int, string> *name = input.find<Vector<int, string> >("name");
+		if(name == NULL)
+		{
+			map<int, string> names;
+			for(set<Task>::const_iterator iter = tg.getTasks().begin(); iter != tg.getTasks().end(); iter++)
+			{
+				names.insert(pair<int, string>(std::distance(tg.getTasks().begin(), iter) + 1, iter->getName()));
+			}
+
+			name = new Vector<int, string>("name", names);
+			sched.insert(name);
+		}
+
+		Vector<int, float> *start = new Vector<int, float>("start", start_time);
+		sched.insert(start);
+
+		return sched;
+	}
 }
