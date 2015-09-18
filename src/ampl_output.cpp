@@ -40,17 +40,6 @@ extern "C" {
 pelib::Record*
 pelib_parse(std::istream& cin, size_t argc, char **argv)
 {
-// We don't care about any argument here
-#if 0
-	while(*argv != NULL)
-	{
-		cout << *argv << " ";
-		argv++;
-	}
-	cout << endl;
-#endif
-
-//	cout << cin.rdbuf();
 	Algebra al = AmplOutput(AmplOutput::intFloatHandlers()).parse(cin);
 	return new Algebra(al);
 }

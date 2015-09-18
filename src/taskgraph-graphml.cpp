@@ -40,18 +40,13 @@ extern "C" {
 pelib::Record*
 pelib_parse(std::istream& cin, size_t argc, char **argv)
 {
-// We don't care about any argument here
-#if 0
-	while(*argv != NULL)
-	{
-		cout << *argv << " ";
-		argv++;
-	}
-	cout << endl;
-#endif
-
-//	cout << cin.rdbuf();
 	return GraphML().parse(cin);
+}
+
+void
+pelib_delete(Record *obj)
+{
+        delete obj;
 }
 
 // /!\ the content of argv is freed after this function is run
@@ -69,7 +64,6 @@ pelib_dump(std::ostream& cout, std::map<const char*, Record*> records, size_t ar
 	{
 		GraphML().dump(cout, tg);
 	}
-	//debug("hello world");
 }
 
 #ifdef __cplusplus

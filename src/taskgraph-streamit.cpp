@@ -100,17 +100,7 @@ pelib_parse(std::istream& cin, size_t argc, char **argv)
 	Taskgraph *tg = new Taskgraph(tasks, links);
 	tg->setName(autname);
 	tg->setDeadlineCalculator("class:synthetic");
-// We don't care about any argument here
-#if 0
-	while(*argv != NULL)
-	{
-		cout << *argv << " ";
-		argv++;
-	}
-	cout << endl;
-#endif
 
-//	cout << cin.rdbuf();
 	return tg;
 }
 
