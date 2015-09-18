@@ -30,17 +30,23 @@
 
 namespace pelib
 {
+	/*** AMPL Output format parser and output class for pelib::Set class instances ***/
 	template <class Value>
 	class AmplOutputSet: public AmplOutputData
 	{
+		/*** Internal format of data collection handled ***/
 		typedef std::set<Value, std::less<Value>, std::allocator<Value> > SetType;
 		
 		public:
+			/** Constructor
+				@param strict If elements in Set are floating-point numeric values and strict is true, then parser fails if any element parsed is written as an integer. A trailing .0 (e.g. 52.0) can force an integer to be parsed as floating-point without failure.
+			**/
 			AmplOutputSet(bool strict = true)
 			{
 				this->strict = strict;
 			}
 			
+			/** Returns a pointer to a copy of this class instance **/
 			virtual
 			AmplOutputSet*
 			clone() const
@@ -48,6 +54,7 @@ namespace pelib
 				return new AmplOutputSet();
 			}
 
+			/** Returns a boost::regex regular expression able to match a AMPL output format Set and extract its elements **/
 			virtual
 			std::string
 			getDetailedPattern()
@@ -55,6 +62,7 @@ namespace pelib
 				return "set\\s+([^\\s\\n]+)\\s*:=(.+)";
 			}
 
+			/** Returns a boost::regex regular expression able to match a AMPL output format Set **/
 			virtual
 			std::string
 			getGlobalPattern()
@@ -62,6 +70,9 @@ namespace pelib
 				return "set\\s+[^\\s\\n]+\\s*:=.+";
 			}
 
+			/** Parses input stream in AMPL output format and builds an instance of pelib::Set from the data extracted
+				@param in input stream to read data from
+			**/
 			virtual
 			AlgebraData*
 			parse(std::istream &in)
@@ -112,6 +123,10 @@ namespace pelib
 				return new Set<Value>(match[1], values);
 			}
 
+			/** Write the content of an instance of pelib::Set into output stream in AMPL output format
+				@param o Output stream where the set is written to in AMPL output format
+				@param data Instance of pelib::Set to write to output stream
+			**/
 			virtual
 			void
 			dump(std::ostream &o, const AlgebraData *data) const
@@ -131,6 +146,7 @@ namespace pelib
 			}
 
 		protected:
+			/** Defines if parsing operation happens in strict mode or not **/
 			bool strict;
 		private:	
 	};

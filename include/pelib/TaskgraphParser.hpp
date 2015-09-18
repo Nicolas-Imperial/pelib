@@ -26,12 +26,15 @@
 
 namespace pelib
 {
+	/** Superclass of all Taskgraph parsers **/
 	class TaskgraphParser : public DataParser
 	{
 		public:
+			/** Parses any input stream and produce an instance of pelib::Taskgraph that contains the data read **/
 			virtual
 			Taskgraph* parse(std::istream &in) const = 0;
 
+			/** Returns a pointer to a copy of the class **/
 			virtual TaskgraphParser* clone() const = 0;
 
 		protected:

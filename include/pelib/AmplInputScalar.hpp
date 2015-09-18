@@ -30,16 +30,21 @@
 
 namespace pelib
 {
+	/** Base class for a parser or output class of a scalar in AMPL input data format **/
 	template <class Value>
 	class
 	AmplInputScalar: public AmplInputData
 	{
 		public:
+			/** Constructor
+				@param strict If true and parsing floating point values, fails when reading any integer value if not written with a trailing decimal 0, e.g. 52.0
+			**/
 			AmplInputScalar(bool strict = true)
 			{
 				this->strict = strict;
 			}
 			
+			/** Return a pointer to a copy of this class instance **/
 			virtual
 			AmplInputScalar*
 			clone() const
@@ -47,6 +52,7 @@ namespace pelib
 				return new AmplInputScalar();
 			}
 			
+			/** Parse input stream in AMPL input format and builds an instance of a derivative class of pelib::AlgebraData containing the values read **/
 			virtual
 			AlgebraData*
 			parse(std::istream &in)
@@ -71,6 +77,10 @@ namespace pelib
 				return scalar;
 			}
 
+			/** Writes an instance of class that derives from pelib::AlgebraData to output stream
+				@param stream Output stream that receives the written output of AlgebraData
+				@param data Instance of a class derived from AlgebraData to write to output stream
+			**/
 			virtual
 			void
 			dump(std::ostream &stream, const AlgebraData *data) const
@@ -81,6 +91,7 @@ namespace pelib
 				stream << "param " << scalar->getName() << " := " << scalar->getValue() << ";" << std::endl;
 			}
 
+			/** Matches a data structure written in AMPL input data format and extract its name and content **/
 			virtual
 			std::string
 			getDetailedPattern()
@@ -88,6 +99,7 @@ namespace pelib
 				return "param\\s+([^\\s\\n]*)\\s*:=\\s*([^\\s]+)\\s*";
 			}
 
+			/** Matches a data structure written in AMPL input data format **/
 			virtual
 			std::string
 			getGlobalPattern()
@@ -96,6 +108,7 @@ namespace pelib
 			}
 	
 		protected:
+			/** Defines if parsing should be performed in strict mode **/
 			bool strict;
 		private:		
 	};

@@ -27,9 +27,11 @@
 
 namespace pelib
 {
+	/** Base class of any parser of AMPL output format algebraic data structure **/
 	class AmplOutputDataParser: public AmplDataParser
 	{
 		public:
+			/** Returns a pointer to a copy of this class instance **/
 			virtual
 			AmplOutputDataParser*
 			clone() const = 0;

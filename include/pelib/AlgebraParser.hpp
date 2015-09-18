@@ -33,9 +33,11 @@
 
 namespace pelib
 {
+	/** Base class of any class that takes data from an input stream and procudes an instance of Algebra. Derive this class before use. **/
 	class AlgebraParser : public RecordParser
 	{
 		public:
+			/** Produces an instance of Algebra from data found in input stream data. **/
 			virtual
 			Algebra
 			parse(std::istream &data) const = 0;

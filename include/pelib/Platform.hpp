@@ -28,40 +28,100 @@
 
 namespace pelib
 {
+	/** Models an execution platform **/
 	class Platform: public Record
 	{
 		public:
+			/** Internal type of a platform core island **/
 			typedef std::set<const Core*> island;
 
+			/** Constructor **/
 			Platform();
+
+			/** Constructor
+				@param p Number of cores in this platform. Each core is its own shared memory, main memory, private memory, voltage and frequency island
+				@param ref Pointer to an instance of pelib::Core duplicated p times and stored in the Platform instance being build
+			**/
 			Platform(size_t p, const Core* ref);
-			Platform(const std::set<const Core*>&);
-			Platform(const std::set<const Core*>&, const std::set<std::set <const Core*> >& shared, const std::set<std::set <const Core*> >& main, const std::set<std::set <const Core*> >& priv, const std::set<std::set <const Core*> >& voltage, const std::set<std::set <const Core*> >& freq);
+
+			/** Constructor
+				@param cores Collection of derivative instances of pelib::Core that model all execution cores in the platform. Each core is its own shared memory, main memory, private memory, voltage and frequency island
+			**/
+			Platform(const std::set<const Core*> &cores);
+
+			/** Constructor
+				@param cores Collection of derivative instances of pelib::Core that model all execution cores in the platform. Each core is its own shared memory, main memory, private memory, voltage and frequency island
+				@param shared On-chip shared memory islands
+				@param main Off-chip shared memory islands
+				@param priv Off-chip Private memory islands
+				@param voltage Voltage scaling islands
+				@param freq Frequency scaling islands
+			**/
+			Platform(const std::set<const Core*>& cores, const std::set<std::set <const Core*> >& shared, const std::set<std::set <const Core*> >& main, const std::set<std::set <const Core*> >& priv, const std::set<std::set <const Core*> >& voltage, const std::set<std::set <const Core*> >& freq);
+
+			/** Copy constructor **/
 			Platform(const Platform *arch);
+
+			/** Constructor
+				@param arch Algebraic representation of a platform: Scalar p is the number of cores, set F is the set of frequency each core can run at. Each core is its own shared memory, main memory, private memory, voltage and frequency island
+			**/
 			Platform(const Algebra &arch);
+
+			/** Returns a pointer to a copy of this platform **/
 			virtual Platform* clone() const;
+
+			/** Returns all cores in the platform **/
 			virtual const std::set<const Core*>& getCores() const;
+
+			/** Returns true if all cores are identical and false otherwise **/
 			virtual bool isHomogeneous() const;
 
+			/** Returns all shared memory islands **/
 			virtual const std::set<island>& getSharedMemoryIslands() const;
+
+			/** Returns the shared memory island corresponding to the core_id-th core of the platform, starting with 1 **/
 			virtual const std::set<island> getSharedMemoryIslands(size_t core_id) const;
+
+			/** Returns the shared memory islands a set of cores belongs to
+				@param islands Set of core id the shared memory islands' are requested
+			**/
 			virtual const std::set<island> getSharedMemoryIslands(const std::set<int>& islands) const;
+			/** Returns the core ids contained in a shared memory island
+				@param islands Shared memory islands that contains the cores to be returned
+			**/
 			virtual const std::set<int> getSharedMemoryIslands(const std::set<island>& islands) const;
+			/** Returns all main memory islands **/
 			virtual const std::set<island>& getMainMemoryIslands() const;
+			/** Returns the main memory island corresponding to the core_id-th core of the platform, starting with 1 **/
 			virtual const std::set<island> getMainMemoryIslands(size_t core_id) const;
+			/** Returns all private memory islands **/
 			virtual const std::set<island>& getPrivateMemoryIslands() const;
+			/** Returns the private memory island corresponding to the core_id-th core of the platform, starting with 1 **/
 			virtual const std::set<island> getPrivateMemoryIslands(size_t core_id) const;
+			/** Returns all voltage memory islands **/
 			virtual const std::set<island>& getVoltageIslands() const;
+			/** Returns the voltage memory island corresponding to the core_id-th core of the platform, starting with 1 **/
 			virtual const island& getVoltageIsland(size_t core_id) const;
+			/** Returns all frequency memory islands **/
 			virtual const std::set<island>& getFrequencyIslands() const;
+			/** Returns the frequency memory island corresponding to the core_id-th core of the platform, starting with 1 **/
 			virtual const island& getFrequencyIsland(size_t core_id) const;
 
+			/** Returns a pointer to core corresponding to its number id in the platform **/
 			virtual const Core* getCore(size_t id) const;
+
+			/** Returns the core id in the platform that corresponds to a pointer to core; throws a CastException if the core doesn't belong to this plaform **/
 			virtual size_t getCoreId(const Core*) const;
+
+			/** Builds an algebraic representation of this platform: p is the number of cores and F is the set of frequency they can run at **/
 			virtual Algebra buildAlgebra() const;
+
+			/** Destructor **/
 			virtual	~Platform();
 		protected:
+			/** Collection of cores **/
 			std::set<const Core*> cores;
+			/** Islands **/
 			std::set<island> shared, main, priv, voltage, freq;
 		private:		
 	};

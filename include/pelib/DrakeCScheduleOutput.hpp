@@ -27,6 +27,7 @@
 
 namespace pelib
 {
+	/** Base class for any class that can generate C code that represents an instance of pelib::Schedule with all its associated Taskgraph and Platform details **/
 	class DrakeCScheduleOutput : public ScheduleOutput
 	{
 	};

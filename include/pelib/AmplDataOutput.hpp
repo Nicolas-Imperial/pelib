@@ -27,6 +27,7 @@
 
 namespace pelib
 {
+	/** Base class of any class able to write some AmplOutput from a class instance derived from AlgebraData **/
 	class AmplDataOutput: public AlgebraDataOutput
 	{
 		public:

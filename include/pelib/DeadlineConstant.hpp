@@ -26,14 +26,18 @@
 
 namespace pelib
 {
+  /** Holds a contant floating-point value and returns it upon deadline computing request **/
   class DeadlineConstant : public DeadlineCalculator
   {
   public:
+    /** Constructor: holds the floating-point value given as parameter to return it upon invocation of calculate() **/
     DeadlineConstant(double val);
 
-	virtual double calculate(const Taskgraph& tg, const Platform& arch) const;
+    /** Returns the private member value, ignoring instances of Taskgraph and Platform **/
+    virtual double calculate(const Taskgraph& tg, const Platform& arch) const;
  
   private:
+    /** Holds the value given when the class instance was constructed and returned upon calls to calculate() **/
     const double value;
   };
 }

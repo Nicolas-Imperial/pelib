@@ -26,6 +26,7 @@
 
 namespace pelib
 {
+	/** Base class for any class able to parser and output derivative classes of pelib::AlgebraData from input and output streams in AMPL input data format **/
 	class AmplInputData: public AmplInputDataOutput, public AmplInputDataParser
 	{
 		public:

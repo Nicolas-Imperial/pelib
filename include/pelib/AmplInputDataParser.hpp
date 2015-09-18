@@ -27,9 +27,11 @@
 
 namespace pelib
 {
+	/** Base class of any class that can read input stream in AMPL input data format and produce class instances derived from pelib::AlgebraData **/
 	class AmplInputDataParser: public AmplDataParser
 	{
 		public:
+			/** Returns a pointer to a copy of this class instance **/
 			virtual
 			AmplInputDataParser*
 			clone() const = 0;

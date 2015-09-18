@@ -20,7 +20,7 @@
 
 #ifndef _MONITOR_H
 #define MONITOR_H
-
+/** Return the number of clock ticks since last processor reset **/
 unsigned long long int
 rdtsc();
 

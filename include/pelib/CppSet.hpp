@@ -30,6 +30,7 @@
 
 namespace pelib
 {
+	/** C++ code generator for a Set **/
 	template <class Value>
 	class CppSet: public CppData
 	{
@@ -40,7 +41,8 @@ namespace pelib
 			{
 				// Do nothing
 			}
-			
+	
+			/** Returns a copy of the class instance **/		
 			virtual
 			CppSet*
 			clone() const
@@ -48,6 +50,7 @@ namespace pelib
 				return new CppSet();
 			}
 
+			/** Generate C++ code that declares a C++ set instance and fills it with the data given in the pelib::Set object instance passed **/
 			virtual
 			void
 			dump(std::ostream &o, const AlgebraData *data) const

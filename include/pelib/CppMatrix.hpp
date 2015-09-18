@@ -27,6 +27,7 @@
 
 namespace pelib
 {
+	/** Output class Matrix as C++ code **/
 	template <class Col, class Row, class Value>		
 	class CppMatrix: public CppData
 	{
@@ -34,11 +35,13 @@ namespace pelib
 		typedef std::map<Row, RowType> MatrixType;
 		
 		public:
+			/** Constructor **/
 			CppMatrix() : CppData()
 			{
 				// Do nothing
 			}
 			
+			/** Returns a pointer to a copy of this class instance **/
 			virtual
 			CppMatrix*
 			clone() const
@@ -46,6 +49,10 @@ namespace pelib
 				return new CppMatrix();
 			}
 
+			/** Generates C++ code that instanciates and instance of pelib::Matrix and fills it with all values contained in the Matrix given as parameter
+				@param o Output stream where C++ code is written to
+				@param data Instance of pelib::Matrix that is written to output stream as C++ code
+			**/
 			virtual
 			void
 			dump(std::ostream &o, const AlgebraData *data) const

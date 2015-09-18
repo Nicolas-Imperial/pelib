@@ -34,9 +34,11 @@
 
 namespace pelib
 {
+	/** Base class of all classes able to output either element in a Algebra collection. This class must be derived to be used. **/
 	class AlgebraDataOutput : public DataOutput
 	{
-		public:	
+		public:
+			/** writes in o a text representation of data **/
 			virtual
 			void
 			dump(std::ostream& o, const AlgebraData *data) const = 0;

@@ -26,13 +26,16 @@
 
 namespace pelib
 {
+	/** Superclass of any parser able to read an input stream and produce an instance of pelib::Schedule from the data read **/
 	class ScheduleParser : public DataParser
 	{
 		public:
+			/** Read the content of input stream and produces an instance of pelib::Schedule **/
 			virtual
 			Schedule*
 			parse(std::istream &in) const = 0;
 
+			/** Returns a pointer to a copy of this Schedule parser **/
 			virtual ScheduleParser* clone() const = 0;
 
 		protected:

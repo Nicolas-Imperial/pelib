@@ -25,22 +25,33 @@
 
 namespace pelib
 {
+	/** Exception fired when parsing an integer while a floating-point value was expected and strict mode parsing is enabled **/
 	class NoDecimalFloatException: std::exception
 	{
 		public:
+			/** Constructor
+				@param message Human-readable message that explains the error
+				@param floating point value parsed
+			**/
 			NoDecimalFloatException(std::string message, float value) throw();
 
+			/** Destructor **/
 			virtual
 			~NoDecimalFloatException() throw();
 
+			/** Returns a mesasge that explain why the exception was thrown **/
 			const char*
 			what();
 
+			/** Return the floating-point value that was parsed **/
 			const float
 			getValue();
 
 		protected:
+			/** Human-readable message that explains the reason why the exception was thrown **/
 			std::string message;
+
+			/** floating-point value that was parsed instead of an integer **/
 			float value;
 	};
 }

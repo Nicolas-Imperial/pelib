@@ -26,11 +26,27 @@
 
 namespace pelib
 {
+	/** Base class for an output class that outputs instances of pelib::Schedule to output streams **/
 	class ScheduleOutput : public RecordOutput
 	{
 		public:	
+			/** Returns a pointer to a copy of this class instance **/
 			virtual ScheduleOutput* clone() const = 0;
+
+			/** Writes a schedule into output stream with support from associated taskgraph and execution platform, depending on details required
+				@param os Output stream where the schedule is written
+				@param data Instance of pelib::Schedule to be written in output stream
+				@param tg Additional data from the taskgraph associated to this schedule
+				@parame pt Additional data from the platform associated to this schedule
+			**/
 			virtual	void dump(std::ostream &os, const Schedule *data, const Taskgraph *tg, const Platform *pt) const = 0;
+
+			/** Writes a schedule into output stream with support from associated taskgraph and execution platform, depending on details required
+				@param os Output stream where the schedule is written
+				@param data Instance of pelib::Schedule to be written in output stream
+				@param tg Additional data from the taskgraph associated to this schedule
+				@parame pt Additional data from the platform associated to this schedule
+			**/
 			virtual	void dump(std::ostream &os, const Schedule &data, const Taskgraph &tg, const Platform &pt) const = 0;
 
 		protected:

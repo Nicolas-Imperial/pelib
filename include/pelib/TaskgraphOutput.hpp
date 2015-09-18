@@ -27,11 +27,24 @@
 
 namespace pelib
 {
+	/** Ancestor class for all outputer of pelib::taskgraph **/
 	class TaskgraphOutput : public RecordOutput
 	{
 		public:	
+			/** Returns a pointer to a copy of the class instance **/
 			virtual TaskgraphOutput* clone() const = 0;
+
+			/** Writes a pelib::Taskgraph instance into output stream
+				@param os Output stream to write Taskgraph
+				@param data Instance of pelib::Taskgraph to be written
+				@param arch Allows TaskgraphOut concrete implementation to write only information useful for this platform
+			**/
 			virtual	void dump(std::ostream &os, const Taskgraph &data, const Platform &arch) const = 0;
+			/** Writes a pelib::Taskgraph instance into output stream
+				@param os Output stream to write Taskgraph
+				@param data Instance of pelib::Taskgraph to be written
+				@param arch Allows TaskgraphOut concrete implementation to write only information useful for this platform
+			**/
 			virtual	void dump(std::ostream &os, const Taskgraph *data, const Platform *arch) const = 0;
 
 		protected:

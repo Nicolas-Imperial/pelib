@@ -29,6 +29,7 @@
 
 namespace pelib
 {
+	/** Parser and output class for pelib::Matrix in AMPL input data format **/
 	template <class Col, class Row, class Value>		
 	class AmplInputMatrix: public AmplInputData
 	{
@@ -36,11 +37,16 @@ namespace pelib
 		typedef std::map<Row, RowType> MatrixType;
 		
 		public:
+			/** Constructor
+				@param strict If parsing Floating-point values and any value to parse is an integer written with no decimal suffix (e.g. 52.0), then if strict is 1, then the complete parsin operation fails
+			**/
 			AmplInputMatrix(bool strict = true)
 			{
 				this->strict = strict;
 			}
 			
+			/** Returns a pointer to a coppy of this class instance
+			**/
 			virtual
 			AmplInputMatrix*
 			clone() const
@@ -48,6 +54,7 @@ namespace pelib
 				return new AmplInputMatrix();
 			}
 
+			/** Returns a boost::regex pattern that can match a matrix in AMPL output format and capture each of its elements **/
 			virtual
 			std::string
 			getDetailedPattern()
@@ -55,6 +62,7 @@ namespace pelib
 				return "param\\s+([^\\s\\n:]+):\\s*(.*)\\s*:=(.+)";
 			}
 
+			/** Returns a boost::regex pattern that can match a matrix in AMPL output format **/
 			virtual
 			std::string
 			getGlobalPattern()
@@ -62,6 +70,10 @@ namespace pelib
 				return "param\\s+[^\\s\\n:]+:\\s*.*\\s*:=.+";
 			}
 
+			/** Parses in content of input stream in AMPL Input format into an instance of pelib::Matrix
+				@param in Text input stream in AMPL input data format to parse into a matrix
+				@return An instance of pelib::Matrix with the content parsed.
+			**/
 			virtual
 			AlgebraData*
 			parse(std::istream &in)
@@ -154,6 +166,10 @@ namespace pelib
 				return new Matrix<Col, Row, Value>(match[1], values);
 			}
 
+			/** Writes the content in class instance of pelib::Matrix into text output stream in AMPL input data format
+				@param o Output stream where the matrix is written to in AMPL input data format
+				@param data Instance of pelib::Matrix to be written in output stream
+			**/
 			virtual
 			void
 			dump(std::ostream &o, const AlgebraData *data) const
@@ -188,6 +204,7 @@ namespace pelib
 			}
 	
 		protected:
+			/** If true and parsing floating point matrix content, fails if any elment is an integer written without any trailing decimal part (e.g. 52.0) **/
 			bool strict;
 		private:		
 	};

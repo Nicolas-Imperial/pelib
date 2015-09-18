@@ -26,13 +26,16 @@
 
 namespace pelib
 {
+	/** Base class of any parser class that produces instances of pelib::Platform from an input stream **/
 	class PlatformParser : public DataParser
 	{
 		public:
+			/** Reads input stream and produces and instance of pelib::Platform **/
 			virtual
 			Platform*
 			parse(std::istream &in) const = 0;
 
+			/** Returns a pointer to a copy of this class **/
 			virtual PlatformParser* clone() const = 0;
 
 		protected:

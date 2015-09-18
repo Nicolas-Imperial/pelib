@@ -28,16 +28,23 @@
 
 namespace pelib
 {
+	/** Parser and output class in AMPL output format for pelib algebraic Vector data structure **/
 	template <class Key, class Value>
 	class AmplOutputVector: public AmplOutputData
 	{
+		/** Type of a pelib::Vector's internal value collection **/
 		typedef std::map<Key, Value> VectorType;
 		
 		public:
+			/** Constructor
+				@param strict If true and parsing a floating-point values-collection, fails if any element is an integer but succeeds if integers are written with a trailing decimal 0 (e.g. 52.0)
+			**/
 			AmplOutputVector(bool strict = true)
 			{
 				this->strict = strict;
 			}
+
+			/** Returns a pointer to a opy of this class instance **/
 			virtual
 			AmplOutputVector*
 			clone() const
@@ -45,6 +52,7 @@ namespace pelib
 				return new AmplOutputVector();
 			}
 
+			/** Uses a boost::regex regular expression to match a vector written in AMPL output format and extract its name and value **/
 			virtual
 			std::string
 			getDetailedPattern()
@@ -52,6 +60,7 @@ namespace pelib
 				return "(\\w[\\w\\d_]*)\\s*\\[\\*\\]\\s*:=\\s*((?:[\\w\\d][\\w\\d_+\\.]*\\s+[\\w\\d][\\w\\d_\\.+]*[\\s\\n]+)+)";
 			}
 
+			/** Uses a boost::regex regular expression to match a vector written in AMPL output format **/
 			virtual
 			std::string
 			getGlobalPattern()
@@ -59,6 +68,10 @@ namespace pelib
 				return "\\w[\\w\\d_]*\\s*\\[\\*\\]\\s*:=.+";
 			}
 
+			/** Reads input stream in AMPL output format and builds an instance of pelib::Vector containing all values
+				@param in Input stream to read AMPL output text from
+				@return An instance of pelib::Vector containing all values read from input
+			**/
 			virtual
 			AlgebraData*
 			parse(std::istream &in)
@@ -121,6 +134,10 @@ namespace pelib
 				return new Vector<Key, Value>(match[1], values);
 			}
 
+			/** Writes an instance of pelib::Vector into an output stream in AMPL output format
+				@param o Output stream
+				@param data Instance of pelib::Vector to be written
+			**/
 			virtual
 			void
 			dump(std::ostream &o, const AlgebraData *data) const
@@ -140,6 +157,7 @@ namespace pelib
 			}
 
 		protected:
+			/** Defines if parsing operations are performed in strict mode (see constructor) **/
 			bool strict;
 		private:	
 	};

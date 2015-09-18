@@ -27,6 +27,7 @@
 
 namespace pelib
 {
+	/** Ancestor class of any C++ generator from Algebraic data structure classes derived from pelib::AlgebraData **/
 	class CppDataOutput: public AlgebraDataOutput
 	{
 		public:

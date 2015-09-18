@@ -28,16 +28,20 @@
 
 namespace pelib
 {
+	/** Output class for pelib::Vector that generate C++ code of a Algebraic Vector **/
 	template <class Key, class Value>
 	class CppVector: public CppData
 	{
 		typedef std::map<Key, Value> VectorType;
 		
 		public:
+			/** Constructor **/
 			CppVector() : CppData()
 			{
 				// Do nothing
 			}
+
+			/** Returns a pointer to a copy of this class instance **/
 			virtual
 			CppVector*
 			clone() const
@@ -45,6 +49,10 @@ namespace pelib
 				return new CppVector();
 			}
 
+			/** Generates C++ code that produce the same instance of pelib::Vector as given as parameter and writes it to output stream
+				@param o Output stream that receives the generated C++ code
+				@param data Instance of pelib::Vector that is translated to C++ code
+			**/
 			virtual
 			void
 			dump(std::ostream &o, const AlgebraData *data) const

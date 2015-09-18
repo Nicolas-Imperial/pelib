@@ -199,7 +199,7 @@ pelib_printf(cfifo_t(CFIFO_T))(FILE* stream, cfifo_t(CFIFO_T) fifo)
 {
 	char* str;
 	str = pelib_string(cfifo_t(CFIFO_T))(fifo);
-	fprintf(pelib_get_stdout(), "%s\n", str);
+	printf("%s\n", str);
 	free(str);
 
 	return stream;
@@ -210,7 +210,7 @@ pelib_printf_detail(cfifo_t(CFIFO_T))(FILE* stream, cfifo_t(CFIFO_T) fifo, int l
 {
 	char* str;
 	str = pelib_string_detail(cfifo_t(CFIFO_T))(fifo, level);
-	fprintf(pelib_get_stdout(), "%s\n", str);
+	printf("%s\n", str);
 	free(str);
 
 	return stream;
@@ -271,9 +271,7 @@ cfifo_state(CFIFO_T)(cfifo_t(CFIFO_T) *cfifo)
           }
         else
           {
-            fprintf(pelib_get_stderr(),
-                "[ERROR:%s:%s:%i] Illegal cfifo state\n", __FILE__,
-                __FUNCTION__, __LINE__);
+            fprintf(stderr, "[ERROR:%s:%s:%i] Illegal cfifo state\n", __FILE__, __FUNCTION__, __LINE__);
             return EMPTY;
           }
       }
@@ -341,9 +339,7 @@ is_in_content(CFIFO_T)(cfifo_t(CFIFO_T) *fifo, size_t index)
         // Do nothing
         break;
         default:
-        fprintf(pelib_get_stderr(),
-            "[ERROR:%s:%s:%i] Illegal cfifo state", __FILE__,
-            __FUNCTION__, __LINE__);
+        fprintf(stderr, "[ERROR:%s:%s:%i] Illegal cfifo state", __FILE__, __FUNCTION__, __LINE__);
         return 0;
         break;
       }

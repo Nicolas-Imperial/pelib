@@ -27,9 +27,11 @@
 
 namespace pelib
 {
+	/** Superclass of any Taskgraph parser in GraphML format **/
 	class GraphMLParser : public TaskgraphParser
 	{
 		public:
+			/** Returns a new instance of Taskgraph with data read from input stream **/
 			virtual Taskgraph* parse(std::istream &is) const = 0;
 	};
 }

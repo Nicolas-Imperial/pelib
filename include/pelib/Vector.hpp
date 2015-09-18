@@ -33,22 +33,29 @@
 
 namespace pelib
 {
+	/** Models an algebraic vector of data **/
 	template <class Key, class Value> 
 	class Vector: public AlgebraData
 	{
 		typedef std::map<Key, Value> VectorType;
 		
 		public:
+			/** Constructor
+				@param name name associated to this vector
+				@param values Values held in the vector associated to an ordered set of indexes
+			**/
 			Vector(const std::string name, const VectorType values) : AlgebraData(name), values(values)
 			{
 				// Do nothing
 			}
 
+			/** Copy constructor **/
 			Vector(const Vector<Key, Value>* vector): AlgebraData(vector->getName()), values(vector->getValues())
 			{
 				// Do nothing
 			}
 
+			/** Returns a pointer to a copy of this Vector **/
 			virtual
 			Vector*
 			clone() const
@@ -56,6 +63,7 @@ namespace pelib
 				return new Vector<Key, Value>(name, values);
 			}
 
+			/** Returns all values held in this Vector, associated to their key **/
 			virtual
 			const std::map<Key, Value>&
 			getValues() const
@@ -63,6 +71,7 @@ namespace pelib
 				return values;
 			}
 
+			/** Returns a single value in the Vector thanks to the key associated to the value **/
 			virtual
 			const Value&
 			find(Key key) const
@@ -70,6 +79,7 @@ namespace pelib
 				return values.find(key)->second;
 			}
 
+			/** Returns the number of elements stored in the Vector **/
 			virtual
 			size_t
 			getSize() const

@@ -31,11 +31,14 @@
 
 namespace pelib
 {
+	/** Base class of any data structure that can be parsed, output or held in a pelib collection **/
 	class Data
 	{
 		public:
+			/** Destructor **/
 			virtual ~Data();
 
+			/** returns a pointer to a copy of this Data instance **/
 			virtual
 			Data*
 			clone() const = 0;

@@ -76,7 +76,7 @@ pelib_string_detail(int)(int a, int level)
 }
 
 size_t
-pelib_fread(int)(int* buffer, size_t size, size_t nmemb, FILE* stream)
+pelib_fread(int)(int* buffer, FILE* stream)
 {
   size_t total;
   int num;

@@ -33,23 +33,29 @@
 
 namespace pelib
 {
+	/** Simple Matrix implementation for linear algebra **/
 	template <class Col, class Row, class Value>
 	class Matrix: public AlgebraData
 	{
+		/** Type of a matrix row **/
 		typedef std::map<Col, Value> RowType;
+		/** Type of the matrix internal container **/
 		typedef std::map<Row, RowType> MatrixType;
 		
 		public:
+			/** Constructor: builds a matrix with the name and values given as parameters **/
 			Matrix(const std::string name, const MatrixType values) : AlgebraData(name)
 			{
 				this->values = values;
 			}
 
+			/** Copy constructor **/
 			Matrix(const Matrix<Col, Row, Value>* matrix): AlgebraData(matrix->getName()), values(matrix->getValues())
 			{
 				// Do nothing
 			}
 
+			/** Returns a pointer to a copy this matrix **/
 			virtual
 			Matrix*
 			clone() const
@@ -57,6 +63,7 @@ namespace pelib
 				return new Matrix<Col, Row, Value>(name, values);
 			}
 
+			/** Returns all values in the matrix **/
 			virtual
 			const MatrixType&
 			getValues() const
@@ -64,6 +71,7 @@ namespace pelib
 				return values;
 			}
 
+			/** Returns a value identified by its row and column **/
 			virtual
 			const Value&
 			find(Col col, Row row) const
@@ -71,6 +79,7 @@ namespace pelib
 				return values.find(row)->second.find(col)->second;
 			}
 
+			/** Returns the number of rows in the matrix **/
 			virtual
 			size_t
 			getColSize() const // /!\ This is the size of a column, i.e. the number of rows
@@ -78,6 +87,7 @@ namespace pelib
 				return values.size();
 			}
 
+			/** Returns the number of columns in the matrix **/
 			virtual
 			size_t
 			getRowSize() const // /!\ This is the size of a row, i.e. the number of columns
@@ -85,6 +95,7 @@ namespace pelib
 				return values.begin()->second.size();
 			}
 
+			/** Returns a new matrix instance that is the transposed of this matrix **/
 			virtual
 			Matrix<Row, Col, Value>
 			transpose() const
@@ -103,6 +114,7 @@ namespace pelib
 			}
 			
 		protected:
+			/** Internal container of the matrix values **/
 			MatrixType values;
 		private:	
 	};

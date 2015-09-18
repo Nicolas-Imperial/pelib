@@ -26,14 +26,21 @@
 
 namespace pelib
 {
-  class DeadlineCalculator
-  {
-	public:
-    virtual ~DeadlineCalculator(){}
-    virtual double calculate(const Taskgraph& tg, const Platform& arch) const = 0;
+	/** Superclass of any class that can compute a deadline for a Taskgraph given a Platform **/
+	class DeadlineCalculator
+	{
+		public:
+		/** Destructor **/
+		virtual ~DeadlineCalculator(){}
 
-    static DeadlineCalculator* getDeadlineCalculator(const std::string key);
-  };
+		/** Computes and returns a deadline value for a taskgraph and platform **/
+		virtual double calculate(const Taskgraph& tg, const Platform& arch) const = 0;
+
+		/** Return an instance derived from DeadlineCalculator that can compute a deadline from a string formula
+			@param key Formula used by a suitable derived class of DeadlineCalculator to compute a deadline
+		**/
+		static DeadlineCalculator* getDeadlineCalculator(const std::string key);
+	};
 }
 
 

@@ -26,13 +26,23 @@
 
 namespace pelib
 {
+  /** Computes a deadline from a mathematical expression in a string **/
   class DeadlineFormula : public DeadlineCalculator
   {
 	public:
+		/** Constructor
+			@param formula String mathematical formula to be intepreted to compute a deadline
+		**/
 		DeadlineFormula(string formula);
+
+		/** Interpret and computes a deadline given instances of a Taskgraph and of a Platform
+			@param tg Taskgraph containing the tasks to run withing the deadline to compure
+			@param arch Platform that runs the tasks
+		**/
 		virtual double calculate(const Taskgraph& tg,const Platform& arch) const;
 		  
 	private:
+	/** Internal holder of the formula to intepret **/
     	const string formula;
   };
 }

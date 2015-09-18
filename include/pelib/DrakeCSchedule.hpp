@@ -27,12 +27,27 @@
 
 namespace pelib
 {
+	/** Generate C code containing all metadata about a drake streaming application **/
 	class DrakeCSchedule : public DrakeCScheduleOutput
 	{
 		public:
+			/** Destructor **/
 			virtual ~DrakeCSchedule();
+			/** Generate C code to output stream, that holds all Taskgraph, Platform and Schedule information required for a drake application
+				@param os Output stream where generated C code is written
+				@param data Schedule of the Drake application
+				@param tg Taskgraph of the application
+				@param pt Platform description for which the Drake application is scheduled for
+			**/
 			virtual	void dump(std::ostream &os, const Schedule *data, const Taskgraph *tg, const Platform *pt) const;
+			/** Generate C code to output stream, that holds all Taskgraph, Platform and Schedule information required for a drake application
+				@param os Output stream where generated C code is written
+				@param data Schedule of the Drake application
+				@param tg Taskgraph of the application
+				@param pt Platform description for which the Drake application is scheduled for
+			**/
 			virtual	void dump(std::ostream &os, const Schedule &data, const Taskgraph &tg, const Platform &pt) const;
+			/** Returns a pointer to a copy of this instance **/
 			virtual DrakeCSchedule* clone() const;
 	};
 }

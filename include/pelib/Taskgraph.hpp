@@ -36,60 +36,83 @@ extern "C"{
 namespace pelib
 {
 	using namespace std;
-	
+
+	/** Models a high-level description of a streaming application **/
 	class Taskgraph: public Record
 	{
 		public:
+			/** Constructor **/
 			Taskgraph();
+
+			/** Copy constructor **/
 			Taskgraph(const Taskgraph *graph);
+			/** Copy constructor **/
 			Taskgraph(const Taskgraph &graph);
-			Taskgraph(const set<Task>&, const set<Link>&);
+			/** Constructor
+				@param tasks Set of tasks in the application
+				@param links Set of links between tasks in the application
+			**/
+			Taskgraph(const set<Task> &tasks, const set<Link> &links);
+			/** Constructor
+				@param algebra Algebraic representation of a streaming application
+			**/
 			Taskgraph(const Algebra &algebra);
+
+			/** Destructor **/
 			virtual ~Taskgraph();
 
+			/** Returns a pointer to a copy of this taskgraph **/
 			virtual
 			Taskgraph*
 			clone() const;
 
+			/** Builds an algebraic representation of this taskgraph, assuming 1 core **/
 			virtual Algebra buildAlgebra() const;
+
+			/** Builds an algebraic representation of this taskgraph, for the Platform given as parameter **/
 			virtual Algebra buildAlgebra(const Platform &arch) const;
 
+			/** Get the name of the application i.e. what it computes **/
 			virtual string
 			getName() const;
 
+			/** Set the name of the application i.e. what it computes **/
 			virtual void
 			setName(const string name);
 
+			/** Get the formula that computes the deadline for each pipeline stage running this application **/
 			virtual string
 			getDeadlineCalculator() const;
 
+			/** Computes the deadline for this application given an execution platform **/
 			virtual double
 			getDeadline(const Platform &arch) const;
 
+			/** Sets the formula that computes the deadline for this applicaion **/
 			virtual void
 			setDeadlineCalculator(const string deadlineCalculator);
 
+			/** Returns the number of tasks in this application **/
 			virtual const set<Task>&
 			getTasks() const;
 
+			/** Returns the number of tasks in this application **/
 			virtual set<Task>&
 			getTasks();
 
-			//virtual void
-			//setTasks(const set<Task>&);
-
+			/** Fins a task in this application using its string identifier **/
 			virtual const Task&
 			findTask(const string &taskId) const;
 
+			/** Gets all links between tasks in this application **/
 			virtual const set<Link>&
 			getLinks() const;
 
+			/** Gets all links between tasks in this application **/
 			virtual set<Link>&
 			getLinks();
 
-			//virtual void
-			//setLinks(const set<Link>&);
-
+			/** Copies all tasks and set links to task copies in the taskgraph instance that receives the assignment **/
 			virtual Taskgraph&
 			operator=(const Taskgraph& copy);
 

@@ -27,6 +27,7 @@
 
 namespace pelib
 {
+	/** Base class of any kind of AMPL parser **/
 	class AmplDataParser: public AlgebraDataParser
 	{
 		public:

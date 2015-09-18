@@ -29,7 +29,10 @@ extern "C" {
 #define PELIB_PARSER
 
 // /!\ the content of argv is freed after this function is run
+/** Parses the content of an input stream with string options and produces a class instance derived from pelib::Record. Used for dynamic library parsers **/
 pelib::Record* pelib_parse(std::istream& cin, size_t argc, char** argv);
+
+/** Deletes a Record produced by pelib_parse **/
 void pelib_delete(pelib::Record*);
 
 #endif

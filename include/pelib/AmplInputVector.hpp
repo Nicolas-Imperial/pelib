@@ -28,17 +28,23 @@
 
 namespace pelib
 {
+	/** Parser and Outputer of a Pelib::Vector in AMPL input format **/
 	template <class Key, class Value>
 	class AmplInputVector: public AmplInputData
 	{
 		typedef std::map<Key, Value> VectorType;
 		
 		public:
+			/**
+				Constructor
+				@param strict if Value is a floating-point number, fails if any element parsed is an integer (but succeeds if it is written as a float, i.e., 52.0
+			**/
 			AmplInputVector(bool strict = true)
 			{
 				this->strict = strict;
 			}
 			
+			/** Returns a pointer to a copy of this class instance **/
 			virtual
 			AmplInputVector*
 			clone() const
@@ -46,6 +52,9 @@ namespace pelib
 				return new AmplInputVector();
 			}
 			
+			/** Parses the input stream into a instance of Pelib::Vector
+				@param in input stream in AMPL input data format to be parsed
+			 **/
 			virtual
 			AlgebraData*
 			parse(std::istream &in)
@@ -102,6 +111,10 @@ namespace pelib
 				return new Vector<Key, Value>(match[1], values);
 			}
 
+			/** Dumps the content of a pelib::Vector into an output stream in AMPL input data format
+				@param o Output stream where is written the vector in AMPL input data format
+				@param data pelib::Vector to be written to output stream
+			**/
 			virtual
 			void
 			dump(std::ostream &o, const AlgebraData *data) const
@@ -120,6 +133,7 @@ namespace pelib
 				o << ";" << std::endl;				
 			}
 
+			/** Returns a boost::regex regular expression that matches a AMPL input data vector data structure and can extract all its elements **/
 			virtual
 			std::string
 			getDetailedPattern()
@@ -127,6 +141,7 @@ namespace pelib
 				return "param\\s*:\\s*([^\\s\\n]+)\\s*:=(.+)";
 			}
 
+			/** Returns a boost::regex regular expression that matches a AMPL input data vector data structure **/
 			virtual
 			std::string
 			getGlobalPattern()
@@ -135,6 +150,7 @@ namespace pelib
 			}
 
 		protected:
+			/** Internal record of the strict or not strict parsing policy of this vector parser instance **/
 			bool strict;
 		private:	
 	};

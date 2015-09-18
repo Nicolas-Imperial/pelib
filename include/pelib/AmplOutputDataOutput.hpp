@@ -27,9 +27,11 @@
 
 namespace pelib
 {
+	/** Base class of any class able to output a class instance derived from pelib::AlgebraData to some output stream in AMPL output format **/
 	class AmplOutputDataOutput: public AmplDataOutput
 	{
 		public:
+			/** Returns a pointer to a copy of this class instance **/
 			virtual AmplOutputDataOutput* clone() const = 0;
 			
 		protected:

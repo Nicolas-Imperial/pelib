@@ -29,15 +29,40 @@
 
 namespace pelib
 {
+	/** Parser and output class of taskgraph in GraphML format **/
 	class GraphML : public GraphMLParser, public GraphMLOutput
 	{
 		public:
+			/** Destructor **/
 			virtual ~GraphML();
+			/** Returns a pointer to a copy of this instance of GraphML **/
 			virtual GraphML* clone() const;
+
+			/** Produces and instance of Taskgraph by parsing text input stream in GraphML format
+				@return is Input text stream in GraphML format
+			**/
 			virtual Taskgraph* parse(std::istream &is) const;
+			/** Output an instance of pelib::Taskgraph to text output stream in GraphML format
+				@param str output stream to write GraphML taskgraph to
+				@param data Instance of pelib::Taskgraph to be written in output stream
+			**/
 			virtual void dump(std::ostream &str, const Taskgraph *data) const;
+			/** Output an instance of pelib::Taskgraph to text output stream in GraphML format
+				@param str output stream to write GraphML taskgraph to
+				@param data Instance of pelib::Taskgraph to be written in output stream
+			**/
 			virtual void dump(std::ostream &str, const Taskgraph &data) const;
+			/** Output an instance of pelib::Taskgraph to text output stream in GraphML format with formula interpreted to fit an execution platform
+				@param str output stream to write GraphML taskgraph to
+				@param data Instance of pelib::Taskgraph to be written in output stream
+				@param arch Instance of pelib::Platform to parse deadline and efficiency formulas in Taskgraph description
+			**/
 			virtual	void dump(std::ostream &os, const Taskgraph &data, const Platform &arch) const;
+			/** Output an instance of pelib::Taskgraph to text output stream in GraphML format with formula interpreted to fit an execution platform
+				@param str output stream to write GraphML taskgraph to
+				@param data Instance of pelib::Taskgraph to be written in output stream
+				@param arch Instance of pelib::Platform to parse deadline and efficiency formulas in Taskgraph description
+			**/
 			virtual void dump(std::ostream &os, const Taskgraph *data, const Platform *arch) const;
 		protected:
 	};

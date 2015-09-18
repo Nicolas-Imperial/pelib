@@ -26,6 +26,7 @@
 
 namespace pelib
 {
+	/** Base class of any class able to take an instance of pelib::Schedule and output it in XML format to an output stream **/
 	class XMLScheduleOutput : public ScheduleOutput
 	{
 	};

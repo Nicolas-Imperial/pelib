@@ -76,8 +76,10 @@ pelib_string_detail(float)(float a, int level)
 }
 
 size_t
-pelib_fread(float)(float* buffer, size_t size, size_t nmemb, FILE* stream)
+pelib_fread(float)(float* buffer, FILE* stream)
 {
+// TODO: adapt for flat number parsing
+/*
   size_t total;
   int num;
   int read, has_more;
@@ -100,6 +102,8 @@ pelib_fread(float)(float* buffer, size_t size, size_t nmemb, FILE* stream)
 
   *buffer = num;
   return total;
+*/
+	fprintf(stderr, "[%s:%s:%d][ERROR] Not implemented. Aborting.\n", __FILE__, __FUNCTION__, __LINE__);
 }
 
 // Now include the generic array implementation

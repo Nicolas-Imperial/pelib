@@ -25,20 +25,33 @@
 
 namespace pelib
 {
+	/** Model a link between tasks of a streaming application **/
 	class Link
 	{
 		public:
+			/** Constructor. Takes the producer and consumer tasks at both ends of the link **/
 			Link(const Task &producer, const Task &consumer);
+
+			/** Returns a pointer to the producer task **/
 			virtual Task* getProducer() const;
+
+			/** Returns a pointer to the consumer task **/
 			virtual Task* getConsumer() const;
 
+			/** Check if this link is striclty inferior to another link given 
+				@param other Other link to compare this instance to
+			**/
 			virtual bool
 			operator<(const Link &other) const;
 
+			/** Returns true if this instance is considered equivalent to another link
+				@param other Other link to be compared
+			**/
 	    		virtual bool
 			operator==(const Link &other) const;
 
 		protected:
+			/** Producer and consumer task pointers **/
 			Task *producer, *consumer;
 
 		private:		

@@ -30,16 +30,21 @@
 
 namespace pelib
 {
+	/** Parser and output class for a pelib::Scalar in AMPL output format **/
 	template <class Value>
 	class
 	AmplOutputScalar: public AmplOutputData
 	{
 		public:
+			/** Constuctor
+				@param strict If true and parsing floating point values, fails in any element parsed is an integer. An integer written as a float (e.g. 52.0) doesn't make the parser to fail.
+			**/
 			AmplOutputScalar(bool strict = true)
 			{
 				this->strict = strict;
 			}
 			
+			/** Returns a pointer to a copy of this instance **/
 			virtual
 			AmplOutputScalar*
 			clone() const
@@ -47,6 +52,7 @@ namespace pelib
 				return new AmplOutputScalar();
 			}
 
+			/** Returns a boost::regex string able to match a scalar in AMPL output format and extract its name and value **/
 			virtual
 			std::string
 			getDetailedPattern()
@@ -54,6 +60,7 @@ namespace pelib
 				return "(\\w[\\w\\d_]*)\\s*=\\s*([\\w\\d][\\w\\d_\\.+]*)";
 			}
 
+			/** Returns a boost::regex string able to match a scalar in AMPL output format **/
 			virtual
 			std::string
 			getGlobalPattern()
@@ -61,6 +68,7 @@ namespace pelib
 				return "\\w[\\w\\d_]*\\s*=\\s*[\\w\\d][\\w\\d_\\.+]*";
 			}
 
+			/** Reads input stream and builds an instance of pelib::Scalar containing the name and value read **/
 			virtual
 			AlgebraData*
 			parse(std::istream &in)
@@ -82,6 +90,7 @@ namespace pelib
 				return scalar;
 			}
 
+			/** Writes the name and value of a pelib::Scalar to output stream in AMPL output format **/
 			virtual
 			void
 			dump(std::ostream &stream, const AlgebraData *data) const

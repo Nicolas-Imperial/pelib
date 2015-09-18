@@ -33,20 +33,24 @@
 
 namespace pelib
 {
+	/** Algebraic scalar value associated to a string name **/
 	template <class Value>
 	class Scalar: public AlgebraData
 	{
 		public:
+			/** Constructor: associates a single value to a string name **/
 			Scalar(const std::string name, const Value value) : AlgebraData(name)
 			{
 				this->value = value;
 			}
 
+			/** Copy constructor **/
 			Scalar(const Scalar<Value>* scalar) : AlgebraData(scalar->getName())
 			{
 				// Do nothing
 			}
 
+			/** Returns a pointer to a copy of this scalar **/
 			virtual
 			Scalar*
 			clone() const
@@ -54,6 +58,7 @@ namespace pelib
 				return new Scalar<Value>(name, value);
 			}
 
+			/** Return the value associated to this instance **/
 			virtual
 			const Value&
 			getValue() const
@@ -62,6 +67,7 @@ namespace pelib
 			}
 				
 		protected:
+			/** Value help by this instance **/
 			Value value;
 		private:		
 	};

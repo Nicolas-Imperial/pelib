@@ -76,7 +76,7 @@ CppDataOutput.cpp \
 Cpp.cpp CppData.cpp CppScalar.cpp CppVector.cpp CppSet.cpp CppMatrix.cpp \
 RecordParser.cpp \
 DrakeCSchedule.cpp 
-cstruct_src = sort.c complex.c float.c integer.c monitor.c printf.c size_t.c pelib_string.c
+cstruct_src = sort.c complex.c float.c integer.c monitor.c size_t.c pelib_string.c
 
 ## executables
 bincxx_project = pelib-convert demo run_record amplmatrixtoraw

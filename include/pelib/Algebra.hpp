@@ -35,24 +35,34 @@
 #define PELIB_ALGEBRA
 namespace pelib
 {
+	/**
+	  * Container of AMPL data structures such as Scalars, Vectors, Matrices and Sets.
+	**/
 	class Algebra : public Record
 	{
 		public:
+			/** Creates an empty AMPL data container **/
 			Algebra();
-			Algebra(const std::map<std::string, const AlgebraData * const>&);
+
+			/** Creates a AMPL data container from Algebra elements found in the map collect given as argument. Note that the string element in each pair element in the collection must match the name of the corresponding AlgebraData data structure. **/
+			Algebra(const std::map<std::string, const AlgebraData * const> &elements);
+
+			/** Copy constructor **/
 			Algebra(const Algebra &rhs);
+
+			/** Destroys all elements in the collection and destroys the collection itself **/
 			virtual	~Algebra();
 
+			/** Returns all elements of any type contained in this collection instance **/
 			const std::map<std::string, const AlgebraData * const>&
 			getAllRecords() const;
 
-			std::map<std::string, const int *>&
-			copyRecords();
-
-			//void merge(const Record& rec) {};
+			/** Builds a new collection from all elements in this collection and in the collection given as argument **/
 			virtual Algebra
 			merge(const Algebra&) const; 
 
+
+			/** Returns all elements in the collection that match type T **/
 			template<class T>
 			std::map<std::string, const T* const>
 			getRecords() const
@@ -81,6 +91,7 @@ namespace pelib
 				return record;
 			}
 
+			/** Returns the element of type T whose name matches the key argument **/
 			template<class T>
 			const T * const
 			find(std::string key) const
@@ -108,19 +119,26 @@ namespace pelib
 				}
 			}
 
+			/** Does nothing at all **/
 			void insert(const Data *data) {}
+
+			/** Copies and insert a AlgebraData element in the collection **/
 			virtual void insert(const pelib::AlgebraData *data);
 
+			/** Finds and remove a AlgebraData element from this collection, based on its name **/
 			virtual void
 			remove(const std::string name);
 
+			/** Flushes all elements in this collection, performs a copy of all elements found in the collection given as argument and place the copies in this collection **/
 			virtual
 			Algebra&
 			operator=(const Algebra &rhs);
 			
 		protected:
+			/** Map container of all elements in the collection **/
 			std::map<std::string, const AlgebraData * const> records;
 
+			/** Flushes all elements in this collection **/
 			void
 			deleteRecords();	
 		private:

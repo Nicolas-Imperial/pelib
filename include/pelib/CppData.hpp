@@ -25,15 +25,21 @@
 
 namespace pelib
 {
+	/** Base class of classes that generate C++ code from instances derives from pelib::AlgebraData **/
 	class CppData: public CppDataOutput
 	{
 		public:
+			/** Returns a pointer to a copy of this class **/
 			virtual
 			CppData*
 			clone() const = 0;
 
 		protected:
+			/**  **/
 			const std::string
+			/** Returns the C++ type string to use in a C/C++ source code, associated to a C++ type
+				@param type Type of some C++ object obtained thanks to typeid()
+			**/
 			type_name(const std::type_info &type) const;
 		private:		
 	};

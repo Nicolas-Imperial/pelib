@@ -33,10 +33,13 @@
 
 namespace pelib
 {
+	/** Ancestor class of all pelib::Data output classes **/
 	class DataOutput
 	{
 		public:	
+			/** Returns a pointer to a copy of this instance **/
 			virtual DataOutput* clone() const = 0;
+			/** Destructor **/
 			virtual ~DataOutput();
 			
 		protected:

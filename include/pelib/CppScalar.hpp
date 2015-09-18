@@ -30,16 +30,19 @@
 
 namespace pelib
 {
+	/** Output class of algebraic scalar in C++ format **/
 	template <class Value>
 	class
 	CppScalar: public CppData
 	{
 		public:
+			/** Constructor **/
 			CppScalar() : CppData()
 			{
 				// Do nothing
 			}
 			
+			/** Returns a pointer to a copy of this instance **/
 			virtual
 			CppScalar*
 			clone() const
@@ -47,6 +50,10 @@ namespace pelib
 				return new CppScalar();
 			}
 
+			/** Generate and write C++ code to output stream, that produces an instance of pelib::Scalar that holds the data in instance of pelib::Scalar given as argument
+				@param stream Output stream where the generated C++ code is written to
+				@param data Instance of pelib::Scalar that contains the scalar to be written
+			**/
 			virtual
 			void
 			dump(std::ostream &stream, const AlgebraData *data) const

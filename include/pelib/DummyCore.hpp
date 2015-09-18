@@ -25,16 +25,26 @@
 
 namespace pelib
 {
+	/** Simple core model **/
 	class DummyCore: public Core
 	{
 		public:
+			/** Constructor
+				@param f Set of frequency that this core can run at
+			**/
 			DummyCore(const std::set<float> &f);
+			/** Copy constructor **/
 			DummyCore(const DummyCore*);
+			/** Copy constructor **/
 			DummyCore(const DummyCore&);
+			/** Destructor **/
 			virtual ~DummyCore();
+			/** Returns a pointer to a copy of this class instance **/
 			virtual Core* clone() const;
+			/** Returns the set of frequencies this core can run at **/
 			virtual const std::set<float>& getFrequencies() const;
 		protected:
+			/** Admissible set of frequencies for this core **/
 			std::set<float> frequencies;
 		private:
 	};

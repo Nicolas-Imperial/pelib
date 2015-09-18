@@ -25,11 +25,15 @@
 
 namespace pelib
 {
+	/** Models a processor Core **/
 	class Core
 	{
 		public:
+			/** Returns a pointer to a copy of this Core **/
 			virtual Core* clone() const = 0;
+			/** Destructor **/
 			virtual ~Core();
+			/** Returns the set of frequencies admissible by this core **/
 			virtual const std::set<float>& getFrequencies() const = 0;
 		protected:
 		private:

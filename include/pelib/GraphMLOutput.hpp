@@ -27,6 +27,7 @@
 
 namespace pelib
 {
+	/** Base class of any output class that produces GraphML output from an instance of pelib::Taskgraph **/
 	class GraphMLOutput : public TaskgraphOutput
 	{
 	};

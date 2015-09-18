@@ -27,20 +27,27 @@
 
 namespace pelib
 {
+	/** Base class of all data classes that a Algebra container can manipulate **/
 	class AlgebraData : public Data
 	{
 		public:
+			/** Creates a new instance AlgebraData with name given as argument **/
 			AlgebraData(const std::string);
+			/** Copy constructor **/
 			AlgebraData(const AlgebraData&);
 
+			/** Returns the name of this element **/
 			virtual	const std::string&
 			getName() const;
 
+			/** Sets the name of this element **/
 			virtual void
 			setName(const std::string);
 
+			/** Returns a copy of this element **/
 			virtual AlgebraData* clone() const = 0;
 		protected:
+			/** Stores the name of this element **/
 			std::string name;
 	};
 }

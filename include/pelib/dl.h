@@ -21,8 +21,20 @@
 #ifndef PELIB_DL_H
 #define PELIB_DL_H
 
+/** Dynamically loads a dynamic library through its filename
+	@param library Filename of the library to be loaded
+	@return Handler for the library loaded
+**/
 void* load_lib(const char* library);
+
+/** Extracts a function pointer from a dynamically laoded function
+	@param Handle Dynmic Library handle obtained with load_lib()
+	@param Function Name of the function in the library to be run
+	@return Function pointer ready to be called
+**/
 void* load_function(void *handle, const char *function);
+
+/** Unload a dynamically loaded function and destroy its handler **/
 void destroy_lib(void *handle);
 
 #endif

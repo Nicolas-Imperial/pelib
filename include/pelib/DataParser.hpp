@@ -36,13 +36,14 @@
 
 namespace pelib
 {
+	/** Superclass of any pelib data parser **/
 	class DataParser
 	{
 		public:
+			/** Destructor **/
 			virtual ~DataParser();
-			virtual
-			DataParser*
-			clone() const = 0;
+			/** Returns a pointer to a copy of this Data parser **/
+			virtual DataParser* clone() const = 0;
 
 		protected:
 		private:

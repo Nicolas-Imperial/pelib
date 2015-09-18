@@ -23,21 +23,29 @@
 
 enum stream {STREAM_NOTHING, STREAM_STDIN, STREAM_STDOUT, STREAM_STDERR, STREAM_FILE};
 
+/** Input or output argument model for pelib-convert **/
 struct pelib_argument_stream
 {
-	char *library;
-	char **argv;
-	size_t argc;
-	char *filename;
-	char *name;
-	enum stream stream;
+	char *library; /** Filename of the library that holds the code able to perform the input or output operation. If a path is not provided, checks in pelib-convert built-in search path (defined as the LD_RUN_PATH environmnet variable at the time pelib-convert was built) or LD_LIBRARY_PATH environment variable, if defined (see document of ld for more information). If not a filename, look for the dynamic library "libpelib-" + library + ".so" in search path as described above **/
+	char **argv; /** List of arguments to prived to the library to perform its work **/
+	size_t argc; /** Number of arguments passed to the library **/
+	char *filename; /** Filename to read input from or write output to by the library **/
+	char *name; /** If reading input, associates a custom name to the content parse, instead of the class name of the content parsed. **/
+	enum stream stream; /** Type of stream the library needs to manipulate: standard input, standard output, standard error or a file. No stream by default **/
 };
+/** Spaceless type alias for struct pelib_argument_stream **/
 typedef struct pelib_argument_stream pelib_argument_stream_t;
 
+/** Give defaults values to an instance of pelib argument data structure **/
 void pelib_argument_stream_init(pelib_argument_stream_t *pelib_argument_stream);
 
+/** Frees all memory that pointers in an instance of pelib argument stram structure points to **/
 void pelib_argument_stream_destroy(const pelib_argument_stream_t pelib_argument_stream);
 
+/** Performs parsing operations stores data gather in a pelib_argument stream instance
+	@param argv Array of strings containing all data to be parsed. Its last element must be a NULL pointer.
+	@param stream Instance of pelib argument_stream that holds the data being parsed
+**/
 unsigned int
 pelib_argument_stream_parse(char **argv, pelib_argument_stream_t* stream);
 

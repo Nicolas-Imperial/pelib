@@ -24,10 +24,12 @@
 #ifndef COMPLEX_H_
 #define COMPLEX_H_
 
+/** Integer complex number **/
 struct complex
 {
 		int r, im;
 };
+/** Spaceless alias for complex structure **/
 typedef struct complex complex_t;
 
 #define STRUCT_T complex_t

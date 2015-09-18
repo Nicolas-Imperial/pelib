@@ -25,12 +25,16 @@
 
 namespace pelib
 {
+	/** Ancestor class of all parsers of data collections **/
 	class RecordParser
 	{
 		public:
+			/** Returns an empty input stream **/
 			std::istream& getEmptyStream();
+			/** Virtual destructor **/
 			virtual ~RecordParser();
 		protected:
+			/** Empty stream returned by the getEmptyStream method **/
 			std::istringstream emptyStream;
 		private:
 	};

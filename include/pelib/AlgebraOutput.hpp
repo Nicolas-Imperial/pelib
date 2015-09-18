@@ -31,13 +31,16 @@
 
 namespace pelib
 {
+	/** Base class of classes that can generate any representation out of an instance of Algebra. Derive this class before use. **/
 	class AlgebraOutput : public RecordOutput
 	{
 		public:
+			/** Generates some representation of an instance of Algebra through its reference and write it to output stream o. **/
 			virtual
 			void
 			dump(std::ostream& o, const Algebra &record) const = 0;
 
+			/** Generates some representation of an instance of Algebra through its pointer and write it to output stream o. **/
 			virtual
 			void
 			dump(std::ostream& o, const AlgebraData *data) const = 0;

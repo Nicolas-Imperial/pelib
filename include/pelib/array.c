@@ -51,8 +51,8 @@ read_value(FILE * file, ARRAY_T* buffer)
 
   //while (read != ' ')
 //    {
-//      if ((has_more = pelib_fread(ARRAY_T)(&read, 1, 1, file)) == 0 || read == ' ')
-	total = pelib_fread(ARRAY_T)(buffer, 1, 1, file);
+//      if ((has_more = pelib_fread(ARRAY_T)(&read, 1, file)) == 0 || read == ' ')
+	total = pelib_fread(ARRAY_T)(buffer, 1, file);
 //        {
 //          break;
 //        }
@@ -100,7 +100,7 @@ pelib_alloc_buffer(array_t(ARRAY_T))(array_t(ARRAY_T)* array, size_t size)
   }
 
 int
-pelib_set_buffer(array_t(ARRAY_T))(array_t(ARRAY_T)* array, void *buffer, size_t size, void* aux)
+pelib_set_buffer(array_t(ARRAY_T))(array_t(ARRAY_T)* array, void *buffer, size_t size)
 {
 	array->data = buffer;
 	array->capacity = size;
@@ -109,13 +109,13 @@ pelib_set_buffer(array_t(ARRAY_T))(array_t(ARRAY_T)* array, void *buffer, size_t
 }
 
 array_t(ARRAY_T)*
-pelib_alloc_collection(array_t(ARRAY_T))(size_t aux)
+pelib_alloc_collection(array_t(ARRAY_T))(size_t n)
   {
     array_t(ARRAY_T) *array;
     array = pelib_alloc_struct(array_t(ARRAY_T))();
     if(array != NULL)
     {
-      if(pelib_alloc_buffer(array_t(ARRAY_T))(array, aux) == PELIB_FAILURE)
+      if(pelib_alloc_buffer(array_t(ARRAY_T))(array, n) == PELIB_FAILURE)
       {
         pelib_free_struct(array_t(ARRAY_T))(array);        
         return NULL;
@@ -126,13 +126,13 @@ pelib_alloc_collection(array_t(ARRAY_T))(size_t aux)
   }
 
 array_t(ARRAY_T)*
-pelib_alloc_from(array_t(ARRAY_T))(void* buffer, size_t size, void* aux)
+pelib_alloc_from(array_t(ARRAY_T))(void* buffer, size_t size)
 {
     array_t(ARRAY_T) *array;
     array = pelib_alloc_struct(array_t(ARRAY_T))();
     if(array != NULL)
     {
-      pelib_set_buffer(array_t(ARRAY_T))(array, buffer, size, aux);
+      pelib_set_buffer(array_t(ARRAY_T))(array, buffer, size);
       return array;
     }
 
@@ -178,7 +178,7 @@ pelib_array_loadfilename(ARRAY_T)(char * filename)
     return NULL;
   }
 
-  int ret = pelib_fread(size_t)(&size, 0, 1, h);
+  int ret = pelib_fread(size_t)(&size, h);
   if(ret != 1)
   {
     return NULL;
@@ -188,7 +188,7 @@ pelib_array_loadfilename(ARRAY_T)(char * filename)
 
   for (i = 0; i < size; i++)
     {
-      pelib_fread(ARRAY_T)(&num, 0, 1, h);
+      pelib_fread(ARRAY_T)(&num, h);
       pelib_array_append(ARRAY_T)(res, num);
     }
 

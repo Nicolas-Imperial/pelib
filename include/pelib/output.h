@@ -30,6 +30,8 @@ extern "C" {
 #define PELIB_OUTPUT
 
 // /!\ the content of argv is freed after this function is run
+/** Writes objects contained in records to output stream. Options can be passed using the string array argv and the number of arguments in argc. Note that call elements of argv and argv itself are freed after this function terminates.
+**/
 void pelib_dump(std::ostream& cout, std::map<const char*, pelib::Record*> records, size_t argc, char** argv);
 
 #endif

@@ -29,17 +29,23 @@
 
 namespace pelib
 {
+	/** Parser and output class for Set in AMPL input data text format **/
 	template <class Value>
 	class AmplInputSet: public AmplInputData
 	{
+		/** Type of the set data manipulated in member functions **/
 		typedef std::set<Value, std::less<Value>, std::allocator<Value> > SetType;
 		
 		public:
+			/** Constructor
+				@param strict If true and Value is a floating-point numeric type, fails if one element is an integer. An integer written as a float (e.g. 52.0) doesn't make the parser to fail
+			**/
 			AmplInputSet(bool strict = true)
 			{
 				this->strict = strict;
 			}
 			
+			/** Returns a pointer to a copy of this class instance **/
 			virtual
 			AmplInputSet*
 			clone() const
@@ -47,6 +53,9 @@ namespace pelib
 				return new AmplInputSet();
 			}
 			
+			/** Parse input stream in AMPL input data format into a pointer to an instance of pelib::Set
+				@param in Input stream in AMPL input data format to be parsed
+				@return An instance of pelib::Set holding all values parsed from in **/
 			virtual
 			AlgebraData*
 			parse(std::istream &in)
@@ -92,6 +101,10 @@ namespace pelib
 				return new Set<Value>(match[1], values);
 			}
 
+			/** Output all values of instance of pelib::set into output stream in AMPL input data format
+				@param o Output stream to write to in AMPL input data format
+				@param data Instance of pelib::Set whose values are to be written to output stream
+			 **/
 			virtual
 			void
 			dump(std::ostream &o, const AlgebraData *data) const
@@ -110,6 +123,7 @@ namespace pelib
 				o << ";" << std::endl;				
 			}
 
+			/** Returns a boost::regex regular expression that matches a Set in AMPL input data format and able to extract its elements **/
 			virtual
 			std::string
 			getDetailedPattern()
@@ -117,6 +131,7 @@ namespace pelib
 				return "set\\s*([^\\s\\n]+)\\s*:=(.+)";
 			}
 
+			/** Returns a boost::regex regular expression that matches a Set in AMPL input data format **/
 			virtual
 			std::string
 			getGlobalPattern()
@@ -125,6 +140,7 @@ namespace pelib
 			}
 
 		protected:
+			/** Defines if parsin operation should fail upon the parsing of an integer when the Set holds floating-point numeric values **/
 			bool strict;
 		private:	
 	};

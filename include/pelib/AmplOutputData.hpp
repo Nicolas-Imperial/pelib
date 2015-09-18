@@ -26,6 +26,7 @@
 
 namespace pelib
 {
+	/** Base class of any algebraic data structure parser or output in AMPL output format **/
 	class AmplOutputData: public AmplOutputDataOutput, public AmplOutputDataParser
 	{
 		public:

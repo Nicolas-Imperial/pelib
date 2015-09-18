@@ -36,6 +36,7 @@
 
 namespace pelib
 {
+	/** Parser and output class of an instance of pelib::Matrix in AMPL output format **/
 	template <class Col, class Row, class Value>		
 	class AmplOutputMatrix: public AmplOutputData
 	{
@@ -43,11 +44,15 @@ namespace pelib
 		typedef std::map<Row, RowType> MatrixType;
 		
 		public:
+			/** Constructor
+				@param strict if 1 and parsing a matrix of floating-points values (except indexes), fails if any value parsed is an integer. An integer written as a float (e.g. 52.0) doesn't makes the parser to fail
+			**/
 			AmplOutputMatrix(bool strict = true)
 			{
 				this->strict = strict;
 			}
 			
+			/** Returns a pointer to a copy of this instance **/
 			virtual
 			AmplOutputMatrix*
 			clone() const
@@ -55,6 +60,7 @@ namespace pelib
 				return new AmplOutputMatrix();
 			}
 			
+			/** Returns a string boost::regex regular expression able to match a Matrix in AMPL output format and extract its name, indexes and values to an instance of pelib::Matrix **/
 			virtual
 			std::string
 			getDetailedPattern()
@@ -62,6 +68,7 @@ namespace pelib
 				return "(\\w[\\w\\d_]*)\\s*\\[\\*,\\*\\]\\s*:\\s*(.+?)\\s*:=\\s*(.+?)\\s*";
 			}
 
+			/** Returns a string boost::regex regular expression able to match a Matrix in AMPL output format **/
 			virtual
 			std::string
 			getGlobalPattern()
@@ -69,6 +76,7 @@ namespace pelib
 				return "\\w[\\w\\d_]*\\s*\\[\\*,\\*\\]\\s*:\\s*(?:[\\w\\d\\.+]+\\s*)+\\s*:=.+";
 			}
 
+			/** Reads the content of an input stream in AMPL output text format and builds an instance of pelib::Matrix from all values read **/
 			virtual
 			AlgebraData*
 			parse(std::istream &in)
@@ -156,6 +164,7 @@ namespace pelib
 				return new Matrix<Col, Row, Value>(match[1], values);
 			}
 
+			/** Writes the content of an instance of pelib::Matrix to a stream output in AMPL output format **/
 			virtual
 			void
 			dump(std::ostream &o, const AlgebraData *data) const
@@ -188,6 +197,7 @@ namespace pelib
 			}
 	
 		protected:
+			/** Defines if parsing operations are performed in strict mode **/
 			bool strict;
 		private:		
 	};

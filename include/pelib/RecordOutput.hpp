@@ -30,6 +30,7 @@
 
 namespace pelib
 {
+	/** Base class of any class instance able to output any derived class instance of pelib::Data **/
 	class RecordOutput
 	{
 		public:

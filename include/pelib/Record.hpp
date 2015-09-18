@@ -32,13 +32,16 @@
 #define PELIB_RECORD
 namespace pelib
 {
+	/** Ancestor class for container classes of derivatives of pelib::Data **/
 	class Record
 	{
 		public:
+			/** Destructor **/
 			virtual ~Record() = 0;
 		protected:
-		// For some interesting reason, a pointer to Record pointing to a derived class is resolved as a Record by typeinfo if there is no virtual function in the base class.
-		// This is an empty virtual function to make sure type_info can resolve the right class name
+		/** For some interesting reason, a pointer to Record pointing to a derived class is resolved as a Record by typeinfo if there is no virtual function in the base class.
+		This is an empty virtual function to make sure type_info can resolve the right class name
+		**/
 		virtual void do_nothing() {}
 		private:
 	};

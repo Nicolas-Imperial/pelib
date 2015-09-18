@@ -46,9 +46,11 @@
 
 namespace pelib
 {
+	/** Base class of any class able to parse a text into a data structure that can be contained in an instance of Algebra. This class must be derived to be used **/
 	class AlgebraDataParser : public DataParser
 	{
 		public:
+			/** Converts a string into an instance of T and throws a ParseException upon conversion error. If T is a numeric base type (int, float and derivatives) and strict is true, then an attempt to convert a string that matches an integer value into a float or double results in throwing a NoDecimalException **/
 			template <class Target>
 			static
 			Target
@@ -283,18 +285,22 @@ namespace pelib
 				return out;
 			}
 
+			/** Returns all matches of regex found in str **/
 			static
 			boost::cmatch
 			match(std::string regex, std::string str);
 
+			/** Returns a boost regular expression that extracts all data in the text to parse, that is stored in the corresponding data structure produced, such as its name or its values. **/
 			virtual
 			std::string
 			getDetailedPattern() = 0;
 
+			/** Returns a boost regular expression that matches the string representation of an algebraic data structure **/
 			virtual
 			std::string
 			getGlobalPattern() = 0;
 
+			/** Parses a text stream into a new instance derived from AlgebraData **/
 			virtual
 			AlgebraData*
 			parse(std::istream &in) = 0;

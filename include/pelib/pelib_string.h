@@ -30,6 +30,7 @@ typedef char* pelib_string;
 #include <pelib/structure.h>
 #define DONE_pelib_string
 
+/** Returns the number of characters contained in the string, exclusing null terminator character \0 **/
 size_t
 pelib_string_length(pelib_string str);
 

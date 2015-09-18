@@ -26,19 +26,29 @@
 
 namespace pelib
 {
+	/** Thrown upon any failed attempt to parse a data structure from input stream **/
 	class ParseException: public std::exception // or std::runtime_error?
 	{
 		public:
+			/** Consutrctor
+				@param msg Human-readable explicative message that describes teh reason why this class instance was thrown
+			**/
 			explicit ParseException(const std::string &msg);
+			/** Consutrctor
+				@param msg Human-readable explicative message that describes teh reason why this class instance was thrown
+			**/
 			explicit ParseException(const char *msg);
 
+			/** Destructor **/
 			virtual
 			~ParseException() throw();
 
+			/** Returns a human-readable string to display if the exception was not caught **/
 			virtual const char*
 			what() const throw();
 
 		protected:
+			/** Descriptive message on the reason why the exception was thrown **/
 			std::string msg;
 	};
 }

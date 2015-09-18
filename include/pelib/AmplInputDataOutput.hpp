@@ -27,6 +27,7 @@
 
 namespace pelib
 {
+	/** Base class of any class about to output data in AMPL Input data format **/
 	class AmplInputDataOutput: public AmplDataOutput
 	{
 		public:

@@ -34,22 +34,27 @@
 
 namespace pelib
 {
+	/** Mathematical Set **/
 	template <class Value> 
 	class Set: public AlgebraData
 	{
+		/** Type of the container that holds all values in this set. **/
 		typedef std::set<Value> SetType;
 		
 		public:
+			/** Constructor of a Set with name and values passed as parameters **/
 			Set(const std::string name, const SetType values) : AlgebraData(name), values(values)
 			{
 				// Do nothing
 			}
 
+			/** Copy constructor **/
 			Set(const Set<Value>* Set): AlgebraData(Set->getName()), values(Set->getValues())
 			{
 				// Do nothing
 			}
 
+			/** Returns a pointer to a copy of the Set instance **/
 			virtual
 			Set*
 			clone() const
@@ -57,6 +62,7 @@ namespace pelib
 				return new Set<Value>(name, values);
 			}
 
+			/** Returns an instance of pelib::SetType containing all values in this Set. **/
 			virtual
 			const SetType&
 			getValues() const
@@ -64,6 +70,7 @@ namespace pelib
 				return values;
 			}
 
+			/** Returns true if an element equal to elem is found in this set. **/
 			virtual
 			bool
 			find(Value elem) const
@@ -71,6 +78,7 @@ namespace pelib
 				return getValues().find(elem) != getValues().end();
 			}
 
+			/** Returns the number of elements in this set **/
 			virtual
 			size_t
 			getSize() const
@@ -79,6 +87,7 @@ namespace pelib
 			}
 			
 		protected:
+			/** Value container in this set **/
 			SetType values;
 		private:		
 	};

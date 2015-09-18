@@ -26,10 +26,17 @@
 
 namespace pelib
 {
+	/** Base class for a Platform output class **/
 	class PlatformOutput : public DataOutput
 	{
 		public:	
+			/** Writes the platform in output stream
+				@param o Output stream to write Platform instance to
+				@param data Instance of pelib::Platform to be written to output stream
+			**/
 			virtual	void dump(std::ostream& o, const Record *data) const = 0;
+
+			/** Returns a pointer to a copy of this Platform output class **/
 			virtual PlatformOutput* clone() const = 0;
 
 		protected:

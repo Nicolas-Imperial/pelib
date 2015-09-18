@@ -26,19 +26,29 @@
 
 namespace pelib
 {
+	/** Exception thrown upon failed cast attempts from a superclass to a derived class **/
 	class CastException: public std::exception
 	{
 		public:
+			/** Constructor
+				@param message Message to display to the screen if the exception is not caught
+			**/
 			explicit CastException(const std::string &message);
+			/** Constructor
+				@param message Message to display to the screen if the exception is not caught
+			**/
 			explicit CastException(const char *message);
 
+			/** Destructor **/
 			virtual
 			~CastException() throw();
 
+			/** Returns a human-readable string that explains the reason that lead to throwing this exception **/
 			virtual const char*
 			what() const throw();
 
 		protected:
+			/** Human-readable message to show if the exception is not caught **/
 			std::string msg;
 	};
 }
