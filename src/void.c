@@ -24,7 +24,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include <pelib/pelib.h>
 #include <pelib/void.h>
 
 void
@@ -32,7 +31,7 @@ pelib_copy(void)(void s1, void * s2)
   {
     *s2 = s1;
 
-    return PELIB_SUCCESS;
+    return 1;
   }
 
 void
@@ -40,7 +39,7 @@ pelib_init(void)(void *val)
   {
     *val = 0;
 
-    return PELIB_SUCCESS;
+    return 1;
   }
 
 void

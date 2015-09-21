@@ -24,7 +24,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <pelib/pelib.h>
 #include <pelib/pelib_string.h>
 
 int
@@ -32,7 +31,7 @@ pelib_copy(pelib_string)(pelib_string s1, pelib_string *s2)
 {
 	strcpy((char*)*s2, (char*)s1);
 
-	return PELIB_SUCCESS;
+	return 1;
 }
 
 int
@@ -40,7 +39,7 @@ pelib_init(pelib_string)(pelib_string *val)
 {
 	**val = '\0';
 
-	return PELIB_SUCCESS;
+	return 1;
 }
 
 int

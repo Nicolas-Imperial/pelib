@@ -23,7 +23,6 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include <pelib/pelib.h>
 
 #include <pelib/complex.h>
 
@@ -34,7 +33,7 @@ pelib_copy
   s2->r = s1.r;
   s2->im = s1.im;
 
-  return PELIB_SUCCESS;
+  return 1;
 }
 
 int
@@ -44,7 +43,7 @@ pelib_init
   cplx->im = 0;
   cplx->r = 0;
 
-  return PELIB_SUCCESS;
+  return 1;
 }
 
 int

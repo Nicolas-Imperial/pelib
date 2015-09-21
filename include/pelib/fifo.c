@@ -29,8 +29,6 @@
 #include <stdio.h>
 #include <stddef.h>
 
-#include <pelib/printf.h>
-
 #ifndef CFIFO_T
 #error Using generic fifo without a type
 #endif

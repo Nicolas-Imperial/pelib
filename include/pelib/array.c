@@ -26,8 +26,6 @@
 #include <assert.h>
 #include <string.h>
 
-#include <pelib/pelib.h>
-#include <pelib/printf.h>
 #include <pelib/size_t.h>
 
 #ifndef ARRAY_T
@@ -91,12 +89,12 @@ pelib_alloc_buffer(array_t(ARRAY_T))(array_t(ARRAY_T)* array, size_t size)
       array->data = calloc(array->capacity, sizeof(ARRAY_T));
       if(array->data == NULL)
       {
-        return PELIB_FAILURE;
+        return 0;
       }
       assert(array->data != NULL && size > 0 || array->data == NULL && size <= 0);
     }
 
-    return PELIB_SUCCESS;
+    return 1;
   }
 
 int
@@ -115,7 +113,7 @@ pelib_alloc_collection(array_t(ARRAY_T))(size_t n)
     array = pelib_alloc_struct(array_t(ARRAY_T))();
     if(array != NULL)
     {
-      if(pelib_alloc_buffer(array_t(ARRAY_T))(array, n) == PELIB_FAILURE)
+      if(pelib_alloc_buffer(array_t(ARRAY_T))(array, n) == 0)
       {
         pelib_free_struct(array_t(ARRAY_T))(array);        
         return NULL;
@@ -143,7 +141,7 @@ int
 pelib_init(array_t(ARRAY_T))(array_t(ARRAY_T)* array)
 {
 	array->length = 0;
-	return PELIB_SUCCESS;
+	return 1;
 }
 
 int

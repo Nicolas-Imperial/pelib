@@ -22,7 +22,6 @@
  */
 #include <assert.h>
 
-#include <pelib/pelib.h>
 #include <pelib/sort.h>
 
 static int
@@ -75,7 +74,7 @@ pelib_copy
   d->begin = s.begin;
   d->end = s.end;
 
-  return PELIB_SUCCESS;
+  return 1;
 }
 int
 pelib_init
@@ -84,7 +83,7 @@ pelib_init
   d->begin = 0;
   d->end = 0;
 
-  return PELIB_SUCCESS;
+  return 1;
 }
 
 static void

@@ -24,8 +24,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include <pelib/printf.h>
-
 cfifo_t(CFIFO_ARRAY_T)*
 pelib_cfifo_from_array(CFIFO_ARRAY_T)(array_t(CFIFO_ARRAY_T) *array)
   {

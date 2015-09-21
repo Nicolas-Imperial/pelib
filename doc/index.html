@@ -63,14 +63,13 @@ Documentation and Examples
 <font face=arial,helvetica size=0 color=#000000>
 <table border="1" bordercolor="#101010" bgcolor="#fffff0" cellpadding="3">
 <tr>
-<td><a href="http://www.ida.liu.se/labs/pelab/pelib/index.html#overview">Overview</a> </td>
-<td><a href="http://www.ida.liu.se/labs/pelab/pelib/index.html#publications">Publications</a> </td>
-<td><a href="http://www.ida.liu.se/labs/pelab/pelib/index.html#example">Code Examples</a> </td>
-<td><a href="http://www.ida.liu.se/labs/pelab/pelib/index.html#download">Download</a> </td>
-<td><a href="http://www.ida.liu.se/labs/pelab/pelib/index.html#license">License</a> </td>
-<td><a href="http://www.ida.liu.se/labs/pelab/pelib/index.html#ongoing">Ongoing Work</a> </td>
-<td><a href="http://www.ida.liu.se/labs/pelab/pelib/index.html#contact">Contact</a> </td>
-<td><a href="http://www.ida.liu.se/labs/pelab/pelib/index.html#funding">Acknowledgments</a> </td>
+<td><a href="#overview">Overview</a> </td>
+<td><a href="#publications">Publications</a> </td>
+<td><a href="#download">Download</a> </td>
+<td><a href="#license">License</a> </td>
+<td><a href="#ongoing">Ongoing Work</a> </td>
+<td><a href="#contact">Contact</a> </td>
+<td><a href="#funding">Acknowledgments</a> </td>
 </tr>
 </table>
 </font>
@@ -87,7 +86,7 @@ It is a swiss army knife for various research activity, in particular around on-
 The pelib includes a flexible C++ programming interface to read and write simple and complex data structure in various text format such as AMPL input data, AMPL output results, GraphML-based streaming applications models and XML-based schedule descriptions. The capability to parse and generate AMPL input and output data simplifies considerably the automation of experimental performance comparison between Linear Programming solvers and C++ algorithm implementations. A C++ program can generate AMPL input problem instances to feed a linear solver with a AMPL frontend and parse its output to compare with another solving method, such as a C++ implementation of a heuristic. We use this approach in our previous and future <a href="#publications">research papers</a>.
 The pelib also provides convenient generic C data structures with type checking, based on an object-oriented design, providing fast ways to show the precise state of internal data structures and functionality composition.
 These data structures are extensively used used in the <a href="/labs/pelab/drake/index.html">Drake</a> C stream programming framework.
-<br>This pages reviews the main features describes above, how to use and extend them. Section <a href="#overview">overview</a> gives a brief overview of pelib. Section <a href="#download">download</a> provides downloading link to the latest pelib source package. Section <a href="#licence">licence</a> provides information about our publication licence. Section <a href="#publications">publication</a> gives the list of articles we published using this library. Section <a href="#installation">installation</a> provides some explanations to compile and install the library. Section <a href="#parsing">Parsing and generating text representation of complex data structures</a> gives code examples on how to use the parser and output classes provded by pelib and describe the underlying structure to respect when writing new parser and output classes. Section <a href="#c_data_structure">Generic C data structures</a> gives an extended description of the C data structures implemented, how to extend their functionalities as well as adding new generic data structures. Check also the <a href="doxygen/html/index.html">doxygen documentation</a> for more detailed information.
+<br>This pages reviews the main features describes above, how to use and extend them. Section <a href="#overview">overview</a> gives a brief overview of pelib. Section <a href="#download">download</a> provides downloading link to the latest pelib source package. Section <a href="#licence">licence</a> provides information about our publication licence. Section <a href="#publications">publication</a> gives the list of articles we published using this library. Section <a href="#installation">installation</a> provides some explanations to compile and install the library. Section <a href="#parsing">Parsing and generating text representation of complex data structures</a> gives code examples on how to use the parser and output classes provded by pelib and describe the underlying structure to respect when writing new parser and output classes. Section <a href="#c_data_structure">Generic C data structures</a> gives an extended description of the C data structures implemented, how to extend their functionalities as well as adding new generic data structures. Check also the <a href="doxygen/html/index.html">doxygen documentation</a> for more detailed information. Section <a href="#ongoing">Ongoing work</a> details the additional features planned for the future. Section <a href="#contact">Contact</a> gives contact information if you want to contact us. Finally, the page ends with <a href="#funding">Acknowledgments</a>.
 </p>
 
 <hr>
@@ -106,6 +105,7 @@ Main features:
 <li>Conversion between AMPL input and AMPL output format of algebraic data structures (scalar, vector, set or matrix)
 <li>Conversion between GraphML taskgraphs or XML schedules and AMPL input or output data format
 <li>API designed for easy maintainability and high extention opportunities
+<li>Generic C data structures with type-checking and composability
 </ul>
 
 <p>
@@ -455,7 +455,7 @@ Therefore, the implementation of collections of a new data type only requires th
 For instance, one can define a display operation of a basic data type and the display operation of a pelib collection can use it to display its the precise content, showing also the content of objects it contains. This simplifies debugging as it makes it easy to write routines to observe the precise state of any complex data structure.
 </p>
 <p>
-Section <a href="#c_data_structure_basic">Pelib C basics</a> introduces the basic use of pelib data structures, including pelib collections and section <a href="#c_data_structure_extend">Develop new data structure</a> describes how to implement a custom data structure.
+Section <a href="#c_data_structure_basic">Pelib C basics</a> introduces the basic use of pelib data structures, including pelib collections and section <a href="#c_data_structure_extend">Develop new data structures</a> describes how to implement a custom data structure.
 </p>
 
 <h3 id="c_data_structure_basic">Pelib C basics</h3>
@@ -552,10 +552,272 @@ This code is roughly the same as above; only the type of a and b, as well as the
 <p>
 Finally, pelib data types and their function can be composed together. The code below illustrates the use if arrays of integers, arrays of complex and arrays of fifos of complex
 <pre class="brush: cpp">
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+#include &lt;pelib/integer.h&gt;
+#include &lt;pelib/complex.h&gt;
+
+// Create a fifo data structure that handles arrays of complex
+// Declare the fifo structure and methods first
+#define CFIFO_T array_t(complex_t)
+#include &lt;pelib/fifo.h&gt;
+// Close the definition of fifo for arrays of complex
+#define DONE_cfifo_array_complex_t_t
+// Then generate the corresponding code
+#define CFIFO_T array_t(complex_t)
+#include &lt;pelib/fifo.c&gt;
+
+int
+main(int argc, char **argv)
+{
+        // Iteration variable
+        size_t i;
+
+        // Variable declaration and initialization
+        int a;
+        pelib_init(int)(&amp;a);
+        complex_t b;
+        pelib_init(complex_t)(&amp;b);
+
+        // Declare and initialize an array of integers, and allocate its buffer
+        array_t(int) array_int;
+        pelib_init(array_t(int))(&amp;array_int);
+        pelib_alloc_buffer(array_t(int))(&amp;array_int, 10);
+
+        // Declare and initialize an array of complex, and allocate its buffer
+        array_t(complex_t) array_complex;
+        pelib_init(array_t(complex_t))(&amp;array_complex);
+        pelib_alloc_buffer(array_t(complex_t))(&amp;array_complex, 10);
+
+        // Fill both integer and complex arrays with increasing number (only in the real value for complex numbers)
+        for(i = 0; i &lt; 10; i++)
+        {
+                pelib_array_append(int)(&amp;array_int, (int)i);
+                b.r = (int)i;
+                pelib_array_append(complex_t)(&amp;array_complex, b);
+        }
+
+        // Display both arrays
+        pelib_printf(array_t(int))(stdout, array_int);
+        pelib_printf(array_t(complex_t))(stdout, array_complex);
+
+        // Declare and initialize a fifo of arrays of complex, and allocate its buffer
+        cfifo_t(array_t(complex_t)) complex_fifo;
+        pelib_init(cfifo_t(array_t(complex_t)))(&amp;complex_fifo);
+        pelib_alloc_buffer(cfifo_t(array_t(complex_t)))(&amp;complex_fifo, 5);
+        // Reinitialize the array of complex (just set its length to 0)
+        pelib_init(array_t(complex_t))(&amp;array_complex);
+
+        // Fill the fifo of increasing size arrays sharing the same data buffer
+        for(i = 0; i &lt; 3; i++)
+        {
+                b.r = 10 - (int)i;
+                pelib_array_append(complex_t)(&amp;array_complex, b);
+		// Below is a bad practice: don't duplicate arrays using a simple copy as it won't copy the array's buffer,
+		// but simply copy the pointer to it. It is better to implement pelib_copy() for arrays instead, but
+		// we never actually needed it so it's not done yet.
+                pelib_cfifo_push(array_t(complex_t))(&amp;complex_fifo, array_complex);
+        }
+
+        // Display the composite fifo
+        pelib_printf(cfifo_t(array_t(complex_t)))(stdout, complex_fifo);
+
+        return EXIT_SUCCESS;
+}
 </pre>
+The code snippet above illustrate the use of a pelib collection with integers of complex data structures. The declaration of an array of integer consists of the type itself (array_t) as well as a containing type specifier (int) that defines what elements can be stored in the array. Any array method called on this array instance must by typed as int. Basic operation method calls (that applies to the most basic pelib object, such as initialization, see <a href="doxygen/html/structure_8h.html">Doxygen documentation</a>) must be typed as the complete object being manipulated. In line 31 for example, the initialization method is typed as "array_t(int)" as an array of integer is being allocated. More specific methods, such as array's method "append" (line 42) can only be typed with the data type the array handles. This is possible because the method (pelib_array_append) is already specified as an array method in its name.
+<br>
+The code snippet above generates a new type of fifo able to receive arrays of complex. Line 9 defines a fifo content type (CFIFO) as an array of complex (array_t(complex)) and generates the data structure and method declaration in line 10. After definition, the new type must be marked as done (DONE_*) to avoid multiple definitions. This is done in line 12. Finally the actual method implementations are generated in line 15 by redefining the fifo element type and including the fifo generic code. The remaining of this code example resets the array of complex by calling its initialization method (that just reset its number of elements to 0) and insert in the fifo several copies of increasing size arrays. Note that as array_complex is given as a copy at each call of fifo push, each copy uses the same data buffer, but they record different number of elements inside. This is generally a bad practice; a better approach would be to implement the copy method of an array and reuse it here. However in this example, it provides a simple way to show illustrate the use of composite objects.
 </p>
 
-<h3 id="c_data_structure_extend"> describes how to implement a custom data structure</h3>
+<h3 id="c_data_structure_extend">Develop new data structures</h3>
+<p>
+Developing new pelib data structure is somewhat challenging, due to the difficulty to read code that makes heavy use of C preprocessor and interpret compilers' outputs. This section gives code snippets that can help to develop new data structures for pelib. Below is a snippet for its header
+<pre class="brush: cpp">
+// Defines PELIB_CONCAT_2 and PELIB_CONCAT_3 used below
+#include &lt;pelib/template.h&gt;
+ 
+// This part is optional, just like any normal header
+// Only to declare type-independent stuff related to our structure
+#ifndef MYSTRUCT_H
+#define MYSTRUCT_H
+ 
+#endif
+ 
+// Here begins the definition of our new data structure
+// This line prevents the following block to be imported twice
+// for the same type, provided DONE_* is defined after each
+// inclusion of this header
+#if PELIB_CONCAT_2(DONE_mystruct_, MYSTRUCT) == 0
+ 
+// Declare the name of the new structure and its generic type MYSTRUCT 
+// We need to declare two variants: one for the structure itself, another
+// for its space-less type alias (see below)
+#define mystruct(elem) PELIB_CONCAT_2(mystruct_, elem)
+#define mystruct_t(elem) PELIB_CONCAT_2(mystruct(elem), _t)
+ 
+// Declare a frontend name for each function that handle our new structure
+#define foo(elem) PELIB_CONCAT_3(tuto_, mystruct_t(elem), _foo)
+#define bar(elem) PELIB_CONCAT_3(tuto_, mystruct_t(elem), _bar)
+ 
+// Our actual generic structure
+struct mystruct(MYSTRUCT)
+{
+    int foo;
+    MYSTRUCT bar;
+};
+// A pelib structure cannot have a space in its name
+// because of the structure name is used to generate
+// function name, therefore we must use a type alias
+// using the second type name defined above
+typedef struct mystruct(MYSTRUCT) mystruct_t(MYSTRUCT);
+ 
+// This defines the basic object method (allocate, initialize, printf, string, etc.)
+// for our new structure
+#define STRUCT_T mystruct_t(MYSTRUCT)
+#include &lt;pelib/structure.h&gt;
+ 
+// Specific methods for our new structure
+// Actual definition of method foo
+int foo(MYSTRUCT)(mystruct_t(MYSTRUCT)* obj);
+size_t bar(MYSTRUCT)(mystruct_t(MYSTRUCT) obj, size_t n); 
+ 
+// End of definition
+#endif
+ 
+// Undefined the generic type name so the portion above cannot be parsed again by error.
+#undef MYSTRUCT
+</pre>
+Note that any copy error in the code above can lead to quite verbose compiler output, very difficult to understand. The code above generates a header with actual C structure and function definitions for each specialized version of our new generic structure. The snippet below gives an actual implementation. We limit it for the purprose of demonstration to the definition of a base method pelib_init and two specialized methods foo and bar. They both use the generic type MYSTRUCT to perform some operations. Just as our structure mystruct, pelib objects are not required to implement all functions defined in pelib/structure.h. However, if your object tries to call a basic method that is unimplemented, the linker will fail to build the final executable. If you want to use a data structure that requires to implement a method you can't implement, then define the missing method, make it to show an error message and abort the program execution, if needed, then avoid to use any method in the data structure you use that may use the missing function.
+<pre class="brush: cpp">
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stddef.h&gt;
+
+#ifndef MYSTRUCT
+#error Using generic mystruct without specialization type
+#endif
+
+// Basic pelib object mdethods implementations
+// Initialization
+int
+pelib_init(mystruct_t(MYSTRUCT))(mystruct_t(MYSTRUCT)* mystruct)
+{
+        mystruct-&gt;foo = 56; 
+        return pelib_init(MYSTRUCT)(&amp;mystruct-&gt;bar);
+}
+
+FILE*
+pelib_printf(mystruct_t(MYSTRUCT))(FILE* stream, mystruct_t(MYSTRUCT) mystruct)
+{
+        fprintf(stream, "%d, ", mystruct.foo);
+        pelib_printf(MYSTRUCT)(stream, mystruct.bar);
+        return stream;
+}
+
+// Many more basic operations should be implemented, but we won't show them for concision
+int
+foo(MYSTRUCT)(mystruct_t(MYSTRUCT)* obj)
+{
+        MYSTRUCT ref;
+
+        // By this line we require that any pelib typed used with our structure requires the implementation
+        // of basic function init()
+        pelib_init(MYSTRUCT)(&amp;ref);
+
+        // Here, we require that the pelib type using our new pelib data structure implements compare()
+        return obj-&gt;foo * pelib_compare(MYSTRUCT)(obj-&gt;bar, ref);
+}
+
+size_t
+bar(MYSTRUCT)(mystruct_t(MYSTRUCT) obj, size_t n)
+{
+        // Trivial operation, just as an example
+        return sizeof(MYSTRUCT) * n;
+}
+</pre>
+The code snippet above should never be compile alone. Instead, it should be included in concrete pelib object implementation. The code below shows the example of an integer making use of our new data structure. As mystruct implements pelib_printf and runs its with the type it is specialized with, we need our integer object to implement some pelib printf method. Let's consider for the sake of example that we can't or don't want to implement it. Instead, we just show an error message.
+<pre class="brush: cpp">
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+#include "integer.h"
+
+int
+pelib_init(int)(int *val)
+{
+        *val = 0;
+        return 1;
+}
+
+int
+pelib_compare(int)(int a, int b)
+{
+        return a - b;
+}
+
+FILE*
+pelib_printf(int)(FILE* stream, int a)
+{
+        fprintf(stderr, "[%s:%s:%d][ERROR] Not implemented\n", __FILE__, __FUNCTION__, __LINE__);
+        return stream;
+}
+
+// Generate mystruct functions for integer
+#define MYSTRUCT int
+#include "mystruct.c"
+</pre>
+As integer must also be a pelib object, we can have the header below
+<pre class="brush: cpp">
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+#define STRUCT_T int
+#include &lt;pelib/structure.h&gt;
+#define DONE_int
+
+#define MYSTRUCT int
+#include "mystruct.h"
+#define DONE_mystruct
+</pre>
+We can fnally use our integer object with mystruct in a program. We declare an instance of mystruct for integers. Because the field bar is generic, it is an int in our example and we can assign it an integer. Then we can use generic forms of methods foo and bar. the pelib basic printf method cannot succeed as our integer doesn't implement it. However as we provided a simple implementation, the program can be compiled and run.
+<pre class="brush: cpp">
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+#include "integer.h"
+
+#define show_int(var) printf("[%s:%s:%d] %s = %d\n", __FILE__, __FUNCTION__, __LINE__, #var, var)
+#define show_size_t(var) printf("[%s:%s:%d] %s = %zu\n", __FILE__, __FUNCTION__, __LINE__, #var, var)
+
+int
+main(int argc, char **argv)
+{
+	// Declare and initialize mystruct for int
+        mystruct_t(int) stuff;
+        pelib_init(mystruct_t(int))(&amp;stuff);
+
+	// Declare and initialize an integer
+        int mybar = 7;
+
+	// We know stuff is a mystruct for int, then we know that stuff.bar is an int and therefore, the line below is correct.
+        stuff.bar = mybar;
+
+	// Run the method foo with our mystruct instance and print it value returned on screen
+        show_int(foo(int)(&amp;stuff));
+
+	// Same procedure with bar method
+        show_size_t(bar(int)(stuff, 42));
+
+	// Finally, let's try the print method.
+        pelib_printf(mystruct_t(int))(stdout, stuff);
+        return EXIT_SUCCESS;
+}
+</pre>
+
+</p>
 
 <hr>
 <p>
@@ -568,9 +830,7 @@ Finally, pelib data types and their function can be composed together. The code 
 <p>
 Additional features to be developped include:
 <ul>
-<li>Parsing and output of XPDL platform descriptions</li>
-<li>Generation of graphic representation of schedules</li>
-<li>Flexible formula parsing scheme similar to pelib-convert dynamic libraries</li>
+<li>Adding a hashmap data structure</li>
 </ul>
 </p>
 <p>

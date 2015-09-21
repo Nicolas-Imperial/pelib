@@ -24,7 +24,6 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include <pelib/pelib.h>
 #include <pelib/size_t.h>
 
 int
@@ -32,7 +31,7 @@ pelib_copy(size_t)(size_t s1, size_t * s2)
 {
   *s2 = s1;
 
-  return PELIB_SUCCESS;
+  return 1;
 }
 
 int
@@ -40,7 +39,7 @@ pelib_init(size_t)(size_t *var)
 {
   *var = 0;
 
-  return PELIB_SUCCESS;
+  return 1;
 }
 
 int
