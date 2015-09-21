@@ -82,11 +82,11 @@ init()
 {
   stack = pelib_alloc_collection(stack_t(complex_t))(0);
   pelib_init(stack_t(complex_t))(stack);
-  assert(pelib_stack_check(complex_t)(stack) == 0);
+  assert(pelib_stack_check(complex_t)(stack) == 1);
 
   pool = pelib_alloc_collection(stack_t(complex_t))(0);
   pelib_init(stack_t(complex_t))(pool);
-  assert(pelib_stack_check(complex_t)(pool) == 0);
+  assert(pelib_stack_check(complex_t)(pool) == 1);
 
   data.im = DATA_IM;
   data.r = DATA_REAL;
@@ -115,7 +115,7 @@ test_push()
   int res;
 
   // Check precondition
-  res = (pelib_stack_check(complex_t)(stack) == 0);
+  res = (pelib_stack_check(complex_t)(stack) == 1);
   assert(res);
 
   // Test case
@@ -123,7 +123,7 @@ test_push()
   ( complex_t)( stack, data);
 
   // Checking
-  res &= (pelib_stack_check(complex_t)(stack) == 0);
+  res &= (pelib_stack_check(complex_t)(stack) == 1);
   assert(res);
 
   res &= (memcmp(&stack->top->buffer, &data, DATA_SIZE) == 0);
@@ -143,7 +143,7 @@ test_peek()
   pelib_stack_peek(complex_t)(stack, &out);
 
   // Checking
-  res = (pelib_stack_check(complex_t)(stack) == 0);
+  res = (pelib_stack_check(complex_t)(stack) == 1);
   assert(res);
 
   res &= !(memcmp(&data, &out, DATA_SIZE) == 0);
@@ -160,7 +160,7 @@ test_pop()
   pelib_stack_pop(complex_t)(stack, &out);
 
   // Checking
-  res = (pelib_stack_check(complex_t)(stack) == 0);
+  res = (pelib_stack_check(complex_t)(stack) == 1);
   assert(res);
 
   res = (stack->top == NULL);
@@ -176,7 +176,7 @@ test_push_safe()
   int res;
 
   // Check precondition
-  res = (pelib_stack_check(complex_t)(stack) == 0);
+  res = (pelib_stack_check(complex_t)(stack) == 1);
   assert(res);
 
   // Test case
@@ -184,7 +184,7 @@ test_push_safe()
   ( complex_t)( stack, data);
 
   // Checking
-  res &= (pelib_stack_check(complex_t)(stack) == 0);
+  res &= (pelib_stack_check(complex_t)(stack) == 1);
   assert(res);
 
   res &= (memcmp(&stack->top->buffer, &data, DATA_SIZE) == 0);
@@ -204,7 +204,7 @@ test_pop_safe()
   pelib_stack_pop_safe(complex_t)(stack, &out);
 
   // Checking
-  res = (pelib_stack_check(complex_t)(stack) == 0);
+  res = (pelib_stack_check(complex_t)(stack) == 1);
   assert(res);
 
   res &= (stack->top == NULL);
@@ -213,6 +213,10 @@ test_pop_safe()
   res &= !(memcmp(&data, &out, DATA_SIZE) == 0);
   assert(res);
 }
+
+#define debug_str(var) printf("[%s:%s:%d] %s = \"%s\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var);
+#define debug_int(var) printf("[%s:%s:%d] %s = %d\n", __FILE__, __FUNCTION__, __LINE__, #var, var);
+#define debug_size_t(var) printf("[%s:%s:%d] %s = %zu\n", __FILE__, __FUNCTION__, __LINE__, #var, var);
 
 void
 test_pushpop_safe_managed()
@@ -223,10 +227,10 @@ test_pushpop_safe_managed()
   pelib_init(stackelem_t(complex_t))(&elem);
 
   // Check precondition
-  res = (pelib_stack_check(complex_t)(stack) == 0);
+  res = (pelib_stack_check(complex_t)(stack) == 1);
   assert(res);
 
-  res &= (pelib_stack_check(complex_t)(pool) == 0);
+  res &= (pelib_stack_check(complex_t)(pool) == 1);
   assert(res);
 
   // Checking
@@ -234,9 +238,11 @@ test_pushpop_safe_managed()
   assert(res);
 
   // Test case
-  pelib_stack_push_safe_managed
-  ( complex_t)( stack, pool, data);
+  debug_str("Hello world");
+  pelib_stack_push_safe_managed(complex_t)(stack, pool, data);
+  debug_str("Hello world");
   pelib_stack_pop_safe_managed(complex_t)(stack, pool, &data);
+  debug_str("Hello world");
 
   // Checking
   res &= !pelib_stack_isempty(complex_t)(pool);

@@ -55,14 +55,7 @@ pelib_string(int)(int a)
     size_t size;
     char* str;
 
-	if(a > 0)
-	{
-		size = (int)log10(a);
-	}
-	else
-	{
-		size = 1;
-	}
+    size = (int)(a > 0 ? log10(a) : 1);
     str = malloc(sizeof(char) * (size + 2));
     sprintf(str, "%i", a);
 
@@ -100,6 +93,15 @@ pelib_fread(int)(int* buffer, FILE* stream)
 
   *buffer = num;
   return total;
+}
+
+FILE*
+pelib_printf(int)(FILE* stream, int a)
+{
+	char *str = pelib_string(int)(a);
+	fprintf(stream, "%s\n", str);
+	free(str);
+	return stream;
 }
 
 // Now include the generic array implementation

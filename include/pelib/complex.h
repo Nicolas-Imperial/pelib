@@ -40,4 +40,12 @@ typedef struct complex complex_t;
 #include <pelib/stack.h>
 #define DONE_stack_complex_t
 
+#define ARRAY_T complex_t
+#include <pelib/array.h>
+#define DONE_array_complex_t
+
+#define CFIFO_T complex_t
+#include <pelib/fifo.h>
+#define DONE_cfifo_complex_t
+
 #endif /* COMPLEX_H_ */

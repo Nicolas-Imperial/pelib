@@ -109,7 +109,7 @@ pelib_alloc_buffer(cfifo_t(CFIFO_T))(cfifo_t(CFIFO_T)* cfifo, size_t capacity)
 	}*/
 	cfifo->capacity = capacity;
 
-	return PELIB_SUCCESS;
+	return 1;
 }
 
 cfifo_t(CFIFO_T)*
@@ -140,7 +140,7 @@ pelib_alloc_collection(cfifo_t(CFIFO_T))(size_t size)
 //		printf("[%s:%s:%d] Fifo @%X: Allocate write to MPB@ %X\n", __FILE__, __FUNCTION__, __LINE__, fifo, pelib_scc_local_offset((void*)fifo->write, init.core));
 //	}
 
-		if(pelib_alloc_buffer(cfifo_t(CFIFO_T))(fifo, size) == PELIB_FAILURE)
+		if(pelib_alloc_buffer(cfifo_t(CFIFO_T))(fifo, size) == 0)
 		{
 			pelib_free_struct(cfifo_t(CFIFO_T))(fifo);
 			return NULL;
@@ -191,7 +191,7 @@ int
 pelib_free_buffer(cfifo_t(CFIFO_T))(cfifo_t(CFIFO_T)* fifo)
 {
 	free(fifo);
-	return PELIB_SUCCESS;
+	return 1;
 }
 
 FILE*
@@ -230,11 +230,11 @@ check_memory(CFIFO_T)(CFIFO_T* ptr, size_t length)
 		{
 		  //printf("MARKER FOUND: buffer is %i\n",*(int*)ptr);
 		  //exit(65);
-			return PELIB_FAILURE;
+			return 0;
 		}
 	}
 
-	return PELIB_SUCCESS;
+	return 1;
 }
 #else
 #define check_memory(elem)
@@ -355,47 +355,45 @@ pelib_string(cfifo_t(CFIFO_T))(cfifo_t(CFIFO_T) fifo)
 
 char*
 pelib_string_detail(cfifo_t(CFIFO_T))(cfifo_t(CFIFO_T) fifo, int level)
+{
+  char *str, *elem;
+  unsigned int i;
+  int status;
+
+  str = (char*)malloc(sizeof(char) * ((PELIB_FIFO_ELEM_MAX_CHAR + 1) * fifo.capacity)
+      + 4);
+
+  sprintf(str, "[");
+  for (i = 0; i < fifo.capacity; i++)
   {
-    char *str, *elem;
-    unsigned int i;
-    int status;
-
-    str = (char*)malloc(sizeof(char) * ((PELIB_FIFO_ELEM_MAX_CHAR + 1) * fifo.capacity)
-        + 4);
-
-    sprintf(str, "[");
-    for (i = 0; i < fifo.capacity; i++)
-      {
-        elem = pelib_string_detail(CFIFO_T)(fifo.buffer[i], level);
-        status = is_in_content(CFIFO_T)(&fifo, i);
-
-        if (abs(status) & 2)
-          {
-            sprintf(str, "%s>", str);
-          }
-        if (abs(status) & 4)
-          {
-            sprintf(str, "%s>", str);
-          }
-        if (status > 0)
-          {
-            sprintf(str, "%s%s", str, elem);
-          }
-        else
-          {
-            sprintf(str, "%s.", str);
-          }
-        if (i < fifo.capacity - 1)
-          {
-            sprintf(str, "%s:", str);
-          }
-
-        //free(elem);
-      }
-    sprintf(str, "%s]", str);
-
-    return str;
+    status = is_in_content(CFIFO_T)(&fifo, i);
+    if (abs(status) & 2)
+    {
+      sprintf(str, "%s>", str);
+    }
+    if (abs(status) & 4)
+    {
+      sprintf(str, "%s>", str);
+    }
+    if(status > 0)
+    {
+      elem = pelib_string_detail(CFIFO_T)(fifo.buffer[i], level);
+      sprintf(str, "%s%s", str, elem);
+      free(elem);
+    }
+    else
+    {
+      sprintf(str, "%s.", str);
+    }
+    if (i < fifo.capacity - 1)
+    {
+      sprintf(str, "%s:", str);
+    }
   }
+  sprintf(str, "%s]", str);
+
+  return str;
+}
 
 #if 0
 void
@@ -589,7 +587,9 @@ pelib_cfifo_pop(CFIFO_T)(cfifo_t(CFIFO_T)* fifo)
     else
       {
         //return def;
-	return (CFIFO_T) 0;
+	CFIFO_T def;
+	pelib_init(CFIFO_T)(&def);
+	return def;
       }
   }
 
@@ -635,8 +635,9 @@ pelib_cfifo_peek(CFIFO_T)(cfifo_t(CFIFO_T)* cfifo, size_t offset)
     else
       {
         // return def; //uninitialized??
-	exit(1);
-	return (CFIFO_T) 0;
+	CFIFO_T def;
+	pelib_init(CFIFO_T)(&def);
+	return def;
       }
   }
 
@@ -1033,7 +1034,7 @@ pelib_cfifo_length(CFIFO_T)(cfifo_t(CFIFO_T) cfifo)
 		break;
 	}
 
-	return PELIB_FAILURE;
+	return 0;
 }
 
 CFIFO_T
@@ -1042,8 +1043,10 @@ pelib_cfifo_last(CFIFO_T)(cfifo_t(CFIFO_T) *cfifo)
 	size_t length = pelib_cfifo_length(CFIFO_T)(*cfifo);
 
 	if(pelib_cfifo_length(CFIFO_T)(*cfifo) <= 0)
-	{
-		return 0;
+	{  
+		CFIFO_T def;
+		pelib_init(CFIFO_T)(&def);
+		return def;
 	}
 	else
 	{

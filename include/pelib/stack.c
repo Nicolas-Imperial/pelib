@@ -138,7 +138,7 @@ pelib_stack_pop(STACK_T)(stack_t(STACK_T) *s, STACK_T* buffer)
   {
     stackelem_t(STACK_T) * elem;
 
-    if (pelib_stack_peek(STACK_T)(s, buffer) != 0)
+    if (!pelib_stack_peek(STACK_T)(s, buffer))
       {
         return 0;
       }
@@ -243,7 +243,7 @@ pelib_stack_push_safe_managed(STACK_T)(stack_t(STACK_T) *s, stack_t(STACK_T) *po
 
     assert(pelib_stack_check(STACK_T)(pool) == 0);
 
-    if (pelib_stack_pop_elem(STACK_T)(pool, &elem) != 0)
+    if (pelib_stack_pop_elem(STACK_T)(pool, &elem) != 1)
       {
         elem = malloc(sizeof(stackelem_t(STACK_T)));
         pelib_init(stackelem_t(STACK_T))(elem);
@@ -261,7 +261,7 @@ pelib_stack_pop_safe_managed(STACK_T)(stack_t(STACK_T) *s, stack_t(STACK_T) *poo
   {
     stackelem_t(STACK_T) *elem = NULL;
 
-    if (pelib_stack_pop_elem_safe(STACK_T)(s, &elem) != 0)
+    if (pelib_stack_pop_elem_safe(STACK_T)(s, &elem) != 1)
       {
         return 0;
       }

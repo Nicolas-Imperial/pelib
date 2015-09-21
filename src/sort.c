@@ -353,7 +353,7 @@ pelib_quicksort_tune(array_t(int)* array, qsort_tune_t p)
     {
       if (res.done == 1)
         {
-          pelib_stack_pop(qsort_bound_t)(stack, &start);
+        int ret = pelib_stack_pop(qsort_bound_t)(stack, &start);
           param.tune.begin = start.begin;
           param.tune.end = start.end;
 

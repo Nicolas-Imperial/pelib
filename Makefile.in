@@ -19,7 +19,7 @@
 
 package = pelib
 version = 1
-minor = 0
+minor = 1
 release = 0
 
 prefix = $(HOME)/.local
