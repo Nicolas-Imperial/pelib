@@ -20,9 +20,6 @@
  *     along with pelib. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-//#ifndef UNUSED
-//#define UNUSED(x) (void)(x)
-//#endif
 
 #include <string.h>
 #include <stdlib.h>
@@ -33,78 +30,29 @@
 #error Using generic fifo without a type
 #endif
 
+// Aliases for static functions
+#define state(elem) PELIB_CONCAT_3(cfifo_, elem, _state)
+#define is_in_content(elem) PELIB_CONCAT_2(is_in_content_, elem)
+#define continuous_read_length(elem) PELIB_CONCAT_2(continuous_read_length_, elem)
+static size_t continuous_read_length(CFIFO_T)(cfifo_t(CFIFO_T) *fifo);
+#define continuous_write_length(elem) PELIB_CONCAT_2(continuous_write_length_, elem)
+static size_t continuous_write_length(CFIFO_T)(cfifo_t(CFIFO_T) *fifo);
+
 #define CFIFO_EMPTY "[]"
 #define CFIFO_SEPARATOR ":"
 #define CFIFO_BEGIN "["
 #define CFIFO_END "]"
 
-#ifndef debug
-#if DEBUG
-#define printf_addr(addr) printf("[%s:%s:%d] @%s: %08X\n", __FILE__, __FUNCTION__, __LINE__, #addr, addr);
-#define printf_int(addr) printf("[%s:%s:%d] %s: %d (signed) = %u (unsigned)\n", __FILE__, __FUNCTION__, __LINE__, #addr, addr, addr);
-#define debug printf("[%s:%s:%d] Hello world!\n", __FILE__, __FUNCTION__, __LINE__);
-#else
-#define printf_addr(addr)
-#define printf_int(var)
-//#define printf_int(addr) printf("[%s:%s:%d] %s: %d (signed) = %u (unsigned)\n", __FILE__, __FUNCTION__, __LINE__, #addr, addr, addr);
-#define debug
-#endif
-#endif
-
-enum cfifo_state
+enum state
 {
   NORMAL, REVERSE, EMPTY, FULL
 };
-typedef enum cfifo_state cfifo_state_t;
-
-#if 0
-CFIFO_T
-pelib_fifo_elem_init()
-  {
-    CFIFO_T elem;
-    elem = 0;
-
-    return elem;
-  }
-
-char*
-pelib_fifo_elem_string(CFIFO_T elem)
-  {
-    char *str;
-
-    str = malloc((PELIB_FIFO_ELEM_MAX_CHAR + 1) * sizeof(char));
-
-    sprintf(str, "%i", elem);
-
-    return str;
-  }
-#endif
-
-/*
-#define get_write(elem) PELIB_CONCAT_3(get_, elem, _write)
-static
-size_t
-get_write(CFIFO_T)(cfifo_t(CFIFO_T)* cfifo)
-{
-	size_t write;
-	write = (cfifo->id < 0) ? cfifo->write : *(size_t*)cfifo->write;
-//	printf_int(write);
-	return write;
-}
-*/
+typedef enum state state_t;
 
 int
 pelib_alloc_buffer(cfifo_t(CFIFO_T))(cfifo_t(CFIFO_T)* cfifo, size_t capacity)
 {
-	/*if(init.core < 0)
-	{*/
-		cfifo->buffer = (CFIFO_T*)malloc(sizeof(CFIFO_T) * capacity);
-	/*}
-	else
-	{
-		cfifo->buffer = (CFIFO_T*)pelib_scc_global_ptr(pelib_scc_stack_grow(init.stack, sizeof(CFIFO_T) * capacity, init.core), init.core);
-//		printf_int(pelib_scc_local_offset((void*)cfifo->buffer, cfifo->id));
-	}*/
+	cfifo->buffer = (CFIFO_T*)malloc(sizeof(CFIFO_T) * capacity);
 	cfifo->capacity = capacity;
 
 	return 1;
@@ -126,18 +74,6 @@ pelib_alloc_collection(cfifo_t(CFIFO_T))(size_t size)
 	fifo = pelib_alloc_struct(cfifo_t(CFIFO_T))();
 	if(fifo != NULL)
 	{
-		
-	//fifo->id = init.core;
-
-//	if(init.core >= 0)
-//	{
-//		printf_int(fifo->id);
-//		printf("[%s:%s:%d] Fifo @%X: Allocate write to MPB@ %X\n", __FILE__, __FUNCTION__, __LINE__, fifo, pelib_scc_local_offset((void*)fifo->write, init.core));
-//		fifo->write = (size_t)pelib_scc_global_ptr(pelib_scc_stack_grow(init.stack, sizeof(size_t), init.core), init.core);
-//		printf_int(pelib_scc_local_offset((void*)fifo->write, fifo->id));
-//		printf("[%s:%s:%d] Fifo @%X: Allocate write to MPB@ %X\n", __FILE__, __FUNCTION__, __LINE__, fifo, pelib_scc_local_offset((void*)fifo->write, init.core));
-//	}
-
 		if(pelib_alloc_buffer(cfifo_t(CFIFO_T))(fifo, size) == 0)
 		{
 			pelib_free_struct(cfifo_t(CFIFO_T))(fifo);
@@ -154,18 +90,7 @@ pelib_init(cfifo_t(CFIFO_T))(cfifo_t(CFIFO_T)* fifo)
 {
 	fifo->last_op = PELIB_CFIFO_POP;
 	fifo->read = 0;
-
-//	if(fifo->id < 0)
-//	{
-		fifo->write = 0;
-//	}
-//	else
-//	{
-//		// TODO: check
-//		pelib_scc_cache_invalidate();
-//		*(size_t*)fifo->write = 0;
-//		printf_int(*(size_t*)fifo->write);
-//	};
+	fifo->write = 0;
 
 	return 1;
 }
@@ -214,49 +139,9 @@ pelib_printf_detail(cfifo_t(CFIFO_T))(FILE* stream, cfifo_t(CFIFO_T) fifo, int l
 	return stream;
 }
 
-#if 0
-#define check_memory(elem) PELIB_CONCAT_3(check_, elem, _memory)
-static
-int
-check_memory(CFIFO_T)(CFIFO_T* ptr, size_t length)
+static state_t
+state(CFIFO_T)(cfifo_t(CFIFO_T) *cfifo)
 {
-	size_t i;
-	for(i = 0; i < length; i++)
-	{
-	  //if(ptr[i] == (CFIFO_T)MARKER && 0)
-	  if(ptr[i] == MARKER)
-		{
-		  //printf("MARKER FOUND: buffer is %i\n",*(int*)ptr);
-		  //exit(65);
-			return 0;
-		}
-	}
-
-	return 1;
-}
-#else
-#define check_memory(elem)
-#endif
-
-#define cfifo_state(elem) PELIB_CONCAT_3(cfifo_, cfifo(elem), _state)
-static cfifo_state_t
-cfifo_state(CFIFO_T)(cfifo_t(CFIFO_T) *cfifo)
-{
-//	printf("%X\n", cfifo);
-  //int id = cfifo->id;
-/*
-	if(id < 0)
-	{
-		write = cfifo->write;
-	}
-	else
-	{
-//		printf("%X\n", cfifo->write);
-		write = *(size_t*)cfifo->write;
-	}
-//    volatile size_t write = get_write(CFIFO_T)(scc_fifo);
-*/
-
     if (cfifo->read == cfifo->write)
       {
         if (cfifo->last_op == PELIB_CFIFO_POP)
@@ -283,7 +168,6 @@ cfifo_state(CFIFO_T)(cfifo_t(CFIFO_T) *cfifo)
       }
   }
 
-#define is_in_content(elem) PELIB_CONCAT_2(cfifo(elem), _is_in_content)
 // returns 1 if index is in data area
 // returns 3 if index is in position of read index
 // returns 7 if index is in both read and write position, and in data area (fifo full)
@@ -307,10 +191,10 @@ is_in_content(CFIFO_T)(cfifo_t(CFIFO_T) *fifo, size_t index)
   {
     int res;
     size_t read;
-    cfifo_state_t state;
+    state_t state;
 
     read = fifo->read;
-    state = cfifo_state(CFIFO_T)(fifo);
+    state = state(CFIFO_T)(fifo);
 
     res = 1;
     res += index == read ? 2 : 0;
@@ -393,80 +277,11 @@ pelib_string_detail(cfifo_t(CFIFO_T))(cfifo_t(CFIFO_T) fifo, int level)
   return str;
 }
 
-#if 0
-void
-pelib_cfifo_printf_content(CFIFO_T)(cfifo_t(CFIFO_T)* fifo)
-  {
-    char* str;
-    str = pelib_cfifo_string_content(CFIFO_T)(fifo);
-    fprintf(pelib_get_stdout(), "%s\n", str);
-    free(str);
-  }
-
-char*
-pelib_cfifo_string_detail(CFIFO_T)
-(cfifo_t(CFIFO_T)* cfifo)
-  {
-    char *str, *elem;
-    unsigned int i;
-    int length;
-    cfifo_state_t state;
-
-    state = cfifo_state(CFIFO_T)(cfifo);
-
-    switch (state)
-      {
-        case NORMAL:
-        length = ((unsigned int) cfifo->write_ptr
-            - (unsigned int) cfifo->read_ptr) / sizeof(CFIFO_T);
-        break;
-        case REVERSE:
-        length = ((unsigned int) cfifo->read_ptr
-            - (unsigned int) cfifo->write_ptr)
-        / sizeof(CFIFO_T);
-        break;
-        case EMPTY:
-        str = malloc(sizeof(CFIFO_EMPTY) + 1);
-        sprintf(str, CFIFO_EMPTY);
-        return str;
-        break;
-        case FULL:
-        length = cfifo->capacity;
-        break;
-        default:
-        fprintf(pelib_get_stderr(),
-            "Illegal circular fifo state: %i\n", state);
-        break;
-      }
-
-    str = malloc((PELIB_FIFO_ELEM_MAX_CHAR
-            + sizeof(CFIFO_SEPARATOR)) * length + sizeof(CFIFO_BEGIN)
-        + sizeof(CFIFO_END) + 1);
-
-    sprintf(str, "%s", CFIFO_BEGIN);
-    int end = ((unsigned int) cfifo->write_ptr
-        - (unsigned int) cfifo->buffer) / sizeof(CFIFO_T);
-    end = end + cfifo->capacity - 1;
-    end = end % cfifo->capacity;
-    for (i = ((unsigned int) cfifo->read_ptr
-            - (unsigned int) cfifo->buffer) / sizeof(CFIFO_T); i
-        != end; i = (i + 1) % cfifo->capacity)
-      {
-        elem = pelib_string(CFIFO_T)(cfifo->buffer[i]);
-        sprintf(str, "%s%s%s", str, elem, CFIFO_SEPARATOR);
-      }
-    elem = pelib_string(CFIFO_T)(cfifo->buffer[i]);
-    sprintf(str, "%s%s%s", str, elem, CFIFO_END);
-
-    return str;
-  }
-#endif
-
 int
 pelib_cfifo_push(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, CFIFO_T elem)
   {
     if (fifo->capacity > 0 && 
-	cfifo_state(CFIFO_T)(fifo) != FULL)
+	state(CFIFO_T)(fifo) != FULL)
       {
         memcpy((void*)&(fifo->buffer[fifo->write]), &elem, sizeof(CFIFO_T));
 
@@ -484,7 +299,7 @@ pelib_cfifo_push(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, CFIFO_T elem)
 size_t
 pelib_cfifo_fill(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, size_t num)
 {
-	size_t length = pelib_cfifo_capacity(CFIFO_T)(fifo) - pelib_cfifo_length(CFIFO_T)(*fifo);
+	size_t length = pelib_cfifo_capacity(CFIFO_T)(fifo) - pelib_cfifo_length(CFIFO_T)(fifo);
 	num = length < num ? length : num;
 
 	fifo->write = (fifo->write + num) % fifo->capacity;
@@ -497,15 +312,17 @@ pelib_cfifo_fill(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, size_t num)
 	return num;
 }
 
-#define cfifo_peek(elem) PELIB_CONCAT_3(cfifo_, cfifo(elem), _peek)
-static
 CFIFO_T*
-cfifo_peek(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, size_t offset)
+pelib_cfifo_peekaddr(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, size_t offset, size_t *num)
   {
     if (fifo->capacity > 0 &&
-	offset < pelib_cfifo_length(CFIFO_T)(*fifo) &&
-	cfifo_state(CFIFO_T)(fifo) != EMPTY)
+	offset < pelib_cfifo_length(CFIFO_T)(fifo) &&
+	state(CFIFO_T)(fifo) != EMPTY)
       {
+	if(num != NULL)
+	{
+		*num = continuous_read_length(CFIFO_T)(fifo);
+	}
         return (CFIFO_T*)&(fifo->buffer[(fifo->read + offset) % fifo->capacity]);
       }
     else
@@ -514,77 +331,23 @@ cfifo_peek(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, size_t offset)
       }
   }
 
-/*
-CFIFO_T
-pelib_cfifo_last(CFIFO_T)(cfifo_t(CFIFO_T)* fifo)
-{
-//	pelib_printf(cfifo_t(CFIFO_T))(*fifo);
-	if(!pelib_cfifo_is_empty(CFIFO_T)(fifo))
-	{
-#if 0
-#define printf_addr(addr) printf("@%s: %08X\n", #addr, addr);
-#define printf_int(addr) printf("%s: %d\n", #addr, addr);
-		printf_addr(fifo->write_ptr);
-		printf_addr(fifo->buffer);
-		printf_addr((char*)fifo->write_ptr - (char*)fifo->buffer);
-		printf_int((char*)fifo->write_ptr - (char*)fifo->buffer);
-		printf_int(((char*)fifo->write_ptr - (char*)fifo->buffer) / sizeof(CFIFO_T));
-		printf_int(((char*)fifo->write_ptr - (char*)fifo->buffer) / sizeof(CFIFO_T) + fifo->capacity);
-		printf_int(((char*)fifo->write_ptr - (char*)fifo->buffer) / sizeof(CFIFO_T) + fifo->capacity - 1);
-		printf_int((((char*)fifo->write_ptr - (char*)fifo->buffer) / sizeof(CFIFO_T) + fifo->capacity - 1) % fifo->capacity);
-		printf_int(((((char*)fifo->write_ptr - (char*)fifo->buffer) / sizeof(CFIFO_T) + fifo->capacity - 1) % fifo->capacity) * sizeof(CFIFO_T));
-		printf_addr(((((char*)fifo->write_ptr - (char*)fifo->buffer) / sizeof(CFIFO_T) + fifo->capacity - 1) % fifo->capacity) * sizeof(CFIFO_T) + (char*)fifo->buffer);
-#endif
-
-		return *(int*)(((((char*)fifo->write_ptr - (char*)fifo->buffer) / sizeof(CFIFO_T) + fifo->capacity - 1) % fifo->capacity) * sizeof(CFIFO_T) + (char*)fifo->buffer);
-	}
-	else
-	{
-		CFIFO_T blank;
-		pelib_init(CFIFO_T)(&blank);
-		return blank;
-	}
- }
-*/
-
-/*
-void
-do_nothing()
-{
-	printf("Doing nothing\n");
- // Do nothing
-}
-
-#define RC_cache_invalidate do_nothing
-*/
-
 CFIFO_T
 pelib_cfifo_pop(CFIFO_T)(cfifo_t(CFIFO_T)* fifo)
   {
     CFIFO_T *ptr,  res;
-    //CFIFO_T def;
 
-    ptr = cfifo_peek(CFIFO_T)(fifo, 0);
+    ptr = pelib_cfifo_peekaddr(CFIFO_T)(fifo, 0, NULL);
     if (ptr != NULL)
       {
         fifo->read = (fifo->read + 1) % fifo->capacity;
         fifo->last_op = PELIB_CFIFO_POP;
 
 	res = *ptr;
-	/*
-	while(res == (CFIFO_T) MARKER)
-	{
-		
-		res = *ptr;
-	}
-	*ptr = (CFIFO_T) MARKER;
-	*/
 
         return res;
       }
     else
       {
-        //return def;
 	CFIFO_T def;
 	pelib_init(CFIFO_T)(&def);
 	return def;
@@ -594,7 +357,7 @@ pelib_cfifo_pop(CFIFO_T)(cfifo_t(CFIFO_T)* fifo)
 size_t
 pelib_cfifo_discard(CFIFO_T)(cfifo_t(CFIFO_T) *fifo, size_t num)
 {
-	int length = pelib_cfifo_length(CFIFO_T)(*fifo);
+	int length = pelib_cfifo_length(CFIFO_T)(fifo);
 	num = num < (size_t) length ? num : (size_t)length;
 
 	fifo->read = (fifo->read + num) % fifo->capacity;
@@ -611,28 +374,14 @@ CFIFO_T
 pelib_cfifo_peek(CFIFO_T)(cfifo_t(CFIFO_T)* cfifo, size_t offset)
   {
     CFIFO_T *ptr, res;
-    //CFIFO_T def;
-    ptr = cfifo_peek(CFIFO_T)(cfifo, offset);
+    ptr = pelib_cfifo_peekaddr(CFIFO_T)(cfifo, offset, NULL);
     if (ptr != NULL)
       {
-	
 	res = *ptr;
-	//int cnt = 0;
-	/*
-	while(res == (CFIFO_T) MARKER)
-	{
-		debug
-		
-		res = *ptr;
-	}
-	*/
-	
-
         return res;
       }
     else
       {
-        // return def; //uninitialized??
 	CFIFO_T def;
 	pelib_init(CFIFO_T)(&def);
 	return def;
@@ -642,38 +391,25 @@ pelib_cfifo_peek(CFIFO_T)(cfifo_t(CFIFO_T)* cfifo, size_t offset)
 int
 pelib_cfifo_is_full(CFIFO_T)(cfifo_t(CFIFO_T)* cfifo)
   {
-    return cfifo_state(CFIFO_T)(cfifo) == FULL;
+    return state(CFIFO_T)(cfifo) == FULL;
   }
 
 int
 pelib_cfifo_is_empty(CFIFO_T)(cfifo_t(CFIFO_T)* cfifo)
   {
-    return cfifo_state(CFIFO_T)(cfifo) == EMPTY;
+    return state(CFIFO_T)(cfifo) == EMPTY;
   }
 
 size_t
 pelib_cfifo_pushmem(CFIFO_T)(cfifo_t(CFIFO_T) *fifo, CFIFO_T* mem, size_t num)
 {
 	size_t left, length, pushed;
-	//CFIFO_T* end;
-	switch(cfifo_state(CFIFO_T)(fifo))
+	switch(state(CFIFO_T)(fifo))
 	{
 		case EMPTY:
-	case NORMAL:			
-	  
-	  
-			// Copy from write to end of buffer
+		case NORMAL:			
 			left = fifo->capacity - fifo->write;
 			length = left < num ? left : num;
-#if 0
-
- exit(50);
- if(check_memory(CFIFO_T)(&fifo->buffer[fifo->write],1) && (int)fifo->buffer[fifo->write] != 0)
-   {
-     //printf("pushmem check failed. value in buffer %x, count: %i \n", (int)fifo->buffer[fifo->write],count);
-     exit(77);
-   }
-#endif
 
 			memcpy((void*)&fifo->buffer[fifo->write], mem, length * sizeof(CFIFO_T));
 
@@ -699,21 +435,9 @@ pelib_cfifo_pushmem(CFIFO_T)(cfifo_t(CFIFO_T) *fifo, CFIFO_T* mem, size_t num)
 		
 		case FULL:
 		case REVERSE:
-
-
 			// Copy from write to read
 			left = fifo->read - fifo->write;
 			length = left < num ? left : num;
-#if 0
-
- if(check_memory(CFIFO_T)(&fifo->buffer[fifo->write],1) && (int)fifo->buffer[fifo->write] != 0)
-   {
-     //printf("pushmem check failed. value in buffer %x, count: %i \n", (int)fifo->buffer[fifo->write],count);
-     exit(78);
-     }
-#endif
-
-
 			memcpy((void*)&(fifo->buffer[fifo->write]), mem, length * sizeof(CFIFO_T));
 
 			fifo->write += length;
@@ -738,71 +462,21 @@ pelib_cfifo_popmem(CFIFO_T)(cfifo_t(CFIFO_T) *fifo, CFIFO_T* mem, size_t num)
 {
 	size_t i;
 	size_t left, length, popped;
-	//CFIFO_T* end;
 	volatile int* ptr;
 	size_t intlength;
 
-	switch(cfifo_state(CFIFO_T)(fifo))
+	switch(state(CFIFO_T)(fifo))
 	{
 		case FULL:
 		case REVERSE:
 			// Copy from write to end of buffer
 			left = fifo->capacity - fifo->read;
 			length = left < num ? left : num;
-/*
-debug 
-			while(!check_memory(CFIFO_T)((CFIFO_T*)&(fifo->buffer[fifo->read]), length))
-			{
-debug
-				
-debug
-			}
-debug
-*/
 
                         memcpy(mem, (void*)&(fifo->buffer[fifo->read]), length * sizeof(CFIFO_T));
                         
                         intlength = (length * sizeof(CFIFO_T)) / sizeof(int) ;
                         ptr = (volatile int*) (&fifo->buffer[fifo->read]);
-			/*
-                        for(i = 0; i < intlength; i++)
-			  {
-			    //pelib_scc_force_wcb();
-			    //
-
-			    //printf("ptr is %x, has value %x. buffer is %x, has value %x\n",&ptr[i],ptr[i],&fifo->buffer[fifo->read],fifo->buffer[fifo->read]);
-			    //pelib_scc_force_wcb();
-			    
-
-			    ptr[i] = MARKER;
-			    //
-
-			    //printf("ptr is %x, has value %x. buffer is %x, has value %x\n",&ptr[i],ptr[i],&fifo->buffer[fifo->read],fifo->buffer[fifo->read]);
-			    //pelib_scc_force_wcb();
-			    //
-
-			  }
-			*/
-
-			//pelib_scc_force_wcb();
-			
-			/*
-			if(check_memory(CFIFO_T)((CFIFO_T*)&(fifo->buffer[fifo->read]),1))
-			   {
-			     printf("Error: MARKER not in the buffer!. value: %x. Supposed to be %x \n",*(int*)(fifo->buffer+fifo->read), (int) MARKER);
-			     
-			     exit(78);
-			   }
-			
-
-
-
-			if(intlength!=1)
-			  {	
-			    printf("intlength=%i, length= %i\n",intlength,length);
-			    //exit(66);
-			    }*/
-			//fifo->buffer[fifo->read] = MARKER;
 
 			// Record amount of elements pushed
 			popped = length;
@@ -830,38 +504,11 @@ debug
 			// Copy from write to read
 			left = fifo->write - fifo->read;
 			length = left < num ? left : num;
-
-/*
-debug
-			while(!check_memory(CFIFO_T)((CFIFO_T*)&(fifo->buffer[fifo->read]), length))
-			{
-debug
-				
-debug
-			}
-debug
-*/
-
 			memcpy(mem, (void*)&(fifo->buffer[fifo->read]), length * sizeof(CFIFO_T));
                         
                         intlength = (length * sizeof(CFIFO_T)) / sizeof(int) ;
 
                         ptr = (volatile int*) (&fifo->buffer[fifo->read]);
-			/*
-                        for(i = 0; i < intlength; i++)
-			  {
-			    ptr[i] = MARKER;
-			  }
-			*/
-
-			//fifo->buffer[fifo->read] = MARKER;
-			//pelib_scc_force_wcb();
-			/*
-			if(intlength!=1)
-			  {
-			    printf("intlength=%i, length= %i\n",intlength,length);
-			    //exit(67);
-			    }*/
 			fifo->read += length;
 			popped = length;
 
@@ -886,7 +533,7 @@ pelib_cfifo_peekmem(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, CFIFO_T* mem, size_t num, s
 	cfifo_t(CFIFO_T) copy = *fifo;
 	copy.read = (copy.read + offset) % copy.capacity;
 
-	switch(cfifo_state(CFIFO_T)(&copy))
+	switch(state(CFIFO_T)(&copy))
 	{
 		case FULL:
 		case REVERSE:
@@ -923,12 +570,11 @@ pelib_cfifo_peekmem(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, CFIFO_T* mem, size_t num, s
 	}
 }
 
-#define cfifo_continuous_read_length(elem) PELIB_CONCAT_3(cfifo_, cfifo(elem), _continuous_read_length)
 static
 size_t
-cfifo_continuous_read_length(CFIFO_T)(cfifo_t(CFIFO_T)* fifo)
+continuous_read_length(CFIFO_T)(cfifo_t(CFIFO_T)* fifo)
 {
-	switch(cfifo_state(CFIFO_T)(fifo))
+	switch(state(CFIFO_T)(fifo))
 	{
 		case FULL:
 		case REVERSE:
@@ -946,12 +592,11 @@ cfifo_continuous_read_length(CFIFO_T)(cfifo_t(CFIFO_T)* fifo)
 	}
 }
 
-#define cfifo_continuous_write_length(elem) PELIB_CONCAT_3(cfifo_, cfifo(elem), _continuous_write_length)
 static
 size_t
-cfifo_continuous_write_length(CFIFO_T)(cfifo_t(CFIFO_T)* fifo)
+continuous_write_length(CFIFO_T)(cfifo_t(CFIFO_T)* fifo)
 {
-	switch(cfifo_state(CFIFO_T)(fifo))
+	switch(state(CFIFO_T)(fifo))
 	{
 		case FULL:
 		case REVERSE:
@@ -972,63 +617,39 @@ cfifo_continuous_write_length(CFIFO_T)(cfifo_t(CFIFO_T)* fifo)
 size_t
 pelib_cfifo_popfifo(CFIFO_T)(cfifo_t(CFIFO_T)* src, cfifo_t(CFIFO_T)* tgt, size_t num)
 {
-debug
 	size_t requested = num;
-debug
 
 	while(num > 0 && !pelib_cfifo_is_empty(CFIFO_T)(src) && !pelib_cfifo_is_full(CFIFO_T)(tgt))
 	{
-debug
-		size_t readl = cfifo_continuous_read_length(CFIFO_T)(src);
-debug
-		volatile size_t writel = cfifo_continuous_write_length(CFIFO_T)(tgt);
-debug
+		size_t readl = continuous_read_length(CFIFO_T)(src);
+		volatile size_t writel = continuous_write_length(CFIFO_T)(tgt);
 		size_t length = readl < writel ? readl : writel;
-debug
 		length = num < length ? num : length;
-debug
-
-//		printf("readl = %d, writel = %d, num = %d, length = %d, src_empty = %d, tgt_full = %d\n", readl, writel, num, length, pelib_cfifo_is_empty(CFIFO_T)(src), pelib_cfifo_is_full(CFIFO_T)(tgt));
-/*
-		while(!check_memory(CFIFO_T)((CFIFO_T*)&(src->buffer[src->read]), length))
-		{
-debug
-			
-debug
-		}
-*/
-debug
 		memcpy((void*)&(tgt->buffer[tgt->write]), (void*)&(src->buffer[src->read]), length * sizeof(CFIFO_T));
-debug
 		num -= length;
-debug
-
 		pelib_cfifo_discard(CFIFO_T)(src, length);
-debug
 		pelib_cfifo_fill(CFIFO_T)(tgt, length);
-debug
 	}
-debug
 
 	return requested - num;
 }
 
 size_t
-pelib_cfifo_length(CFIFO_T)(cfifo_t(CFIFO_T) cfifo)
+pelib_cfifo_length(CFIFO_T)(cfifo_t(CFIFO_T) *cfifo)
 {
-	switch(cfifo_state(CFIFO_T)(&cfifo))
+	switch(state(CFIFO_T)(cfifo))
 	{
 		case EMPTY:
 			return 0;
 		break;
 		case NORMAL:
-			return cfifo.write - cfifo.read;
+			return cfifo->write - cfifo->read;
 		break;
 		case REVERSE:
-			return cfifo.capacity - (cfifo.read - cfifo.write);
+			return cfifo->capacity - (cfifo->read - cfifo->write);
 		break;
 		case FULL:
-			return cfifo.capacity;
+			return cfifo->capacity;
 		break;
 	}
 
@@ -1038,9 +659,9 @@ pelib_cfifo_length(CFIFO_T)(cfifo_t(CFIFO_T) cfifo)
 CFIFO_T
 pelib_cfifo_last(CFIFO_T)(cfifo_t(CFIFO_T) *cfifo)
 {	
-	size_t length = pelib_cfifo_length(CFIFO_T)(*cfifo);
+	size_t length = pelib_cfifo_length(CFIFO_T)(cfifo);
 
-	if(pelib_cfifo_length(CFIFO_T)(*cfifo) <= 0)
+	if(pelib_cfifo_length(CFIFO_T)(cfifo) <= 0)
 	{  
 		CFIFO_T def;
 		pelib_init(CFIFO_T)(&def);
@@ -1048,7 +669,7 @@ pelib_cfifo_last(CFIFO_T)(cfifo_t(CFIFO_T) *cfifo)
 	}
 	else
 	{
-		CFIFO_T* ptr = cfifo_peek(CFIFO_T)(cfifo, length - 1);
+		CFIFO_T* ptr = pelib_cfifo_peekaddr(CFIFO_T)(cfifo, length - 1, NULL);
 		return *ptr;
 	}
 }

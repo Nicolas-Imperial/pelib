@@ -1,5 +1,5 @@
 /*
- * integer.c
+ * fifo_array.c
  *
  *  Created on: 20 Feb 2012
  *  Copyright 2012 Nicolas Melot
@@ -30,13 +30,11 @@ pelib_cfifo_from_array(CFIFO_ARRAY_T)(array_t(CFIFO_ARRAY_T) *array)
 
   cfifo_t(CFIFO_T) *fifo;
     fifo = pelib_alloc_struct(cfifo_t(CFIFO_ARRAY_T))();
-    //printf("Length: %d. Capacity: %d \n",pelib_array_length(CFIFO_ARRAY_T)(array),pelib_array_capacity(CFIFO_ARRAY_T)(array));
     fifo->buffer = array->data;
     if(array->data == NULL) exit(81);
     fifo->capacity = pelib_array_capacity(CFIFO_ARRAY_T)(array);
     fifo->read = 0;   
     fifo->write = pelib_array_length(CFIFO_ARRAY_T)(array) % fifo->capacity; 
-    //fifo->id = -1; 
 
     if (pelib_array_length(CFIFO_ARRAY_T)(array) > 0)
       {
@@ -56,7 +54,7 @@ array_t(CFIFO_ARRAY_T)*
 pelib_array_from_cfifo(CFIFO_ARRAY_T)(cfifo_t(CFIFO_ARRAY_T) *cfifo)
 {
 	array_t(CFIFO_T) *array;
-	array = pelib_alloc_collection(array_t(CFIFO_ARRAY_T))(pelib_cfifo_length(CFIFO_ARRAY_T)(*cfifo));
+	array = pelib_alloc_collection(array_t(CFIFO_ARRAY_T))(pelib_cfifo_length(CFIFO_ARRAY_T)(cfifo));
 	pelib_init(array_t(CFIFO_ARRAY_T))(array);
 
 	array->length = pelib_cfifo_popmem(CFIFO_ARRAY_T)(cfifo, array->data, pelib_array_capacity(CFIFO_ARRAY_T)(array));

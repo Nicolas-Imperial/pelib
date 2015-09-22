@@ -604,7 +604,7 @@ test_peekmem_reverse()
 	}
 
 	pelib_cfifo_peekmem(size_t)(cfifo, different, CAPACITY - TO_TAIL + FROM_HEAD, 0);
-	assert(pelib_cfifo_length(size_t)(*cfifo) == CAPACITY - TO_TAIL + FROM_HEAD);
+	assert(pelib_cfifo_length(size_t)(cfifo) == CAPACITY - TO_TAIL + FROM_HEAD);
 	
 	for(i = 0; i < CAPACITY - TO_TAIL + FROM_HEAD; i++)
 	{
@@ -624,7 +624,7 @@ test_peekmem_too_much()
 
 	ret = pelib_cfifo_peekmem(size_t)(cfifo, different, CAPACITY, 0);
 
-	assert_equals_size_t(pelib_cfifo_length(size_t)(*cfifo), (size_t)(CAPACITY - TO_TAIL));
+	assert_equals_size_t(pelib_cfifo_length(size_t)(cfifo), (size_t)(CAPACITY - TO_TAIL));
 	assert_equals_size_t(ret, (size_t)(CAPACITY - TO_TAIL));
 
 	for(i = 0; i < CAPACITY - TO_TAIL; i++)
@@ -636,25 +636,25 @@ test_peekmem_too_much()
 void
 cfifo_length()
 {
-	assert(pelib_cfifo_length(size_t)(*cfifo) == CAPACITY);
+	assert(pelib_cfifo_length(size_t)(cfifo) == CAPACITY);
 
 	pelib_cfifo_popmem(size_t)(cfifo, normal, FROM_HEAD);
-	assert(pelib_cfifo_length(size_t)(*cfifo) == CAPACITY - FROM_HEAD);
+	assert(pelib_cfifo_length(size_t)(cfifo) == CAPACITY - FROM_HEAD);
 
 	pelib_cfifo_popmem(size_t)(cfifo, normal, TO_TAIL - FROM_HEAD);
-	assert(pelib_cfifo_length(size_t)(*cfifo) == CAPACITY - TO_TAIL);
+	assert(pelib_cfifo_length(size_t)(cfifo) == CAPACITY - TO_TAIL);
 
 	pelib_cfifo_popmem(size_t)(cfifo, normal, CAPACITY - TO_TAIL);
-	assert(pelib_cfifo_length(size_t)(*cfifo) == 0);
+	assert(pelib_cfifo_length(size_t)(cfifo) == 0);
 
 	pelib_cfifo_pushmem(size_t)(cfifo, normal, FROM_HEAD);
-	assert(pelib_cfifo_length(size_t)(*cfifo) == FROM_HEAD);
+	assert(pelib_cfifo_length(size_t)(cfifo) == FROM_HEAD);
 
 	pelib_cfifo_pushmem(size_t)(cfifo, normal, TO_TAIL - FROM_HEAD);
-	assert(pelib_cfifo_length(size_t)(*cfifo) == TO_TAIL);
+	assert(pelib_cfifo_length(size_t)(cfifo) == TO_TAIL);
 	
 	pelib_cfifo_pushmem(size_t)(cfifo, normal, CAPACITY - TO_TAIL);
-	assert(pelib_cfifo_length(size_t)(*cfifo) == CAPACITY);
+	assert(pelib_cfifo_length(size_t)(cfifo) == CAPACITY);
 }
 
 void
@@ -686,22 +686,22 @@ test_discard()
 	// Do not discard anything
 	res = pelib_cfifo_discard(size_t)(cfifo, 0);
 	assert(res == 0);
-	assert(pelib_cfifo_length(size_t)(*cfifo) == CAPACITY);
+	assert(pelib_cfifo_length(size_t)(cfifo) == CAPACITY);
 	
 	// Discard a few values
 	res = pelib_cfifo_discard(size_t)(cfifo, DISCARD);
 	assert(res == DISCARD);
-	assert(pelib_cfifo_length(size_t)(*cfifo) == CAPACITY - DISCARD);
+	assert(pelib_cfifo_length(size_t)(cfifo) == CAPACITY - DISCARD);
 
 	// Discard all remaining values
 	res = pelib_cfifo_discard(size_t)(cfifo, CAPACITY - DISCARD);
 	assert(res == CAPACITY - DISCARD);
-	assert(pelib_cfifo_length(size_t)(*cfifo) == 0);
+	assert(pelib_cfifo_length(size_t)(cfifo) == 0);
 
 	// Discard even more values
 	res = pelib_cfifo_discard(size_t)(cfifo, DISCARD);
 	assert(res == 0);
-	assert(pelib_cfifo_length(size_t)(*cfifo) == 0);
+	assert(pelib_cfifo_length(size_t)(cfifo) == 0);
 }
 
 void
@@ -712,7 +712,7 @@ test_discard_too_much()
 	// Discard more elements than in fifo
 	res = pelib_cfifo_discard(size_t)(cfifo, CAPACITY + DISCARD);
 	assert(res == CAPACITY);
-	assert(pelib_cfifo_length(size_t)(*cfifo) == 0);
+	assert(pelib_cfifo_length(size_t)(cfifo) == 0);
 }
 
 void
@@ -726,23 +726,23 @@ test_fill()
 	// Do not fill at all
 	res = pelib_cfifo_fill(size_t)(cfifo, 0);
 	assert(res == 0);
-	assert(pelib_cfifo_length(size_t)(*cfifo) == 0);
+	assert(pelib_cfifo_length(size_t)(cfifo) == 0);
 	
 	// Fill a few values
 	res = pelib_cfifo_fill(size_t)(cfifo, DISCARD);
 	assert(res == DISCARD);
-	assert(pelib_cfifo_length(size_t)(*cfifo) == DISCARD);
+	assert(pelib_cfifo_length(size_t)(cfifo) == DISCARD);
 
 	// Fill as much as remaining free spots
 	res = pelib_cfifo_fill(size_t)(cfifo, CAPACITY - DISCARD);
 	assert(res == CAPACITY - DISCARD);
-	assert(pelib_cfifo_length(size_t)(*cfifo) == CAPACITY);
+	assert(pelib_cfifo_length(size_t)(cfifo) == CAPACITY);
 	assert(pelib_cfifo_is_full(size_t)(cfifo));
 
 	// Fill with even more values
 	res = pelib_cfifo_fill(size_t)(cfifo, DISCARD);
 	assert(res == 0);
-	assert(pelib_cfifo_length(size_t)(*cfifo) == CAPACITY);
+	assert(pelib_cfifo_length(size_t)(cfifo) == CAPACITY);
 	assert(pelib_cfifo_is_full(size_t)(cfifo));
 }
 
@@ -758,7 +758,7 @@ test_fill_too_much()
 	res = pelib_cfifo_fill(size_t)(cfifo, CAPACITY + DISCARD);
 
 	assert(res == CAPACITY);
-	assert(pelib_cfifo_length(size_t)(*cfifo) == CAPACITY);
+	assert(pelib_cfifo_length(size_t)(cfifo) == CAPACITY);
 	assert(pelib_cfifo_is_full(size_t)(cfifo));
 }
 
@@ -843,11 +843,11 @@ test_popfifo_complex()
 
 	res = pelib_cfifo_popfifo(size_t)(cfifo, recipient, CAPACITY);
 	assert(res == TO_TAIL - FROM_HEAD - 2 * OFFSET);
-	assert(pelib_cfifo_length(size_t)(*recipient) == CAPACITY);
+	assert(pelib_cfifo_length(size_t)(recipient) == CAPACITY);
 	assert(pelib_cfifo_is_full(size_t)(recipient));
 	assert(!pelib_cfifo_is_full(size_t)(cfifo));
 	assert(!pelib_cfifo_is_empty(size_t)(cfifo));
-	assert(pelib_cfifo_length(size_t)(*cfifo) == FROM_HEAD + CAPACITY - TO_TAIL - (TO_TAIL - FROM_HEAD - 2 * OFFSET));
+	assert(pelib_cfifo_length(size_t)(cfifo) == FROM_HEAD + CAPACITY - TO_TAIL - (TO_TAIL - FROM_HEAD - 2 * OFFSET));
 
 	/* TODO: Make sure recipient indeed has the expected values */
 

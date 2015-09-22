@@ -55,6 +55,7 @@ typedef enum pelib_fifo_operation pelib_fifo_operation_t;
 #define pelib_cfifo_pushmem(elem) PELIB_CONCAT_3(pelib_, cfifo(elem), _pushmem)
 #define pelib_cfifo_popmem(elem) PELIB_CONCAT_3(pelib_, cfifo(elem), _popmem)
 #define pelib_cfifo_peekmem(elem) PELIB_CONCAT_3(pelib_, cfifo(elem), _peekmem)
+#define pelib_cfifo_peekaddr(elem) PELIB_CONCAT_3(pelib_, cfifo(elem), _peekaddr)
 #define pelib_cfifo_popfifo(elem) PELIB_CONCAT_3(pelib_, cfifo(elem), _popfifo)
 #define pelib_cfifo_length(elem) PELIB_CONCAT_3(pelib_, cfifo(elem), _length)
 #define pelib_cfifo_last(elem) PELIB_CONCAT_3(pelib_, cfifo(elem), _last)
@@ -96,6 +97,10 @@ pelib_cfifo_discard(CFIFO_T)(cfifo_t(CFIFO_T)*, size_t n);
 **/
 CFIFO_T
 pelib_cfifo_peek(CFIFO_T)(cfifo_t(CFIFO_T)*, size_t offset);
+
+/** Returns an address that contains elements to be read. If num is not NULL and if there is at least one element available, writes the number of elements available in address pointer by num. If no element is available, returns NULL and writes nothing in memory pointed by num. **/
+CFIFO_T*
+pelib_cfifo_peekaddr(CFIFO_T)(cfifo_t(CFIFO_T)*, size_t offset, size_t *num);
 
 /** Returns 0 if at least one push operation can be performed on the fifo **/
 int
@@ -139,7 +144,7 @@ pelib_cfifo_popfifo(CFIFO_T)(cfifo_t(CFIFO_T)*, cfifo_t(CFIFO_T)* dest, size_t n
 
 /** Returns the number of elements available in the fifo **/
 size_t
-pelib_cfifo_length(CFIFO_T)(cfifo_t(CFIFO_T));
+pelib_cfifo_length(CFIFO_T)(cfifo_t(CFIFO_T)*);
 
 /** Returns the number that was last written in the fifo **/
 CFIFO_T
