@@ -56,6 +56,7 @@ typedef enum pelib_fifo_operation pelib_fifo_operation_t;
 #define pelib_cfifo_popmem(elem) PELIB_CONCAT_3(pelib_, cfifo(elem), _popmem)
 #define pelib_cfifo_peekmem(elem) PELIB_CONCAT_3(pelib_, cfifo(elem), _peekmem)
 #define pelib_cfifo_peekaddr(elem) PELIB_CONCAT_3(pelib_, cfifo(elem), _peekaddr)
+#define pelib_cfifo_writeaddr(elem) PELIB_CONCAT_3(pelib_, cfifo(elem), _writeaddr)
 #define pelib_cfifo_popfifo(elem) PELIB_CONCAT_3(pelib_, cfifo(elem), _popfifo)
 #define pelib_cfifo_length(elem) PELIB_CONCAT_3(pelib_, cfifo(elem), _length)
 #define pelib_cfifo_last(elem) PELIB_CONCAT_3(pelib_, cfifo(elem), _last)
@@ -98,9 +99,13 @@ pelib_cfifo_discard(CFIFO_T)(cfifo_t(CFIFO_T)*, size_t n);
 CFIFO_T
 pelib_cfifo_peek(CFIFO_T)(cfifo_t(CFIFO_T)*, size_t offset);
 
-/** Returns an address that contains elements to be read. If num is not NULL and if there is at least one element available, writes the number of elements available in address pointer by num. If no element is available, returns NULL and writes nothing in memory pointed by num. **/
+/** Returns an address that contains elements to be read. If num is not NULL and if there is at least one element available, writes the number of elements available in address pointer by num. If no element is available, returns NULL and writes nothing in other parameters. Note that *num may take a lower value than pelib_cfifo_length() if pelib_cfifo_length() >= 2. In this case, if remaining is not null, then remaining is set to point to the the rest of the data; otherwise it is set to NULL. **/
 CFIFO_T*
-pelib_cfifo_peekaddr(CFIFO_T)(cfifo_t(CFIFO_T)*, size_t offset, size_t *num);
+pelib_cfifo_peekaddr(CFIFO_T)(cfifo_t(CFIFO_T)*, size_t offset, size_t *num, CFIFO_T **remaining);
+
+/** Returns an address that can hold new elements. If num is not NULL and if there is at least one memory element available, writes the number of additional elements the fifo can store in address pointer by num. If no memory is available, returns NULL and writes nothing in other parameters. Note that *num may take a lower value than pelib_cifo_capacity() - pelib_cfifo_length(). In this case and if remaining is non-null, remaining points to the extra memory buffer. Otherwise, it is set to NULL. **/
+CFIFO_T*
+pelib_cfifo_writeaddr(CFIFO_T)(cfifo_t(CFIFO_T)*, size_t *num, CFIFO_T **remaining);
 
 /** Returns 0 if at least one push operation can be performed on the fifo **/
 int

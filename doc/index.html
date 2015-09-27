@@ -184,7 +184,7 @@ to compile and install the pelib. This will install pelib libraries in $HOME/.lo
 <pre class="brush: cpp">
 make install prefix=&lt;/any/path/at/all&gt;
 </pre>
-Make will create directories bin, lib, lib/pkgconfig and include in the the installation directory you may choose.
+Make will create directories bin, lib, lib/pkgconfig and include in the the installation directory you may choose. The compilation of Pelib is quite long due to inefficient Makefiles, so feel free to do something else while pelib is being compiled.
 </p>
 
 <hr>
@@ -325,6 +325,31 @@ Here is a list of classes able to parse and output data structures:
 </ul>
 </p>
 
+<h4 id="parsing_use_formula">Formula parsing</h4>
+<p>
+Taskgraph description uses formulas to express quantities that can only be computed when more information is available, such as the number of cores available in the execution platform that should execute the streaming application described in a taskgraph. This is the case for the graph property "deadline" as well as the node property "efficiency".
+</p>
+<p>
+The overal structure of a formula parsed by the pelib consists of an optional prefix and a body. The prefix is a string terminated by a colon ":" and that defines the parsing implementation used to parses the formula. The body is a string that respect the grammer used by the parsiing formula. If no prefix is provided, then the formula body is casted from string to C++ base type double. The prefix "exprtk:" enables parsing with <a href="http://www.partow.net/programming/exprtk/index.html">exprtk</a>. The symbols defined depend on the context in which the formula is parsed, that is if this is a deadline formula or an efficiency formula.
+</p>
+<p>
+<!--Graph property "deadline" models the time in milliseconds in which a pipeline stage of the streaming application should run. While it makes sens to fix this value for an application, for instance 240 millisecond for a movie decoder (that is, 1 / 24 seconds per frame to decode), a wider expressivity is useful to generate interesting scheduling problems. This is a functionnality used by <a href="/labs/pelab/mimer/index.html">Mimer</a> to provide a scheduling experimentation framework. -->
+When parsing a formula to compute a taskgraph's deadline in millisecond, the following symbols are provided by pelib:
+<ul>
+<li><b>p[]</b>: Number of processors available in the platform
+<li><b>n[]</b>: Number of tasks in the taskgraph
+<li><b>F</b>: Set of frequencies admitted by the execution platform
+<li><b>tau[i]</b>: workload of task i, starting from 0
+</ul>
+</p>
+<p>
+When parsing formula to compute a task's parallel efficiency, the symbols below are define:
+<ul>
+<li><b>p</b>: Number of processors that run the task.
+<li><b>W</b>: Maximum width of the task
+</ul>
+</p>
+
 <h4 id="parsing_use_conversion">Pelib conversion tool</h4>
 
 <p>
@@ -445,7 +470,6 @@ where &lt;structure&gt; is the class name of the data structure parsed and/or ou
 <p>
 <br>
 </p>
-
 
 <h2 id="c_data_structure">Generic C data structures</h2>
 <p>

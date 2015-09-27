@@ -30,12 +30,14 @@
 #include <pelib/Vector.hpp>
 #include <pelib/Matrix.hpp>
 
-#ifndef debug
-#if 0
+#ifdef debug
+#undef debug
+#endif
+
+#if 1
 #define debug(var) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << endl;
 #else
 #define debug(var)
-#endif
 #endif
 
 using namespace std;

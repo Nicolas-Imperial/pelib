@@ -313,17 +313,60 @@ pelib_cfifo_fill(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, size_t num)
 }
 
 CFIFO_T*
-pelib_cfifo_peekaddr(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, size_t offset, size_t *num)
+pelib_cfifo_peekaddr(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, size_t offset, size_t *num, CFIFO_T **addr)
   {
     if (fifo->capacity > 0 &&
 	offset < pelib_cfifo_length(CFIFO_T)(fifo) &&
 	state(CFIFO_T)(fifo) != EMPTY)
       {
+	size_t avail = continuous_read_length(CFIFO_T)(fifo);
 	if(num != NULL)
 	{
-		*num = continuous_read_length(CFIFO_T)(fifo);
+		*num = avail;
 	}
+	if(addr != NULL)
+	{
+ 		if((fifo->read + offset + avail) % fifo->capacity != fifo->write)
+		{
+			*addr = (CFIFO_T*)&(fifo->buffer[(fifo->read + offset + avail) % fifo->capacity]);
+		}
+		else
+		{
+			*addr = NULL;
+		}
+	}
+
         return (CFIFO_T*)&(fifo->buffer[(fifo->read + offset) % fifo->capacity]);
+      }
+    else
+      {
+        return NULL;
+      }
+  }
+
+CFIFO_T*
+pelib_cfifo_writeaddr(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, size_t *num, CFIFO_T **addr)
+  {
+    if (fifo->capacity - pelib_cfifo_length(CFIFO_T)(fifo) > 0)
+      {
+	size_t avail = continuous_write_length(CFIFO_T)(fifo);
+	if(num != NULL)
+	{
+		*num = avail;
+	}
+	if(addr != NULL)
+	{
+ 		if((fifo->write + avail) % fifo->capacity != fifo->read)
+		{
+			*addr = (CFIFO_T*)&(fifo->buffer[(fifo->write + avail) % fifo->capacity]);
+		}
+		else
+		{
+			*addr = NULL;
+		}
+	}
+
+        return (CFIFO_T*)&(fifo->buffer[fifo->write]);
       }
     else
       {
@@ -336,7 +379,7 @@ pelib_cfifo_pop(CFIFO_T)(cfifo_t(CFIFO_T)* fifo)
   {
     CFIFO_T *ptr,  res;
 
-    ptr = pelib_cfifo_peekaddr(CFIFO_T)(fifo, 0, NULL);
+    ptr = pelib_cfifo_peekaddr(CFIFO_T)(fifo, 0, NULL, NULL);
     if (ptr != NULL)
       {
         fifo->read = (fifo->read + 1) % fifo->capacity;
@@ -374,7 +417,7 @@ CFIFO_T
 pelib_cfifo_peek(CFIFO_T)(cfifo_t(CFIFO_T)* cfifo, size_t offset)
   {
     CFIFO_T *ptr, res;
-    ptr = pelib_cfifo_peekaddr(CFIFO_T)(cfifo, offset, NULL);
+    ptr = pelib_cfifo_peekaddr(CFIFO_T)(cfifo, offset, NULL, NULL);
     if (ptr != NULL)
       {
 	res = *ptr;
@@ -669,7 +712,7 @@ pelib_cfifo_last(CFIFO_T)(cfifo_t(CFIFO_T) *cfifo)
 	}
 	else
 	{
-		CFIFO_T* ptr = pelib_cfifo_peekaddr(CFIFO_T)(cfifo, length - 1, NULL);
+		CFIFO_T* ptr = pelib_cfifo_peekaddr(CFIFO_T)(cfifo, length - 1, NULL, NULL);
 		return *ptr;
 	}
 }
