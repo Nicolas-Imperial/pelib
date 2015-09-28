@@ -5,7 +5,7 @@ set -o xtrace
 
 username=nicme26
 host=remote.ida.liu.se
-dir=/info/www/labs/pelab/pelib
+dir=/home/nicme26/www-pub/pelib
 target=$username@$host:$dir
 
 echo Copying files to server. Append $HOME/.ssh/id_rsa.pub to $username@$host:'$'HOME/.ssh/authorized_keys to avoid password prompts. Use ssh-keygen to generate $HOME/.ssh/id_rsa.pub if it doesn\'t exist.

@@ -1,3 +1,5 @@
+<!--#include virtual=pelib-data.shtml" -->
+
 <html>
 <head>
 <style type="text/css">
@@ -154,7 +156,7 @@ The source code available above is released under GPLv3 licence. Please contact 
 Publications 
 </h2>
 </a>
-This library is heavily used internally by Crown scheduling heuristic C++ implementations, C++ schedule analytic evaluators used in our Crown Scheduler paper as well as in the <a href="/labs/pelab/drake/index.html">Drake</a> C stream programming framework. Below is a list of papers whose experimental work relied on the pelib library.
+This library is heavily used internally by Crown scheduling heuristic C++ implementations, C++ schedule analytic evaluators used in our Crown Scheduler paper as well as in the <a href="<!--#echo var="dir" -->/../drake/index.html">Drake</a> C stream programming framework. Below is a list of papers whose experimental work relied on the pelib library.
 <ul>
 <li><p>
 Nicolas Melot, Christoph Kessler, Joerg Keller and Patrick Eitschberger
@@ -176,7 +178,7 @@ Eighth International Workshop on Parallel Programming Models and Systems Softwar
 
 <h2 id="installation">Installation</h2>
 <p>
-Pelib requires the libraries igraph (&gt;= 0.7.1), libdl, libboost-regex, libboost-graph and libexpat, pthread and libxml++-2.6 to compile and run correctly. Once the dependencies are installed, define the environment variables CC=gcc (or any other C compiler you prefer, provided its switches are the same as gcc) and CXX=g++. <a href="download/pelib-1.0.0.tar.gz">Download</a> and extract the pelib source package. cd' into the pelib source directory, make sure you use GNU make and type 
+Pelib requires the libraries igraph (&gt;= 0.7.1), libdl, libboost-regex, libboost-graph and libexpat, pthread and libxml++-2.6 to compile and run correctly. Once the dependencies are installed, define the environment variables CC=gcc (or any other C compiler you prefer, provided its switches are the same as gcc) and CXX=g++. <a href="download/<!--#echo var="pelib" -->.tar.gz">Download</a> and extract the pelib source package. cd' into the pelib source directory, make sure you use GNU make and type 
 <pre class="brush: cpp">
 make install
 </pre>
@@ -885,8 +887,6 @@ Acknowledgments
 </a>
 <p>
 This work was partly funded by the EU FP7 project 
-<a href="http://www.peppher.eu/">PEPPHER</a> and 
-by <a href="http://www.e-science.se">SeRC</a> project OpCoReS.
 </p>
 <p>
 </p>
