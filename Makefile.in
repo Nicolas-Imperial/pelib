@@ -35,7 +35,7 @@ CONFIG = RELEASE
 subdirs = src include
 
 doc:
-	@doxygen
+	doxygen
 	./make-doc
 
 .PHONY: doc

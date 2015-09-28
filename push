@@ -5,7 +5,7 @@ set -o xtrace
 
 username=nicme26
 host=remote.ida.liu.se
-dir=/home/nicme26/www-pub/pelib
+dir=/home/nicme26/www-pub/dev/pelib
 target=$username@$host:$dir
 
 echo Copying files to server. Append $HOME/.ssh/id_rsa.pub to $username@$host:'$'HOME/.ssh/authorized_keys to avoid password prompts. Use ssh-keygen to generate $HOME/.ssh/id_rsa.pub if it doesn\'t exist.
@@ -16,6 +16,7 @@ scp `ls *.tar.gz|sort -V|head -1` $target/download/
 
 ## Generate documentation and copy it in output directory
 make doc
-echo '<!--#set var='\"dir\" value=\"$dir\"'-->' | tee -a doc/$package-data.shtml
+echo '<!--#set var='\"absolute\" value=\"\"'-->' | tee -a doc/pelib-data.shtml
+echo '<!--#set var='\"relative\" value=\"../\"'-->' | tee -a doc/pelib-data.shtml
 scp -r doc/* $target
 
