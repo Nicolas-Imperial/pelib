@@ -16,7 +16,7 @@ scp `ls *.tar.gz|sort -V|head -1` $target/download/
 
 ## Generate documentation and copy it in output directory
 make doc
-echo '<!--#set var='\"absolute\" value=\"\"'-->' | tee -a doc/pelib-data.shtml
+echo '<!--#set var='\"absolute\" value=\"/~nicme26/dev/pelib/\"'-->' | tee -a doc/pelib-data.shtml
 echo '<!--#set var='\"relative\" value=\"../\"'-->' | tee -a doc/pelib-data.shtml
 scp -r doc/* $target
 

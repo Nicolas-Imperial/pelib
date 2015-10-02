@@ -30,12 +30,14 @@
 
 #include <pelib/exprtk.hpp>
 
-#ifndef debug
+#ifdef debug
+#undef debug
+#endif
+
 #if 0
 #define debug(var) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << endl;
 #else
 #define debug(var)
-#endif
 #endif
 
 using namespace pelib;
@@ -48,10 +50,12 @@ struct e: public exprtk::ifunction<double>
 			: exprtk::ifunction<double>(2), tasks(tasks), arch(arch)
 		{}  
 
-		inline double operator()(const string &id, const double &p) 
-		{   
-			Task key(id);
-			return tasks.find(key)->getEfficiency((int)p);
+		inline double operator()(const double &id, const double &p) 
+		{
+			set<Task>::const_iterator begin = tasks.begin();
+			std::advance(begin, id - 1);
+			double val = begin->getEfficiency((int)p);
+			return val;
 		}   
 
 	private:
@@ -129,11 +133,11 @@ DeadlineFormula::calculate(const Taskgraph &tg, const Platform &arch) const
 	parser_t parser;
 
 	parser.compile(formula, expression);	
-	double output =  expression.value();
+	double output = expression.value();
 
 	if(std::isnan(output))
 	{
-		throw ParseException("Deadline type not recognized: " + formula);
+		throw ParseException("Error while parsing formula: " + formula);
 	}	
 
 	return output;

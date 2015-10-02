@@ -38,7 +38,7 @@ Pelib: Programming Environment Library - Documentation and Examples
   })();
 
 </script>
-<link rel="canonical" href="<!--#echo var="absolute"-->index.shtml" />
+<link rel="canonical" href="<!--#echo var="absolute"-->index.en.shtml" />
 </head>
 
 <body bgcolor=#FFFFFF>
@@ -84,7 +84,7 @@ Documentation and Examples
 <font face=arial,helvetica size=-1 color=#000000>
 
 <small>
-You can access to this page through the link <a href="<!--#echo var="absolute"-->index.shtml">http://www.ida.liu.se<!--#echo var="absolute"-->index.shtml</a>
+You can access to this page through the link <a href="<!--#echo var="absolute"-->index.en.shtml">http://www.ida.liu.se<!--#echo var="absolute"-->index.en.shtml</a>
 </small>
 <p>
 <br>
@@ -95,7 +95,7 @@ Pelib stands for <b>P</b>rogramming <b>E</b>nvironment <b>Lib</b>rary, as the re
 It is a swiss army knife for various research activity, in particular around on-chip pipelining and scheduling research.
 The pelib includes a flexible C++ programming interface to read and write simple and complex data structure in various text format such as AMPL input data, AMPL output results, GraphML-based streaming applications models and XML-based schedule descriptions. The capability to parse and generate AMPL input and output data simplifies considerably the automation of experimental performance comparison between Linear Programming solvers and C++ algorithm implementations. A C++ program can generate AMPL input problem instances to feed a linear solver with a AMPL frontend and parse its output to compare with another solving method, such as a C++ implementation of a heuristic. We use this approach in our previous and future <a href="#publications">research papers</a>.
 The pelib also provides convenient generic C data structures with type checking, based on an object-oriented design, providing fast ways to show the precise state of internal data structures and functionality composition.
-These data structures are extensively used used in the <a href="<!--#echo var="relative"-->drake/index.shtml">Drake</a> C stream programming framework.
+These data structures are extensively used used in the <a href="<!--#echo var="relative"-->drake/index.en.shtml">Drake</a> C stream programming framework.
 <br>This pages reviews the main features describes above, how to use and extend them. Section <a href="#overview">overview</a> gives a brief overview of pelib. Section <a href="#download">download</a> provides downloading link to the latest pelib source package. Section <a href="#licence">licence</a> provides information about our publication licence. Section <a href="#publications">publication</a> gives the list of articles we published using this library. Section <a href="#installation">installation</a> provides some explanations to compile and install the library. Section <a href="#parsing">Parsing and generating text representation of complex data structures</a> gives code examples on how to use the parser and output classes provded by pelib and describe the underlying structure to respect when writing new parser and output classes. Section <a href="#c_data_structure">Generic C data structures</a> gives an extended description of the C data structures implemented, how to extend their functionalities as well as adding new generic data structures. Check also the <a href="doxygen/html/index.html">doxygen documentation</a> for more detailed information. Section <a href="#ongoing">Ongoing work</a> details the additional features planned for the future. Section <a href="#contact">Contact</a> gives contact information if you want to contact us. Finally, the page ends with <a href="#funding">Acknowledgments</a>.
 </p>
 
@@ -164,7 +164,7 @@ The source code available above is released under GPLv3 licence. Please contact 
 Publications 
 </h2>
 </a>
-This library is heavily used internally by Crown scheduling heuristic C++ implementations, C++ schedule analytic evaluators used in our Crown Scheduler paper as well as in the <a href="<!--#echo var="relative"-->drake/index.shtml">Drake</a> C stream programming framework. Below is a list of papers whose experimental work relied on the pelib library.
+This library is heavily used internally by Crown scheduling heuristic C++ implementations, C++ schedule analytic evaluators used in our Crown Scheduler paper as well as in the <a href="<!--#echo var="relative"-->drake/index.en.shtml">Drake</a> C stream programming framework. Below is a list of papers whose experimental work relied on the pelib library.
 <ul>
 <li><p>
 Nicolas Melot, Christoph Kessler, Joerg Keller and Patrick Eitschberger

@@ -34,7 +34,7 @@
 #undef debug
 #endif
 
-#if 1
+#if 0
 #define debug(var) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << endl;
 #else
 #define debug(var)
