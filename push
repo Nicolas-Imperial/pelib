@@ -12,7 +12,7 @@ echo Copying files to server. Append $HOME/.ssh/id_rsa.pub to $username@$host:'$
 
 ## Generate an archive
 make dist
-scp `ls *.tar.gz|sort -V|head -1` $target/download/
+scp `ls *.tar.gz|sort -Vr|head -1` $target/download/
 
 ## Generate documentation and copy it in output directory
 make doc
