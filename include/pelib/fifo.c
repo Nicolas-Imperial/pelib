@@ -43,6 +43,18 @@ static size_t continuous_write_length(CFIFO_T)(cfifo_t(CFIFO_T) *fifo);
 #define CFIFO_BEGIN "["
 #define CFIFO_END "]"
 
+#if 0 
+#define debug(var) printf("[%s:%s:%d] %s = \"%s\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
+#define debug_addr(var) printf("[%s:%s:%d] %s = \"%p\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
+#define debug_int(var) printf("[%s:%s:%d] %s = \"%d\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
+#define debug_size_t(var) printf("[%s:%s:%d] %s = \"%zu\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
+#else
+#define debug(var)
+#define debug_addr(var)
+#define debug_int(var)
+#define debug_size_t(var)
+#endif
+
 enum state
 {
   NORMAL, REVERSE, EMPTY, FULL
@@ -154,7 +166,7 @@ state(CFIFO_T)(cfifo_t(CFIFO_T) *cfifo)
           }
         else
           {
-            fprintf(stderr, "[ERROR:%s:%s:%i] Illegal cfifo state\n", __FILE__, __FUNCTION__, __LINE__);
+            fprintf(stdout, "[ERROR:%s:%s:%i] Illegal state at fifo %p\n", __FILE__, __FUNCTION__, __LINE__, cfifo);
             return EMPTY;
           }
       }
@@ -299,15 +311,24 @@ pelib_cfifo_push(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, CFIFO_T elem)
 size_t
 pelib_cfifo_fill(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, size_t num)
 {
+	debug("Hello world!");
 	size_t length = pelib_cfifo_capacity(CFIFO_T)(fifo) - pelib_cfifo_length(CFIFO_T)(fifo);
+	debug("Hello world!");
 	num = length < num ? length : num;
+	debug("Hello world!");
+	debug_size_t(fifo->capacity);
+	debug("Hello world!");
 
 	fifo->write = (fifo->write + num) % fifo->capacity;
+	debug("Hello world!");
 
 	if(num > 0)
 	{
+	debug("Hello world!");
 		fifo->last_op = PELIB_CFIFO_PUSH;
+	debug("Hello world!");
 	}
+	debug("Hello world!");
 
 	return num;
 }

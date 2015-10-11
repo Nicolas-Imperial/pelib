@@ -221,6 +221,7 @@ pelib_array_preloadfilenamebinary(ARRAY_T)(char *filename)
   array_t(ARRAY_T)* array;
   FILE *h;
   size_t ret;
+  int numel;
   size_t size;
 
   h = fopen(filename, "r");
@@ -229,7 +230,8 @@ pelib_array_preloadfilenamebinary(ARRAY_T)(char *filename)
     return NULL;
   }
 
-  ret = fread(&size, sizeof(int), 1, h);
+  ret = fread(&numel, sizeof(int), 1, h);
+  size = (size_t)numel;
   if(ret != 1)
   {
     return NULL;
@@ -259,7 +261,9 @@ pelib_array_loadfilenamewindowbinary(ARRAY_T)(char *filename, size_t offset, siz
 {
   array_t(ARRAY_T)* array;
   FILE * h;
-  size_t ret, size;
+  size_t ret;
+  int numel;
+  size_t size;
 
   h = fopen(filename, "r");
   if(h == NULL)
@@ -267,7 +271,8 @@ pelib_array_loadfilenamewindowbinary(ARRAY_T)(char *filename, size_t offset, siz
     return NULL;
   }
 
-  ret = fread(&size, sizeof(int), 1, h);
+  ret = fread(&numel, sizeof(int), 1, h);
+  size = (size_t)numel;
   if(ret != 1)
   {
     return NULL;
