@@ -94,7 +94,7 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 	{
 		os << "		case " << std::distance(tg->getTasks().begin(), i) << ":" << endl << "			return \"" << i->getName() << "\";" << endl << "		break;" << endl;
 	}
-	os <<
+	os << "		default:" << endl << "			return \"invalid task id\";" << endl << "		break;" << endl <<
 		"	}" << endl << "}" << endl << endl <<
 		"void drake_schedule_init(drake_schedule_t* schedule)" << endl <<
 		"{" << endl <<
