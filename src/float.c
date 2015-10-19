@@ -103,6 +103,7 @@ pelib_fread(float)(float* buffer, FILE* stream)
   return total;
 */
 	fprintf(stderr, "[%s:%s:%d][ERROR] Not implemented. Aborting.\n", __FILE__, __FUNCTION__, __LINE__);
+	return 0;
 }
 
 // Now include the generic array implementation
