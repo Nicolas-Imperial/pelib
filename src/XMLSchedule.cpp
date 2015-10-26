@@ -82,6 +82,28 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 		//<< "makespan=\"" << target_makespan << "\" "
 		<< ">" << endl;
 
+	// Finds and set the precision required for this schedule
+	std::streamsize old_precision = os.precision();
+	float min_delta = FLT_MAX;
+	for(Schedule::table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
+	{
+		float last_start = 0;
+		for(Schedule::sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
+		{
+			Task t = *j->second.first;
+			if(t.getStartTime() > 0)
+			{
+				float delta = t.getStartTime() - last_start;
+				if(delta < min_delta)
+				{
+					min_delta = delta;
+				}
+			}
+		}
+	}
+	std::streamsize precision = (std::streamsize)(ceil(-log10(min_delta)) + 1);
+
+	os << setprecision(precision);
 	for(Schedule::table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 	{
 		int p = i->first;
@@ -111,6 +133,7 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 		}
 		os << " </core>" << endl;
 	}
+	os << setprecision(old_precision);
 
 	os << "</schedule>" << endl;
 }
@@ -160,16 +183,19 @@ XMLSchedule::parse(istream &is) const
 
 			int core_id = atoi(dynamic_cast<xmlpp::Element*>(*iter)->get_attribute_value("coreid").c_str());
 			Schedule::sequence core_schedule_map;
+			//cout << "Core " << core_id << endl;
 
 			std::list<xmlpp::Node*> itasks = (*iter)->get_children();
 			for(std::list<xmlpp::Node*>::iterator taskiter = itasks.begin(); taskiter != itasks.end(); ++taskiter)
 			{
 				if((*taskiter)->get_name().compare("task") != 0) //skip indentation characters et cetera
 				{
+					//cout << "Skipping " << (*taskiter)->get_name() << endl;
 					continue;
 				}
 
 				Element *igraph_task = dynamic_cast<Element*>(*taskiter);
+				//cout << "Task " << igraph_task->get_attribute_value("name") << endl;
 
 				//Task &task = (Task&) tg.findTask(igraph_task->get_attribute_value("taskid"));
 				Task task(igraph_task->get_attribute_value("name"));

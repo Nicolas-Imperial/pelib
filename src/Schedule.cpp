@@ -30,12 +30,14 @@
 #include <pelib/Set.hpp>
 #include <pelib/CastException.hpp>
 
-#ifndef debug
-#if 0
-#define debug(expr) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
+#ifdef debug
+#undef debug
+#endif 
+
+#if 1
+#define debug(expr) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << (#expr) << " = \"" << (expr) << "\"." << endl;
 #else
 #define debug(var)
-#endif
 #endif
 
 using namespace std;
@@ -194,7 +196,7 @@ namespace pelib
 				start.insert(pair<int, float>(std::distance(this->getTasks().begin(), this->getTasks().find(j->second.first->getName())), j->second.first->getStartTime())); 
 			}
 
-			sched.insert(pair<int, map<int, float> >(core + 1, schedule_row));
+			sched.insert(pair<int, map<int, float> >(core, schedule_row));
 		}
 
 		// pad with 0
@@ -568,17 +570,18 @@ namespace pelib
 			i->second = 0;
 		}
 
+		std::cout << std::setprecision(10);
 		for(map<int, map<int, float> >::const_iterator i = map_sched.begin(); i != map_sched.end(); i++)
 		{
-			double start = 0;
+			double mystart = 0;
 			for(map<int, float>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 			{
 				int n = (int)j->second;
 				if(n > 0)
 				{
-					if(start_time.find((int)n)->second < start)
+					if(start_time.find((int)n)->second < mystart)
 					{
-						start_time.find((int)n)->second = start;
+						start_time.find((int)n)->second = mystart;
 					}
 
 					double tau = workload.find((int)n)->second;
@@ -586,7 +589,8 @@ namespace pelib
 					size_t Wi = (size_t)max_width.find((int)n)->second;
 					double e = wi <= Wi ? efficiency.find((int)n)->second.find((int)wi)->second : 1e-06;
 					double f = frequency.find((int)n)->second;
-					start += tau / (wi * e) / f;
+					double delta = (tau / (wi * e) / f);
+					mystart = mystart + delta;
 				}
 			}
 		}
