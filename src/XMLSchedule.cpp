@@ -98,10 +98,20 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 				{
 					min_delta = delta;
 				}
+				/*
+				os << "<!-- core : " << i->first << " -->" << endl;
+				os << "<!-- task : " << t.getName() << " -->" << endl;
+				os << "<!-- start_time = " << t.getStartTime() << " -->" << endl;
+				os << "<!-- last_start = " << last_start << " -->" << endl;
+				*/
+
+				// update last time
+				last_start = t.getStartTime();
 			}
 		}
 	}
 	std::streamsize precision = (std::streamsize)(ceil(-log10(min_delta)) + 1);
+	//os << "<!-- precision = " << precision << " -->" << endl;
 
 	os << setprecision(precision);
 	for(Schedule::table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
