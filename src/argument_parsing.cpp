@@ -26,7 +26,11 @@
 
 #include <pelib/argument_parsing.hpp>
 
-#ifndef debug
+#ifdef debug
+#undef debug
+#endif
+
+#if 0
 #define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
 #endif
 
@@ -99,7 +103,7 @@ pelib_argument_stream_parse(char **argv, pelib_argument_stream_t* stream)
 	unsigned int parsed = 0;
 	while((void*)argv[0] != NULL)
 	{
-		if(string(*argv).compare("--lib") == 0 || string(*argv).compare("-l") == 0)
+		if(string(*argv).compare("--library") == 0 || string(*argv).compare("-l") == 0)
 		{
 			argv++;
 			parsed++;
@@ -120,7 +124,7 @@ pelib_argument_stream_parse(char **argv, pelib_argument_stream_t* stream)
 			continue;
 		}
 
-		if(string(*argv).compare("--format") == 0 || string(*argv).compare("-m") == 0)
+		if(string(*argv).compare("--lib") == 0 || string(*argv).compare("-m") == 0)
 		{
 			argv++;
 			parsed++;

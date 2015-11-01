@@ -32,12 +32,14 @@ using namespace pelib;
 extern "C" {
 #endif
 
-#ifndef debug
+#ifdef debug
+#undef debug
+#endif
+
 #if 0
 #define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
 #else
 #define debug(var)
-#endif
 #endif
 
 typedef struct

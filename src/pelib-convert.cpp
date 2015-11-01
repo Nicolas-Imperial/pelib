@@ -28,7 +28,11 @@
 #include <pelib/argument_parsing.hpp>
 #include <pelib/dl.h>
 
-#ifndef debug
+#ifdef debug
+#undef debug
+#endif
+
+#if 10
 #define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
 #endif
 
@@ -38,6 +42,7 @@ using namespace pelib;
 struct conversion
 {
 	vector<pelib_argument_stream_t> inputs;
+	pelib_argument_stream_t process;
 	vector<pelib_argument_stream_t> outputs;
 };
 typedef struct conversion conversion_t;
@@ -46,6 +51,7 @@ static conversion_t
 parse_args(char** argv)
 {
 	conversion_t conversion;
+	conversion.process.library = NULL;
 
 	for(argv++; *argv != NULL; argv++)
 	{
@@ -57,6 +63,17 @@ parse_args(char** argv)
 			size_t num = pelib_argument_stream_parse(argv, &input);
 			argv = argv + num - 1;
 			conversion.inputs.push_back(input);
+			continue;
+		}
+
+		if(string(*argv).compare("--process") == 0)
+		{
+			pelib_argument_stream_t process;
+			pelib_argument_stream_init(&process);
+			argv++;
+			size_t num = pelib_argument_stream_parse(argv, &process);
+			argv = argv + num - 1;
+			conversion.process = process;
 			continue;
 		}
 
@@ -80,9 +97,13 @@ parse_args(char** argv)
 int
 main(int argc, char **argv)
 {
+	void *libProcess = 0;
+	map<const char*, Record*> inputs;
+	map<const char*, void (*)(Record*)> freelist;
+	map<const char*, void*> parserList;
+
 	conversion_t conversion = parse_args(argv);
 
-	map<const char*, Record*> inputs;
 	size_t counter = 0;
 	for(vector<pelib_argument_stream_t>::const_iterator i = conversion.inputs.begin(); i != conversion.inputs.end(); i++, counter++)
 	{
@@ -100,6 +121,7 @@ main(int argc, char **argv)
 
 		/* Link function handles to function pointers */
 		Record* (*parse)(istream&, size_t, char**) = (Record* (*)(istream&, size_t, char**))load_function(libParser, "pelib_parse");
+		void (*del)(Record*) = (void (*)(Record*))load_function(libParser, "pelib_delete");
 
 		switch(i->stream)
 		{
@@ -111,10 +133,14 @@ main(int argc, char **argv)
 						if(i->name != NULL)
 						{
 							inputs.insert(pair<const char*, Record*>(i->name, rec));
+							freelist.insert(pair<const char*, void (*)(Record*)>(i->name, del));
+							parserList.insert(pair<const char*, void*>(pair<const char*, void*>(i->name, libParser)));
 						}
 						else
 						{
 							inputs.insert(pair<const char*, Record*>(typeid(*rec).name(), rec));
+							freelist.insert(pair<const char*, void (*)(Record*)>(typeid(*rec).name(), del));
+							parserList.insert(pair<const char*, void*>(pair<const char*, void*>(typeid(*rec).name(), libParser)));
 						}
 					}
 					else
@@ -137,10 +163,12 @@ main(int argc, char **argv)
 						if(i->name != NULL)
 						{
 							inputs.insert(pair<const char*, Record*>(i->name, rec));
+							freelist.insert(pair<const char*, void (*)(Record*)>(i->name, del));
 						}
 						else
 						{
 							inputs.insert(pair<const char*, Record*>(typeid(*rec).name(), rec));
+							freelist.insert(pair<const char*, void (*)(Record*)>(typeid(*rec).name(), del));
 						}
 						myfile.close();
 					}
@@ -156,19 +184,45 @@ main(int argc, char **argv)
 			break;
 		}
 
-		destroy_lib(libParser);
+		// Don't destroy the libparser yet, as we need to destroy data elements parsed
+		// Don't destroy the pelib_argument_stream descriptor yet as we still need input names
+	}
 
-		// Don̈́'t destroy the pelib_argument_stream descriptor yet as we still need input names
+	if(conversion.process.library != NULL)
+	{
+		libProcess = load_lib(conversion.process.library);
+
+		/* Link function handles to function pointers */
+		std::map<const char*, Record*> (*process)(std::map<const char*, Record*> records, size_t, char**) = (std::map<const char*, Record*> (*)(std::map<const char*, Record*> records, size_t, char**))load_function(libProcess, "pelib_process");
+		std::map<const char*, Record*> transform = process(inputs, conversion.process.argc, conversion.process.argv);
+
+		// Free data structure parsed
+		for(map<const char*, void (*)(Record*)>::iterator i = freelist.begin(); i != freelist.end(); i++)
+		{
+			void (*del)(Record*) = i->second;
+			del(inputs.find(i->first)->second);
+		}
+
+		// Replace inputs with transformation outcome
+		inputs = transform;
+
+		// Replace function pointers
+		freelist.clear();
+		void (*del)(Record*) = (void (*)(Record*))load_function(libProcess, "pelib_delete");
+		for(map<const char*, Record*>::iterator i = inputs.begin(); i != inputs.end(); i++)
+		{
+			freelist.insert(pair<const char*, void (*)(Record*)>(i->first, del));
+		}
 	}
 
 	counter = 0;
 	for(vector<pelib_argument_stream_t>::const_iterator i = conversion.outputs.begin(); i != conversion.outputs.end() && inputs.size() > 0; i++, counter++)
 	{
 		/* Load functions from shared libraries */
-		void *libParser;
+		void *libOutput;
 		if(i->library != NULL)
 		{
-			libParser = load_lib(i->library);
+			libOutput = load_lib(i->library);
 		}
 		else
 		{
@@ -177,7 +231,7 @@ main(int argc, char **argv)
 		}
 
 		/* Link function handles to function pointers */
-		void (*dump)(ostream&, std::map<const char*, Record*> records, size_t, char**) = (void (*)(ostream&, std::map<const char*, Record*> records, size_t, char**))load_function(libParser, "pelib_dump");
+		void (*dump)(ostream&, std::map<const char*, Record*> records, size_t, char**) = (void (*)(ostream&, std::map<const char*, Record*> records, size_t, char**))load_function(libOutput, "pelib_dump");
 
 		switch(i->stream)
 		{
@@ -202,20 +256,35 @@ main(int argc, char **argv)
 			break;
 		}
 
-		destroy_lib(libParser);
+		// Destroy dynamic libraries
+		destroy_lib(libOutput);
 
 		// Destroy the stream descriptor
 		pelib_argument_stream_destroy(*i);
 	}
 
+	// Destroy input structures
+	for(map<const char*, Record*>::iterator i = inputs.begin(); i != inputs.end(); i++)
+	{
+		void (*del)(Record*) = freelist.find(i->first)->second;
+		del(i->second);
+	}
+
+	// Destroy input library handlers
+	for(map<const char*, void*>::iterator i = parserList.begin(); i != parserList.end(); i++)
+	{
+		destroy_lib(i->second);
+	}
+
+	// Delete processing dynamic library
+	if(conversion.process.library != NULL)
+	{
+		destroy_lib(libProcess);
+	}
+
+	// Destroy input arguments
 	for(vector<pelib_argument_stream_t>::const_iterator i = conversion.inputs.begin(); i != conversion.inputs.end(); i++)
 	{
 		pelib_argument_stream_destroy(*i);
-	}
-
-	// Free input fields
-	for(map<const char*, Record*>::iterator i = inputs.begin(); i != inputs.end(); i++)
-	{
-		delete i->second;
 	}
 }
