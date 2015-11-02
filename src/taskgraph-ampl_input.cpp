@@ -62,6 +62,12 @@ pelib_dump(std::ostream& cout, std::map<const char*, Record*> records, size_t ar
 	}
 }
 
+void
+pelib_delete(Record *obj)
+{
+	delete obj;
+}
+
 #ifdef __cplusplus
 }
 #endif
