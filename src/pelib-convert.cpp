@@ -46,6 +46,7 @@ static conversion_t
 parse_args(char** argv)
 {
 	conversion_t conversion;
+	string self(argv[0]);
 
 	for(argv++; *argv != NULL; argv++)
 	{
@@ -69,6 +70,12 @@ parse_args(char** argv)
 			argv = argv + num - 1;
 			conversion.outputs.push_back(output);
 			continue;
+		}
+
+		if(string(*argv).compare("--sources") == 0)
+		{
+			string cmd = string("ls $(dirname $(realpath $(which ").append(self).append(")))/../share/pelib/pelib-*.tar.gz | sort -rV | head -1 | xargs realpath");
+			exit(system(cmd.c_str()));
 		}
 
 		cerr << "[WARNING] Incorrect argument: \"" << *argv << "\". Ignoring" << endl;

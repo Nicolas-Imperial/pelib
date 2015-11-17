@@ -38,6 +38,10 @@ doc:
 	doxygen
 	./make-doc
 
+post-install: dist
+	install -d $(DESTDIR)$(prefix)/share/$(package)
+	install -m 644 $(package)-$(version).$(minor).$(release).tar.gz $(DESTDIR)$(prefix)/share/$(package)
+
 .PHONY: doc
 
 ## Targets to run before any other target runs
