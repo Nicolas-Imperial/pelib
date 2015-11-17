@@ -52,6 +52,12 @@ pelib_dump(std::ostream& cout, std::map<const char*, Record*> records, size_t ar
 	AmplOutput(AmplOutput::intFloatHandlers()).dump(cout, al);
 }
 
+void
+pelib_delete(Record* rec)
+{
+	delete rec;
+}
+
 #ifdef __cplusplus
 }
 #endif

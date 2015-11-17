@@ -19,40 +19,24 @@
 
 
 #include <iostream>
-
-#include <pelib/output.h>
-
-#include <pelib/DrakeCSchedule.hpp>
-#include <pelib/Schedule.hpp>
-
-using namespace std;
-using namespace pelib;
+#include <pelib/Record.hpp>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifndef debug
-#define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
-#endif
+#ifndef PELIB_PARSER
+#define PELIB_PARSER
 
 // /!\ the content of argv is freed after this function is run
-void
-pelib_dump(std::ostream& cout, std::map<const char*, Record*> records, size_t argc, char **argv)
-{
-	Schedule *sc = (Schedule*)records.find(typeid(Schedule).name())->second;
-	Taskgraph *tg = (Taskgraph*)records.find(typeid(Taskgraph).name())->second;
-	Platform *pt = (Platform*)records.find(typeid(Platform).name())->second;
-	DrakeCSchedule().dump(cout, sc, tg, pt);
-}
+/** Parses the content of an input stream with string options and produces a class instance derived from pelib::Record. Used for dynamic library parsers **/
+std::map<const char*, pelib::Record*> pelib_process(std::map<const char*, pelib::Record*> records, size_t argc, char** argv);
 
-void
-pelib_delete(Record *obj)
-{
-	delete obj;
-}
+/** Deletes a Record produced by pelib_parse **/
+void pelib_delete(pelib::Record*);
+
+#endif
 
 #ifdef __cplusplus
 }
 #endif
-

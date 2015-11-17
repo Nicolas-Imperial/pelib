@@ -32,15 +32,22 @@ using namespace pelib;
 extern "C" {
 #endif
 
-#ifndef debug
+#ifdef debug
+#undef debug
+#endif
+
+#if 0
 #define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
+#else
+#define debug(expr)
 #endif
 
 // /!\ the content of argv is freed after this function is run
 pelib::Record*
 pelib_parse(std::istream& cin, size_t argc, char **argv)
 {
-	return GraphML().parse(cin);
+	Taskgraph *tg = GraphML().parse(cin);
+	return tg;
 }
 
 void

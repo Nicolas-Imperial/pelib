@@ -43,7 +43,7 @@ static size_t continuous_write_length(CFIFO_T)(cfifo_t(CFIFO_T) *fifo);
 #define CFIFO_BEGIN "["
 #define CFIFO_END "]"
 
-#if 0 
+#if 0
 #define debug(var) printf("[%s:%s:%d] %s = \"%s\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
 #define debug_addr(var) printf("[%s:%s:%d] %s = \"%p\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
 #define debug_int(var) printf("[%s:%s:%d] %s = \"%d\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
@@ -311,24 +311,15 @@ pelib_cfifo_push(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, CFIFO_T elem)
 size_t
 pelib_cfifo_fill(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, size_t num)
 {
-	debug("Hello world!");
 	size_t length = pelib_cfifo_capacity(CFIFO_T)(fifo) - pelib_cfifo_length(CFIFO_T)(fifo);
-	debug("Hello world!");
 	num = length < num ? length : num;
-	debug("Hello world!");
-	debug_size_t(fifo->capacity);
-	debug("Hello world!");
 
 	fifo->write = (fifo->write + num) % fifo->capacity;
-	debug("Hello world!");
 
 	if(num > 0)
 	{
-	debug("Hello world!");
 		fifo->last_op = PELIB_CFIFO_PUSH;
-	debug("Hello world!");
 	}
-	debug("Hello world!");
 
 	return num;
 }
@@ -336,9 +327,7 @@ pelib_cfifo_fill(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, size_t num)
 CFIFO_T*
 pelib_cfifo_peekaddr(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, size_t offset, size_t *num, CFIFO_T **addr)
   {
-    if (fifo->capacity > 0 &&
-	offset < pelib_cfifo_length(CFIFO_T)(fifo) &&
-	state(CFIFO_T)(fifo) != EMPTY)
+    if ((fifo->capacity > 0 && offset < pelib_cfifo_length(CFIFO_T)(fifo) && state(CFIFO_T)(fifo) != EMPTY) || 1)
       {
 	size_t avail = continuous_read_length(CFIFO_T)(fifo);
 	if(num != NULL)
@@ -368,7 +357,7 @@ pelib_cfifo_peekaddr(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, size_t offset, size_t *num
 CFIFO_T*
 pelib_cfifo_writeaddr(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, size_t *num, CFIFO_T **addr)
   {
-    if (fifo->capacity - pelib_cfifo_length(CFIFO_T)(fifo) > 0)
+    if ((fifo->capacity - pelib_cfifo_length(CFIFO_T)(fifo) > 0) || 1)
       {
 	size_t avail = continuous_write_length(CFIFO_T)(fifo);
 	if(num != NULL)
@@ -646,6 +635,8 @@ continuous_read_length(CFIFO_T)(cfifo_t(CFIFO_T)* fifo)
 		break;
 		
 		case EMPTY:
+			return 0;
+		break;
 		case NORMAL:
 			return fifo->write - fifo->read;
 		break;
@@ -663,6 +654,8 @@ continuous_write_length(CFIFO_T)(cfifo_t(CFIFO_T)* fifo)
 	switch(state(CFIFO_T)(fifo))
 	{
 		case FULL:
+			return 0;
+		break;
 		case REVERSE:
 			return fifo->read - fifo->write;
 		break;
