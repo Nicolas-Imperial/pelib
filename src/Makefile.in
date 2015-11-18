@@ -320,7 +320,7 @@ shared_pelib-schedule_export = $(sharedcxx_pelib-schedule_embed) $(sharedcxx_pel
 shared_pelib-schedule_libs = 
 shared_pelib-schedule_ldflags = 
 shared_pelib-schedule_deps = 
-shared_pelib-schedule_pkg = pelib
+shared_pelib-schedule_pkg = igraph pelib
 shared_pelib-schedule_pkg_igraph_version = >= 0.7.1
 shared_pelib-schedule_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-schedule_pkg_ld = 
