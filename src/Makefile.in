@@ -71,7 +71,7 @@ Platform.cpp Core.cpp DummyCore.cpp \
 DeadlineCalculator.cpp DeadlineFormula.cpp DeadlineConstant.cpp \
 AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp \
 AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
-XMLSchedule.cpp GraphML.cpp \
+XMLSchedule.cpp SVGSchedule.cpp GraphML.cpp \
 CppDataOutput.cpp \
 Cpp.cpp CppData.cpp CppScalar.cpp CppVector.cpp CppSet.cpp CppMatrix.cpp \
 RecordParser.cpp \
@@ -126,7 +126,7 @@ bin_amplmatrixtoraw_static = 0
 ## Cpp format classes: base class, data structure base class, output data structure classes; no parser because of lack of cpp parser base class
 
 ## dynamic library packages and their sources
-sharedcxx_project = pelib-platform-ampl_input pelib-platform-ampl_output pelib-taskgraph-graphml pelib-taskgraph-streamit pelib-taskgraph-ampl_input pelib-taskgraph-ampl_output pelib-schedule-xml pelib-schedule-drake pelib-schedule-ampl_input pelib-schedule-ampl_output pelib-ampl_input pelib-ampl_output pelib-schedule
+sharedcxx_project = pelib-platform-ampl_input pelib-platform-ampl_output pelib-taskgraph-graphml pelib-taskgraph-streamit pelib-taskgraph-ampl_input pelib-taskgraph-ampl_output pelib-schedule-xml pelib-schedule-svg pelib-schedule-drake pelib-schedule-ampl_input pelib-schedule-ampl_output pelib-ampl_input pelib-ampl_output pelib-schedule
 sharedcxx_package = $(if $(filter 1,$(SHARED)),pelib $(if $(filter text,$(packages)),$(sharedcxx_project)),$(if $(filter 1,$(STATIC)),$(if $(filter text,$(packages)),$(sharedcxx_project))))
 
 sharedcxx_pelib_src = $(if $(filter text,$(packages)),$(text_src)) argument_parsing.cpp dl.cpp
@@ -135,16 +135,14 @@ shared_pelib_export = $(sharedcxx_pelib_embed) $(sharedcxx_pelib_src)
 shared_pelib_libs = -lboost_regex -lboost_graph -lexpat
 shared_pelib_ldflags = -pthread
 shared_pelib_cxxflags = -fPIC
-shared_pelib_cflags = -fPIC
 shared_pelib_deps =
-shared_pelib_pkg = igraph libxml++-2.6
+shared_pelib_pkg = igraph libxml++-2.6 cairomm-1.0
 shared_pelib_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib_pkg_ld = 
 shared_pelib_pkg_libs = -lm
 shared_pelib_pkg_igraph_version = >= 0.7.1
 shared_pelib_pkg_requires = 
 shared_pelib_pkg_requires_igraph_version = >= 0.7.1
-shared_pelib_pkg_cxxflags = 
 shared_pelib_pkg_description = General research utility library used in PELAB
 shared_pelib_embed = 
 
@@ -273,6 +271,20 @@ shared_pelib-schedule-xml_cxxflags = -fPIC
 shared_pelib-schedule-xml_pkg_description = Platform parser and input in AMPL input format
 shared_pelib-schedule-xml_embed =
 
+sharedcxx_pelib-schedule-svg_src = schedule-svg.cpp
+shared_pelib-schedule-svg_export = $(sharedcxx_pelib-schedule-svg_embed) $(sharedcxx_pelib-schedule-svg_src)
+shared_pelib-schedule-svg_libs = 
+shared_pelib-schedule-svg_ldflags = -L.
+shared_pelib-schedule-svg_deps = 
+shared_pelib-schedule-svg_pkg = pelib igraph cairomm-1.0
+shared_pelib-schedule-svg_pkg_igraph_version = >= 0.7.1
+shared_pelib-schedule-svg_pkg_url = http://www.ida.liu.se/~nicme26
+shared_pelib-schedule-svg_pkg_ld = 
+shared_pelib-schedule-svg_pkg_libs = 
+shared_pelib-schedule-svg_cxxflags = -fPIC
+shared_pelib-schedule-svg_pkg_description = Platform parser and input in AMPL input format
+shared_pelib-schedule-svg_embed =
+
 sharedcxx_pelib-schedule-drake_src = schedule-drake.cpp
 shared_pelib-schedule-drake_export = $(sharedcxx_pelib-schedule-drake_embed) $(sharedcxx_pelib-schedule-drake_src)
 shared_pelib-schedule-drake_libs = 
@@ -336,6 +348,7 @@ libcxx_pelib-schedule_src = schedule.cpp
 libcc_pelib-schedule_src = $(if $(filter cstruct,$(packages)),$(cstruct_src))
 lib_pelib-schedule_libs = 
 lib_pelib-schedule_export = $(lib_pelib-schedule_embed) $(libcxx_pelib-schedule_src) $(libcc_pelib-schedule_src)
+lib_pelib-schedule_cxxflags =
 lib_pelib-schedule_ldflags =  
 lib_pelib-schedule_deps = 
 lib_pelib-schedule_pkg = igraph pelib
@@ -350,14 +363,14 @@ libcxx_pelib_src = $(if $(filter text,$(packages)),$(text_src)) argument_parsing
 libcc_pelib_src = $(if $(filter cstruct,$(packages)),$(cstruct_src))
 lib_pelib_libs = -lboost_regex -lboost_graph -lexpat
 lib_pelib_export = $(lib_pelib_embed) $(libcxx_pelib_src) $(libcc_pelib_src)
+lib_pelib_cxxflags =
 lib_pelib_ldflags = -pthread 
 lib_pelib_deps = 
-lib_pelib_pkg = igraph libxml++-2.6
+lib_pelib_pkg = igraph libxml++-2.6 cairomm-1.0
 lib_pelib_pkg_url = http://www.ida.liu.se/~nicme26
 lib_pelib_pkg_ld = 
 lib_pelib_pkg_libs = -lboost_regex -lboost_graph -lm
 lib_pelib_pkg_igraph_version = >= 0.7.1
-lib_pelib_pkg_cxxflags = 
 lib_pelib_pkg_description = General research utility library used in PELAB
 lib_pelib_embed = 
 
