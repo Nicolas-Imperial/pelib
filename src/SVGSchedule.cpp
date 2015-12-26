@@ -141,12 +141,14 @@ class Canvas
 
 			// Create cairo surface into svg output stream
 			Slot slot(out);
+#if 0
 			debug(this->width);
 			debug(this->height);
 			debug(this->core_size);
 			debug(this->absthick);
 			debug(this->legend_size);
 			debug(this->margin);
+#endif
 			this->surface = SvgSurface::create_for_stream(slot, this->width, this->height);
 			this->cr = Cairo::Context::create(surface);
 
@@ -205,6 +207,7 @@ class Canvas
 				double text_width = te.width - te.x_bearing;
 				double text_height = te.height;
 
+#if 0
 				debug("##########################");
 				debug(delta);
 				debug(font_size);
@@ -216,6 +219,7 @@ class Canvas
 				debug(time * this->magnify - 2 * absthick - minError);
 				debug(width * this->core_size - 2 * absthick - maxError);
 				debug(time * this->magnify - 2 * absthick - maxError);
+#endif
 
 				if((text_width >= width * this->core_size - 2 * absthick - minError) || (text_height >= time * this->magnify - 2 * absthick - minError))
 				{
