@@ -29,7 +29,7 @@ Platform.hpp Core.hpp DummyCore.hpp \
 DeadlineConstant.hpp DeadlineFormula.hpp DeadlineCalculator.hpp \
 AmplDataParser.hpp AmplDataOutput.hpp GraphML.hpp \
 AmplInput.hpp AmplInputData.hpp AmplInputScalar.hpp AmplInputVector.hpp AmplInputSet.hpp AmplInputMatrix.hpp \
-AmplOutput.hpp AmplOutputData.hpp AmplOutputScalar.hpp AmplOutputVector.hpp AmplOutputSet.hpp AmplOutputMatrix.hpp XMLSchedule.hpp SVGSchedule.hpp \
+AmplOutput.hpp AmplOutputData.hpp AmplOutputScalar.hpp AmplOutputVector.hpp AmplOutputSet.hpp AmplOutputMatrix.hpp XMLSchedule.hpp TetrisSchedule.hpp \
 CppDataOutput.hpp \
 Cpp.hpp CppData.hpp CppScalar.hpp CppVector.hpp CppSet.hpp CppMatrix.hpp \
 RecordParser.hpp constraints.hpp RecordOutput.hpp AlgebraDataParser.hpp AlgebraDataOutput.hpp AmplInputDataParser.hpp \
@@ -38,7 +38,7 @@ GraphMLParser.hpp GraphMLOutput.hpp TaskgraphParser.hpp TaskgraphOutput.hpp \
 PlatformParser.hpp PlatformOutput.hpp \
 ScheduleParser.hpp ScheduleOutput.hpp \
 XMLScheduleParser.hpp XMLScheduleOutput.hpp \
-SVGScheduleOutput.hpp \
+TetrisScheduleOutput.hpp \
 DrakeCSchedule.hpp DrakeCScheduleOutput.hpp \
 exprtk.hpp
 

@@ -71,7 +71,7 @@ Platform.cpp Core.cpp DummyCore.cpp \
 DeadlineCalculator.cpp DeadlineFormula.cpp DeadlineConstant.cpp \
 AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp \
 AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
-XMLSchedule.cpp SVGSchedule.cpp GraphML.cpp \
+XMLSchedule.cpp TetrisSchedule.cpp GraphML.cpp \
 CppDataOutput.cpp \
 Cpp.cpp CppData.cpp CppScalar.cpp CppVector.cpp CppSet.cpp CppMatrix.cpp \
 RecordParser.cpp \
@@ -126,7 +126,7 @@ bin_amplmatrixtoraw_static = 0
 ## Cpp format classes: base class, data structure base class, output data structure classes; no parser because of lack of cpp parser base class
 
 ## dynamic library packages and their sources
-sharedcxx_project = pelib-platform-ampl_input pelib-platform-ampl_output pelib-taskgraph-graphml pelib-taskgraph-streamit pelib-taskgraph-ampl_input pelib-taskgraph-ampl_output pelib-schedule-xml pelib-schedule-svg pelib-schedule-drake pelib-schedule-ampl_input pelib-schedule-ampl_output pelib-ampl_input pelib-ampl_output pelib-schedule
+sharedcxx_project = pelib-platform-ampl_input pelib-platform-ampl_output pelib-taskgraph-graphml pelib-taskgraph-streamit pelib-taskgraph-ampl_input pelib-taskgraph-ampl_output pelib-schedule-xml pelib-schedule-tetris pelib-schedule-drake pelib-schedule-ampl_input pelib-schedule-ampl_output pelib-ampl_input pelib-ampl_output pelib-schedule
 sharedcxx_package = $(if $(filter 1,$(SHARED)),pelib $(if $(filter text,$(packages)),$(sharedcxx_project)),$(if $(filter 1,$(STATIC)),$(if $(filter text,$(packages)),$(sharedcxx_project))))
 
 sharedcxx_pelib_src = $(if $(filter text,$(packages)),$(text_src)) argument_parsing.cpp dl.cpp
@@ -271,19 +271,19 @@ shared_pelib-schedule-xml_cxxflags = -fPIC
 shared_pelib-schedule-xml_pkg_description = Platform parser and input in AMPL input format
 shared_pelib-schedule-xml_embed =
 
-sharedcxx_pelib-schedule-svg_src = schedule-svg.cpp
-shared_pelib-schedule-svg_export = $(sharedcxx_pelib-schedule-svg_embed) $(sharedcxx_pelib-schedule-svg_src)
-shared_pelib-schedule-svg_libs = 
-shared_pelib-schedule-svg_ldflags = -L.
-shared_pelib-schedule-svg_deps = 
-shared_pelib-schedule-svg_pkg = pelib igraph cairomm-1.0
-shared_pelib-schedule-svg_pkg_igraph_version = >= 0.7.1
-shared_pelib-schedule-svg_pkg_url = http://www.ida.liu.se/~nicme26
-shared_pelib-schedule-svg_pkg_ld = 
-shared_pelib-schedule-svg_pkg_libs = 
-shared_pelib-schedule-svg_cxxflags = -fPIC
-shared_pelib-schedule-svg_pkg_description = Platform parser and input in AMPL input format
-shared_pelib-schedule-svg_embed =
+sharedcxx_pelib-schedule-tetris_src = schedule-tetris.cpp
+shared_pelib-schedule-tetris_export = $(sharedcxx_pelib-schedule-tetris_embed) $(sharedcxx_pelib-schedule-tetris_src)
+shared_pelib-schedule-tetris_libs = 
+shared_pelib-schedule-tetris_ldflags = -L.
+shared_pelib-schedule-tetris_deps = 
+shared_pelib-schedule-tetris_pkg = pelib igraph cairomm-1.0
+shared_pelib-schedule-tetris_pkg_igraph_version = >= 0.7.1
+shared_pelib-schedule-tetris_pkg_url = http://www.ida.liu.se/~nicme26
+shared_pelib-schedule-tetris_pkg_ld = 
+shared_pelib-schedule-tetris_pkg_libs = 
+shared_pelib-schedule-tetris_cxxflags = -fPIC
+shared_pelib-schedule-tetris_pkg_description = Platform parser and input in AMPL input format
+shared_pelib-schedule-tetris_embed =
 
 sharedcxx_pelib-schedule-drake_src = schedule-drake.cpp
 shared_pelib-schedule-drake_export = $(sharedcxx_pelib-schedule-drake_embed) $(sharedcxx_pelib-schedule-drake_src)
