@@ -119,45 +119,189 @@ class Slot: public sigc::mem_functor2<ErrorStatus, Slot, const unsigned char*, u
 		ostream *out;
 };
 
+static unsigned int
+shiftLeft(unsigned int value, unsigned int shift)
+{
+	return value << shift;
+}
+
+static unsigned int
+shiftRight(unsigned int value, unsigned int shift)
+{
+	return value >> shift;
+}
+
+static unsigned char
+decode(unsigned int value, unsigned int position)
+{
+	return shiftRight(value & shiftLeft(255, position * 8), position * 8);
+}
+
+static unsigned int
+encode(unsigned int base, unsigned char value, unsigned int position)
+{
+	return base - shiftLeft(decode(base, position), position * 8) + shiftLeft(value, position * 8);
+}
+
+static
+map<float, unsigned int>
+makeGradient(vector<unsigned int> colors, set<float> values)
+{
+	map<float, unsigned int> gradient;
+	float minValue = *values.begin();
+	float maxValue = *values.rbegin();
+
+	for(set<float>::iterator i = values.begin(); i != values.end(); i++)
+	{
+		float value = *i;
+		float position = (value - minValue) / (maxValue - minValue) * (colors.size() - 1);
+		size_t minIndex = (size_t)floor(position);
+		size_t maxIndex = (size_t)ceil(position);
+		position = (position - minIndex);
+
+		vector<unsigned int>::iterator minIter = colors.begin();
+		std::advance(minIter, minIndex);
+		unsigned int minColor = *minIter;
+		unsigned char minRed = decode(minColor, 0);
+		unsigned char minGreen = decode(minColor, 1);
+		unsigned char minBlue = decode(minColor, 2);
+		unsigned char minAlpha = decode(minColor, 3);
+
+		vector<unsigned int>::iterator maxIter = colors.begin();
+		std::advance(maxIter, maxIndex);
+		unsigned int maxColor = *maxIter;
+		unsigned char maxRed = decode(maxColor, 0);
+		unsigned char maxGreen = decode(maxColor, 1);
+		unsigned char maxBlue = decode(maxColor, 2);
+		unsigned char maxAlpha = decode(maxColor, 3);
+
+		unsigned char valueRed = minRed * (1 - position) + maxRed * position;
+		unsigned char valueGreen = minGreen * (1 - position) + maxGreen * position;
+		unsigned char valueBlue = minBlue * (1 - position) + maxBlue * position;
+		unsigned char valueAlpha = minAlpha * (1 - position) + maxAlpha * position;
+		unsigned int valueColor = valueRed + encode(0, valueGreen, 1) + encode(0, valueBlue, 2) + encode(0, valueAlpha, 3);
+
+		gradient.insert(pair<float, int>(value, valueColor));
+	}
+
+	return gradient;
+}
+
 class Canvas
 {
 	public:
-		Canvas(ostream &out, double height, double width, double thickness, double magnify, size_t p, set<float> F, vector<unsigned int> colors)
+		Canvas(double height, double width, double thickness, double magnify, map<float, unsigned int> colors, bool drawDeadline)
+		{
+			this->height = height;
+			this->width = width;
+			this->thickness = thickness;
+			this->magnify = magnify;
+			this->colors = colors;
+			this->drawDeadline = drawDeadline;
+		}
+		
+		void
+		dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const Platform *pt)
 		{
 #ifdef CAIRO_HAS_SVG_SURFACE
 			// Compute canvas size, taking thickness and magnification into account
-			this->thickness = thickness;
-			this->magnify = magnify;
 			this->magnify = height >= magnify ? magnify : magnify / height;
 			height = height * this->magnify;
 			this->absthick = thickness * height;
 			this->height = height + absthick;
 			this->width = width * this->magnify + absthick;
+
 			// Create cairo surface into svg output stream
-			Slot slot(out);
-#if 0
-			debug(this->width);
-			debug(this->height);
-			debug(this->core_size);
-			debug(this->absthick);
-			debug(this->legend_size);
-			debug(this->margin);
-#endif
+			Slot slot(os);
 			this->surface = SvgSurface::create_for_stream(slot, this->width, this->height);
 			this->cr = Cairo::Context::create(surface);
-			this->colors = Canvas::makeGradient(colors, F);
 
-			size_t f = F.size();
+			// Partition drawing surface
+			// Space for frequency legend
+			size_t f = this->colors.size();
 			this->legend_size = (((this->height - this->absthick) / (f + 2)) + this->absthick) * 3; // Space for legend
+			// Space for y axis legend
 			cairo_text_extents_t te;
 			cairo_font_extents_t fe;
 			cr->select_font_face("Sans", FONT_SLANT_NORMAL, FONT_WEIGHT_BOLD);
 			cr->get_text_extents("Time", te);
 			cr->get_font_extents(fe);
-			this->yaxis_size = 7 * absthick + te.height; // Space for y axis legend
-			this->margin = 0.02 * (this->width - absthick - this->legend_size); // Space between extreme-left and extreme-right tasks and extremities of barriers
+			this->yaxis_size = 7 * absthick + te.height;
+
+			// Space between extreme-left and extreme-right tasks and extremities of barriers
+			this->margin = 0.02 * (this->width - absthick - this->legend_size);
+			size_t p = pt->getCores().size();
 			this->core_size = (this->width - absthick - this->margin * 2 - this->legend_size - this->yaxis_size) / p;
-			this->fontSize = 0;
+
+			// Browse all tasks to determine the biggest font size that fits all tasks to draw
+			double startSize = this->getHeight() > this->getWidth() ? this->getHeight() : this->getWidth();
+			double fontSize = startSize;
+			for(set<Task>::const_iterator i = sched->getTasks().begin(); i != sched->getTasks().end(); i++)
+			{
+				Task task = *i;
+				task.setWorkload(tg->getTasks().find(task)->getWorkload());
+				double runtime = task.runtime(i->getWidth(), i->getFrequency());
+				double width = i->getWidth();
+				string name = i->getName();
+				double idealSize = this->idealFontSize(runtime, width, name, startSize);
+				if(idealSize <= fontSize)
+				{
+					fontSize = idealSize;
+				}
+			}
+
+			// Check out font size of frequency legend
+			float legend_height = this->legend_size / 3 - absthick;
+			float legend_width = legend_height / this->core_size;
+			float legend_font_size = legend_height;
+			map<float, string> freq_labels;
+			for(map<float, unsigned int>::const_iterator i = this->colors.begin(); i != this->colors.end(); i++)
+			{
+				float freq = i->first;
+				unsigned int letter_number = ((unsigned int)log10(freq)) / 3;
+				float short_freq = freq;
+				unsigned char letter;
+				switch(letter_number)
+				{
+					case 0:
+						letter = 'K';
+					break;
+					case 1:
+						letter = 'M';
+						short_freq /= 1000;
+					break;
+					case 2:
+						letter = 'G';
+						short_freq /= 1000;
+						short_freq /= 1000;
+					break;
+					break;
+					case 3:
+						letter = 'T';
+						short_freq /= 1000;
+						short_freq /= 1000;
+						short_freq /= 1000;
+					break;
+					default:
+						letter = 'X';
+					break;
+				}
+				stringstream freq_label;
+				if(letter != '\0')
+				{
+					freq_label << short_freq << letter;
+				}
+				else
+				{
+					freq_label << short_freq;
+				}
+				freq_labels.insert(pair<float, string>(freq, freq_label.str()));
+				double ideal_legend_size = this->idealFontSize(legend_height, legend_width, freq_label.str(), (double)legend_height);
+				if(ideal_legend_size < legend_font_size)
+				{
+					legend_font_size = ideal_legend_size;
+				}	
+			}
 
 			// Set the pen thickness and style
 			cr->set_line_width(this->absthick);
@@ -165,7 +309,7 @@ class Canvas
 			cr->set_line_join(LINE_JOIN_ROUND);
 			setColor(255); // solid black
 
-			// Draw y axis
+			// Draw y axis legend
 			// Vertical line
 			cr->move_to((te.height + this->yaxis_size) / 2, height - this->absthick * 2.5); 
 			cr->line_to((te.height + this->yaxis_size) / 2, this->absthick * 2.5); 
@@ -180,11 +324,69 @@ class Canvas
 			cr->stroke();
 			// Text
 			cr->save();
+			this->setFontSize(5 * this->absthick);
 			cr->move_to((te.height + this->yaxis_size) / 2 - this->absthick * 2.5, height / 2 + te.width / 2 - te.x_bearing); 
 			cr->translate((te.height + this->yaxis_size) / 2 - this->absthick * 2.5, height / 2 + te.width / 2 - te.x_bearing); 
 			cr->rotate_degrees(-90);
 			cr->show_text("Time");
 			cr->restore();
+
+			// draw frequency legend
+			for(map<float, unsigned int>::iterator i = this->colors.begin(); i != this->colors.end(); i++)
+			{
+				unsigned int color = i->second;
+				size_t index = std::distance(this->colors.begin(), i);
+
+				//cr->rectangle(this->width * magnify - this->legend_size / 3 * 2, legend_height * (index + 1), legend_height, legend_height);
+				cr->rectangle(this->width - 2 * legend_height, legend_height * (index + 1), legend_height, legend_height);
+				setColor(color);
+				cr->fill_preserve();
+				setColor(255);
+				cr->stroke();
+
+				// Write Frequency
+				float freq = i->first;
+				cr->set_font_size(legend_font_size);
+				cairo_text_extents_t te;
+				cairo_font_extents_t fe;
+				cr->select_font_face("Sans", FONT_SLANT_NORMAL, FONT_WEIGHT_BOLD);
+				cr->get_font_extents(fe);
+				cr->get_text_extents(freq_labels.find(freq)->second, te);
+				cr->move_to(this->width - 1.5 * legend_height - te.width / 2 + te.x_bearing, legend_height * (index + 2) - legend_height / 2 - fe.descent + fe.height / 2);
+				setColor(255);
+				cr->show_text(freq_labels.find(freq)->second);
+			}
+
+			// Restore font size computed above
+			this->setFontSize(fontSize);
+
+			// Browse all tasks in schedule to draw them
+			set<Task> drawn;
+			for(Schedule::table::const_iterator i = sched->getSchedule().begin(); i != sched->getSchedule().end(); i++)
+			{
+				for(Schedule::sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
+				{
+					Task task = *j->second.first;
+					if(drawn.find(task) == drawn.end())
+					{
+						task.setWorkload(tg->getTasks().find(task)->getWorkload());
+						double runtime = task.runtime(task.getWidth(), task.getFrequency());
+						double width = task.getWidth();
+						double start = task.getStartTime();
+						size_t core = std::distance(sched->getSchedule().begin(), i) + 1;
+						string name = task.getName();
+						this->drawTask(runtime, width, task.getFrequency(), start, core, name);
+						drawn.insert(task);
+					}
+				}
+			}
+
+			// Draw final deadline, if necessary
+			this->drawBarrier(0);
+			if(drawDeadline)
+			{
+				this->drawBarrier(this->height - this->absthick / 2);
+			}
 #else
 #warning You must compile cairo with SVG support for this schedule output to work.
 #endif
@@ -220,50 +422,6 @@ class Canvas
 #endif
 		}
 
-		static
-		map<float, unsigned int>
-		makeGradient(vector<unsigned int> colors, set<float> values)
-		{
-			map<float, unsigned int> gradient;
-			float minValue = *values.begin();
-			float maxValue = *values.rbegin();
-
-			for(set<float>::iterator i = values.begin(); i != values.end(); i++)
-			{
-				float value = *i;
-				float position = (value - minValue) / (maxValue - minValue) * (colors.size() - 1);
-				size_t minIndex = (size_t)floor(position);
-				size_t maxIndex = (size_t)ceil(position);
-				position = (position - minIndex);
-
-				vector<unsigned int>::iterator minIter = colors.begin();
-				std::advance(minIter, minIndex);
-				unsigned int minColor = *minIter;
-				unsigned char minRed = decode(minColor, 0);
-				unsigned char minGreen = decode(minColor, 1);
-				unsigned char minBlue = decode(minColor, 2);
-				unsigned char minAlpha = decode(minColor, 3);
-
-				vector<unsigned int>::iterator maxIter = colors.begin();
-				std::advance(maxIter, maxIndex);
-				unsigned int maxColor = *maxIter;
-				unsigned char maxRed = decode(maxColor, 0);
-				unsigned char maxGreen = decode(maxColor, 1);
-				unsigned char maxBlue = decode(maxColor, 2);
-				unsigned char maxAlpha = decode(maxColor, 3);
-
-				unsigned char valueRed = minRed * (1 - position) + maxRed * position;
-				unsigned char valueGreen = minGreen * (1 - position) + maxGreen * position;
-				unsigned char valueBlue = minBlue * (1 - position) + maxBlue * position;
-				unsigned char valueAlpha = minAlpha * (1 - position) + maxAlpha * position;
-				unsigned int valueColor = valueRed + encode(0, valueGreen, 1) + encode(0, valueBlue, 2) + encode(0, valueAlpha, 3);
-
-				gradient.insert(pair<float, int>(value, valueColor));
-			}
-
-			return gradient;
-		}
-
 		double
 		idealFontSize(double time, double width, string label, double startSize)
 		{
@@ -283,22 +441,7 @@ class Canvas
 				cr->get_text_extents(label, te);
 				double text_width = te.width - te.x_bearing;
 				double text_height = te.height;
-#if 0
-				debug("##########################");
-				debug(delta);
-				debug(font_size);
-				debug(text_width);
-				debug(text_height);
-				debug(height);
-				debug(width);
-				debug(width * this->core_size);
-				debug(time * this->magnify);
-				debug(width * this->core_size - 2 * absthick - minError);
-				debug(time * this->magnify - 2 * absthick - minError);
-				debug(width * this->core_size - 2 * absthick - maxError);
-				debug(time * this->magnify - 2 * absthick - maxError);
-				debug(label);
-#endif
+
 				if(((text_width >= (width * this->core_size - 2 * absthick - minError)) || (text_height >= (time * this->magnify - 2 * absthick - minError))) && delta > 0)
 				{
 					delta = delta / 2;
@@ -337,6 +480,7 @@ class Canvas
 		setFontSize(double size)
 		{
 			this->fontSize = size;
+			this->cr->set_font_size(this->fontSize);
 		}
 
 		double
@@ -349,30 +493,6 @@ class Canvas
 		getHeight() const
 		{
 			return this->height;
-		}
-
-		static unsigned int
-		shiftLeft(unsigned int value, unsigned int shift)
-		{
-			return value << shift;
-		}
-
-		static unsigned int
-		shiftRight(unsigned int value, unsigned int shift)
-		{
-			return value >> shift;
-		}
-
-		static unsigned char
-		decode(unsigned int value, unsigned int position)
-		{
-			return shiftRight(value & shiftLeft(255, position * 8), position * 8);
-		}
-
-		static unsigned int
-		encode(unsigned int base, unsigned char value, unsigned int position)
-		{
-			return base - shiftLeft(decode(base, position), position * 8) + shiftLeft(value, position * 8);
 		}
 
 	protected:
@@ -392,6 +512,7 @@ class Canvas
 		double legend_size;
 		double fontSize;
 		double yaxis_size;
+		bool drawDeadline;
 		map<float, unsigned int> colors;
 #ifdef CAIRO_HAS_SVG_SURFACE
 		Cairo::RefPtr<Cairo::Context> cr;
@@ -402,11 +523,13 @@ class Canvas
 void
 TetrisSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const Platform *pt) const
 {
-#ifdef CAIRO_HAS_SVG_SURFACE
-	Schedule::table schedule = sched->getSchedule();
-	set<string> task_ids;
-	set<float> frequencies;
+	vector<unsigned int> colors;
+	unsigned int darkRed = encode(0, 84, 3) + encode(0, 0, 2) + encode(0, 0, 1) + 255;
+	unsigned int lightYellow = encode(0, 255, 3) + encode(0, 250, 2) + encode(0, 165, 1) + 255;
+	colors.push_back(lightYellow);
+	colors.push_back(darkRed);
 
+	set<float> frequencies;
 	for(set<const Core*>::iterator i = pt->getCores().begin(); i != pt->getCores().end(); i++)
 	{
 		const Core *core = *i;
@@ -416,6 +539,11 @@ TetrisSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		}
 	}
 
+	double thickness = 0.02;
+	double magnify = 100;
+
+	Schedule::table schedule = sched->getSchedule();
+
 	// Browse all tasks to find the time the last task stops	
 	double max_stop_time = 0;
 	for(Schedule::table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
@@ -424,7 +552,6 @@ TetrisSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		{
 			Task task = *j->second.first;
 			task.setWorkload(tg->getTasks().find(task)->getWorkload());
-			task_ids.insert(task.getName());
 			double stop_time = task.getStartTime() + task.runtime(task.getWidth(), task.getFrequency());
 			if(stop_time > max_stop_time)
 			{
@@ -434,63 +561,9 @@ TetrisSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 	}
 
 	double deadline = tg->getDeadline(pt);
-	bool drawDeadline = deadline > 0;
-	float thickness = 0.02;
-	double magnify = 100;
 	deadline = deadline > 0 ? deadline : max_stop_time;
-
-	vector<unsigned int> colors;
-	unsigned int darkRed = Canvas::encode(0, 84, 3) + Canvas::encode(0, 0, 2) + Canvas::encode(0, 0, 1) + 255;
-	unsigned int lightYellow = Canvas::encode(0, 255, 3) + Canvas::encode(0, 250, 2) + Canvas::encode(0, 165, 1) + 255;
-	colors.push_back(lightYellow);
-	colors.push_back(darkRed);
-	Canvas canvas(os, deadline, deadline * this->ratio, thickness, magnify, pt->getCores().size(), frequencies, colors);
-
-	// Browse all tasks to determine the biggest font size
-	double startSize = canvas.getHeight() > canvas.getWidth() ? canvas.getHeight() : canvas.getWidth();
-	double fontSize = startSize;
-	for(set<Task>::const_iterator i = sched->getTasks().begin(); i != sched->getTasks().end(); i++)
-	{
-		Task task = *i;
-		task.setWorkload(tg->getTasks().find(task)->getWorkload());
-		double runtime = task.runtime(i->getWidth(), i->getFrequency());
-		double width = i->getWidth();
-		string name = i->getName();
-		double idealSize = canvas.idealFontSize(runtime, width, name, startSize);
-		if(idealSize <= fontSize)
-		{
-			fontSize = idealSize;
-		}
-	}
-	canvas.setFontSize(fontSize);
-
-	// Browse all tasks in schedule to draw them
-	set<Task> drawn;
-	for(Schedule::table::iterator i = schedule.begin(); i != schedule.end(); i++)
-	{
-		for(Schedule::sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
-		{
-			Task task = *j->second.first;
-			if(drawn.find(task) == drawn.end())
-			{
-				task.setWorkload(tg->getTasks().find(task)->getWorkload());
-				double runtime = task.runtime(task.getWidth(), task.getFrequency());
-				double width = task.getWidth();
-				double start = task.getStartTime();
-				size_t core = std::distance(schedule.begin(), i) + 1;
-				string name = task.getName();
-				canvas.drawTask(runtime, width, task.getFrequency(), start, core, name);
-				drawn.insert(task);
-			}
-		}
-	}
-
-	canvas.drawBarrier(0);
-	if(drawDeadline)
-	{
-		canvas.drawBarrier(deadline);
-	}
-#endif
+	//Canvas canvas(deadline, deadline * this->ratio, thickness, magnify, pt->getCores().size(), frequencies, makeGradient(colors, frequencies)).dump(os, sched, tg, pt);
+	Canvas(deadline, deadline * ratio, thickness, magnify, makeGradient(colors, frequencies), deadline > 0).dump(os, sched, tg, pt);
 }
 
 TetrisSchedule*
