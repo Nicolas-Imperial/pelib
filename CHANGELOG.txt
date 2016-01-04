@@ -1,0 +1,1 @@
+* Added new visual Schedule output class, tetris style in SVG format

@@ -29,14 +29,6 @@ namespace pelib
 	/** Base class of any class able to take an instance of pelib::Schedule and output it in Tetris%g format to an output stream **/
 	class TetrisScheduleOutput : public ScheduleOutput
 	{
-		public:
-		protected:
-			float ratio;
-			bool showCores;
-			bool showFrequencies;
-			bool linearFrequencyRadiant;
-			unsigned int lowFrequencyRGBA;
-			unsigned int highFrequencyRGBA;
 	};
 }
 

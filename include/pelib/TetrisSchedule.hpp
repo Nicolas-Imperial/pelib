@@ -33,7 +33,7 @@ namespace pelib
 	{
 		public:
 			TetrisSchedule();
-			TetrisSchedule(double deadline, float ratio, bool showCores, bool showFrequencies, bool linearFrequencyradiant, unsigned int lowFrequencyRGBA, unsigned int highFrequencyRGBA);
+			TetrisSchedule(float ratio, bool showFrequencies, vector<unsigned int> colors);
 			/** Destructor **/
 			virtual ~TetrisSchedule();
 			/** Writes the content of instance of pelib::Schedule into output stream in Tetris format, using additional information from associated taskgraph and platform **/
@@ -42,6 +42,13 @@ namespace pelib
 			virtual	void dump(std::ostream &os, const Schedule &data, const Taskgraph &tg, const Platform &pt) const;
 			/** Read text input in Tetris format and creates an instance of pelib::Schedule containing all data read **/
 			virtual TetrisSchedule* clone() const;
+			static float defaultRatio();
+			static bool defaultFrequencyLegend();
+			static vector<unsigned int> defaultFrequencyColors();
+		protected:
+			float ratio;
+			bool showFrequencies;
+			vector<unsigned int> colors;
 	};
 }
 

@@ -57,24 +57,109 @@ using namespace pelib;
 using namespace std;
 using namespace Cairo;
 
-TetrisSchedule::TetrisSchedule()
+static unsigned int
+shiftLeft(unsigned int value, unsigned int shift)
 {
-	this->ratio = 4.0 / 3;
-	this->showCores = false;
-	this->showFrequencies = true;
-	this->linearFrequencyRadiant = true;
-	this->lowFrequencyRGBA = -1;
-	this->highFrequencyRGBA = 255;
+	return value << shift;
 }
 
-TetrisSchedule::TetrisSchedule(double deadline, float ratio, bool showCores, bool showFrequencies, bool linearFrequencyRadiant, unsigned int lowFrequencyRGBA, unsigned int higFrequencyRGBA)
+static unsigned int
+shiftRight(unsigned int value, unsigned int shift)
+{
+	return value >> shift;
+}
+
+static unsigned char
+decode(unsigned int value, unsigned int position)
+{
+	return shiftRight(value & shiftLeft(255, position * 8), position * 8);
+}
+
+static unsigned int
+encode(unsigned int base, unsigned char value, unsigned int position)
+{
+	return base - shiftLeft(decode(base, position), position * 8) + shiftLeft(value, position * 8);
+}
+
+static
+map<float, unsigned int>
+makeGradient(vector<unsigned int> colors, set<float> values)
+{
+	map<float, unsigned int> gradient;
+	float minValue = *values.begin();
+	float maxValue = *values.rbegin();
+
+	for(set<float>::iterator i = values.begin(); i != values.end(); i++)
+	{
+		float value = *i;
+		float position = (value - minValue) / (maxValue - minValue) * (colors.size() - 1);
+		size_t minIndex = (size_t)floor(position);
+		size_t maxIndex = (size_t)ceil(position);
+		position = (position - minIndex);
+		vector<unsigned int>::iterator minIter = colors.begin();
+		std::advance(minIter, minIndex);
+		unsigned int minColor = *minIter;
+		unsigned char minRed = decode(minColor, 0);
+		unsigned char minGreen = decode(minColor, 1);
+		unsigned char minBlue = decode(minColor, 2);
+		unsigned char minAlpha = decode(minColor, 3);
+
+		vector<unsigned int>::iterator maxIter = colors.begin();
+		std::advance(maxIter, maxIndex);
+		unsigned int maxColor = *maxIter;
+		unsigned char maxRed = decode(maxColor, 0);
+		unsigned char maxGreen = decode(maxColor, 1);
+		unsigned char maxBlue = decode(maxColor, 2);
+		unsigned char maxAlpha = decode(maxColor, 3);
+
+		unsigned char valueRed = minRed * (1 - position) + maxRed * position;
+		unsigned char valueGreen = minGreen * (1 - position) + maxGreen * position;
+		unsigned char valueBlue = minBlue * (1 - position) + maxBlue * position;
+		unsigned char valueAlpha = minAlpha * (1 - position) + maxAlpha * position;
+		unsigned int valueColor = valueRed + encode(0, valueGreen, 1) + encode(0, valueBlue, 2) + encode(0, valueAlpha, 3);
+
+		gradient.insert(pair<float, int>(value, valueColor));
+	}
+
+	return gradient;
+}
+
+float
+TetrisSchedule::defaultRatio()
+{
+	return 4.0 / 3;
+}
+
+bool
+TetrisSchedule::defaultFrequencyLegend()
+{
+	return true;
+}
+
+vector<unsigned int>
+TetrisSchedule::defaultFrequencyColors()
+{
+	vector<unsigned int> colors;
+	unsigned int darkRed = encode(0, 84, 3) + encode(0, 0, 2) + encode(0, 0, 1) + 255;
+	unsigned int lightYellow = encode(0, 255, 3) + encode(0, 250, 2) + encode(0, 165, 1) + 255;
+	colors.push_back(lightYellow);
+	colors.push_back(darkRed);
+
+	return colors;
+}
+
+TetrisSchedule::TetrisSchedule()
+{
+	this->ratio = defaultRatio();
+	this->showFrequencies = defaultFrequencyLegend();
+	this->colors = defaultFrequencyColors();
+}
+
+TetrisSchedule::TetrisSchedule(float ratio, bool showFrequencies, vector<unsigned int> frequency_colors)
 {
 	this->ratio = ratio;
-	this->showCores = showCores;
 	this->showFrequencies = showFrequencies;
-	this->linearFrequencyRadiant = linearFrequencyRadiant;
-	this->lowFrequencyRGBA = lowFrequencyRGBA;
-	this->highFrequencyRGBA = highFrequencyRGBA;
+	this->colors = frequency_colors;
 }
 
 TetrisSchedule::~TetrisSchedule()
@@ -119,78 +204,10 @@ class Slot: public sigc::mem_functor2<ErrorStatus, Slot, const unsigned char*, u
 		ostream *out;
 };
 
-static unsigned int
-shiftLeft(unsigned int value, unsigned int shift)
-{
-	return value << shift;
-}
-
-static unsigned int
-shiftRight(unsigned int value, unsigned int shift)
-{
-	return value >> shift;
-}
-
-static unsigned char
-decode(unsigned int value, unsigned int position)
-{
-	return shiftRight(value & shiftLeft(255, position * 8), position * 8);
-}
-
-static unsigned int
-encode(unsigned int base, unsigned char value, unsigned int position)
-{
-	return base - shiftLeft(decode(base, position), position * 8) + shiftLeft(value, position * 8);
-}
-
-static
-map<float, unsigned int>
-makeGradient(vector<unsigned int> colors, set<float> values)
-{
-	map<float, unsigned int> gradient;
-	float minValue = *values.begin();
-	float maxValue = *values.rbegin();
-
-	for(set<float>::iterator i = values.begin(); i != values.end(); i++)
-	{
-		float value = *i;
-		float position = (value - minValue) / (maxValue - minValue) * (colors.size() - 1);
-		size_t minIndex = (size_t)floor(position);
-		size_t maxIndex = (size_t)ceil(position);
-		position = (position - minIndex);
-
-		vector<unsigned int>::iterator minIter = colors.begin();
-		std::advance(minIter, minIndex);
-		unsigned int minColor = *minIter;
-		unsigned char minRed = decode(minColor, 0);
-		unsigned char minGreen = decode(minColor, 1);
-		unsigned char minBlue = decode(minColor, 2);
-		unsigned char minAlpha = decode(minColor, 3);
-
-		vector<unsigned int>::iterator maxIter = colors.begin();
-		std::advance(maxIter, maxIndex);
-		unsigned int maxColor = *maxIter;
-		unsigned char maxRed = decode(maxColor, 0);
-		unsigned char maxGreen = decode(maxColor, 1);
-		unsigned char maxBlue = decode(maxColor, 2);
-		unsigned char maxAlpha = decode(maxColor, 3);
-
-		unsigned char valueRed = minRed * (1 - position) + maxRed * position;
-		unsigned char valueGreen = minGreen * (1 - position) + maxGreen * position;
-		unsigned char valueBlue = minBlue * (1 - position) + maxBlue * position;
-		unsigned char valueAlpha = minAlpha * (1 - position) + maxAlpha * position;
-		unsigned int valueColor = valueRed + encode(0, valueGreen, 1) + encode(0, valueBlue, 2) + encode(0, valueAlpha, 3);
-
-		gradient.insert(pair<float, int>(value, valueColor));
-	}
-
-	return gradient;
-}
-
 class Canvas
 {
 	public:
-		Canvas(double height, double width, double thickness, double magnify, map<float, unsigned int> colors, bool drawDeadline)
+		Canvas(double height, double width, double thickness, double magnify, map<float, unsigned int> colors, bool drawDeadline, bool showFrequencies)
 		{
 			this->height = height;
 			this->width = width;
@@ -198,6 +215,7 @@ class Canvas
 			this->magnify = magnify;
 			this->colors = colors;
 			this->drawDeadline = drawDeadline;
+			this->showFrequencies = showFrequencies;
 		}
 		
 		void
@@ -218,8 +236,15 @@ class Canvas
 
 			// Partition drawing surface
 			// Space for frequency legend
-			size_t f = this->colors.size();
-			this->legend_size = (((this->height - this->absthick) / (f + 2)) + this->absthick) * 3; // Space for legend
+			if(this->showFrequencies)
+			{
+				size_t f = this->colors.size();
+				this->legend_size = (((this->height - this->absthick) / (f + 2)) + this->absthick) * 3; // Space for legend
+			}
+			else
+			{
+				this->legend_size = 0;
+			}
 			// Space for y axis legend
 			cairo_text_extents_t te;
 			cairo_font_extents_t fe;
@@ -251,56 +276,61 @@ class Canvas
 			}
 
 			// Check out font size of frequency legend
-			float legend_height = this->legend_size / 3 - absthick;
-			float legend_width = legend_height / this->core_size;
-			float legend_font_size = legend_height;
+			float legend_height = 0;
+			float legend_font_size = 0;
 			map<float, string> freq_labels;
-			for(map<float, unsigned int>::const_iterator i = this->colors.begin(); i != this->colors.end(); i++)
+			if(this->showFrequencies)
 			{
-				float freq = i->first;
-				unsigned int letter_number = ((unsigned int)log10(freq)) / 3;
-				float short_freq = freq;
-				unsigned char letter;
-				switch(letter_number)
+				legend_height = this->legend_size / 3 - absthick;
+				float legend_width = legend_height / this->core_size;
+				legend_font_size = legend_height;
+				for(map<float, unsigned int>::const_iterator i = this->colors.begin(); i != this->colors.end(); i++)
 				{
-					case 0:
-						letter = 'K';
-					break;
-					case 1:
-						letter = 'M';
-						short_freq /= 1000;
-					break;
-					case 2:
-						letter = 'G';
-						short_freq /= 1000;
-						short_freq /= 1000;
-					break;
-					break;
-					case 3:
-						letter = 'T';
-						short_freq /= 1000;
-						short_freq /= 1000;
-						short_freq /= 1000;
-					break;
-					default:
-						letter = 'X';
-					break;
+					float freq = i->first;
+					unsigned int letter_number = ((unsigned int)log10(freq)) / 3;
+					float short_freq = freq;
+					unsigned char letter;
+					switch(letter_number)
+					{
+						case 0:
+							letter = 'K';
+						break;
+						case 1:
+							letter = 'M';
+							short_freq /= 1000;
+						break;
+						case 2:
+							letter = 'G';
+							short_freq /= 1000;
+							short_freq /= 1000;
+						break;
+						break;
+						case 3:
+							letter = 'T';
+							short_freq /= 1000;
+							short_freq /= 1000;
+							short_freq /= 1000;
+						break;
+						default:
+							letter = 'X';
+						break;
+					}
+					stringstream freq_label;
+					if(letter != '\0')
+					{
+						freq_label << short_freq << letter;
+					}
+					else
+					{
+						freq_label << short_freq;
+					}
+					freq_labels.insert(pair<float, string>(freq, freq_label.str()));
+					double ideal_legend_size = this->idealFontSize(legend_height, legend_width, freq_label.str(), (double)legend_height);
+					if(ideal_legend_size < legend_font_size)
+					{
+						legend_font_size = ideal_legend_size;
+					}	
 				}
-				stringstream freq_label;
-				if(letter != '\0')
-				{
-					freq_label << short_freq << letter;
-				}
-				else
-				{
-					freq_label << short_freq;
-				}
-				freq_labels.insert(pair<float, string>(freq, freq_label.str()));
-				double ideal_legend_size = this->idealFontSize(legend_height, legend_width, freq_label.str(), (double)legend_height);
-				if(ideal_legend_size < legend_font_size)
-				{
-					legend_font_size = ideal_legend_size;
-				}	
 			}
 
 			// Set the pen thickness and style
@@ -332,29 +362,32 @@ class Canvas
 			cr->restore();
 
 			// draw frequency legend
-			for(map<float, unsigned int>::iterator i = this->colors.begin(); i != this->colors.end(); i++)
+			if(this->showFrequencies)
 			{
-				unsigned int color = i->second;
-				size_t index = std::distance(this->colors.begin(), i);
+				for(map<float, unsigned int>::iterator i = this->colors.begin(); i != this->colors.end(); i++)
+				{
+					unsigned int color = i->second;
+					size_t index = std::distance(this->colors.begin(), i);
 
-				//cr->rectangle(this->width * magnify - this->legend_size / 3 * 2, legend_height * (index + 1), legend_height, legend_height);
-				cr->rectangle(this->width - 2 * legend_height, legend_height * (index + 1), legend_height, legend_height);
-				setColor(color);
-				cr->fill_preserve();
-				setColor(255);
-				cr->stroke();
+					//cr->rectangle(this->width * magnify - this->legend_size / 3 * 2, legend_height * (index + 1), legend_height, legend_height);
+					cr->rectangle(this->width - 2 * legend_height, legend_height * (index + 1), legend_height, legend_height);
+					setColor(color);
+					cr->fill_preserve();
+					setColor(255);
+					cr->stroke();
 
-				// Write Frequency
-				float freq = i->first;
-				cr->set_font_size(legend_font_size);
-				cairo_text_extents_t te;
-				cairo_font_extents_t fe;
-				cr->select_font_face("Sans", FONT_SLANT_NORMAL, FONT_WEIGHT_BOLD);
-				cr->get_font_extents(fe);
-				cr->get_text_extents(freq_labels.find(freq)->second, te);
-				cr->move_to(this->width - 1.5 * legend_height - te.width / 2 + te.x_bearing, legend_height * (index + 2) - legend_height / 2 - fe.descent + fe.height / 2);
-				setColor(255);
-				cr->show_text(freq_labels.find(freq)->second);
+					// Write Frequency
+					float freq = i->first;
+					cr->set_font_size(legend_font_size);
+					cairo_text_extents_t te;
+					cairo_font_extents_t fe;
+					cr->select_font_face("Sans", FONT_SLANT_NORMAL, FONT_WEIGHT_BOLD);
+					cr->get_font_extents(fe);
+					cr->get_text_extents(freq_labels.find(freq)->second, te);
+					cr->move_to(this->width - 1.5 * legend_height - te.width / 2 + te.x_bearing, legend_height * (index + 2) - legend_height / 2 - fe.descent + fe.height / 2);
+					setColor(255);
+					cr->show_text(freq_labels.find(freq)->second);
+				}
 			}
 
 			// Restore font size computed above
@@ -513,6 +546,7 @@ class Canvas
 		double fontSize;
 		double yaxis_size;
 		bool drawDeadline;
+		bool showFrequencies;
 		map<float, unsigned int> colors;
 #ifdef CAIRO_HAS_SVG_SURFACE
 		Cairo::RefPtr<Cairo::Context> cr;
@@ -523,12 +557,6 @@ class Canvas
 void
 TetrisSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const Platform *pt) const
 {
-	vector<unsigned int> colors;
-	unsigned int darkRed = encode(0, 84, 3) + encode(0, 0, 2) + encode(0, 0, 1) + 255;
-	unsigned int lightYellow = encode(0, 255, 3) + encode(0, 250, 2) + encode(0, 165, 1) + 255;
-	colors.push_back(lightYellow);
-	colors.push_back(darkRed);
-
 	set<float> frequencies;
 	for(set<const Core*>::iterator i = pt->getCores().begin(); i != pt->getCores().end(); i++)
 	{
@@ -562,8 +590,7 @@ TetrisSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 
 	double deadline = tg->getDeadline(pt);
 	deadline = deadline > 0 ? deadline : max_stop_time;
-	//Canvas canvas(deadline, deadline * this->ratio, thickness, magnify, pt->getCores().size(), frequencies, makeGradient(colors, frequencies)).dump(os, sched, tg, pt);
-	Canvas(deadline, deadline * ratio, thickness, magnify, makeGradient(colors, frequencies), deadline > 0).dump(os, sched, tg, pt);
+	Canvas(deadline, deadline * ratio, thickness, magnify, makeGradient(colors, frequencies), deadline > 0, this->showFrequencies).dump(os, sched, tg, pt);
 }
 
 TetrisSchedule*
