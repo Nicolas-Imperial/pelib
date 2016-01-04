@@ -1,1 +1,2 @@
 * Added new visual Schedule output class, tetris style in SVG format
+* Added unit for platform frequencies in AMPL scalar "Funit". Multiply with element in F to obtain frequency in Hertz.

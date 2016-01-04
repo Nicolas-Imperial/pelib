@@ -210,7 +210,7 @@ namespace pelib
 		set<float> f;
 		f.insert(1);
 		set<const Core*> cores;
-		cores.insert(new DummyCore(f));
+		cores.insert(new DummyCore(f, 1));
 		Platform arch(cores);
 		
 		return buildAlgebra(Platform(cores));

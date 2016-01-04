@@ -35,7 +35,10 @@ namespace pelib
 			virtual ~Core();
 			/** Returns the set of frequencies admissible by this core **/
 			virtual const std::set<float>& getFrequencies() const = 0;
+			/** Returns the frequency multiplier of the frequency set to obtain frequencies in Hertz **/
+			virtual float getFrequencyUnit() const = 0;
 		protected:
+			float frequencyUnit;
 		private:
 	};
 }

@@ -35,7 +35,7 @@ namespace pelib
 	{
 		set<float> f;
 		f.insert(1);
-		Core *core = new DummyCore(f);
+		Core *core = new DummyCore(f, 1);
 		this->cores.insert(core);
 		set<const Core*> island;
 		island.insert(core);
@@ -170,6 +170,7 @@ namespace pelib
 	Platform::Platform(const Algebra &arch)
 	{
 		const Scalar<float> *scalar_p = arch.find<Scalar<float> >("p");
+		const Scalar<float> *f_unit = arch.find<Scalar<float> >("Funit");
 		const Set<float> *set_F = arch.find<Set<float> >("F");
 
 		if(scalar_p == NULL || set_F == NULL)
@@ -180,7 +181,7 @@ namespace pelib
 		//set<const Core*> shared;
 		for(size_t i = 0; i < scalar_p->getValue(); i++)
 		{
-			const Core *core = new DummyCore(set_F->getValues());
+			const Core *core = new DummyCore(set_F->getValues(), f_unit == NULL ? 1 : f_unit->getValue());
 			this->cores.insert(core);
 			set<const Core*> island;
 			island.insert(core);
@@ -247,9 +248,11 @@ namespace pelib
 		}
 
 		Scalar<float> scalar_p("p", this->getCores().size());
+		Scalar<float> f_unit("Funit", (*this->getCores().begin())->getFrequencyUnit());
 		Set<float> set_F("F", (*this->getCores().begin())->getFrequencies());
 
 		record.insert(&scalar_p);
+		record.insert(&f_unit);
 		record.insert(&set_F);
 
 		return record;

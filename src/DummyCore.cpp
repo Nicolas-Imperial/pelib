@@ -24,19 +24,22 @@ using namespace std;
 
 namespace pelib
 {
-	DummyCore::DummyCore(const set<float> &f)
+	DummyCore::DummyCore(const set<float> &f, float unit)
 	{
 		this->frequencies = set<float>(f);
+		this->frequencyUnit = unit;
 	}
 
 	DummyCore::DummyCore(const DummyCore* src)
 	{
 		this->frequencies = set<float>(src->getFrequencies());
+		this->frequencyUnit = src->getFrequencyUnit();
 	}
 
 	DummyCore::DummyCore(const DummyCore &src)
 	{
 		this->frequencies = set<float>(src.getFrequencies());
+		this->frequencyUnit = src.getFrequencyUnit();
 	}
 
 	DummyCore::~DummyCore()
@@ -54,5 +57,11 @@ namespace pelib
 	DummyCore::getFrequencies() const
 	{
 		return this->frequencies;
+	}
+
+	float
+	DummyCore::getFrequencyUnit() const
+	{
+		return this->frequencyUnit;
 	}
 }

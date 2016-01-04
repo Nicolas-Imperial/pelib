@@ -286,27 +286,34 @@ class Canvas
 				legend_font_size = legend_height;
 				for(map<float, unsigned int>::const_iterator i = this->colors.begin(); i != this->colors.end(); i++)
 				{
-					float freq = i->first;
+					float freq = i->first * (*pt->getCores().begin())->getFrequencyUnit();
 					unsigned int letter_number = ((unsigned int)log10(freq)) / 3;
 					float short_freq = freq;
 					unsigned char letter;
 					switch(letter_number)
 					{
 						case 0:
-							letter = 'K';
+							letter = '\0';
 						break;
 						case 1:
-							letter = 'M';
+							letter = 'K';
 							short_freq /= 1000;
 						break;
 						case 2:
+							letter = 'M';
+							short_freq /= 1000;
+							short_freq /= 1000;
+						break;
+						case 3:
 							letter = 'G';
 							short_freq /= 1000;
 							short_freq /= 1000;
+							short_freq /= 1000;
 						break;
 						break;
-						case 3:
+						case 4:
 							letter = 'T';
+							short_freq /= 1000;
 							short_freq /= 1000;
 							short_freq /= 1000;
 							short_freq /= 1000;
@@ -377,14 +384,14 @@ class Canvas
 					cr->stroke();
 
 					// Write Frequency
-					float freq = i->first;
+					float freq = i->first * (*pt->getCores().begin())->getFrequencyUnit();
 					cr->set_font_size(legend_font_size);
 					cairo_text_extents_t te;
 					cairo_font_extents_t fe;
 					cr->select_font_face("Sans", FONT_SLANT_NORMAL, FONT_WEIGHT_BOLD);
 					cr->get_font_extents(fe);
 					cr->get_text_extents(freq_labels.find(freq)->second, te);
-					cr->move_to(this->width - 1.5 * legend_height - te.width / 2 + te.x_bearing, legend_height * (index + 2) - legend_height / 2 - fe.descent + fe.height / 2);
+					cr->move_to(this->width - 1.5 * legend_height - te.width / 2 - te.x_bearing, legend_height * (index + 2) - legend_height / 2 - fe.descent + fe.height / 2);
 					setColor(255);
 					cr->show_text(freq_labels.find(freq)->second);
 				}

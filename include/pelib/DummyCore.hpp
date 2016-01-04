@@ -32,7 +32,7 @@ namespace pelib
 			/** Constructor
 				@param f Set of frequency that this core can run at
 			**/
-			DummyCore(const std::set<float> &f);
+			DummyCore(const std::set<float> &f, float unit);
 			/** Copy constructor **/
 			DummyCore(const DummyCore*);
 			/** Copy constructor **/
@@ -43,6 +43,8 @@ namespace pelib
 			virtual Core* clone() const;
 			/** Returns the set of frequencies this core can run at **/
 			virtual const std::set<float>& getFrequencies() const;
+			/** Returns the frequency multiplier of the frequency set to obtain frequencies in Hertz **/
+			virtual float getFrequencyUnit() const;
 		protected:
 			/** Admissible set of frequencies for this core **/
 			std::set<float> frequencies;

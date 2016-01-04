@@ -47,8 +47,8 @@ pelib_parse(std::istream& cin, size_t argc, char **argv)
 	std::string line;
 	Algebra alg_arch = reader.parse(cin);
 
-
 	const Scalar<float> *scalar_p = alg_arch.find<Scalar<float> >("p");
+	const Scalar<float> *f_unit = alg_arch.find<Scalar<float> >("Funit");
 	const Set<float> *set_F = alg_arch.find<Set<float> >("F");
 
 	if(scalar_p == NULL || set_F == NULL)
@@ -59,7 +59,7 @@ pelib_parse(std::istream& cin, size_t argc, char **argv)
 	set<const Core*> cores;
 	for(size_t i = 0; i < (size_t)scalar_p->getValue(); i++)
 	{
-		cores.insert(new DummyCore(set_F->getValues()));
+		cores.insert(new DummyCore(set_F->getValues(), f_unit->getValue()));
 	}
 
 	Platform *arch = new Platform(cores);
