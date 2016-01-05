@@ -130,6 +130,12 @@ TetrisSchedule::defaultRatio()
 	return 4.0 / 3;
 }
 
+float
+TetrisSchedule::defaultStrokeSize()
+{
+	return 1;
+}
+
 bool
 TetrisSchedule::defaultFrequencyLegend()
 {
@@ -148,18 +154,28 @@ TetrisSchedule::defaultFrequencyColors()
 	return colors;
 }
 
+bool
+TetrisSchedule::defaultTaskLabel()
+{
+	return false;
+}
+
 TetrisSchedule::TetrisSchedule()
 {
 	this->ratio = defaultRatio();
 	this->showFrequencies = defaultFrequencyLegend();
+	this->useTaskName = useTaskName;
 	this->colors = defaultFrequencyColors();
+	this->strokeSize = defaultStrokeSize();
 }
 
-TetrisSchedule::TetrisSchedule(float ratio, bool showFrequencies, vector<unsigned int> frequency_colors)
+TetrisSchedule::TetrisSchedule(float ratio, bool showFrequencies, bool useTaskName, vector<unsigned int> frequency_colors, float strokeSize)
 {
 	this->ratio = ratio;
 	this->showFrequencies = showFrequencies;
 	this->colors = frequency_colors;
+	this->useTaskName = useTaskName;
+	this->strokeSize = strokeSize;
 }
 
 TetrisSchedule::~TetrisSchedule()
@@ -219,13 +235,13 @@ class Canvas
 		}
 		
 		void
-		dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const Platform *pt)
+		dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const Platform *pt, bool useTaskName, float strokeSize)
 		{
 #ifdef CAIRO_HAS_SVG_SURFACE
 			// Compute canvas size, taking thickness and magnification into account
 			this->magnify = height >= magnify ? magnify : magnify / height;
 			height = height * this->magnify;
-			this->absthick = thickness * height;
+			this->absthick = thickness * height * strokeSize;
 			this->height = height + absthick;
 			this->width = width * this->magnify + absthick;
 
@@ -239,35 +255,46 @@ class Canvas
 			if(this->showFrequencies)
 			{
 				size_t f = this->colors.size();
-				this->legend_size = (((this->height - this->absthick) / (f + 2)) + this->absthick) * 3; // Space for legend
+				this->legend_size = (((this->height - this->absthick) / (f + 2))); // Space for legend
 			}
 			else
 			{
 				this->legend_size = 0;
 			}
 			// Space for y axis legend
+			this->setFontSize(4 * this->absthick);
 			cairo_text_extents_t te;
 			cairo_font_extents_t fe;
 			cr->select_font_face("Sans", FONT_SLANT_NORMAL, FONT_WEIGHT_BOLD);
 			cr->get_text_extents("Time", te);
 			cr->get_font_extents(fe);
-			this->yaxis_size = 7 * absthick + te.height;
+			this->yaxis_size = 4 * absthick - te.y_bearing;
 
 			// Space between extreme-left and extreme-right tasks and extremities of barriers
-			this->margin = 0.02 * (this->width - absthick - this->legend_size);
+			this->margin = 3 * absthick;
 			size_t p = pt->getCores().size();
 			this->core_size = (this->width - absthick - this->margin * 2 - this->legend_size - this->yaxis_size) / p;
 
 			// Browse all tasks to determine the biggest font size that fits all tasks to draw
 			double startSize = this->getHeight() > this->getWidth() ? this->getHeight() : this->getWidth();
 			double fontSize = startSize;
-			for(set<Task>::const_iterator i = sched->getTasks().begin(); i != sched->getTasks().end(); i++)
+			for(set<Task>::iterator i = sched->getTasks().begin(); i != sched->getTasks().end(); i++)
 			{
 				Task task = *i;
 				task.setWorkload(tg->getTasks().find(task)->getWorkload());
 				double runtime = task.runtime(i->getWidth(), i->getFrequency());
 				double width = i->getWidth();
-				string name = i->getName();
+				string name;
+				if(useTaskName)
+				{
+					name = i->getName();
+				}
+				else
+				{
+					stringstream ss;
+					ss << std::distance(sched->getTasks().begin(), i) + 1;
+					name = ss.str();
+				}
 				double idealSize = this->idealFontSize(runtime, width, name, startSize);
 				if(idealSize <= fontSize)
 				{
@@ -281,7 +308,7 @@ class Canvas
 			map<float, string> freq_labels;
 			if(this->showFrequencies)
 			{
-				legend_height = this->legend_size / 3 - absthick;
+				legend_height = this->legend_size;
 				float legend_width = legend_height / this->core_size;
 				legend_font_size = legend_height;
 				for(map<float, unsigned int>::const_iterator i = this->colors.begin(); i != this->colors.end(); i++)
@@ -348,27 +375,27 @@ class Canvas
 
 			// Draw y axis legend
 			// Vertical line
-			cr->move_to((te.height + this->yaxis_size) / 2, height - this->absthick * 2.5); 
-			cr->line_to((te.height + this->yaxis_size) / 2, this->absthick * 2.5); 
+			cr->move_to((te.height + this->yaxis_size + absthick) / 2, height - this->absthick * 2.5); 
+			cr->line_to((te.height + this->yaxis_size + absthick) / 2, this->absthick * 2.5); 
 			cr->stroke();
 			// Left arrow stroke
-			cr->move_to((te.height + this->yaxis_size) / 2, this->absthick * 2.5); 
-			cr->line_to((te.height + this->yaxis_size) / 2 - this->absthick * 2, this->absthick * 4.5); 
+			cr->move_to((te.height + this->yaxis_size + absthick) / 2, this->absthick * 2.5); 
+			cr->line_to((te.height + this->yaxis_size + absthick) / 2 - this->absthick * 2, this->absthick * 6.5); 
 			cr->stroke();
 			// Right arrow stroke
-			cr->move_to((te.height + this->yaxis_size) / 2, this->absthick * 2.5); 
-			cr->line_to((te.height + this->yaxis_size) / 2 + this->absthick * 2, this->absthick * 4.5); 
+			cr->move_to((te.height + this->yaxis_size + absthick) / 2, this->absthick * 2.5); 
+			cr->line_to((te.height + this->yaxis_size + absthick) / 2 + this->absthick * 2, this->absthick * 6.5); 
 			cr->stroke();
 			// Text
 			cr->save();
-			this->setFontSize(5 * this->absthick);
-			cr->move_to((te.height + this->yaxis_size) / 2 - this->absthick * 2.5, height / 2 + te.width / 2 - te.x_bearing); 
-			cr->translate((te.height + this->yaxis_size) / 2 - this->absthick * 2.5, height / 2 + te.width / 2 - te.x_bearing); 
+			this->setFontSize(4 * this->absthick);
+			cr->move_to(-te.y_bearing, height / 2 + te.width / 2 - te.x_bearing); 
+			cr->translate(-te.y_bearing, height / 2 + te.width / 2 - te.x_bearing); 
 			cr->rotate_degrees(-90);
 			cr->show_text("Time");
 			cr->restore();
 
-			// draw frequency legend
+			// Draw frequency legend
 			if(this->showFrequencies)
 			{
 				for(map<float, unsigned int>::iterator i = this->colors.begin(); i != this->colors.end(); i++)
@@ -376,8 +403,7 @@ class Canvas
 					unsigned int color = i->second;
 					size_t index = std::distance(this->colors.begin(), i);
 
-					//cr->rectangle(this->width * magnify - this->legend_size / 3 * 2, legend_height * (index + 1), legend_height, legend_height);
-					cr->rectangle(this->width - 2 * legend_height, legend_height * (index + 1), legend_height, legend_height);
+					cr->rectangle(this->width - legend_height - absthick / 2, legend_height * (index + 1) + absthick / 2, legend_height, legend_height);
 					setColor(color);
 					cr->fill_preserve();
 					setColor(255);
@@ -391,7 +417,7 @@ class Canvas
 					cr->select_font_face("Sans", FONT_SLANT_NORMAL, FONT_WEIGHT_BOLD);
 					cr->get_font_extents(fe);
 					cr->get_text_extents(freq_labels.find(freq)->second, te);
-					cr->move_to(this->width - 1.5 * legend_height - te.width / 2 - te.x_bearing, legend_height * (index + 2) - legend_height / 2 - fe.descent + fe.height / 2);
+					cr->move_to(this->width - 0.5 * legend_height - te.width / 2 - absthick / 2 - te.x_bearing, legend_height * (index + 2) - legend_height / 2 - fe.descent + fe.height / 2 + absthick / 2);
 					setColor(255);
 					cr->show_text(freq_labels.find(freq)->second);
 				}
@@ -410,11 +436,23 @@ class Canvas
 					if(drawn.find(task) == drawn.end())
 					{
 						task.setWorkload(tg->getTasks().find(task)->getWorkload());
+						task.setMaxWidth(tg->getTasks().find(task)->getMaxWidth());
+						task.setEfficiencyString(tg->getTasks().find(task)->getEfficiencyString());
 						double runtime = task.runtime(task.getWidth(), task.getFrequency());
 						double width = task.getWidth();
 						double start = task.getStartTime();
 						size_t core = std::distance(sched->getSchedule().begin(), i) + 1;
-						string name = task.getName();
+						string name;
+						if(useTaskName)
+						{
+							name = task.getName();
+						}
+						else
+						{
+							stringstream ss;
+							ss << (std::distance(sched->getTasks().begin(), sched->getTasks().find(task)) + 1);
+							name = ss.str();
+						}
 						this->drawTask(runtime, width, task.getFrequency(), start, core, name);
 						drawn.insert(task);
 					}
@@ -425,7 +463,7 @@ class Canvas
 			this->drawBarrier(0);
 			if(drawDeadline)
 			{
-				this->drawBarrier(this->height - this->absthick / 2);
+				this->drawBarrier(this->height - this->absthick);
 			}
 #else
 #warning You must compile cairo with SVG support for this schedule output to work.
@@ -503,8 +541,10 @@ class Canvas
 		drawBarrier(double time)
 		{
 #ifdef CAIRO_HAS_SVG_SURFACE
-			cr->move_to(this->absthick / 2 + this->yaxis_size, height - time * magnify - this->absthick / 2); 
-			cr->line_to(width - this->absthick / 2 - legend_size, height - time * magnify - this->absthick / 2);
+			//cr->move_to(this->absthick / 2 + this->yaxis_size, height - time * magnify - this->absthick / 2); 
+			//cr->line_to(width - this->absthick / 2 - legend_size, height - time * magnify - this->absthick / 2);
+			cr->move_to(this->absthick / 2 + this->yaxis_size, height - time - this->absthick / 2); 
+			cr->line_to(width - this->absthick / 2 - legend_size, height - time - this->absthick / 2);
 			setColor(255); // solid black
 			cr->stroke();
 #endif
@@ -587,6 +627,8 @@ TetrisSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		{
 			Task task = *j->second.first;
 			task.setWorkload(tg->getTasks().find(task)->getWorkload());
+			task.setMaxWidth(tg->getTasks().find(task)->getMaxWidth());
+			task.setEfficiencyString(tg->getTasks().find(task)->getEfficiencyString());
 			double stop_time = task.getStartTime() + task.runtime(task.getWidth(), task.getFrequency());
 			if(stop_time > max_stop_time)
 			{
@@ -596,8 +638,9 @@ TetrisSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 	}
 
 	double deadline = tg->getDeadline(pt);
+	bool drawDeadline = deadline > 0;
 	deadline = deadline > 0 ? deadline : max_stop_time;
-	Canvas(deadline, deadline * ratio, thickness, magnify, makeGradient(colors, frequencies), deadline > 0, this->showFrequencies).dump(os, sched, tg, pt);
+	Canvas(deadline, deadline * ratio, thickness, magnify, makeGradient(colors, frequencies), drawDeadline, this->showFrequencies).dump(os, sched, tg, pt, useTaskName, strokeSize);
 }
 
 TetrisSchedule*
