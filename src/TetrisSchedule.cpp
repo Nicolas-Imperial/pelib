@@ -164,7 +164,7 @@ TetrisSchedule::TetrisSchedule()
 {
 	this->ratio = defaultRatio();
 	this->showFrequencies = defaultFrequencyLegend();
-	this->useTaskName = useTaskName;
+	this->useTaskName = defaultTaskLabel();
 	this->colors = defaultFrequencyColors();
 	this->strokeSize = defaultStrokeSize();
 }
@@ -427,21 +427,62 @@ class Canvas
 			this->setFontSize(fontSize);
 
 			// Browse all tasks in schedule to draw them
-			set<Task> drawn;
+			map<Task, pair<size_t, size_t> > drawn;
 			for(Schedule::table::const_iterator i = sched->getSchedule().begin(); i != sched->getSchedule().end(); i++)
 			{
 				for(Schedule::sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 				{
+					// Checks the number of core already covered when drawing this task
 					Task task = *j->second.first;
-					if(drawn.find(task) == drawn.end())
+					// done is the number of cores already drawn for the task
+					// next is the first core after what has been already drawn for the task
+					size_t done = 0, next = 1;
+					size_t core = i->first;
+
+					// Find the task in the list of task already partially drawn
+					if(drawn.find(task) != drawn.end())
+					{
+						done = drawn.find(task)->second.first;
+						next = drawn.find(task)->second.second;
+
+						// Remove task from list only if it will run again
+						if(done < task.getWidth() && core >= next)
+						{
+							drawn.erase(drawn.find(task));
+						}
+					}
+
+					// Draw the task only if all its core has not been drawn yet,
+					// and if the current core is at least as high as the next allowed
+					// core computed last time the task was partially drawn
+					if(done < task.getWidth() && core >= next)
 					{
 						task.setWorkload(tg->getTasks().find(task)->getWorkload());
 						task.setMaxWidth(tg->getTasks().find(task)->getMaxWidth());
 						task.setEfficiencyString(tg->getTasks().find(task)->getEfficiencyString());
 						double runtime = task.runtime(task.getWidth(), task.getFrequency());
-						double width = task.getWidth();
+
+						// Looks for the number of cores through the task can be drawn in a continuous manner
+						// Instead of the task's width, because mapping may not be to contiguous cores
+						size_t width = 0;
+						for(Schedule::table::const_iterator k = i; k != sched->getSchedule().end(); k++)
+						{
+							bool task_found = false;
+							for(Schedule::sequence::const_iterator l = k->second.begin(); l != k->second.end(); l++)
+							{
+								if(*l->second.first == task)
+								{
+									width++;
+									task_found = true;;
+								}
+							}
+
+							if(!task_found)
+							{
+								break;
+							}
+						}
 						double start = task.getStartTime();
-						size_t core = std::distance(sched->getSchedule().begin(), i) + 1;
 						string name;
 						if(useTaskName)
 						{
@@ -454,7 +495,7 @@ class Canvas
 							name = ss.str();
 						}
 						this->drawTask(runtime, width, task.getFrequency(), start, core, name);
-						drawn.insert(task);
+						drawn.insert(pair<Task, pair<size_t, size_t> >(task, pair<size_t, size_t>(done + width, core + width)));
 					}
 				}
 			}

@@ -106,7 +106,7 @@ namespace pelib
 	
 		if(start == NULL || tau == NULL || wi == NULL || sched == NULL || freq == NULL)
 		{
-			throw CastException("Missing parameter");
+			throw CastException("Missing some input data structure instance. Check start, tau, wi, sched and freq.");
 		}
 		else
 		{

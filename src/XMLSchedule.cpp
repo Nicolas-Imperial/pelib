@@ -84,20 +84,53 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 
 	// Finds and set the precision required for this schedule
 	std::streamsize old_precision = os.precision();
-	float min_delta = FLT_MAX;
+	std::streamsize max_work_precision = 0;
+	std::streamsize max_freq_precision = 0;
+	std::streamsize max_start_precision = 0;
 	for(Schedule::table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 	{
 		float last_start = 0;
+		float last_time = 0;
 		for(Schedule::sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 		{
 			Task t = *j->second.first;
 			if(t.getStartTime() > 0)
 			{
 				float delta = t.getStartTime() - last_start;
-				if(delta < min_delta)
+				delta = delta - floor(delta);
+				debug(delta);
+				std::streamsize precision = (std::streamsize)(ceil(-log10(delta)) + 2);
+				if(precision > max_start_precision)
 				{
-					min_delta = delta;
+					max_start_precision = precision;
 				}
+				last_start = t.getStartTime();
+
+				delta = abs(t.getStartTime() - (last_start + last_time));
+				delta = delta - floor(delta);
+				debug(delta);
+				precision = (std::streamsize)(ceil(-log10(delta)) + 2);
+				if(precision > max_start_precision)
+				{
+					max_start_precision = precision;
+				}
+				const Task &tgt = *tg->getTasks().find(t);
+				last_time = tgt.runtime(t.getWidth(), t.getFrequency());
+
+				double work = t.getWorkload() - floor(t.getWorkload());
+				precision = (std::streamsize)(ceil(-log10(work)) + 2);
+				if(precision > max_work_precision)
+				{
+					max_work_precision = precision;
+				}
+
+				double freq = t.getFrequency() - floor(t.getFrequency());
+				precision = (std::streamsize)(ceil(-log10(freq)) + 2);
+				if(precision > max_freq_precision)
+				{
+					max_freq_precision = precision;
+				}
+
 				/*
 				os << "<!-- core : " << i->first << " -->" << endl;
 				os << "<!-- task : " << t.getName() << " -->" << endl;
@@ -106,14 +139,10 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 				*/
 
 				// update last time
-				last_start = t.getStartTime();
 			}
 		}
 	}
-	std::streamsize precision = (std::streamsize)(ceil(-log10(min_delta)) + 1);
-	//os << "<!-- precision = " << precision << " -->" << endl;
 
-	os << setprecision(precision);
 	for(Schedule::table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 	{
 		int p = i->first;
@@ -128,18 +157,22 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 			Task t = *j->second.first;
 			size_t task_index = std::distance(sched->getTasks().begin(), sched->getTasks().find(t));
 			
-			os << "  <task name=\"" << taskid << "\" "
-				<< "start=\"" << (t.getStartTime() > 0 ? t.getStartTime() : start) << "\" "
-				<< "frequency=\"" << t.getFrequency() << "\" "
-				<< "width=\"" << t.getWidth() << "\" "
-				<< "workload=\"" << t.getWorkload() << "\""
-				<< "/>" << endl;
+			os << "  <task name=\"" << taskid << "\" ";
+			os << setprecision(max_start_precision);
+			os << "start=\"" << std::fixed << (t.getStartTime() > 0 ? t.getStartTime() : start) << "\" ";
+			os << setprecision(max_freq_precision);
+			os << "frequency=\"" << std::fixed << (float)t.getFrequency() << "\" ";
+			os << "width=\"" << std::fixed << t.getWidth() << "\" ";
+			os << setprecision(max_work_precision);
+			os << "workload=\"" << std::fixed << t.getWorkload() << "\"";
+			os << "/>" << endl;
+			os << setprecision(old_precision);
 
-				set<Task>::iterator iter = tasks.begin();
-				std::advance(iter, task_index);
-				t.setMaxWidth(iter->getMaxWidth());
-				t.setEfficiencyString(iter->getEfficiencyString());
-				start += t.runtime(t.getWidth(), t.getFrequency());
+			set<Task>::iterator iter = tasks.begin();
+			std::advance(iter, task_index);
+			t.setMaxWidth(iter->getMaxWidth());
+			t.setEfficiencyString(iter->getEfficiencyString());
+			start += t.runtime(t.getWidth(), t.getFrequency());
 		}
 		os << " </core>" << endl;
 	}
