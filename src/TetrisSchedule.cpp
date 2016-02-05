@@ -50,42 +50,158 @@ extern "C"{
 #endif
 
 #ifndef debug
-#define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
+#define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << (expr) << "\"." << endl;
 #endif
 
 using namespace pelib;
 using namespace std;
 using namespace Cairo;
 
-static unsigned int
-shiftLeft(unsigned int value, unsigned int shift)
+static uint32_t
+shiftLeft(uint32_t value, uint32_t shift)
 {
 	return value << shift;
 }
 
-static unsigned int
-shiftRight(unsigned int value, unsigned int shift)
+static uint32_t
+shiftRight(uint32_t value, uint32_t shift)
 {
 	return value >> shift;
 }
 
 static unsigned char
-decode(unsigned int value, unsigned int position)
+decode(uint32_t value, uint32_t position)
 {
 	return shiftRight(value & shiftLeft(255, position * 8), position * 8);
 }
 
-static unsigned int
-encode(unsigned int base, unsigned char value, unsigned int position)
+static uint32_t
+encode(uint32_t base, unsigned char value, uint32_t position)
 {
 	return base - shiftLeft(decode(base, position), position * 8) + shiftLeft(value, position * 8);
 }
 
+// Adapted from https://www.programmingalgorithms.com/algorithm/hsl-to-rgb?lang=C%2B%2
 static
-map<float, unsigned int>
-makeGradient(vector<unsigned int> colors, set<float> values)
+double
+HueToRGB(double v1, double v2, double vH)
 {
-	map<float, unsigned int> gradient;
+	if (vH < 0)
+	{
+		vH += 1;
+	}
+
+	if (vH > 1)
+	{
+		vH -= 1;
+	}
+
+	if ((6 * vH) < 1)
+	{
+		return (v1 + (v2 - v1) * 6 * vH);
+	}
+
+	if ((2 * vH) < 1)
+	{
+		return v2;
+	}
+
+	if ((3 * vH) < 2)
+	{
+		return (v1 + (v2 - v1) * ((2.0f / 3) - vH) * 6);
+	}
+
+	return v1;
+}
+
+static
+uint32_t
+HSLtoRGB(uint32_t tsl)
+{
+	double T = decode(tsl, 3);
+	double S = decode(tsl, 2);
+	double L = decode(tsl, 1);
+	double A = decode(tsl, 0);
+
+
+	T = T / 255;
+	S = S / 255;
+	L = L / 255;
+	
+	double R, G, B;
+	if (S == 0)
+	{
+		R = G = B = L * 255;
+	}
+	else
+	{
+		double v1, v2;
+
+		v2 = (L < 0.5) ? (L * (1 + S)) : ((L + S) - (L * S));
+		v1 = 2 * L - v2;
+
+		R = 255 * HueToRGB(v1, v2, T + (1.0f / 3));
+		G = 255 * HueToRGB(v1, v2, T);
+		B = 255 * HueToRGB(v1, v2, T - (1.0f / 3));
+	}
+
+	// Round RGB values to closest integer by truncating value + 0.5
+	uint32_t rgb = A + encode(0, R + 0.5, 3) + encode(0, G + 0.5, 2) + encode(0, B + 0.5, 1);
+
+	return rgb;
+}
+// End 
+
+static
+uint32_t
+RGBtoHSL(uint32_t rgb)
+{
+	double R = decode(rgb, 3);
+	double G = decode(rgb, 2);
+	double B = decode(rgb, 1);
+	double A = decode(rgb, 0);
+
+
+	R = R / 255;
+	G = G / 255;
+	B = B / 255;
+
+	double M = R > G ? R > B ? R : B : G > B ? G : B;
+	double m = R < G ? R < B ? R : B : G < B ? G : B;
+	double C = M - m;
+
+	double T = 0;
+	if(M == R)
+	{
+		T = (G - B) / C;
+	}
+	else if(M == G)
+	{
+		T = ((B - R) / C) + 2;
+	}
+	else if(M == B)
+	{
+		T = ((R - G) / C) + 4;
+	}
+	else
+	{
+		// Cannot happen
+	}
+	T = 60 * T;
+	double L = (M + m) / 2;
+	double S = C == 0 ? 0 : C / (1 - abs(2 * L - 1));
+
+	uint32_t tsl = A + encode(0, T / 360 * 255, 3) + encode(0, S * 255, 2) + encode(0, L * 255, 1);
+	HSLtoRGB(tsl);
+
+	return tsl;
+}
+
+static
+map<float, uint32_t>
+makeGradient(vector<uint32_t> colors, set<float> values)
+{
+	map<float, uint32_t> gradient;
 	float minValue = *values.begin();
 	float maxValue = *values.rbegin();
 
@@ -96,27 +212,31 @@ makeGradient(vector<unsigned int> colors, set<float> values)
 		size_t minIndex = (size_t)floor(position);
 		size_t maxIndex = (size_t)ceil(position);
 		position = (position - minIndex);
-		vector<unsigned int>::iterator minIter = colors.begin();
+		vector<uint32_t>::iterator minIter = colors.begin();
 		std::advance(minIter, minIndex);
-		unsigned int minColor = *minIter;
-		unsigned char minRed = decode(minColor, 0);
-		unsigned char minGreen = decode(minColor, 1);
-		unsigned char minBlue = decode(minColor, 2);
-		unsigned char minAlpha = decode(minColor, 3);
+		uint32_t minColor = *minIter;
+		unsigned char minRed = decode(minColor, 3);
+		unsigned char minGreen = decode(minColor, 2);
+		unsigned char minBlue = decode(minColor, 1);
+		unsigned char minAlpha = decode(minColor, 0);
+		unsigned char minLuminosity = decode(RGBtoHSL(minColor), 2);
 
-		vector<unsigned int>::iterator maxIter = colors.begin();
+		vector<uint32_t>::iterator maxIter = colors.begin();
 		std::advance(maxIter, maxIndex);
-		unsigned int maxColor = *maxIter;
-		unsigned char maxRed = decode(maxColor, 0);
-		unsigned char maxGreen = decode(maxColor, 1);
-		unsigned char maxBlue = decode(maxColor, 2);
-		unsigned char maxAlpha = decode(maxColor, 3);
+		uint32_t maxColor = *maxIter;
+		unsigned char maxRed = decode(maxColor, 3);
+		unsigned char maxGreen = decode(maxColor, 2);
+		unsigned char maxBlue = decode(maxColor, 1);
+		unsigned char maxAlpha = decode(maxColor, 0);
+		unsigned char maxLuminosity = decode(RGBtoHSL(maxColor), 2);
 
 		unsigned char valueRed = minRed * (1 - position) + maxRed * position;
 		unsigned char valueGreen = minGreen * (1 - position) + maxGreen * position;
 		unsigned char valueBlue = minBlue * (1 - position) + maxBlue * position;
 		unsigned char valueAlpha = minAlpha * (1 - position) + maxAlpha * position;
-		unsigned int valueColor = valueRed + encode(0, valueGreen, 1) + encode(0, valueBlue, 2) + encode(0, valueAlpha, 3);
+		unsigned char valueLuminosity = minLuminosity * (1 - position) + maxLuminosity * position;
+		uint32_t valueColor = encode(0, valueRed, 3) + encode(0, valueGreen, 2) + encode(0, valueBlue, 1) + encode(0, valueAlpha, 0);
+		valueColor = HSLtoRGB(encode(RGBtoHSL(valueColor), valueLuminosity, 2));
 
 		gradient.insert(pair<float, int>(value, valueColor));
 	}
@@ -142,12 +262,12 @@ TetrisSchedule::defaultFrequencyLegend()
 	return true;
 }
 
-vector<unsigned int>
+vector<uint32_t>
 TetrisSchedule::defaultFrequencyColors()
 {
-	vector<unsigned int> colors;
-	unsigned int darkRed = encode(0, 84, 3) + encode(0, 0, 2) + encode(0, 0, 1) + 255;
-	unsigned int lightYellow = encode(0, 255, 3) + encode(0, 250, 2) + encode(0, 165, 1) + 255;
+	vector<uint32_t> colors;
+	uint32_t darkRed = encode(0, 84, 3) + encode(0, 0, 2) + encode(0, 0, 1) + 255;
+	uint32_t lightYellow = encode(0, 255, 3) + encode(0, 250, 2) + encode(0, 165, 1) + 255;
 	colors.push_back(lightYellow);
 	colors.push_back(darkRed);
 
@@ -169,7 +289,7 @@ TetrisSchedule::TetrisSchedule()
 	this->strokeSize = defaultStrokeSize();
 }
 
-TetrisSchedule::TetrisSchedule(float ratio, bool showFrequencies, bool useTaskName, vector<unsigned int> frequency_colors, float strokeSize)
+TetrisSchedule::TetrisSchedule(float ratio, bool showFrequencies, bool useTaskName, vector<uint32_t> frequency_colors, float strokeSize)
 {
 	this->ratio = ratio;
 	this->showFrequencies = showFrequencies;
@@ -190,16 +310,16 @@ TetrisSchedule::dump(ostream& os, const Schedule &data, const Taskgraph &tg, con
 }
 
 // sigc callback class initialized with an output stream
-class Slot: public sigc::mem_functor2<ErrorStatus, Slot, const unsigned char*, unsigned int>
+class Slot: public sigc::mem_functor2<ErrorStatus, Slot, const unsigned char*, uint32_t>
 {
 	public:
-		Slot(ostream &out): sigc::mem_functor2<ErrorStatus, Slot, const unsigned char* , unsigned int>(sigc::mem_functor2<ErrorStatus, Slot, const unsigned char*, unsigned int>(&Slot::write))
+		Slot(ostream &out): sigc::mem_functor2<ErrorStatus, Slot, const unsigned char* , uint32_t>(sigc::mem_functor2<ErrorStatus, Slot, const unsigned char*, uint32_t>(&Slot::write))
 		{
 			this->out = &out;
 		}
 		
 		ErrorStatus
-		write(const unsigned char* data, unsigned int length)
+		write(const unsigned char* data, uint32_t length)
 		{
 			bool success = true;
 			for(size_t i = 0; i < length && success; i++)
@@ -211,7 +331,7 @@ class Slot: public sigc::mem_functor2<ErrorStatus, Slot, const unsigned char*, u
 		};
 	
 		ErrorStatus
-		operator()(const unsigned char* data, unsigned int length)
+		operator()(const unsigned char* data, uint32_t length)
 		{
 			return write(data, length);
 		}
@@ -223,7 +343,7 @@ class Slot: public sigc::mem_functor2<ErrorStatus, Slot, const unsigned char*, u
 class Canvas
 {
 	public:
-		Canvas(double height, double width, double thickness, double magnify, map<float, unsigned int> colors, bool drawDeadline, bool showFrequencies)
+		Canvas(double height, double width, double thickness, double magnify, map<float, uint32_t> colors, bool drawDeadline, bool showFrequencies)
 		{
 			this->height = height;
 			this->width = width;
@@ -311,10 +431,10 @@ class Canvas
 				legend_height = this->legend_size;
 				float legend_width = legend_height / this->core_size;
 				legend_font_size = legend_height;
-				for(map<float, unsigned int>::const_iterator i = this->colors.begin(); i != this->colors.end(); i++)
+				for(map<float, uint32_t>::const_iterator i = this->colors.begin(); i != this->colors.end(); i++)
 				{
 					float freq = i->first * (*pt->getCores().begin())->getFrequencyUnit();
-					unsigned int letter_number = ((unsigned int)log10(freq)) / 3;
+					uint32_t letter_number = ((uint32_t)log10(freq)) / 3;
 					float short_freq = freq;
 					unsigned char letter;
 					switch(letter_number)
@@ -398,9 +518,9 @@ class Canvas
 			// Draw frequency legend
 			if(this->showFrequencies)
 			{
-				for(map<float, unsigned int>::iterator i = this->colors.begin(); i != this->colors.end(); i++)
+				for(map<float, uint32_t>::iterator i = this->colors.begin(); i != this->colors.end(); i++)
 				{
-					unsigned int color = i->second;
+					uint32_t color = i->second;
 					size_t index = std::distance(this->colors.begin(), i);
 
 					cr->rectangle(this->width - legend_height - absthick / 2, legend_height * (index + 1) + absthick / 2, legend_height, legend_height);
@@ -465,12 +585,13 @@ class Canvas
 						// Looks for the number of cores through the task can be drawn in a continuous manner
 						// Instead of the task's width, because mapping may not be to contiguous cores
 						size_t width = 0;
-						for(Schedule::table::const_iterator k = i; k != sched->getSchedule().end(); k++)
+						int counter = core - 1;
+						for(Schedule::table::const_iterator k = i; k != sched->getSchedule().end(); k++, counter++)
 						{
 							bool task_found = false;
 							for(Schedule::sequence::const_iterator l = k->second.begin(); l != k->second.end(); l++)
 							{
-								if(*l->second.first == task)
+								if(*l->second.first == task && k->first == counter + 1)
 								{
 									width++;
 									task_found = true;;
@@ -518,7 +639,7 @@ class Canvas
 			// Task rectangle
 			cr->rectangle((firstCore - 1) * this->core_size + absthick / 2 + margin + yaxis_size, height - absthick / 2 - (start + time) * magnify, width * this->core_size, time * magnify);
 			// Fill rectangle in solid red
-			unsigned int color = this->colors.find(frequency)->second;
+			uint32_t color = this->colors.find(frequency)->second;
 			setColor(color);
 			cr->fill_preserve();
 			// Trace stroke in solid back
@@ -534,7 +655,24 @@ class Canvas
 				cr->select_font_face("Sans", FONT_SLANT_NORMAL, FONT_WEIGHT_BOLD);
 				cr->get_font_extents(fe);
 				cr->get_text_extents(label, te);
-				cr->move_to(absthick / 2 + margin + this->yaxis_size + (firstCore - 1) * this->core_size + this->core_size * width / 2 - te.width / 2 - te.x_bearing, height - absthick / 2 - start * magnify - time * magnify / 2 - fe.descent + fe.height / 2);
+				// See http://www.cairographics.org/tutorial/ for more information on cairo text placement
+				// Secont "Understanding text"
+				cr->move_to(
+					// Move along x
+					absthick / 2 + // half the line thickness
+					margin + // Extra length of beginning and end barriers over actual schedule
+					this->yaxis_size + // Y axis legend space
+					(firstCore - 1) * this->core_size + // Find the first core in which the task is being drawn
+					this->core_size * width / 2 - // Middle of the task to be drawn
+					te.width / 2 - te.x_bearing, // Half the the text length
+					// Move along y
+					height - // Whole height of the figure 
+					absthick / 2 - // Half of line thickness
+					start * magnify - // Starting time of the task, time by magnification factor
+					time * magnify / 2 - // Half of the task running time
+					fe.descent + // Space in the text under the baseline where the font is applied (lower space necessary to draw letters p, gand j for example)
+					fe.height / 2 // Height of the rest of the text
+				);
 				setColor(255);
 				cr->show_text(label);
 			}
@@ -547,8 +685,8 @@ class Canvas
 #ifdef CAIRO_HAS_SVG_SURFACE
 			double font_size = startSize;
 			double delta = font_size;
-			double minError = 0 * this->absthick;
-			double maxError = 0 * this->absthick;
+			double minError = 0.5 * this->absthick;
+			double maxError = 1 * this->absthick;
 
 			while(true)
 			{
@@ -618,7 +756,7 @@ class Canvas
 
 	protected:
 		void
-		setColor(unsigned int rgba)
+		setColor(uint32_t rgba)
 		{
 			cr->set_source_rgba((float)decode(rgba, 3) / 255, (float)decode(rgba, 2) / 255, (float)decode(rgba, 1) / 255, (float)decode(rgba, 0) / 255);
 		}
@@ -635,7 +773,7 @@ class Canvas
 		double yaxis_size;
 		bool drawDeadline;
 		bool showFrequencies;
-		map<float, unsigned int> colors;
+		map<float, uint32_t> colors;
 #ifdef CAIRO_HAS_SVG_SURFACE
 		Cairo::RefPtr<Cairo::Context> cr;
 		Cairo::RefPtr<Cairo::SvgSurface> surface;

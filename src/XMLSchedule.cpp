@@ -98,7 +98,6 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 			{
 				float delta = t.getStartTime() - last_start;
 				delta = delta - floor(delta);
-				debug(delta);
 				std::streamsize precision = (std::streamsize)(ceil(-log10(delta)) + 2);
 				if(precision > max_start_precision)
 				{
@@ -108,8 +107,7 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 
 				delta = abs(t.getStartTime() - (last_start + last_time));
 				delta = delta - floor(delta);
-				debug(delta);
-				precision = (std::streamsize)(ceil(-log10(delta)) + 2);
+				precision = (std::streamsize)(ceil(-log10(delta)) + 1);
 				if(precision > max_start_precision)
 				{
 					max_start_precision = precision;
@@ -118,14 +116,14 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 				last_time = tgt.runtime(t.getWidth(), t.getFrequency());
 
 				double work = t.getWorkload() - floor(t.getWorkload());
-				precision = (std::streamsize)(ceil(-log10(work)) + 2);
+				precision = (std::streamsize)(ceil(-log10(work)) + 1);
 				if(precision > max_work_precision)
 				{
 					max_work_precision = precision;
 				}
 
 				double freq = t.getFrequency() - floor(t.getFrequency());
-				precision = (std::streamsize)(ceil(-log10(freq)) + 2);
+				precision = (std::streamsize)(ceil(-log10(freq)) + 1);
 				if(precision > max_freq_precision)
 				{
 					max_freq_precision = precision;
@@ -160,13 +158,11 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 			os << "  <task name=\"" << taskid << "\" ";
 			os << setprecision(max_start_precision);
 			os << "start=\"" << std::fixed << (t.getStartTime() > 0 ? t.getStartTime() : start) << "\" ";
-			os << setprecision(max_freq_precision);
-			os << "frequency=\"" << std::fixed << (float)t.getFrequency() << "\" ";
-			os << "width=\"" << std::fixed << t.getWidth() << "\" ";
-			os << setprecision(max_work_precision);
-			os << "workload=\"" << std::fixed << t.getWorkload() << "\"";
-			os << "/>" << endl;
 			os << setprecision(old_precision);
+			os << "frequency=\"" << (float)t.getFrequency() << "\" ";
+			os << "width=\"" << t.getWidth() << "\" ";
+			os << "workload=\"" << t.getWorkload() << "\"";
+			os << "/>" << endl;
 
 			set<Task>::iterator iter = tasks.begin();
 			std::advance(iter, task_index);

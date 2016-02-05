@@ -46,12 +46,12 @@ namespace pelib
 			static float defaultStrokeSize();
 			static bool defaultFrequencyLegend();
 			static bool defaultTaskLabel();
-			static vector<unsigned int> defaultFrequencyColors();
+			static vector<uint32_t> defaultFrequencyColors();
 		protected:
 			float ratio, strokeSize;
 			bool showFrequencies;
 			bool useTaskName;
-			vector<unsigned int> colors;
+			vector<uint32_t> colors;
 	};
 }
 
