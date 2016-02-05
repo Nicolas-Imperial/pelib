@@ -81,86 +81,94 @@ encode(uint32_t base, unsigned char value, uint32_t position)
 	return base - shiftLeft(decode(base, position), position * 8) + shiftLeft(value, position * 8);
 }
 
-// Adapted from https://www.programmingalgorithms.com/algorithm/hsl-to-rgb?lang=C%2B%2
-static
-double
-HueToRGB(double v1, double v2, double vH)
-{
-	if (vH < 0)
-	{
-		vH += 1;
-	}
-
-	if (vH > 1)
-	{
-		vH -= 1;
-	}
-
-	if ((6 * vH) < 1)
-	{
-		return (v1 + (v2 - v1) * 6 * vH);
-	}
-
-	if ((2 * vH) < 1)
-	{
-		return v2;
-	}
-
-	if ((3 * vH) < 2)
-	{
-		return (v1 + (v2 - v1) * ((2.0f / 3) - vH) * 6);
-	}
-
-	return v1;
-}
-
 static
 uint32_t
-HSLtoRGB(uint32_t tsl)
+HSLtoRGB(uint32_t hsl, double *CC)
 {
-	double T = decode(tsl, 3);
-	double S = decode(tsl, 2);
-	double L = decode(tsl, 1);
-	double A = decode(tsl, 0);
+	double H = decode(hsl, 3);
+	double S = decode(hsl, 2);
+	double L = decode(hsl, 1);
+	double A = decode(hsl, 0);
 
-
-	T = T / 255;
+	H = H / 255 * 6;
+	H = fmod(H, 2);
 	S = S / 255;
 	L = L / 255;
 	
-	double R, G, B;
-	if (S == 0)
+	double R, G, B, C;
+	if(CC != NULL)
 	{
-		R = G = B = L * 255;
+		C = *CC;
 	}
 	else
 	{
-		double v1, v2;
-
-		v2 = (L < 0.5) ? (L * (1 + S)) : ((L + S) - (L * S));
-		v1 = 2 * L - v2;
-
-		R = 255 * HueToRGB(v1, v2, T + (1.0f / 3));
-		G = 255 * HueToRGB(v1, v2, T);
-		B = 255 * HueToRGB(v1, v2, T - (1.0f / 3));
+		C = (1 - abs(2 * L  - 1)) * S;
 	}
+	double X =  C * (1 - abs(H - 1));
+
+	if(0 <= H && H < 1)
+	{
+		R = C;
+		G = X;
+		B = 0;
+	}
+	else if(1 <= H && H < 2)
+	{
+		R = X;
+		G = C;
+		B = 0;
+	}
+	else if(2 <= H && H < 3)
+	{
+		R = 0;
+		G = C;
+		B = X;
+	}
+	else if(3 <= H && H < 4)
+	{
+		R = 0;
+		G = X;
+		B = C;
+	}
+	else if(4 <= H && H < 5)
+	{
+		R = X;
+		G = 0;
+		B = C;
+	}
+	else if(5 <= H && H < 6)
+	{
+		R = C;
+		G = 0;
+		B = X;
+	}
+	else
+	{
+		R = G = B = 0;
+	}
+
+	//double m = L - C / 2;
+	double m = L - (0.3 * R + 0.59 * G + 0.11 * B);
+
+	R = (R + m) * 255;
+	G = (G + m) * 255;
+	B = (B + m) * 255;
 
 	// Round RGB values to closest integer by truncating value + 0.5
 	uint32_t rgb = A + encode(0, R + 0.5, 3) + encode(0, G + 0.5, 2) + encode(0, B + 0.5, 1);
 
 	return rgb;
 }
-// End 
 
+// Give HSLtoRGB the output value C if you want to convert back the color to RGB
 static
 uint32_t
-RGBtoHSL(uint32_t rgb)
+RGBtoHSL(uint32_t rgb, double &C)
 {
 	double R = decode(rgb, 3);
 	double G = decode(rgb, 2);
 	double B = decode(rgb, 1);
 	double A = decode(rgb, 0);
-
 
 	R = R / 255;
 	G = G / 255;
@@ -168,33 +176,38 @@ RGBtoHSL(uint32_t rgb)
 
 	double M = R > G ? R > B ? R : B : G > B ? G : B;
 	double m = R < G ? R < B ? R : B : G < B ? G : B;
-	double C = M - m;
+	C = M - m;
 
-	double T = 0;
+	double H = 0;
 	if(M == R)
 	{
-		T = (G - B) / C;
+		H = fmod((G - B) / C, 6);
 	}
 	else if(M == G)
 	{
-		T = ((B - R) / C) + 2;
+		H = ((B - R) / C) + 2;
 	}
 	else if(M == B)
 	{
-		T = ((R - G) / C) + 4;
+		H = ((R - G) / C) + 4;
 	}
 	else
 	{
 		// Cannot happen
 	}
-	T = 60 * T;
-	double L = (M + m) / 2;
-	double S = C == 0 ? 0 : C / (1 - abs(2 * L - 1));
+	H = 60 * H;
 
-	uint32_t tsl = A + encode(0, T / 360 * 255, 3) + encode(0, S * 255, 2) + encode(0, L * 255, 1);
-	HSLtoRGB(tsl);
+	// HSL
+	//double L = (M + m) / 2;
+	//double S = C == 0 ? 0 : C / (1 - abs(2 * L - 1));
 
-	return tsl;
+	// Rec 601 NTSC
+	double L = 0.3 * R + 0.59 * G + 0.11 * B;
+	double S = 1 - m / ((R + G + B) / 3);
+
+	uint32_t hsl = A + encode(0, H / 360 * 255 + 0.5, 3) + encode(0, S * 255 + 0.5, 2) + encode(0, L * 255 + 0.5, 1);
+
+	return hsl;
 }
 
 static
@@ -207,6 +220,7 @@ makeGradient(vector<uint32_t> colors, set<float> values)
 
 	for(set<float>::iterator i = values.begin(); i != values.end(); i++)
 	{
+		double C;
 		float value = *i;
 		float position = (value - minValue) / (maxValue - minValue) * (colors.size() - 1);
 		size_t minIndex = (size_t)floor(position);
@@ -219,7 +233,7 @@ makeGradient(vector<uint32_t> colors, set<float> values)
 		unsigned char minGreen = decode(minColor, 2);
 		unsigned char minBlue = decode(minColor, 1);
 		unsigned char minAlpha = decode(minColor, 0);
-		unsigned char minLuminosity = decode(RGBtoHSL(minColor), 2);
+		unsigned char minLuminosity = decode(RGBtoHSL(minColor, C), 2);
 
 		vector<uint32_t>::iterator maxIter = colors.begin();
 		std::advance(maxIter, maxIndex);
@@ -228,7 +242,7 @@ makeGradient(vector<uint32_t> colors, set<float> values)
 		unsigned char maxGreen = decode(maxColor, 2);
 		unsigned char maxBlue = decode(maxColor, 1);
 		unsigned char maxAlpha = decode(maxColor, 0);
-		unsigned char maxLuminosity = decode(RGBtoHSL(maxColor), 2);
+		unsigned char maxLuminosity = decode(RGBtoHSL(maxColor, C), 2);
 
 		unsigned char valueRed = minRed * (1 - position) + maxRed * position;
 		unsigned char valueGreen = minGreen * (1 - position) + maxGreen * position;
@@ -236,7 +250,8 @@ makeGradient(vector<uint32_t> colors, set<float> values)
 		unsigned char valueAlpha = minAlpha * (1 - position) + maxAlpha * position;
 		unsigned char valueLuminosity = minLuminosity * (1 - position) + maxLuminosity * position;
 		uint32_t valueColor = encode(0, valueRed, 3) + encode(0, valueGreen, 2) + encode(0, valueBlue, 1) + encode(0, valueAlpha, 0);
-		valueColor = HSLtoRGB(encode(RGBtoHSL(valueColor), valueLuminosity, 2));
+		valueColor = RGBtoHSL(valueColor, C);
+		valueColor = HSLtoRGB(encode(valueColor, valueLuminosity, 2), &C);
 
 		gradient.insert(pair<float, int>(value, valueColor));
 	}
@@ -265,9 +280,12 @@ TetrisSchedule::defaultFrequencyLegend()
 vector<uint32_t>
 TetrisSchedule::defaultFrequencyColors()
 {
+	double C;
 	vector<uint32_t> colors;
 	uint32_t darkRed = encode(0, 84, 3) + encode(0, 0, 2) + encode(0, 0, 1) + 255;
+	RGBtoHSL(darkRed, C);
 	uint32_t lightYellow = encode(0, 255, 3) + encode(0, 250, 2) + encode(0, 165, 1) + 255;
+	RGBtoHSL(lightYellow, C);
 	colors.push_back(lightYellow);
 	colors.push_back(darkRed);
 
