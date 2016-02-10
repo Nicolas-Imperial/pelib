@@ -57,7 +57,7 @@ namespace pelib
 			std::string
 			getDetailedPattern()
 			{
-				return "(\\w[\\w\\d_]*)\\s*\\[\\*\\]\\s*:=\\s*((?:[\\w\\d][\\w\\d_+\\.]*\\s+[\\w\\d][\\w\\d_\\.+]*[\\s\\n]+)+)";
+				return "(\\w[\\w\\d_]*)\\s*\\[\\*\\]\\s*:=\\s*((?:[-+\\w\\d][-\\w\\d_+\\.]*\\s+[-+\\w\\d][-\\w\\d_\\.+]*[\\s\\n]+)+)";
 			}
 
 			/** Uses a boost::regex regular expression to match a vector written in AMPL output format **/

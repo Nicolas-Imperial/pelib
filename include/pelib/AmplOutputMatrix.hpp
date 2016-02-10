@@ -73,7 +73,7 @@ namespace pelib
 			std::string
 			getGlobalPattern()
 			{
-				return "\\w[\\w\\d_]*\\s*\\[\\*,\\*\\]\\s*:\\s*(?:[\\w\\d\\.+]+\\s*)+\\s*:=.+";
+				return "\\w[\\w\\d_]*\\s*\\[\\*,\\*\\]\\s*:\\s*(?:[-\\w\\d\\.+]+\\s*)+\\s*:=.+";
 			}
 
 			/** Reads the content of an input stream in AMPL output text format and builds an instance of pelib::Matrix from all values read **/

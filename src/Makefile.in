@@ -58,7 +58,7 @@ SHARED = 1
 packages = text cstruct
 
 ## Packages source files
-text_src = ParseException.cpp CastException.cpp NoDecimalFloatException.cpp Record.cpp \
+text_src = PelibException.cpp ParseException.cpp CastException.cpp NoDecimalFloatException.cpp Record.cpp \
 Data.cpp AlgebraData.cpp Algebra.cpp \
 AlgebraParser.cpp DataParser.cpp AlgebraDataParser.cpp \
 AlgebraOutput.cpp DataOutput.cpp AlgebraDataOutput.cpp \
@@ -75,7 +75,9 @@ XMLSchedule.cpp TetrisSchedule.cpp GraphML.cpp \
 CppDataOutput.cpp \
 Cpp.cpp CppData.cpp CppScalar.cpp CppVector.cpp CppSet.cpp CppMatrix.cpp \
 RecordParser.cpp \
-DrakeCSchedule.cpp 
+DrakeCSchedule.cpp \
+\
+Solver.cpp AmplSolver.cpp 
 cstruct_src = sort.c complex.c float.c integer.c monitor.c size_t.c pelib_string.c malloc.c
 
 ## executables
@@ -126,7 +128,7 @@ bin_amplmatrixtoraw_static = 0
 ## Cpp format classes: base class, data structure base class, output data structure classes; no parser because of lack of cpp parser base class
 
 ## dynamic library packages and their sources
-sharedcxx_project = pelib-platform-ampl_input pelib-platform-ampl_output pelib-taskgraph-graphml pelib-taskgraph-streamit pelib-taskgraph-ampl_input pelib-taskgraph-ampl_output pelib-schedule-xml pelib-schedule-tetris pelib-schedule-drake pelib-schedule-ampl_input pelib-schedule-ampl_output pelib-ampl_input pelib-ampl_output pelib-schedule
+sharedcxx_project = pelib-platform-ampl_input pelib-platform-ampl_output pelib-taskgraph-graphml pelib-taskgraph-streamit pelib-taskgraph-ampl_input pelib-taskgraph-ampl_output pelib-schedule-xml pelib-schedule-tetris pelib-schedule-drake pelib-schedule-ampl_input pelib-schedule-ampl_output pelib-ampl_input pelib-ampl_output pelib-schedule pelib-solve pelib-ampl
 sharedcxx_package = $(if $(filter 1,$(SHARED)),pelib $(if $(filter text,$(packages)),$(sharedcxx_project)),$(if $(filter 1,$(STATIC)),$(if $(filter text,$(packages)),$(sharedcxx_project))))
 
 sharedcxx_pelib_src = $(if $(filter text,$(packages)),$(text_src)) argument_parsing.cpp dl.cpp
@@ -341,8 +343,64 @@ shared_pelib-schedule_cxxflags = -fPIC
 shared_pelib-schedule_pkg_description = Platform parser and output in AMPL input format
 shared_pelib-schedule_embed = 
 
+sharedcxx_pelib-solve_src = solve.cpp
+shared_pelib-solve_export = $(sharedcxx_pelib-solve_embed) $(sharedcxx_pelib-solve_src)
+shared_pelib-solve_libs = 
+shared_pelib-solve_ldflags = 
+shared_pelib-solve_deps = 
+shared_pelib-solve_pkg = igraph pelib
+shared_pelib-solve_pkg_igraph_version = >= 0.7.1
+shared_pelib-solve_pkg_url = http://www.ida.liu.se/~nicme26
+shared_pelib-solve_pkg_ld = 
+shared_pelib-solve_pkg_libs = 
+shared_pelib-solve_cxxflags = -fPIC
+shared_pelib-solve_pkg_description = Platform parser and output in AMPL input format
+shared_pelib-solve_embed = 
+
+sharedcxx_pelib-ampl_src = ampl.cpp
+shared_pelib-ampl_export = $(sharedcxx_pelib-ampl_embed) $(sharedcxx_pelib-ampl_src)
+shared_pelib-ampl_libs = 
+shared_pelib-ampl_ldflags = 
+shared_pelib-ampl_deps = 
+shared_pelib-ampl_pkg = igraph pelib
+shared_pelib-ampl_pkg_igraph_version = >= 0.7.1
+shared_pelib-ampl_pkg_url = http://www.ida.liu.se/~nicme26
+shared_pelib-ampl_pkg_ld = 
+shared_pelib-ampl_pkg_libs = 
+shared_pelib-ampl_cxxflags = -fPIC
+shared_pelib-ampl_pkg_description = Platform parser and output in AMPL input format
+shared_pelib-ampl_embed = 
+
 ## static library packages and their sources
-lib_package = $(if $(filter 1,$(STATIC)),pelib) pelib-schedule
+lib_package = $(if $(filter 1,$(STATIC)),pelib) pelib-schedule pelib-solve pelib-ampl
+
+libcxx_pelib-ampl_src = ampl.cpp
+lib_pelib-ampl_export = $(libcxx_pelib-ampl_embed) $(libcxx_pelib-ampl_src)
+lib_pelib-ampl_libs = 
+lib_pelib-ampl_ldflags = 
+lib_pelib-ampl_deps = 
+lib_pelib-ampl_pkg = igraph pelib
+lib_pelib-ampl_pkg_igraph_version = >= 0.7.1
+lib_pelib-ampl_pkg_url = http://www.ida.liu.se/~nicme26
+lib_pelib-ampl_pkg_ld = 
+lib_pelib-ampl_pkg_libs = 
+lib_pelib-ampl_cxxflags = 
+lib_pelib-ampl_pkg_description = Platform parser and output in AMPL input format
+lib_pelib-ampl_embed = 
+
+libcxx_pelib-solve_src = solve.cpp
+lib_pelib-solve_export = $(libcxx_pelib-solve_embed) $(libcxx_pelib-solve_src)
+lib_pelib-solve_libs = 
+lib_pelib-solve_ldflags = 
+lib_pelib-solve_deps = 
+lib_pelib-solve_pkg = igraph pelib
+lib_pelib-solve_pkg_igraph_version = >= 0.7.1
+lib_pelib-solve_pkg_url = http://www.ida.liu.se/~nicme26
+lib_pelib-solve_pkg_ld = 
+lib_pelib-solve_pkg_libs = 
+lib_pelib-solve_cxxflags = 
+lib_pelib-solve_pkg_description = Platform parser and output in AMPL input format
+lib_pelib-solve_embed = 
 
 libcxx_pelib-schedule_src = schedule.cpp
 libcc_pelib-schedule_src = $(if $(filter cstruct,$(packages)),$(cstruct_src))
@@ -443,5 +501,9 @@ test_fifo_array-test_static = 0
 
 first:
 	@# Display some basic variable content here and call "make all"
-	@echo $(testcxx_list)
+	@echo $(embed_object)
+	@echo $(call embed,$(sharedcxx_package),shared)
+	@echo $(call embed,$(call suffixin,pelib,$(sharedcxx_package)),shared)
+	@echo $(patsubst %.so.$(version).$(minor).$(release),%,libpelib.so.3.0.0)
+	@echo $(call embed,$(call suffixin,$(patsubst %.so.$(version).$(minor).$(release),%,libpelib.so.3.0.0),$(sharedcxx_package)),shared)
 	@/bin/false

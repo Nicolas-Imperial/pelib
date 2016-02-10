@@ -57,7 +57,7 @@ namespace pelib
 			std::string
 			getDetailedPattern()
 			{
-				return "(\\w[\\w\\d_]*)\\s*=\\s*([\\w\\d][\\w\\d_\\.+]*)";
+				return "(\\w[\\w\\d_]*)\\s*=\\s*([-+\\w\\d][-\\w\\d_\\.+]*)";
 			}
 
 			/** Returns a boost::regex string able to match a scalar in AMPL output format **/
@@ -65,7 +65,7 @@ namespace pelib
 			std::string
 			getGlobalPattern()
 			{
-				return "\\w[\\w\\d_]*\\s*=\\s*[\\w\\d][\\w\\d_\\.+]*";
+				return "\\w[\\w\\d_]*\\s*=\\s*[-+\\w\\d][-\\w\\d_\\.+]*";
 			}
 
 			/** Reads input stream and builds an instance of pelib::Scalar containing the name and value read **/

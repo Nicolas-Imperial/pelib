@@ -40,6 +40,10 @@ ScheduleParser.hpp ScheduleOutput.hpp \
 XMLScheduleParser.hpp XMLScheduleOutput.hpp \
 TetrisScheduleOutput.hpp \
 DrakeCSchedule.hpp DrakeCScheduleOutput.hpp \
+\
+Solver.hpp AlgebraSolver.hpp AmplSolver.hpp \
+calculus.h \
+\
 exprtk.hpp
 
 cstruct = array.h fifo_array.h integer.h float.h pelib_string.h monitor.h sort.h structure.h complex.h fifo.h size_t.h stack.h template.h array.c fifo.c fifo_array.c stack.c malloc.h

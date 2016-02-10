@@ -1,2 +1,5 @@
+pelib 3.1.0
 * Added new visual Schedule output class, tetris style in SVG format
 * Added unit for platform frequencies in AMPL scalar "Funit". Multiply with element in F to obtain frequency in Hertz.
+* Added new Solver class hierarchy
+* Added Ampl Algebra Solver implementation (calling existing installation of Ampl and backend solver)

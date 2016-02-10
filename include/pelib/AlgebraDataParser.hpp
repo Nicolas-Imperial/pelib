@@ -36,14 +36,6 @@
 #ifndef PELIB_ALGEBRADATAPARSER
 #define PELIB_ALGEBRADATAPARSER
 
-#ifndef debug
-#if 0
-#define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << std::endl;
-#else
-#define debug(var)
-#endif
-#endif
-
 namespace pelib
 {
 	/** Base class of any class able to parse a text into a data structure that can be contained in an instance of Algebra. This class must be derived to be used **/
@@ -129,7 +121,7 @@ namespace pelib
 						try
 						{
 							// let's try to parse against a fixed-point value
-							match("\\d+\\.\\d+", element);
+							match("[-+]?\\d+\\.\\d+", element);
 #if TRACE
 							std::cerr << "\"" << element << "\" passed the fixed-point format matching" << std::endl;
 #endif
@@ -189,7 +181,7 @@ namespace pelib
 						try
 						{
 							// let's try to parse against a fixed-point value
-							match("\\d+\\.\\d+", element);
+							match("[+-]?\\d+\\.\\d+", element);
 						} catch(ParseException &e)
 						{
 #if TRACE
