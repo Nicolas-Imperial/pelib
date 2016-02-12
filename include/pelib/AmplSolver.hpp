@@ -28,12 +28,14 @@ namespace pelib
 	{
 		public:
 			AmplSolver(std::istream &model, const std::string &model_filename, std::istream &run, bool showOutput = false, bool showError = false);
-			AmplSolver(std::istream &model, const std::string &model_filename, std::istream &run, const std::map<std::string, const Algebra> &data, bool showOutput = false, bool showError = false);
-			pelib::Algebra* solve() const;
-			pelib::Algebra* solve(const std::map<std::string, const Algebra> &data) const;
+			AmplSolver(std::istream &model, const std::string &model_filename, std::istream &run, const std::map<const std::string, const Algebra> &data, bool showOutput = false, bool showError = false);
+			virtual Algebra solve(const std::map<const std::string, const Algebra> &data) const;
+			virtual Algebra solve(const std::map<const std::string, const Algebra> &data, std::map<const std::string, double> &statistics) const;
+			virtual const Algebra* solve() const;
+			virtual const Algebra* solve(std::map<const std::string, double> &statistics) const;
 		protected:
 			std::string model, model_file, run;
-			std::map<std::string, const Algebra> data;
+			std::map<const std::string, const Algebra> data;
 			bool showOutput, showError;
 		private:
 			void initModelFromStream(std::istream&, const std::string&, std::istream&, bool showOutput = false, bool showError = false);

@@ -17,6 +17,7 @@
  along with Pelib. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <map>
 #include <pelib/Record.hpp>
 
 #ifndef PELIB_SOLVER
@@ -29,7 +30,8 @@ namespace pelib
 		public:
 			/** Destructor **/
 			virtual ~Solver() = 0;
-			virtual Record* solve() const = 0;
+			virtual const Record* solve() const = 0;
+			virtual const Record* solve(std::map<const std::string, double> &statistics) const = 0;
 		protected:
 		/** For some interesting reason, a pointer to Solver pointing to a derived class is resolved as a Solver by typeinfo if there is no virtual function in the base class.
 		This is an empty virtual function to make sure type_info can resolve the right class name

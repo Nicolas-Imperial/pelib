@@ -35,14 +35,13 @@
 
 #include <pelib/ParseException.hpp>
 #include <pelib/CastException.hpp>
+#include <pelib/PelibException.hpp>
 
-#ifndef debug
-#if 0
-#define debug(var) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << endl;
-#else
-#define debug(var)
+#ifdef debug
+#undef debug
 #endif
-#endif
+
+#define debug(var) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << (var) << "\"" << endl;
 
 using namespace std;
 using namespace boost::algorithm;
@@ -230,7 +229,8 @@ namespace pelib
 
 		if(out == outputs.end())
 		{
-			for (out = stringOutputs().begin(); out != stringOutputs().end(); out++)
+			vector<AmplInputDataOutput*> string_outputs = stringOutputs();
+			for (out = string_outputs.begin(); out != string_outputs.end(); out++)
 			{
 				const AmplInputDataOutput *output = *out;
 				try
@@ -244,9 +244,9 @@ namespace pelib
 				}
 			}
 
-			if(out == stringOutputs().end())
+			if(out == string_outputs.end())
 			{
-				// Throw an exception?
+				throw PelibException("Could not find a suitable output format for data record of name \"" + string(data->getName()) + "\".");
 			}
 		}
 	}

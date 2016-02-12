@@ -32,9 +32,7 @@
 #undef debug
 #endif
 
-#if 10
 #define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
-#endif
 
 using namespace std;
 using namespace pelib;

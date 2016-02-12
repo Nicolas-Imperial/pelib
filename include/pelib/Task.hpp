@@ -37,7 +37,9 @@ namespace pelib
 			/** Constructor
 				@param id Identifier of the task
 			**/
-			Task(const std::string id);
+			Task(const std::string &id);
+			/** Copy constructor **/
+			Task(const Task&);
 
 			/** Destructor **/
 			virtual ~Task();
@@ -64,7 +66,7 @@ namespace pelib
 
 			/** Sets the name of the module containing the code run by this task **/
 			virtual void
-			setModule(const std::string name);
+			setModule(const std::string &name);
 
 			/** Gets the name (identifier string) of the task **/
 			virtual std::string
@@ -76,7 +78,7 @@ namespace pelib
 
 			/** Sets the formula that defines the overhead of the parallelization of this task **/
 			virtual void
-			setEfficiencyString(const std::string efficiencyString);
+			setEfficiencyString(const std::string &efficiencyString);
 
 			/** Computes the efficiency of the task, given its efficiency formula
 				@param p Get efficiency of the task for p cores

@@ -51,6 +51,11 @@ namespace pelib
 				@param algebra Collection of AlgebraData descendant class instances that describes a schedule in an algebraic form, used as basis to build the Schedule class instance
 			**/
 			Schedule(const std::string &name, const Algebra &algebra);
+			/** Constructor
+				@param algebra Collection of AlgebraData descendant class instances that describes a schedule in an algebraic form, used as basis to build the Schedule class instance
+			**/
+			Schedule(const std::string &name, const std::string &appName, const Algebra &algebra);
+			Schedule(const Schedule& src);
 
 			/** Destructor **/
 			virtual ~Schedule();
@@ -156,7 +161,8 @@ namespace pelib
 			**/
 			virtual void
 			setSchedule(const table&);
-		private:		
+		private:
+			void buildFromAlgebra(const string &name, const string &appName, const Algebra &data);
 	};
 }
 

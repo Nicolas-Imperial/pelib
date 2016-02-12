@@ -23,6 +23,7 @@
 #include <ext/stdio_filebuf.h>
 #include <boost/regex.hpp>
 
+#include <pelib/PelibException.hpp>
 #include <pelib/AmplSolver.hpp>
 #include <pelib/AmplInput.hpp>
 #include <pelib/AmplOutput.hpp>
@@ -36,9 +37,6 @@
 using namespace std;
 using namespace boost;
 using namespace pelib;
-
-extern char _binary_start_ampl_start;
-extern char _binary_start_ampl_end;
 
 static
 string
@@ -63,15 +61,23 @@ AmplSolver::AmplSolver(istream &model, const string &model_filename, istream &ru
 	initModelFromStream(model, model_filename, run, showOutput, showError);
 }
 
-AmplSolver::AmplSolver(istream &model, const string &model_filename, istream &run, const map<string, const Algebra> &data, bool showOutput, bool showError)
+AmplSolver::AmplSolver(istream &model, const string &model_filename, istream &run, const map<const string, const Algebra> &data, bool showOutput, bool showError)
 {
 	initModelFromStream(model, model_filename, run, showOutput, showError);
 	this->data = data;
 }
 
-Algebra* AmplSolver::solve() const
+const Algebra*
+AmplSolver::solve() const
 {
-	return this->solve(this->data);
+	map<const string, double> statistics;
+	return new Algebra(this->solve(this->data, statistics));
+}
+
+const Algebra*
+AmplSolver::solve(map<const string, double> &statistics) const
+{
+	return new Algebra(this->solve(this->data, statistics));
 }
 
 // From http://codereview.stackexchange.com/questions/71793/function-to-grab-stdin-stdout-stderr-of-a-child-process
@@ -93,7 +99,7 @@ opencmd(string cmd, vector<string> argv, istream &stdin, string &out, string &er
 	{
 		size_t ii = distance(argv.begin(), i);
 		c_argv[ii] = (char*)i->c_str();
-		//cout << "" << c_argv[ii] << " ";
+		//cout << "'" << c_argv[ii] << "' ";
 	}
 	//cout << endl;
 	//debug("Hello world!");
@@ -171,12 +177,26 @@ opencmd(string cmd, vector<string> argv, istream &stdin, string &out, string &er
 			string string = istream_to_string(stdin);
 			pstdin << string;
 
-			// Wait for child process to terminate
-			int status;
-			waitpid(pid, &status, 0);
-
+			// This will not run before the solver is done
 			out = istream_to_string(pstdout);
 			err = istream_to_string(pstderr);
+
+			// Wait for child process to terminate
+			int status;
+			waitpid(pid, &status, WNOHANG);
+
+			//debug(WIFSIGNALED(status));
+			//debug(WIFEXITED(status));
+			//debug(WEXITSTATUS(status));
+
+			if(WIFEXITED(status) == 1 && WIFSIGNALED(status) == 0)
+			{
+				status = WEXITSTATUS(status);
+			}
+			else
+			{
+				status = 0;
+			}
 
 			// Close streams
 			filein.close();
@@ -190,11 +210,16 @@ opencmd(string cmd, vector<string> argv, istream &stdin, string &out, string &er
 	}
 }
 
-Algebra*
-AmplSolver::solve(const std::map<std::string, const Algebra> &data) const
+Algebra
+AmplSolver::solve(const std::map<const std::string, const Algebra> &data) const
 {
-	bool success;
+	map<const string, double> statistics;
+	return solve(data, statistics);
+}
 
+Algebra
+AmplSolver::solve(const std::map<const std::string, const Algebra> &data, map<const string, double> &statistics) const
+{
 	if(this->model.compare("") != 0 && this->run.compare("") != 0)
 	{
 		// Do solving
@@ -205,7 +230,10 @@ AmplSolver::solve(const std::map<std::string, const Algebra> &data) const
 		size_t counter = 1;
 		stringstream str;
 		str << counter;
-		string newrun = boost::regex_replace(run, regex("^\\s*model\\s+" + this->model_file + "\\s*;"), string("model \\$" + str.str() + ";"));
+		string newrun = run;
+		newrun = boost::regex_replace(newrun, regex("\\\\"), string("\\\\\\\\\\\\\\\\\\\\\\\\"));
+		newrun = boost::regex_replace(newrun, regex("\\$"), string("\\\\\\\\\\\\$"));
+		newrun = boost::regex_replace(newrun, regex("^\\s*model\\s+" + this->model_file + "\\s*;"), string("model \\\\\\$" + str.str() + ";"));
 		counter++;
 
 		string data_args;
@@ -216,26 +244,38 @@ AmplSolver::solve(const std::map<std::string, const Algebra> &data) const
 			str << counter;
 
 			// Replace data statement in model
-			newrun = boost::regex_replace(newrun, regex("^\\s*data\\s+" + i->first + "\\s*;"), string("data \\$" + str.str() + ";"));
+			newrun = boost::regex_replace(newrun, regex("^\\s*data\\s+" + i->first + "\\s*;"), string("data \\\\\\$" + str.str() + ";"));
 
 			// Build input data sources
 			stringstream data;
 			AmplInput(AmplInput::intFloatHandlers()).dump(data, i->second);
 			// Fixes possible quote and backslashes issues in input data file
-			string data_str = boost::regex_replace(data.str(), regex("'"), string("\\\\\\\\\\\\\\\\'"));
+			string data_str = boost::regex_replace(data.str(), regex("\""), string("\"'\"'\""));
 			data_str = boost::regex_replace(data_str, regex("\\\\"), string("\\\\"));
+			data_str = boost::regex_replace(data_str, regex("\\$"), string("\\$"));
 
 			data_args += " <(echo '" + data_str + "')";
 			counter++;
 		}
 
 		// Fix possible quotes and backslashes issues in input data file
-		newrun = boost::regex_replace(newrun, regex("'"), string("\\\\\\\\\\\\\\\\'"));
-		newrun = boost::regex_replace(newrun, regex("\\\\"), string("\\\\"));
-		
+		newrun = boost::regex_replace(newrun, regex("'"), string("\\'"));
+		newrun = boost::regex_replace(newrun, regex("\""), string("\\\\\"'\\\\\"'\\\\\""));
+
 		args.push_back("-c");
-		args.push_back("bash <(echo -e '#!/bin/bash\nampl <(echo -e \"" + newrun + "\")') <(echo \"" + model + "\")" + data_args);
-		success = (opencmd("bash", args, in, out, err) == 0);
+		args.push_back("bash <(echo -e \"#!/bin/bash\nampl <(echo -e \\\"" + newrun + "\\\");\") <(echo -e \"" + model + "\")" + data_args + "");
+		int success = opencmd("bash", args, in, out, err);
+
+		const boost::regex time("time limit");
+		bool optimal = out.find("time limit") == std::string::npos && out.find("optimal solution") != std::string::npos;
+
+		const boost::regex infeasible("infeasible");
+		const boost::regex hold(" cannot hold");
+		const boost::regex bail("Bailing out");
+		bool feasible = !((out.find("infeasible") != std::string::npos) || (out.find(" cannot hold") != std::string::npos) || (out.find("bailing out") != std::string::npos));
+		
+		statistics.insert(pair<string, double>(string("optimal"), optimal ? 1 : 0));
+		statistics.insert(pair<string, double>(string("feasible"), feasible ? 1 : 0));
 
 		if(showError)
 		{
@@ -247,20 +287,30 @@ AmplSolver::solve(const std::map<std::string, const Algebra> &data) const
 			cout << out;
 		}
 
-		if(success)
+		// If the solver didn't fail, but determined that their is no possible solution, then report output
+		if(success == 0 || !feasible)
 		{
+			out = boost::regex_replace(out, regex("^\\s*absmipgap[^\\n]*\\n"), string(""));
 			stringstream outstr(out);
-			Algebra *alg = new Algebra(AmplOutput(AmplOutput::intFloatHandlers()).parse(outstr));
-			return alg;
+			Algebra solution = AmplOutput(AmplOutput::floatHandlers()).parse(outstr);
+
+			if(solution.find<Scalar<float> >("_total_solve_elapsed_time") != NULL)
+			{
+				Scalar<float> time = *solution.find<Scalar<float> >("_total_solve_elapsed_time");
+				statistics.insert(pair<const string, double>(string("time"), time.getValue()));
+			}
+			return solution;
 		}
 		else
-		{
-			return NULL;
+		{	
+			stringstream ss;
+			ss << success;
+			throw PelibException(string("Ampl exited with value ") + ss.str() + string("."));
 		}
 	}
 	else
 	{
-		return NULL;
+		throw PelibException(string("Missing model or run script to run with Ampl."));
 	}
 }
 

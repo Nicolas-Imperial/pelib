@@ -17,23 +17,20 @@
  along with Pelib. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <pelib/Solver.hpp>
-#include <pelib/Algebra.hpp>
 
-#ifndef PELIB_ALGEBRASOLVER
-#define PELIB_ALGEBRASOLVER
+#include <string>
+#include <set>
+#include <vector>
+
+#include <pelib/Task.hpp>
+#include <pelib/Platform.hpp>
+
+#ifndef PELIB_EXPRTK
+#define PELIB_EXPRTK
+
 namespace pelib
 {
-	class AlgebraSolver : public Solver
-	{
-		public:
-			virtual pelib::Algebra solve(const std::map<const std::string, const Algebra> &data) const = 0;
-			virtual pelib::Algebra solve(const std::map<const std::string, const Algebra> &data, std::map<const std::string, double> &statistics) const = 0;
-			virtual const pelib::Algebra* solve() const = 0;
-			virtual const pelib::Algebra* solve(std::map<const std::string, double> &statistics) const = 0;
-		protected:
-		private:
-	};
+	double parseEfficiency(const std::string &formula, double W, double tau, double p);
+	double parseDeadline(const std::string &deadline, const std::set<Task> &tasks, const Platform &pt, std::vector<double> n, std::vector<double> p, std::vector<double> F, std::vector<double> tau, std::vector<double> W);
 }
-
 #endif

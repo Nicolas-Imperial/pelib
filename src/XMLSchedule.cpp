@@ -42,9 +42,14 @@ extern "C"{
 #include <pelib/CastException.hpp>
 #include <pelib/ParseException.hpp>
 
-#ifndef debug
-#define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
+#include <pelib/AmplInput.hpp>
+#include <pelib/Algebra.hpp>
+
+#ifdef debug
+#undef debug
 #endif
+
+#define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << (expr) << "\"." << endl;
 
 using namespace pelib;
 using namespace std;
@@ -151,8 +156,8 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 
 		for(Schedule::sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++, order++)
 		{
-			string taskid = j->second.first->getName();
 			Task t = *j->second.first;
+			string taskid = t.getName();
 			size_t task_index = std::distance(sched->getTasks().begin(), sched->getTasks().find(t));
 			
 			os << "  <task name=\"" << taskid << "\" ";
@@ -167,7 +172,8 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 			set<Task>::iterator iter = tasks.begin();
 			std::advance(iter, task_index);
 			t.setMaxWidth(iter->getMaxWidth());
-			t.setEfficiencyString(iter->getEfficiencyString());
+			t.setEfficiencyString(string(iter->getEfficiencyString()));
+			string eff = string(iter->getEfficiencyString());
 			start += t.runtime(t.getWidth(), t.getFrequency());
 		}
 		os << " </core>" << endl;

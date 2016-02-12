@@ -17,20 +17,20 @@
  along with Pelib. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <pelib/Solver.hpp>
+#include <map>
 #include <pelib/Algebra.hpp>
+#include <pelib/Taskgraph.hpp>
+#include <pelib/Platform.hpp>
+#include <pelib/Solver.hpp>
 
-#ifndef PELIB_ALGEBRASOLVER
-#define PELIB_ALGEBRASOLVER
+#ifndef PELIB_SCHEDULER
+#define PELIB_SCHEDULER
 namespace pelib
 {
-	class AlgebraSolver : public Solver
+	class Scheduler : public Solver
 	{
 		public:
-			virtual pelib::Algebra solve(const std::map<const std::string, const Algebra> &data) const = 0;
-			virtual pelib::Algebra solve(const std::map<const std::string, const Algebra> &data, std::map<const std::string, double> &statistics) const = 0;
-			virtual const pelib::Algebra* solve() const = 0;
-			virtual const pelib::Algebra* solve(std::map<const std::string, double> &statistics) const = 0;
+			virtual Schedule schedule(const Taskgraph &tg, const Platform &pt, std::map<const std::string, double> &statistics) const = 0;
 		protected:
 		private:
 	};

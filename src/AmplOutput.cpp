@@ -35,6 +35,7 @@
 
 #include <pelib/ParseException.hpp>
 #include <pelib/CastException.hpp>
+#include <pelib/PelibException.hpp>
 
 #ifndef debug
 #if 0
@@ -224,7 +225,8 @@ namespace pelib
 	void
 	AmplOutput::dump(std::ostream& o, const AlgebraData *data) const
 	{
-		for (std::vector<AmplOutputDataOutput*>::const_iterator out = outputs.begin(); out != outputs.end(); out++)
+		std::vector<AmplOutputDataOutput*>::const_iterator out;
+		for (out = outputs.begin(); out != outputs.end(); out++)
 		{
 			const AmplOutputDataOutput *output = *out;
 			try
@@ -235,6 +237,29 @@ namespace pelib
 			{
 				// No suitable element to output
 				// Couldn't cast the element to record: just let that go and try again with next element
+			}
+		}
+
+		if(out == outputs.end())
+		{
+			vector<AmplOutputDataOutput*> string_outputs = stringOutputs();
+			for (out = string_outputs.begin(); out != string_outputs.end(); out++)
+			{
+				const AmplOutputDataOutput *output = *out;
+				try
+				{
+					output->dump(o, data);
+					break;
+				} catch(CastException &e)
+				{
+					// No suitable element to output
+					// Couldn't cast the element to record: just let that go and try again with next element
+				}
+			}
+
+			if(out == string_outputs.end())
+			{
+				throw PelibException("Could not find a suitable output format for data record of name \"" + string(data->getName()) + "\".");
 			}
 		}
 	}

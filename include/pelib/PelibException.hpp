@@ -21,8 +21,8 @@
 #include <string>
 #include <cstdlib>
 
-#ifndef PELIB_CASTEXCEPTION
-#define PELIB_CASTEXCEPTION
+#ifndef PELIB_EXCEPTION
+#define PELIB_EXCEPTION
 
 namespace pelib
 {

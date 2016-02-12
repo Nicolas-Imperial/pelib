@@ -86,13 +86,13 @@ parse(char **args)
 	return out;
 }
 
-Algebra*
-pelib_calculus(const map<string, const Algebra> &data, size_t argc, char**argv)
+const Algebra*
+pelib_calculus(const map<const string, const Algebra> &data, size_t argc, char**argv, map<const string, double> &statistics)
 {
 	args_t args = parse(argv);
 	ifstream model(args.model);
 	ifstream run(args.run);
-	Algebra *res = AmplSolver(model, args.model_file, run, data, args.showOutput, args.showError).solve();
+	const Algebra *res = AmplSolver(model, args.model_file, run, data, args.showOutput, args.showError).solve(statistics);
 	return res;
 }
 

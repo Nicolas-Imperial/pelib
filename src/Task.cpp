@@ -20,38 +20,24 @@
 
 #include <iostream>
 #include <sstream>
+#include <string>
 
-#include <pelib/exprtk.hpp>
+#include <pelib/pelib_exprtk.hpp>
 
 #include <pelib/Task.hpp>
 #include <pelib/ParseException.hpp>
 
-#ifndef debug
-#define debug(expr) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
+#ifdef debug
+#undef debug
 #endif
+
+#define debug(expr) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << (expr) << "\"." << endl;
 
 using namespace std;
 
-struct print : public exprtk::ifunction<double>
-{
-	public:
-		print(ostream &stream)
-			: exprtk::ifunction<double>(1), stream(stream)
-		{}  
-
-		inline double operator()(const double &value) 
-		{   
-			stream << value << endl;
-			return value;
-		}   
-
-	private:
-		ostream &stream;
-};
-
 namespace pelib
 {
-	Task::Task(const std::string name)
+	Task::Task(const std::string &name)
 	{
 		this->name = name;
 		this->module = "dummy";
@@ -61,6 +47,21 @@ namespace pelib
 		this->workload = 1;
 		this->efficiencyString = "exprtk:p <= 1 ? 1 : 1e-6";
 		this->start_time = 0;
+	}
+
+	Task::Task(const Task &task)
+	{
+		this->name = task.getName();
+		this->module = task.getModule();
+		this->frequency = task.getFrequency();
+		this->width = task.getWidth();
+		this->maxWidth = task.getMaxWidth();
+		this->workload = task.getWorkload();
+		this->efficiencyString = task.getEfficiencyString();
+		this->start_time = task.getStartTime();
+
+		this->consumers = task.getConsumers();
+		this->producers = task.getProducers();
 	}
 
 	Task::~Task()
@@ -112,13 +113,14 @@ namespace pelib
 	}
 
 	void
-	Task::setEfficiencyString(const std::string efficiencyString)
+	Task::setEfficiencyString(const std::string &efficiencyString)
 	{
-		std::string old = getEfficiencyString();
+		//std::string old = getEfficiencyString();
 		
-		this->efficiencyString = efficiencyString;
+		this->efficiencyString = string(efficiencyString);
 		
 		// Attemps to compute an efficiency
+		/*
 		try
 		{
 			getEfficiency(1);
@@ -128,6 +130,7 @@ namespace pelib
 			this->efficiencyString = old;
 			throw e;
 		}
+		*/
 	}
 
 	double
@@ -136,31 +139,10 @@ namespace pelib
 		if(getEfficiencyString().find("exprtk") == 0)
 		{
 			string formula = getEfficiencyString().substr(string("exprtk").size() + 1);
-
-			print print_cout(cout);
-			print print_cerr(cerr);
-
-			typedef exprtk::expression<double> expression_t;
-			typedef exprtk::parser<double>         parser_t;
-
 			double W = this->getMaxWidth();
 			double tau = this->getWorkload();
-			expression_t expression;
-			double pp = p;
 
-			exprtk::symbol_table<double> symbol_table;
-			symbol_table.add_variable("W", W);
-			symbol_table.add_variable("p", pp);
-			symbol_table.add_variable("tau", tau);
-			symbol_table.add_function("cout", print_cout);
-			symbol_table.add_function("cerr", print_cerr);
-
-			expression.register_symbol_table(symbol_table);
-
-			parser_t parser;
-
-			parser.compile(formula, expression);	
-			double output =  expression.value();
+			double output = parseEfficiency(formula, W, tau, p);
 
 			if(std::isnan(output))
 			{
@@ -387,7 +369,7 @@ namespace pelib
 	}
 
 	void
-	Task::setModule(const std::string module)
+	Task::setModule(const std::string &module)
 	{
 		this->module = module;
 	}

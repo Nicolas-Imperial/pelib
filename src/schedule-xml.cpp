@@ -52,6 +52,9 @@ pelib_dump(std::ostream& cout, std::map<const char*, Record*> records, size_t ar
 	Schedule *sc = (Schedule*)records.find(typeid(Schedule).name())->second;
 	Taskgraph *tg = (Taskgraph*)records.find(typeid(Taskgraph).name())->second;
 	Platform *pt = (Platform*)records.find(typeid(Platform).name())->second;
+#define check(var, core, task) { Schedule::table::iterator ii = ((Schedule::table&)var).begin(); std::advance(ii, core); Schedule::sequence::iterator jj = ii->second.begin(); std::advance(jj, task); debug(jj->second.first->getName()); }
+	//check(((Schedule*)sc)->getSchedule(), 1, 0);
+	//check(((Schedule*)sc)->getSchedule(), 2, 0);
 	XMLSchedule().dump(cout, sc, tg, pt);
 }
 

@@ -28,70 +28,22 @@
 #include <pelib/ParseException.hpp>
 #include <pelib/CastException.hpp>
 
-#include <pelib/exprtk.hpp>
+#include <pelib/pelib_exprtk.hpp>
 
 #ifdef debug
 #undef debug
 #endif
 
-#if 0
 #define debug(var) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << endl;
-#else
-#define debug(var)
-#endif
 
 using namespace pelib;
 using namespace std;
-
-struct e: public exprtk::ifunction<double>
-{
-	public:
-		e(const set<Task> &tasks, const Platform &arch)
-			: exprtk::ifunction<double>(2), tasks(tasks), arch(arch)
-		{}  
-
-		inline double operator()(const double &id, const double &p) 
-		{
-			set<Task>::const_iterator begin = tasks.begin();
-			std::advance(begin, id - 1);
-			double val = begin->getEfficiency((int)p);
-			return val;
-		}   
-
-	private:
-		const set<Task> &tasks;
-		const Platform &arch;
-};
-
-struct print: public exprtk::ifunction<double>
-{
-	public:
-		print(ostream &stream)
-			: exprtk::ifunction<double>(1), stream(stream)
-		{}  
-
-		inline double operator()(const double &value) 
-		{   
-			stream << value << endl;
-			return value;
-		}   
-
-	private:
-		ostream &stream;
-};
 
 DeadlineFormula::DeadlineFormula(string formula) : formula(formula) {}
 
 double
 DeadlineFormula::calculate(const Taskgraph &tg, const Platform &arch) const
 {
-	e matrix_e(tg.getTasks(), arch);
-	print print_cout(cout);
-	print print_cerr(cerr);
-
-	typedef exprtk::expression<double> expression_t;
-	typedef exprtk::parser<double>         parser_t;
-
 	if(!arch.isHomogeneous())
 	{
 		throw CastException("Cannot compute a deadline for a taskgraph with a heterogeneous platform.");
@@ -116,25 +68,7 @@ DeadlineFormula::calculate(const Taskgraph &tg, const Platform &arch) const
 		F.push_back(*i);
 	}
 
-	expression_t expression;
-
-	exprtk::symbol_table<double> symbol_table;
-	symbol_table.add_vector("n", n);
-	symbol_table.add_vector("p", p);
-	symbol_table.add_vector("F", F);
-	symbol_table.add_vector("tau", tau);
-	symbol_table.add_vector("W", W);
-	symbol_table.add_function("e", matrix_e);
-	symbol_table.add_function("cout", print_cout);
-	symbol_table.add_function("cerr", print_cerr);
-
-	expression.register_symbol_table(symbol_table);
-
-	parser_t parser;
-
-	parser.compile(formula, expression);	
-	double output = expression.value();
-
+	double output = parseDeadline(formula, tg.getTasks(), arch, n, p, F, tau, W);
 	if(std::isnan(output))
 	{
 		throw ParseException("Error while parsing formula: " + formula);

@@ -22,6 +22,7 @@
 #include <string>
 
 #include <pelib/AmplOutput.hpp>
+#include <pelib/AmplInputVector.hpp>
 
 #include <pelib/Schedule.hpp>
 #include <pelib/Scalar.hpp>
@@ -34,11 +35,7 @@
 #undef debug
 #endif 
 
-#if 1
 #define debug(expr) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << (#expr) << " = \"" << (expr) << "\"." << endl;
-#else
-#define debug(var)
-#endif
 
 using namespace std;
 
@@ -74,7 +71,7 @@ namespace pelib
 				const Task *task = j->second.first;
 				Task t = *task;
 				this->tasks.insert(t);
-				Task &task_ref = (Task&)*this->getTasks().find(t);
+				const Task &task_ref = *(this->getTasks().find(t));
 				pair<float, work> new_pair = pair<float, work>(j->first, work(&task_ref, j->second.second));
 				new_sequence.insert(new_pair);
 
@@ -91,8 +88,27 @@ namespace pelib
 
 	Schedule::Schedule(const std::string &name, const Algebra &algebra)
 	{
+		buildFromAlgebra(name, string("Generated from Algebra"), algebra);	
+	}
+
+	Schedule::Schedule(const std::string &name, const string &appName, const Algebra &algebra)
+	{
+		buildFromAlgebra(name, appName, algebra);
+	}
+
+	Schedule::Schedule(const Schedule& src)
+	{
+		this->name = src.getName();
+		this->appName = src.getName();
+		this->tasks = src.getTasks();
+		this->setSchedule(src.getSchedule());
+	}
+
+	void
+	Schedule::buildFromAlgebra(const string &name, const string &appName, const Algebra &algebra)
+	{
 		this->name = name;
-		this->appName = string("Generated from Algebra");
+		this->appName = appName;
 
 		const Vector<int, float> *tau = algebra.find<Vector<int, float> >("Tau");
 		const Vector<int, float> *start = algebra.find<Vector<int, float> >("start");
@@ -146,6 +162,14 @@ namespace pelib
 				}
 
 				schedule.insert(pair<int, sequence>(i->first, core_schedule));
+			}
+		}
+
+		for(Schedule::table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
+		{
+			for(Schedule::sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
+			{
+				string taskid = j->second.first->getName();
 			}
 		}
 
@@ -257,6 +281,7 @@ namespace pelib
 	{
 		this->name = name;
 		this->appName = appName;
+		this->tasks = copy.getTasks();
 	
 		// Copy taskgraph	
 		this->setSchedule(schedule);

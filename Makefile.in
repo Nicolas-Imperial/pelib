@@ -18,8 +18,8 @@
 
 
 package = pelib
-version = 3
-minor = 1
+version = 4
+minor = 0
 release = 0
 
 prefix = $(HOME)/.local

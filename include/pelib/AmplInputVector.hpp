@@ -17,7 +17,7 @@
  along with Pelib. If not, see <http://www.gnu.org/licenses/>.
 */
 
-
+#include <iostream>
 #include <pelib/AmplInputData.hpp>
 #include <pelib/Vector.hpp>
 #include <pelib/CastException.hpp>
@@ -25,6 +25,12 @@
 
 #ifndef PELIB_AMPLINPUTVECTOR
 #define PELIB_AMPLINPUTVECTOR
+
+#ifdef debug
+#undef debug
+#endif
+
+#define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << (var) << "\"" << std::endl;
 
 namespace pelib
 {

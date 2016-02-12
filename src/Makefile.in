@@ -77,7 +77,9 @@ Cpp.cpp CppData.cpp CppScalar.cpp CppVector.cpp CppSet.cpp CppMatrix.cpp \
 RecordParser.cpp \
 DrakeCSchedule.cpp \
 \
-Solver.cpp AmplSolver.cpp 
+Solver.cpp AmplSolver.cpp \
+exprtk.cpp
+ 
 cstruct_src = sort.c complex.c float.c integer.c monitor.c size_t.c pelib_string.c malloc.c
 
 ## executables
