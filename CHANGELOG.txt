@@ -5,4 +5,4 @@ pelib 4.0.0
 * Added Ampl Algebra Solver implementation (calling existing installation of Ampl and backend solver)
 * Fixed parsing of negative numbers
 * Added argument passing to pelib-convert scheduler base library function signature
-
+* Fixed segfault bug when using copied schedule instances
