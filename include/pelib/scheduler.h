@@ -29,6 +29,7 @@ extern "C" {
 #ifndef CROWN_H
 #define CROWN_H
 	const pelib::Schedule* pelib_schedule(const pelib::Taskgraph &tg, const pelib::Platform &pt, size_t argc, char **argv, std::map<const std::string, double> &statistics);
+	std::string pelib_description(size_t argc, char **argv);
 	void pelib_delete(pelib::Schedule *sched);
 #endif
 

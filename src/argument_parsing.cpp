@@ -30,9 +30,7 @@
 #undef debug
 #endif
 
-#if 0
 #define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
-#endif
 
 using namespace std;
 
@@ -101,7 +99,7 @@ unsigned int
 pelib_argument_stream_parse(char **argv, pelib_argument_stream_t* stream)
 {
 	unsigned int parsed = 0;
-	while((void*)argv[0] != NULL)
+	while((void*)argv[0] != NULL && string(argv[0]).compare("--") != 0)
 	{
 		if(string(*argv).compare("--library") == 0 || string(*argv).compare("-l") == 0)
 		{
@@ -229,8 +227,23 @@ pelib_argument_stream_parse(char **argv, pelib_argument_stream_t* stream)
 			argv++;
 			parsed++;
 	
-			while(*argv != NULL && string(*argv).compare("--") != 0)
+			size_t args_counter = 1;
+			while(*argv != NULL)
 			{
+ 				if(string(*argv).compare("--args") == 0)
+				{
+					args_counter++;
+				}	
+				
+ 				if(string(*argv).compare("--") == 0)
+				{
+					args_counter--;
+					if(args_counter == 0)
+					{
+						break;
+					}
+				}
+
 				add_argument(stream, *argv);
 				argv++;
 				parsed++;

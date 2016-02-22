@@ -17,25 +17,20 @@
  along with Pelib. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <map>
-#include <pelib/Algebra.hpp>
-#include <pelib/Schedule.hpp>
-#include <pelib/Taskgraph.hpp>
-#include <pelib/Platform.hpp>
-#include <pelib/Solver.hpp>
+#include <time.h>
 
-#ifndef PELIB_SCHEDULER
-#define PELIB_SCHEDULER
-namespace pelib
-{
-	class Scheduler : public Solver
-	{
-		public:
-			virtual Schedule schedule(const Taskgraph &tg, const Platform &pt, std::map<const std::string, double> &statistics) const = 0;
-			virtual std::string getShortDescription() const = 0;
-		protected:
-		private:
-	};
+#ifndef PELIB_TIME
+#define PELIB_TIME
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+ 
+extern const long long int pelib_nsec_in_sec;
+int pelib_timespec_subtract(struct timespec *result, struct timespec *x, struct timespec *y);
+
+#ifdef __cplusplus
 }
+#endif
 
 #endif

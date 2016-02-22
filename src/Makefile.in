@@ -134,7 +134,7 @@ sharedcxx_project = pelib-platform-ampl_input pelib-platform-ampl_output pelib-t
 sharedcxx_package = $(if $(filter 1,$(SHARED)),pelib $(if $(filter text,$(packages)),$(sharedcxx_project)),$(if $(filter 1,$(STATIC)),$(if $(filter text,$(packages)),$(sharedcxx_project))))
 
 sharedcxx_pelib_src = $(if $(filter text,$(packages)),$(text_src)) argument_parsing.cpp dl.cpp
-sharedcc_pelib_src = $(if $(filter cstruct,$(packages)),$(cstruct_src))
+sharedcc_pelib_src = $(if $(filter cstruct,$(packages)),$(cstruct_src)) time.c
 shared_pelib_export = $(sharedcxx_pelib_embed) $(sharedcxx_pelib_src)
 shared_pelib_libs = -lboost_regex -lboost_graph -lexpat
 shared_pelib_ldflags = -pthread
@@ -420,7 +420,7 @@ lib_pelib-schedule_pkg_description = General research utility library used in PE
 lib_pelib-schedule_embed = 
 
 libcxx_pelib_src = $(if $(filter text,$(packages)),$(text_src)) argument_parsing.cpp dl.cpp
-libcc_pelib_src = $(if $(filter cstruct,$(packages)),$(cstruct_src))
+libcc_pelib_src = $(if $(filter cstruct,$(packages)),$(cstruct_src)) time.c
 lib_pelib_libs = -lboost_regex -lboost_graph -lexpat
 lib_pelib_export = $(lib_pelib_embed) $(libcxx_pelib_src) $(libcc_pelib_src)
 lib_pelib_cxxflags =

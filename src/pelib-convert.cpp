@@ -92,8 +92,6 @@ parse_args(char** argv)
 			string cmd = string("ls $(dirname $(realpath $(which ").append(self).append(")))/../share/pelib/pelib-*.tar.gz | sort -rV | head -1 | xargs realpath");
 			exit(system(cmd.c_str()));
 		}
-
-		cerr << "[WARNING] Incorrect argument: \"" << *argv << "\". Ignoring" << endl;
 	}
 
 	return conversion;

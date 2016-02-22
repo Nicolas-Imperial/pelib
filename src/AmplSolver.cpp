@@ -183,19 +183,23 @@ opencmd(string cmd, vector<string> argv, istream &stdin, string &out, string &er
 
 			// Wait for child process to terminate
 			int status;
-			waitpid(pid, &status, WNOHANG);
+			waitpid(pid, &status, WUNTRACED);
 
-			//debug(WIFSIGNALED(status));
-			//debug(WIFEXITED(status));
-			//debug(WEXITSTATUS(status));
+			/*
+			debug(WIFSIGNALED(status));
+			debug(WIFEXITED(status));
+			debug(WEXITSTATUS(status));
+			*/
 
 			if(WIFEXITED(status) == 1 && WIFSIGNALED(status) == 0)
 			{
 				status = WEXITSTATUS(status);
+				//debug(status);
 			}
 			else
 			{
 				status = 0;
+				//debug(status);
 			}
 
 			// Close streams
