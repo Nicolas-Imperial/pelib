@@ -24,13 +24,15 @@
 #include <pelib/Set.hpp>
 #include <pelib/CastException.hpp>
 
+#define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << (var) << "\"" << std::endl;
+
 #ifndef PELIB_AMPLINPUTSET
 #define PELIB_AMPLINPUTSET
 
 namespace pelib
 {
 	/** Parser and output class for Set in AMPL input data text format **/
-	template <class Value>
+	template <class Value, class Key = size_t>
 	class AmplInputSet: public AmplInputData
 	{
 		/** Type of the set data manipulated in member functions **/
@@ -66,7 +68,8 @@ namespace pelib
 				boost::cmatch match = AlgebraDataParser::match(getDetailedPattern(), str);
 				
 				boost::regex param_set("\\s*([^\\s]+)");
-				std::string remain = match[2];
+				std::string keystr = match[2];
+				std::string remain = match[3];
 				const int subs[] = {1};
 				boost::sregex_token_iterator iter = make_regex_token_iterator(remain, param_set, subs, boost::regex_constants::match_default);
 				boost::sregex_token_iterator end;
@@ -79,7 +82,8 @@ namespace pelib
 					try
 					{
 						value = AlgebraDataParser::convert<Value>(*iter, strict);
-					} catch(NoDecimalFloatException &e)
+					}
+					catch(NoDecimalFloatException &e)
 					{
 						std::stringstream ss;
 						ss << e.getValue();
@@ -98,7 +102,27 @@ namespace pelib
 					throw ParseException(std::string("Set only composed of integer-parsable values."));
 				}
 
-				return new Set<Value>(match[1], values);
+				if(keystr.compare(std::string()) == 0)
+				{
+					return new Set<Value>(match[1], values);
+				}
+				else
+				{
+					Key key;
+
+					try
+					{
+						key = AlgebraDataParser::convert<Key>(keystr, strict);
+					}
+					catch(NoDecimalFloatException &e)
+					{
+						std::stringstream ss;
+						ss << e.getValue();
+						ss >> key;
+					}
+
+					return new Set<Value, Key>(match[1], key, values);
+				}
 			}
 
 			/** Output all values of instance of pelib::set into output stream in AMPL input data format
@@ -109,18 +133,28 @@ namespace pelib
 			void
 			dump(std::ostream &o, const AlgebraData *data) const
 			{
-				const Set<Value> *set = dynamic_cast<const Set<Value>*>(data);
+				const Set<Value, Key> *set = dynamic_cast<const Set<Value>*>(data);
 				if(set == NULL) throw CastException("parameter \"data\" was not of type \"Set<Value>\".");				
-					
-				o << "set " << set->getName() << " :=";
-				SetType values = set->getValues();
 				
-				for(typename std::set<Value>::const_iterator iter = values.begin(); iter != values.end(); iter++)
+				for(typename Set<Value, Key>::SetOfSetsType::const_iterator i = set->getSubsets().begin(); i != set->getSubsets().end(); i++)
 				{
-					o << " " << *iter;
-				}
+					if(set->isOneSet())
+					{
+						o << "set " << set->getName() << " :=";
+					}
+					else
+					{
+						o << "set " << set->getName() << "[" << i->first << "] :=";
+					}
+					
+					SetType values = i->second;
+					for(typename std::set<Value>::const_iterator iter = values.begin(); iter != values.end(); iter++)
+					{
+						o << " " << *iter;
+					}
 
-				o << ";" << std::endl;				
+					o << ";" << std::endl;
+				}
 			}
 
 			/** Returns a boost::regex regular expression that matches a Set in AMPL input data format and able to extract its elements **/
@@ -128,7 +162,7 @@ namespace pelib
 			std::string
 			getDetailedPattern()
 			{
-				return "set\\s*([^\\s\\n]+)\\s*:=(.+)";
+				return "set\\s*([^\\s\\n\\[\\]]+)\\s*(?:\\[([^\\s\\n]+)\\])?\\s*:=(.+)";
 			}
 
 			/** Returns a boost::regex regular expression that matches a Set in AMPL input data format **/
@@ -136,7 +170,7 @@ namespace pelib
 			std::string
 			getGlobalPattern()
 			{
-				return "set\\s*[^\\s\\n]+\\s*:=.+";
+				return "set\\s*[^\\s\\n\\[\\]]+\\s*(?:\\[[^\\s\\n]+\\])?\\s*:=.+";
 			}
 
 		protected:

@@ -87,6 +87,28 @@ namespace pelib
 				return values.size();
 			}
 			
+			void
+			merge(const AlgebraData *ptr)
+			{
+				// Only allow merging if both this and ptr are of same name and type
+				if(ptr->getName().compare(this->getName()) == 0 && std::string(typeid(*ptr).name()).compare(typeid(Vector<Key, Value>).name()) == 0)
+				{
+					Vector<Key, Value> *vector = (Vector<Key, Value>*)ptr;
+					for(typename VectorType::iterator i = vector->values.begin(); i != vector->values.end(); i++)
+					{
+						if(this->getValues().find(i->first) != this->getValues().end())
+						{
+							this->values.erase(this->values.find(i->first));
+						}
+						// Add the new row in this matrix
+						this->values.insert(std::pair<Key, Value>(i->first, i->second));
+					}
+				}
+				else
+				{
+					throw PelibException(std::string("Cannot merge data \"") + ptr->getName() + "\" with " + typeid(Value).name() + " vector of name \"" + this->getName() + "\".");
+				}
+			}
 		protected:
 			VectorType values;
 		private:		

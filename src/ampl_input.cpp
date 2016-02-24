@@ -36,11 +36,7 @@ extern "C" {
 #undef debug
 #endif
 
-#if 0
 #define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
-#else
-#define debug(var)
-#endif
 
 typedef struct
 {
@@ -53,7 +49,8 @@ pelib::Record*
 pelib_parse(std::istream& cin, size_t argc, char **argv)
 {
 	Algebra al = AmplInput(AmplInput::intFloatHandlers()).parse(cin);
-	return new Algebra(al);
+	Algebra *ptr = new Algebra(al);
+	return ptr;
 }
 
 // /!\ the content of argv is freed after this function is run
