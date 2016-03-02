@@ -27,6 +27,7 @@
 #include <iomanip>
 
 #include <pelib/AlgebraData.hpp>
+#include <pelib/PelibException.hpp>
 
 #ifndef PELIB_MATRIX
 #define PELIB_MATRIX

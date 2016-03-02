@@ -30,8 +30,6 @@
 #include <pelib/AlgebraData.hpp>
 #include <pelib/PelibException.hpp>
 
-#define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << (var) << "\"" << std::endl;
-
 #ifndef PELIB_SET
 #define PELIB_SET
 
