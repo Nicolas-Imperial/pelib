@@ -120,9 +120,9 @@ namespace pelib
 		table schedule;
 		set<Task> tasks;
 	
-		if(start == NULL || tau == NULL || wi == NULL || sched == NULL || freq == NULL)
+		if(start == NULL || tau == NULL || wi == NULL || sched == NULL || freq == NULL || task_name == NULL)
 		{
-			throw CastException("Missing some input data structure instance. Check start, tau, wi, sched and freq.");
+			throw CastException("Missing some input data structure instance. Check start, tau, wi, sched, freq and name.");
 		}
 		else
 		{

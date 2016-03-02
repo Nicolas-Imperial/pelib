@@ -19,7 +19,7 @@
 
 ## All files to include in a distribution package
 text = parser.h output.h process.h scheduler.h dl.h argument_parsing.hpp \
-ParseException.hpp CastException.hpp NoDecimalFloatException.hpp Record.hpp \
+ParseException.hpp CastException.hpp PelibException.hpp NoDecimalFloatException.hpp Record.hpp \
 Data.hpp AlgebraData.hpp Algebra.hpp \
 AlgebraParser.hpp DataParser.hpp \
 AlgebraOutput.hpp DataOutput.hpp \

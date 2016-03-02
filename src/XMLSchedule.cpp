@@ -45,10 +45,6 @@ extern "C"{
 #include <pelib/AmplInput.hpp>
 #include <pelib/Algebra.hpp>
 
-#ifdef debug
-#undef debug
-#endif
-
 #define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << (expr) << "\"." << endl;
 
 using namespace pelib;
@@ -268,11 +264,8 @@ XMLSchedule::parse(istream &is) const
 		for(set<const Task*>::const_iterator j = sched->getTasks(1).begin(); j != sched->getTasks(1).end(); j++)
 		{
 			const Task *jj = *j;
-			debug(jj);
 			Task jjj = *jj;
-			debug(jjj.getName());
 		}
-		debug("Out from XML Schedule parser");
 		*/
 
 		return sched;

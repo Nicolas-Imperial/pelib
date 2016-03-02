@@ -24,6 +24,7 @@
 #include <pelib/DeadlineCalculator.hpp>
 #include <pelib/ParseException.hpp>
 #include <pelib/CastException.hpp>
+#include <pelib/PelibException.hpp>
 #include <pelib/DummyCore.hpp>
 
 #include <pelib/Scalar.hpp>
@@ -146,10 +147,12 @@ namespace pelib
 		const Vector<int, float> *Wi = algebra.find<Vector<int, float> >("Wi");
 		const Matrix<int, int, float> *e = algebra.find<Matrix<int, int, float> >("e");
 		const Matrix<int, int, float> *c = algebra.find<Matrix<int, int, float> >("c");
+		const Vector<int, string> *task_name = algebra.find<Vector<int, string> >("name");
 		
-		if(M == NULL || n == NULL || tau == NULL || Wi == NULL || e == NULL)
+		if(M == NULL || n == NULL || tau == NULL || Wi == NULL || e == NULL || task_name == NULL)
 		{
-			throw CastException("Missing parameter. Need float scalar M, integer scalar n, integer vectors tau and Wi (of size n), and float matrix e of n lines.");
+			//throw CastException("Missing parameter. Need float scalar M, integer scalar n, integer vectors tau and Wi (of size n), and float matrix e of n lines.");
+			throw PelibException("Missing parameter. Need float scalar M, integer scalar n, integer vectors tau and Wi (of size n), float matrix e of n lines and vector name for tasks' names.");
 		}
 		else
 		{
@@ -169,10 +172,18 @@ namespace pelib
 			{
 				ss << j->second << " ";
 			}
-		
+	
+			/*	
 			stringstream estr;
 			estr << "task_" << id;	
 			Task t(estr.str());
+			*/
+			if(task_name->getValues().find(id) == task_name->getValues().end())
+			{
+				throw PelibException("Missing task name in Algebra record when building a Taskgraph instance");
+			}
+
+			Task t(task_name->getValues().find(id)->second);
 			t.setWorkload(work);
 			t.setMaxWidth(max_wi);
 			t.setEfficiencyString(ss.str());
@@ -226,6 +237,7 @@ namespace pelib
 		map<int, map<int, float> > map_c;
 		map<int, float> map_tau;
 		map<int, float> map_Wi;
+		map<int, string> map_name;
 
 		if(!arch.isHomogeneous())
 		{
@@ -235,6 +247,7 @@ namespace pelib
 		for(set<Task>::const_iterator i = getTasks().begin(); i != getTasks().end(); i++)
 		{
 			map_tau.insert(pair<int, float>(std::distance(this->getTasks().begin(), i) + 1, i->getWorkload()));
+			map_name.insert(pair<int, string>(std::distance(this->getTasks().begin(), i) + 1, i->getName()));
 			float max_width = 0;
 			if(i->getMaxWidth() > arch.getCores().size())
 			{
@@ -272,12 +285,14 @@ namespace pelib
 
 		Vector<int, float> tau("Tau", map_tau);
 		Vector<int, float> Wi("Wi", map_Wi);
+		Vector<int, string> name("name", map_name);
 		Matrix<int, int, float> e("e", map_e);
 		Matrix<int, int, float> c("c", map_c);
 
 		Scalar<float> M("M", getDeadline(arch));
 
 		out.insert(&n);
+		out.insert(&name);
 		out.insert(&tau);
 		out.insert(&Wi);
 		out.insert(&e);

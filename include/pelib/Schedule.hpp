@@ -24,6 +24,7 @@
 #include <pelib/Link.hpp>
 #include <pelib/Task.hpp>
 #include <pelib/Taskgraph.hpp>
+#include <pelib/Platform.hpp>
 
 #ifndef PELIB_SCHEDULE
 #define PELIB_SCHEDULE
