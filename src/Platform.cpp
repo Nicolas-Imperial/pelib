@@ -27,6 +27,8 @@
 #include <pelib/ParseException.hpp>
 #include <pelib/CastException.hpp>
 
+#define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << (var) << "\"" << std::endl;
+
 using namespace std;
 
 namespace pelib
@@ -172,13 +174,28 @@ namespace pelib
 		const Scalar<float> *scalar_p = arch.find<Scalar<float> >("p");
 		const Scalar<float> *f_unit = arch.find<Scalar<float> >("Funit");
 		const Set<float> *set_F = arch.find<Set<float> >("F");
+		const Set<float> *set_Fi = arch.find<Set<float> >("Fi");
+
+		for(map<string, const AlgebraData* const>::const_iterator i = arch.getAllRecords().begin(); i != arch.getAllRecords().end(); i++)
+		{
+		}
 
 		if(scalar_p == NULL || set_F == NULL)
 		{
 			throw ParseException(std::string("Missing core number scalar \"p\" or frequency set \"F\" in input."));
 		}
 
-		//set<const Core*> shared;
+		// Create empty frequency islands, if a description is given
+		vector<island> frequency;
+		if(set_Fi != NULL)
+		{
+			Set<float>::SetOfSetsType Fi = set_Fi->getSubsets();
+			for(typename Set<float>::SetOfSetsType::iterator i = Fi.begin(); i != Fi.end(); i++)
+			{
+				frequency.push_back(set<const Core*>());
+			}
+		}
+
 		for(size_t i = 0; i < scalar_p->getValue(); i++)
 		{
 			const Core *core = new DummyCore(set_F->getValues(), f_unit == NULL ? 1 : f_unit->getValue());
@@ -186,13 +203,53 @@ namespace pelib
 			set<const Core*> island;
 			island.insert(core);
 
+			// Each core is its own shared mamory island
 			this->shared.insert(set<const Core*>(island));
-			this->main.insert(set<const Core*>(island));
-			this->priv.insert(set<const Core*>(island));
-			this->voltage.insert(set<const Core*>(island));
-			this->freq.insert(set<const Core*>(island));
+
+			// If frequency islands are provided, then insert core in the right island
+			if(set_Fi != NULL)
+			{
+				size_t core_id = i + 1;
+				vector<Platform::island>::iterator jj = frequency.begin();
+
+				// Find the frequency island that holds this core
+				Set<float>::SetOfSetsType Fi = set_Fi->getSubsets();
+				for(typename Set<float>::SetOfSetsType::iterator j = Fi.begin(); j != Fi.end(); j++)
+				{
+					if(j->second.find(core_id) != j->second.end())
+					{
+						size_t island_id = std::distance(Fi.begin(), j);
+						std::advance(jj, island_id);
+						set<const Core*> island = *jj;
+						frequency[island_id].insert(core);
+
+						break;
+					}
+				}
+			}
+
+			this->main = shared;
+			this->priv = shared;
+
+			// If voltage/frequency islands are provided, then copy the
+			// frequency island set computed above to voltage and frequency
+			// islands
+			if(set_Fi == NULL)
+			{
+				this->voltage = shared;
+				this->freq = shared;
+			}
+			else
+			{
+				set<Platform::island> islands;
+				for(vector<Platform::island>::iterator i = frequency.begin(); i != frequency.end(); i++)
+				{
+					islands.insert(*i);
+				}
+				this->voltage = islands;
+				this->freq = islands;
+			}
 		}
-		//this->shared.insert(shared);
 	}
 
 	Platform::~Platform()
@@ -251,9 +308,25 @@ namespace pelib
 		Scalar<float> f_unit("Funit", (*this->getCores().begin())->getFrequencyUnit());
 		Set<float> set_F("F", (*this->getCores().begin())->getFrequencies());
 
+		Set<float>::SetOfSetsType Fi;
+		for(set<island>::iterator i = this->freq.begin(); i != this->freq.end(); i++)
+		{
+			Set<float>::SetType island;
+			for(set<const Core*>::const_iterator j = i->begin(); j != i->end(); j++)
+			{
+				set<const Core*>::iterator core_iter = cores.find(*j);
+				island.insert(std::distance(cores.begin(), core_iter) + 1);
+			}
+			Fi.insert(pair<size_t, Set<float>::SetType>((size_t)(std::distance(this->freq.begin(), i) + 1), island));
+		}
+		Set<float> set_Fi("Fi", Fi);
+
 		record.insert(&scalar_p);
 		record.insert(&f_unit);
 		record.insert(&set_F);
+		record.insert(&set_Fi);
+		Scalar<float> scalar_Fin("Fin", Fi.size());
+		record.insert(&scalar_Fin);
 
 		return record;
 	}

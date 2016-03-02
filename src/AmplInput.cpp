@@ -129,7 +129,7 @@ namespace pelib
 		while(!getline(ampl_data, line).fail())
 		{
 			boost::regex comment("([^#]*)#[^$]*$");
-            line = boost::regex_replace(line, comment, first_only, boost::match_default | boost::format_all);
+			line = boost::regex_replace(line, comment, first_only, boost::match_default | boost::format_all);
 			boost::regex surrounding_space("^[\\n\\s]*([^\\s\n]*)[\\s\n]*$");
 			line = boost::regex_replace(line, surrounding_space, first_only, boost::match_default | boost::format_all);
 

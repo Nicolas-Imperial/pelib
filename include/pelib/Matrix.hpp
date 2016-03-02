@@ -113,6 +113,50 @@ namespace pelib
 				return Matrix<Row, Col, Value>(this->getName(), new_values);
 			}
 			
+			void
+			merge(const AlgebraData* ptr)
+			{
+				// Only allow merging if both this and ptr are of same name, type and row size
+				if(ptr->getName().compare(this->getName()) == 0 &&
+					std::string(typeid(*ptr).name()).compare(typeid(Matrix<Col, Row, Value>).name()) == 0)
+				{
+					Matrix<Col, Row, Value> *matrix = (Matrix<Col, Row, Value>*)ptr;
+					// Do some complex merge work if the matrix to merge actually has data to merge
+					if(matrix->getValues().size() > 0 && matrix->getValues().begin()->second.size() > 0)
+					{
+						// Only allow merge if this matrix is empty, or if not, 
+						// if both matrices are of same row size (same number of columns)
+						if (this->getValues().begin() == this->getValues().end() ||
+							this->getValues().begin()->second.size() == matrix->getValues().begin()->second.size())
+						{
+							// Take all rows of the new matrix and merge it with the rows of this matrix
+							for(typename MatrixType::iterator i = matrix->values.begin(); i != matrix->values.end(); i++)
+							{
+								// If this row's key already exists in this matrix, then delete the existing row
+								if(this->getValues().find(i->first) != this->getValues().end())
+								{
+									this->values.erase(this->values.find(i->first));
+								}
+
+								// Add the new row in this matrix
+								this->values.insert(std::pair<Row, std::map<Col, Value> >(i->first, i->second));
+							}
+						}
+						else
+						{
+							throw PelibException(std::string("Matrices \"") + ptr->getName() + "\" and " + this->getName() + "\" are of incompatible size to merge.");
+						}
+					}
+					else
+					{
+						// Nothing to merge, do nothing and return quietly
+					}
+				}
+				else
+				{
+					throw PelibException(std::string("Cannot merge data \"") + ptr->getName() + "\" with " + typeid(Value).name() + " matrix of name \"" + this->getName() + "\".");
+				}
+			}
 		protected:
 			/** Internal container of the matrix values **/
 			MatrixType values;

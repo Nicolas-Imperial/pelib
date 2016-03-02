@@ -31,7 +31,7 @@
 namespace pelib
 {
 	/*** AMPL Output format parser and output class for pelib::Set class instances ***/
-	template <class Value>
+	template <class Value, class Key = size_t>
 	class AmplOutputSet: public AmplOutputData
 	{
 		/*** Internal format of data collection handled ***/
@@ -59,7 +59,7 @@ namespace pelib
 			std::string
 			getDetailedPattern()
 			{
-				return "set\\s+([^\\s\\n]+)\\s*:=(.+)";
+				return "set\\s*([^\\s\\n\\[\\]]+)\\s*(?:\\[([^\\s\\n]+)\\])?\\s*:=(.+)";
 			}
 
 			/** Returns a boost::regex regular expression able to match a AMPL output format Set **/
@@ -67,7 +67,7 @@ namespace pelib
 			std::string
 			getGlobalPattern()
 			{
-				return "set\\s+[^\\s\\n]+\\s*:=.+";
+				return "set\\s*[^\\s\\n\\[\\]]+\\s*(?:\\[[^\\s\\n]+\\])?\\s*:=.+";
 			}
 
 			/** Parses input stream in AMPL output format and builds an instance of pelib::Set from the data extracted
@@ -80,16 +80,13 @@ namespace pelib
 				SetType values;
 				
 				std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-				//std::cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "]" << std::endl;
-				boost::cmatch match=AlgebraDataParser::match(getDetailedPattern(), str);
-				//std::cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "]" << std::endl;
+				boost::cmatch match = AlgebraDataParser::match(getDetailedPattern(), str);
 				
 				boost::regex param_set("\\s*([^\\s]+)");
-				std::string remain = match[2];
+				std::string keystr = match[2];
+				std::string remain = match[3];
 				const int subs[] = {1};
-				//std::cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "]" << std::endl;
 				boost::sregex_token_iterator iter = make_regex_token_iterator(remain, param_set, subs, boost::regex_constants::match_default);
-				//std::cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "]" << std::endl;
 				boost::sregex_token_iterator end;
 
 				int integer_values = 0, total_values = 0;
@@ -100,11 +97,11 @@ namespace pelib
 					try
 					{
 						value = AlgebraDataParser::convert<Value>(*iter, strict);
-					} catch(NoDecimalFloatException &e)
+					}
+					catch(NoDecimalFloatException &e)
 					{
-						float float_value = e.getValue();
 						std::stringstream ss;
-						ss << float_value;
+						ss << e.getValue();
 						ss >> value;
 						integer_values++;
 					}
@@ -120,7 +117,27 @@ namespace pelib
 					throw ParseException(std::string("Set only composed of integer-parsable values."));
 				}
 
-				return new Set<Value>(match[1], values);
+				if(keystr.compare(std::string()) == 0)
+				{
+					return new Set<Value>(match[1], values);
+				}
+				else
+				{
+					Key key;
+
+					try
+					{
+						key = AlgebraDataParser::convert<Key>(keystr, strict);
+					}
+					catch(NoDecimalFloatException &e)
+					{
+						std::stringstream ss;
+						ss << e.getValue();
+						ss >> key;
+					}
+
+					return new Set<Value, Key>(match[1], key, values);
+				}
 			}
 
 			/** Write the content of an instance of pelib::Set into output stream in AMPL output format
@@ -131,18 +148,28 @@ namespace pelib
 			void
 			dump(std::ostream &o, const AlgebraData *data) const
 			{				
-				const Set<Value> *set = dynamic_cast<const Set<Value>*>(data);
-				if(set == NULL) throw CastException("parameter \"data\" was not of type \"Set<Value>\".");
-					
-				o << "set " << set->getName() << " :=";
-				SetType values = set->getValues();
+				const Set<Value, Key> *set = dynamic_cast<const Set<Value>*>(data);
+				if(set == NULL) throw CastException("parameter \"data\" was not of type \"Set<Value>\".");				
 				
-				for(typename std::set<Value>::const_iterator iter = values.begin(); iter != values.end(); iter++)
+				for(typename Set<Value, Key>::SetOfSetsType::const_iterator i = set->getSubsets().begin(); i != set->getSubsets().end(); i++)
 				{
-					o << " " << *iter;
-				}
+					if(set->isOneSet())
+					{
+						o << "set " << set->getName() << " :=";
+					}
+					else
+					{
+						o << "set " << set->getName() << "[" << i->first << "] :=";
+					}
+					
+					SetType values = i->second;
+					for(typename std::set<Value>::const_iterator iter = values.begin(); iter != values.end(); iter++)
+					{
+						o << " " << *iter;
+					}
 
-				o << ";" << std::endl;					
+					o << ";" << std::endl;
+				}
 			}
 
 		protected:

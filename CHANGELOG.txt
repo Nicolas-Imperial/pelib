@@ -4,6 +4,9 @@ pelib 4.0.0
 * Added new Solver class hierarchy
 * Added Ampl Algebra Solver implementation (calling existing installation of Ampl and backend solver)
 * Fixed parsing of negative numbers
-* Added argument passing to pelib-convert scheduler base library function signature
+* Added argument passing to pelib-convert schedulers
 * Fixed segfault bug when using copied schedule instances
 * Added task name generation and parsing for taskgraphs
+* Added support for Sets of Sets
+* Added merge methods for AlgebraData structures
+* Added support for Voltage/Frequency islands in AMPL platform representations

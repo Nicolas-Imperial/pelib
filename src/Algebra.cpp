@@ -30,11 +30,15 @@
 #include <pelib/AmplDataParser.hpp>
 #include <pelib/AlgebraData.hpp>
 
+#define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << (var) << "\"" << std::endl;
+
+using namespace std;
+
 namespace pelib
 {	
 	Algebra::Algebra() { /* Do nothing */ }
 	
-	Algebra::Algebra(const std::map<std::string, const AlgebraData* const> &records)
+	Algebra::Algebra(const map<string, const AlgebraData* const> &records)
 	{
 		this->records = records;
 	}
@@ -53,25 +57,25 @@ namespace pelib
 	Algebra::merge(const Algebra& record) const
 	{
 		// Copy all AlgebraData
-		std::map<std::string, const AlgebraData * const> rec;
+		map<string, const AlgebraData * const> rec;
 
 		// Copy all records stored in this instance
-		for(std::map<std::string, const AlgebraData * const>::const_iterator iter = records.begin(); iter != records.end(); iter++)
+		for(map<string, const AlgebraData * const>::const_iterator iter = records.begin(); iter != records.end(); iter++)
 		{
-			rec.insert(std::pair<std::string, pelib::AlgebraData*>(iter->second->getName(), iter->second->clone()));
+			rec.insert(pair<string, pelib::AlgebraData*>(iter->second->getName(), iter->second->clone()));
 		}
 
 		// Copy all records from the foreign instance
-		for(std::map<std::string, const AlgebraData * const>::const_iterator iter = record.getAllRecords().begin(); iter != record.getAllRecords().end(); iter++)
+		for(map<string, const AlgebraData * const>::const_iterator iter = record.getAllRecords().begin(); iter != record.getAllRecords().end(); iter++)
 		{
-			rec.insert(std::pair<std::string, pelib::AlgebraData*>(iter->second->getName(), iter->second->clone()));
+			rec.insert(pair<string, pelib::AlgebraData*>(iter->second->getName(), iter->second->clone()));
 		}
 
 		// Build a new algebra with all records
 		return Algebra(rec);
 	}
 
-	const std::map<std::string, const AlgebraData * const>&
+	const map<string, const AlgebraData * const>&
 	Algebra::getAllRecords() const
 	{
 		return records;
@@ -80,20 +84,28 @@ namespace pelib
 	void
 	Algebra::insert(const pelib::AlgebraData *data)
 	{
-		std::map<std::string, const AlgebraData * const>::iterator iter = records.find(data->getName());
+		map<string, const AlgebraData * const>::iterator iter = records.find(data->getName());
+		const AlgebraData *new_elem;
 		if(iter != records.end())
 		{
-			const AlgebraData *element = iter->second;
-			records.erase(iter);
-			delete element;
+			const AlgebraData *ptr = iter->second;
+			AlgebraData *dat = ptr->clone();
+			delete ptr;
+			dat->merge(data);
+			new_elem = dat;
+				records.erase(iter);
 		}
-		records.insert(std::pair<std::string, pelib::AlgebraData*>(data->getName(), data->clone()));
+		else
+		{
+			new_elem = data->clone();
+		}
+		records.insert(pair<string, const AlgebraData*>(data->getName(), new_elem));
 	}
 
 	void
-	Algebra::remove(const std::string name)
+	Algebra::remove(const string name)
 	{
-		std::map<std::string, const AlgebraData * const>::iterator ptr = records.find(name);
+		map<string, const AlgebraData * const>::iterator ptr = records.find(name);
 
 		if(ptr != records.end())
 		{
@@ -111,11 +123,11 @@ namespace pelib
 			deleteRecords();
 			
 			// Clone every objects of the source's collection
-			std::map<std::string, const AlgebraData * const> rhrec = rhs.records; 
-			for (std::map<std::string, const AlgebraData * const>::iterator i = rhrec.begin(); i != rhrec.end(); i++)
+			map<string, const AlgebraData * const> rhrec = rhs.records; 
+			for (map<string, const AlgebraData * const>::iterator i = rhrec.begin(); i != rhrec.end(); i++)
 			{
 				AlgebraData *copy = i->second->clone();
-				this->records.insert(std::pair<std::string, const AlgebraData * const>(i->first, copy));
+				this->records.insert(pair<string, const AlgebraData * const>(i->first, copy));
 			}
 		}
 		
@@ -125,10 +137,10 @@ namespace pelib
 	void
 	Algebra::deleteRecords()
 	{
-		for (std::map<std::string, const AlgebraData * const>::iterator i = records.begin(); i != records.end();)
+		for (map<string, const AlgebraData * const>::iterator i = records.begin(); i != records.end();)
 		{
 			delete i->second;
-			std::map<std::string, const AlgebraData * const>::iterator erase = i;
+			map<string, const AlgebraData * const>::iterator erase = i;
 			i++;
 			records.erase(erase);
 		}

@@ -27,6 +27,7 @@
 #include <iomanip>
 
 #include <pelib/AlgebraData.hpp>
+#include <pelib/PelibException.hpp>
 
 #ifndef PELIB_SCALAR
 #define PELIB_SCALAR
@@ -65,7 +66,21 @@ namespace pelib
 			{
 				return value;
 			}
-				
+			
+			void	
+			merge(const AlgebraData* ptr)
+			{
+				// Only allow merging if both this and ptr are of same name and type
+				if(ptr->getName().compare(this->getName()) == 0 && std::string(typeid(*ptr).name()).compare(typeid(Scalar<Value>).name()) == 0)
+				{
+					Scalar<Value> *scalar = (Scalar<Value>*)ptr;
+					this->value = scalar->getValue();
+				}
+				else
+				{
+					throw PelibException(std::string("Cannot merge data \"") + ptr->getName() + "\" with " + typeid(Value).name() + " scalar of name \"" + this->getName() + "\".");
+				}
+			}
 		protected:
 			/** Value help by this instance **/
 			Value value;

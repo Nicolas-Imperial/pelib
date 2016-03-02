@@ -33,6 +33,7 @@ namespace pelib
 		public:
 			/** Creates a new instance AlgebraData with name given as argument **/
 			AlgebraData(const std::string);
+
 			/** Copy constructor **/
 			AlgebraData(const AlgebraData&);
 
@@ -46,6 +47,10 @@ namespace pelib
 
 			/** Returns a copy of this element **/
 			virtual AlgebraData* clone() const = 0;
+
+			/** Merge data in this instance and instance given as argument,
+			    or replace it if merging is not possible **/
+			virtual void merge(const AlgebraData*) = 0;
 		protected:
 			/** Stores the name of this element **/
 			std::string name;
