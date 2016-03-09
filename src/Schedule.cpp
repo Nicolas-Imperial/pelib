@@ -122,7 +122,7 @@ namespace pelib
 	
 		if(start == NULL || tau == NULL || wi == NULL || sched == NULL || freq == NULL || task_name == NULL)
 		{
-			throw CastException("Missing some input data structure instance. Check start, tau, wi, sched, freq and name.");
+			throw CastException("Missing some input data structure instance. Check start, tau, wi, schedule, frequency and name.");
 		}
 		else
 		{
