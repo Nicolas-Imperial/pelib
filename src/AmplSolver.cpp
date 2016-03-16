@@ -271,7 +271,7 @@ AmplSolver::solve(const std::map<const std::string, const Algebra> &data, map<co
 		int success = opencmd("bash", args, in, out, err);
 
 		bool optimal = out.find("time limit") == std::string::npos && out.find("optimal solution") != std::string::npos;
-		bool feasible = !((out.find("infeasible") != std::string::npos) || (out.find(" cannot hold") != std::string::npos) || (out.find("bailing out") != std::string::npos) || (err.find(" but lower bound") != std::string::npos));
+		bool feasible = !((out.find("infeasible") != std::string::npos) || (out.find(" cannot hold") != std::string::npos) || (out.find("bailing out") != std::string::npos) || (err.find(" but lower bound") != std::string::npos) || (out.find("No primal or dual variables returned") != std::string::npos));
 		
 		statistics.insert(pair<string, double>(string("optimal"), optimal ? 1 : 0));
 		statistics.insert(pair<string, double>(string("feasible"), feasible ? 1 : 0));
