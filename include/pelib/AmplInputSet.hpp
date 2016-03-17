@@ -24,8 +24,6 @@
 #include <pelib/Set.hpp>
 #include <pelib/CastException.hpp>
 
-#define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << (var) << "\"" << std::endl;
-
 #ifndef PELIB_AMPLINPUTSET
 #define PELIB_AMPLINPUTSET
 

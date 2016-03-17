@@ -49,9 +49,34 @@ pelib_parse(std::istream& cin, size_t argc, char **argv)
 void
 pelib_dump(std::ostream& cout, std::map<const char*, Record*> records, size_t argc, char **argv)
 {
-	Schedule *sc = (Schedule*)records.find(typeid(Schedule).name())->second;
-	Taskgraph *tg = (Taskgraph*)records.find(typeid(Taskgraph).name())->second;
-	Platform *pt = (Platform*)records.find(typeid(Platform).name())->second;
+	Schedule *sc;
+	Taskgraph *tg;
+	Platform *pt;
+
+	if(records.find(typeid(Schedule).name()) != records.end())
+	{
+		sc = (Schedule*)records.find(typeid(Schedule).name())->second;
+	}
+	else
+	{
+		throw PelibException("Missing schedule instance to output in data set.");
+	}
+	if(records.find(typeid(Taskgraph).name()) != records.end())
+	{
+		tg = (Taskgraph*)records.find(typeid(Taskgraph).name())->second;
+	}
+	else
+	{
+		throw PelibException("Missing taskgraph instance in data set, required to output a schedule.");
+	}
+	if(records.find(typeid(Platform).name()) != records.end())
+	{
+		pt = (Platform*)records.find(typeid(Platform).name())->second;
+	}
+	else
+	{
+		throw PelibException("Missing platform instance in data set, required to output a schedule.");
+	}
 #define check(var, core, task) { Schedule::table::iterator ii = ((Schedule::table&)var).begin(); std::advance(ii, core); Schedule::sequence::iterator jj = ii->second.begin(); std::advance(jj, task); debug(jj->second.first->getName()); }
 	//check(((Schedule*)sc)->getSchedule(), 1, 0);
 	//check(((Schedule*)sc)->getSchedule(), 2, 0);
