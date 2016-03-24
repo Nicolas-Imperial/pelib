@@ -18,6 +18,7 @@
 */
 
 
+#include <typeinfo>
 #include <string>
 
 #include <pelib/Data.hpp>
@@ -25,17 +26,29 @@
 #ifndef PELIB_ALGEBRADATA
 #define PELIB_ALGEBRADATA
 
+#if 01
+#define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << std::endl;
+#else
+#define debug(var)
+#endif
+
 namespace pelib
 {
 	/** Base class of all data classes that a Algebra container can manipulate **/
 	class AlgebraData : public Data
 	{
 		public:
+			/** If the data is a float or a double, instruct pelib to printf
+			 * the value rounded up to the next higher last digit displayed
+			 * or to leave it as it is. The latter is the default setting.
+			*/
+			enum precision { leave, higher };
+
 			/** Creates a new instance AlgebraData with name given as argument **/
-			AlgebraData(const std::string);
+			AlgebraData(const std::string, precision = leave);
 
 			/** Copy constructor **/
-			AlgebraData(const AlgebraData&);
+			AlgebraData(const AlgebraData&, precision = leave);
 
 			/** Returns the name of this element **/
 			virtual	const std::string&
@@ -51,10 +64,29 @@ namespace pelib
 			/** Merge data in this instance and instance given as argument,
 			    or replace it if merging is not possible **/
 			virtual void merge(const AlgebraData*) = 0;
+
+			precision getPrecision() const;
+
+			template<class Value> static
+			Value fixPrecision(const Value &data, std::streamsize precision);
+
 		protected:
 			/** Stores the name of this element **/
 			std::string name;
+			precision prec;
 	};
+
+	template<class Value>
+	Value
+	AlgebraData::fixPrecision(const Value &data, std::streamsize precision)
+	{
+		if(std::string(typeid(Value).name()).compare(std::string(typeid(float).name())) == 0)
+		{
+			debug("Hello world!");
+		}
+		return data;
+	}
 }
 
+#undef debug
 #endif

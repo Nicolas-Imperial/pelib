@@ -19,19 +19,30 @@
 
 
 #include <iostream>
+#include <math.h>
 
 #include <pelib/AlgebraData.hpp>
 
+#if 01
+#define debug(var) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << endl;
+#else
+#define debug(var)
+#endif
+
+using namespace std;
+
 namespace pelib
 {
-	AlgebraData::AlgebraData(const std::string name)
+	AlgebraData::AlgebraData(const std::string name, precision prec)
 	{
 		this->name = name;
+		this->prec = prec;
 	}
 
-	AlgebraData::AlgebraData(const AlgebraData& data)
+	AlgebraData::AlgebraData(const AlgebraData& data, precision prec)
 	{
 		this->name = data.getName();
+		this->prec = prec;
 	}
 	
 	void
@@ -44,5 +55,71 @@ namespace pelib
 	AlgebraData::getName() const
 	{
 		return this->name;
+	}
+
+	AlgebraData::precision
+	AlgebraData::getPrecision() const
+	{
+		return this->prec;
+	}
+
+	template<>
+	float
+	AlgebraData::fixPrecision(const float &data, std::streamsize precision)
+	{
+		float val = data;
+		// Get the decimal part of our value
+		float integ = floorf(data);
+		float visible_dec = (data - integ) * powf(10, precision);
+
+		// If there is more digits after the part that will actually be visible, then
+		// we increment this digit
+		if(visible_dec != floorf(visible_dec))
+		{
+			visible_dec = 1 / powf(10, precision);
+			val += visible_dec;
+		}
+
+		return val;
+	}
+
+	template<>
+	double
+	AlgebraData::fixPrecision<double>(const double &data, std::streamsize precision)
+	{
+		double val = data;
+		// Get the decimal part of our value
+		double integ = floorf(data);
+		double visible_dec = (data - integ) * powf(10, precision);
+
+		// If there is more digits after the part that will actually be visible, then
+		// we increment this digit
+		if(visible_dec != floor(visible_dec))
+		{
+			visible_dec = 1 / pow(10, precision);
+			val += visible_dec;
+		}
+
+		return data;
+	}
+
+	template<>
+	long double
+	AlgebraData::fixPrecision<long double>(const long double &data, std::streamsize precision)
+	{
+		long double val = data;
+		// Get the decimal part of our value
+		long double integ = floorf(data);
+		long double visible_dec = (data - integ) * powf(10, precision);
+
+		// If there is more digits after the part that will actually be visible, then
+		// we increment this digit
+		if(visible_dec != floorl(visible_dec))
+		{
+			visible_dec = 1 / powl(10, precision);
+			val += visible_dec;
+		}
+
+		return data;
 	}
 }
