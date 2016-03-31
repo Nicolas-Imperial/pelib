@@ -26,6 +26,7 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 
+#include <pelib/PelibException.hpp>
 #include <pelib/AlgebraData.hpp>
 
 #ifndef PELIB_VECTOR
