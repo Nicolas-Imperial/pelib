@@ -40,13 +40,13 @@ namespace pelib
 	{
 		public:
 			/** Constructor: associates a single value to a string name **/
-			Scalar(const std::string name, const Value value) : AlgebraData(name)
+			Scalar(const std::string name, const Value value, precision prec = leave) : AlgebraData(name, prec)
 			{
 				this->value = value;
 			}
 
 			/** Copy constructor **/
-			Scalar(const Scalar<Value>* scalar) : AlgebraData(scalar->getName())
+			Scalar(const Scalar<Value>* scalar) : AlgebraData(scalar->getName(), scalar->getPrecision())
 			{
 				// Do nothing
 			}
@@ -56,7 +56,7 @@ namespace pelib
 			Scalar*
 			clone() const
 			{
-				return new Scalar<Value>(name, value);
+				return new Scalar<Value>(name, value, prec);
 			}
 
 			/** Return the value associated to this instance **/

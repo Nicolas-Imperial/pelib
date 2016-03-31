@@ -419,7 +419,7 @@ lib_pelib-schedule_pkg_cxxflags =
 lib_pelib-schedule_pkg_description = General research utility library used in PELAB
 lib_pelib-schedule_embed = 
 
-libcxx_pelib_src = $(if $(filter text,$(packages)),$(text_src)) argument_parsing.cpp dl.cpp
+libcxx_pelib_src = #$(if $(filter text,$(packages)),$(text_src)) argument_parsing.cpp dl.cpp
 libcc_pelib_src = $(if $(filter cstruct,$(packages)),$(cstruct_src)) time.c
 lib_pelib_libs = -lboost_regex -lboost_graph -lexpat
 lib_pelib_export = $(lib_pelib_embed) $(libcxx_pelib_src) $(libcc_pelib_src)

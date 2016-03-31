@@ -51,9 +51,11 @@ pelib_parse(std::istream& cin, size_t argc, char **argv)
 	AmplOutput ampl_output(AmplOutput::intFloatHandlers());
 	AmplInput ai(AmplInput::floatHandlers());
 
+/*
 	std::cout << std::setprecision(6)
 		<< std::setiosflags(std::ios::fixed)
 		<< std::setiosflags(std::ios::showpoint);
+*/
 
 	Algebra data = ai.parse(cin);
 	const Matrix<int, int, float> *taskworkcomm = data.find<Matrix<int, int, float> >("taskworkcomm");

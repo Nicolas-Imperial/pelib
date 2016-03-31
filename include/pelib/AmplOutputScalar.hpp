@@ -98,7 +98,13 @@ namespace pelib
 				const Scalar<Value> *scalar = dynamic_cast<const Scalar<Value>* >(data);
 				if(scalar == NULL) throw CastException("parameter \"data\" was not of type \"Scalar<Value>\".");
 
-				stream << scalar->getName() << " = " << scalar->getValue() << std::endl;
+				Value val = scalar->getValue();
+				if(scalar->getPrecision() == AlgebraData::higher)
+				{
+					val = AlgebraData::fixPrecision(val, stream.precision());
+				}
+
+				stream << scalar->getName() << " = " << val << std::endl;
 			}
 	
 		protected:

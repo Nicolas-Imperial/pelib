@@ -595,7 +595,6 @@ namespace pelib
 			i->second = 0;
 		}
 
-		std::cout << std::setprecision(10);
 		for(map<int, map<int, float> >::const_iterator i = map_sched.begin(); i != map_sched.end(); i++)
 		{
 			double mystart = 0;

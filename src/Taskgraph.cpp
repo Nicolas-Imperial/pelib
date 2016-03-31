@@ -35,7 +35,7 @@
 #undef debug
 #endif
 
-#if 0
+#if 01
 #define debug(var) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << endl;
 #else
 #define debug(var)
@@ -289,7 +289,7 @@ namespace pelib
 		Matrix<int, int, float> e("e", map_e);
 		Matrix<int, int, float> c("c", map_c);
 
-		Scalar<float> M("M", getDeadline(arch));
+		Scalar<float> M("M", getDeadline(arch), AlgebraData::higher);
 
 		out.insert(&n);
 		out.insert(&name);
