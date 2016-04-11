@@ -26,6 +26,8 @@
 #ifndef PELIB_AMPLOUTPUTVECTOR
 #define PELIB_AMPLOUTPUTVECTOR
 
+#define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << (var) << "\"" << std::endl;
+
 namespace pelib
 {
 	/** Parser and output class in AMPL output format for pelib algebraic Vector data structure **/
@@ -167,4 +169,5 @@ namespace pelib
 	};
 }
 
+#undef debug
 #endif

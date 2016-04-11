@@ -118,15 +118,15 @@ namespace pelib
 #if TRACE
 						std::cerr << "So we are asking for a decimal conversion" << std::endl;
 #endif
-						try
+						// let's try to parse against a fixed-point value
+						//match("[-+]?\\d+\\.\\d+", element);
+						boost::cmatch match;
+						if(!boost::regex_match(element.c_str(), match, boost::regex("[-+]?\\d+\\.\\d+")))
 						{
-							// let's try to parse against a fixed-point value
-							match("[-+]?\\d+\\.\\d+", element);
 #if TRACE
-							std::cerr << "\"" << element << "\" passed the fixed-point format matching" << std::endl;
+							// This should bin in the else clause
+							//std::cerr << "\"" << element << "\" passed the fixed-point format matching" << std::endl;
 #endif
-						} catch(ParseException &e)
-						{
 							// OK so it doesn't parse a fixed-point notation
 							// Then I suppose it was a scientific notation; let's see if it indeed denotes a decimal digit
 							double val;
@@ -178,11 +178,10 @@ namespace pelib
 #if TRACE
 						std::cerr << "So we are asking for a integer conversion" << std::endl;
 #endif
-						try
-						{
-							// let's try to parse against a fixed-point value
-							match("[+-]?\\d+\\.\\d+", element);
-						} catch(ParseException &e)
+						// let's try to parse against a fixed-point value
+						//match("[+-]?\\d+\\.\\d+", element);
+						boost::cmatch match;
+						if(!boost::regex_match(element.c_str(), match, boost::regex("[+-]?\\d+\\.\\d+")))
 						{
 #if TRACE
 							std::cerr << "It is not fixed-point format, good" << std::endl;
@@ -277,10 +276,14 @@ namespace pelib
 				return out;
 			}
 
+			// This is causing too much problem, probably due to a bug in boost::regex, even when inlining
+			// Inline manually instead
+#if 0
 			/** Returns all matches of regex found in str **/
-			static
+			static inline
 			boost::cmatch
 			match(std::string regex, std::string str);
+#endif
 
 			/** Returns a boost regular expression that extracts all data in the text to parse, that is stored in the corresponding data structure produced, such as its name or its values. **/
 			virtual

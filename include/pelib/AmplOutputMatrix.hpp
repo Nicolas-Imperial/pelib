@@ -91,6 +91,7 @@ namespace pelib
 				{
 					throw ParseException(std::string("String \"").append(str).append("\" doesn't match regex \"").append(getDetailedPattern()).append("\". "));
 				}
+
 				std::string indexes = match[2];
 				std::string remain = match[3];
 

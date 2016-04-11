@@ -31,6 +31,9 @@
 
 namespace pelib
 {
+	// This is causing too much problem, probably due to a bug in boost::regex, even when inlining
+	// Inline manually instead
+	#if 0
 	boost::cmatch
 	AlgebraDataParser::match(std::string regex, std::string str)
 	{
@@ -48,4 +51,5 @@ namespace pelib
 			throw ParseException(std::string("String \"").append(str).append("\" doesn't match regex \"").append(regex).append("\". "));
 		}
 	}
+	#endif
 }
