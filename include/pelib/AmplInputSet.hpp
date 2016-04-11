@@ -24,10 +24,10 @@
 #include <pelib/Set.hpp>
 #include <pelib/CastException.hpp>
 
-#define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << (var) << "\"" << std::endl;
-
 #ifndef PELIB_AMPLINPUTSET
 #define PELIB_AMPLINPUTSET
+
+#define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << (var) << "\"" << std::endl;
 
 namespace pelib
 {
@@ -63,9 +63,16 @@ namespace pelib
 			parse(std::istream &in)
 			{
 				SetType values;
-				
 				std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-				boost::cmatch match = AlgebraDataParser::match(getDetailedPattern(), str);
+
+				// TODO: investigate why using AlgebraDataParser results in random results
+				boost::cmatch match;
+				if(!boost::regex_match(str.c_str(), match, boost::regex(getDetailedPattern())))
+				{
+					throw ParseException(std::string("String \"").append(str).append("\" doesn't match regex \"").append(getDetailedPattern()).append("\". "));
+				}
+				//boost::cmatch match(AlgebraDataParser::match(getDetailedPattern(), str));
+				//boost::cmatch match = AlgebraDataParser::match(getDetailedPattern(), str);
 				
 				boost::regex param_set("\\s*([^\\s]+)");
 				std::string keystr = match[2];
@@ -180,4 +187,5 @@ namespace pelib
 	};
 }
 
+#undef debug
 #endif

@@ -27,6 +27,8 @@
 
 #include <pelib/AlgebraDataParser.hpp>
 
+#define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << (var) << "\"" << std::endl;
+
 namespace pelib
 {
 	boost::cmatch

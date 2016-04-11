@@ -172,17 +172,14 @@ namespace pelib
 	Platform::Platform(const Algebra &arch)
 	{
 		const Scalar<float> *scalar_p = arch.find<Scalar<float> >("p");
+		const Scalar<float> *scalar_fin = arch.find<Scalar<float> >("Fin");
 		const Scalar<float> *f_unit = arch.find<Scalar<float> >("Funit");
 		const Set<float> *set_F = arch.find<Set<float> >("F");
 		const Set<float> *set_Fi = arch.find<Set<float> >("Fi");
 
-		for(map<string, const AlgebraData* const>::const_iterator i = arch.getAllRecords().begin(); i != arch.getAllRecords().end(); i++)
+		if(scalar_p == NULL || set_F == NULL || f_unit == NULL || set_Fi == NULL || scalar_fin == NULL)
 		{
-		}
-
-		if(scalar_p == NULL || set_F == NULL)
-		{
-			throw ParseException(std::string("Missing core number scalar \"p\" or frequency set \"F\" in input."));
+			throw ParseException(std::string("Missing core number scalar \"p\", frequency set \"F\", frequency unit \"Funit\" or frequency islands number \"Fin\" and details set \"Fi[1..Fin]\" in input."));
 		}
 
 		// Create empty frequency islands, if a description is given

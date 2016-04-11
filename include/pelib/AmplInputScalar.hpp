@@ -28,6 +28,8 @@
 #ifndef PELIB_AMPLINPUTSCALAR
 #define PELIB_AMPLINPUTSCALAR
 
+#define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << (var) << "\"" << std::endl;
+
 namespace pelib
 {
 	/** Base class for a parser or output class of a scalar in AMPL input data format **/
@@ -58,8 +60,13 @@ namespace pelib
 			parse(std::istream &in)
 			{
 				std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-
 				boost::cmatch match;
+				// TODO: Investigate why regex doesn't return correct string when called in AlgebraDataParser
+				if(!boost::regex_match(str.c_str(), match, boost::regex(getDetailedPattern())))
+				{
+					throw ParseException(std::string("String \"").append(str).append("\" doesn't match regex \"").append(getDetailedPattern()).append("\". "));
+				}
+				/*
 				try
 				{
 					match = AlgebraDataParser::match(getDetailedPattern(), str);
@@ -69,6 +76,7 @@ namespace pelib
 					ss << e.getValue();
 					throw ParseException(std::string("Asked a decimal conversion, but \"").append(ss.str()).append("\" is integer."));
 				}
+				*/
 
 				std::string match1 = match[1];
 				std::string match2 = match[2];
@@ -114,4 +122,5 @@ namespace pelib
 	};
 }
 
+#undef debug
 #endif
