@@ -27,15 +27,7 @@
 #ifndef PELIB_AMPLINPUTSCALAR
 #define PELIB_AMPLINPUTSCALAR
 
-<<<<<<< HEAD
 #define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << (var) << "\"" << std::endl;
-=======
-#if 01
-#define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << std::endl;
-#else
-#define debug(var)
-#endif
->>>>>>> 43a2cf2bff724f0fad09fdac490cedf850a4451b
 
 namespace pelib
 {
@@ -77,7 +69,7 @@ namespace pelib
 				try
 				{
 					match = AlgebraDataParser::match(getDetailedPattern(), str);
-				} catch(NoDecimalFloatException &e)
+	} catch(NoDecimalFloatException &e)
 				{
 					std::ostringstream ss;
 					ss << e.getValue();

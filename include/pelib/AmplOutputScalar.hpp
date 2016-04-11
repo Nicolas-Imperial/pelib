@@ -76,6 +76,10 @@ namespace pelib
 				std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
 
 				boost::cmatch match;
+				if(!boost::regex_match(str.c_str(), match, boost::regex(std::string("(?:.*?)").append(getDetailedPattern()))))
+				{
+					throw ParseException(std::string("String \"").append(str).append("\" doesn't match regex \"").append(getDetailedPattern()).append("\". "));
+				}/*
 				try
 				{
 					match = AlgebraDataParser::match(std::string("(?:.*?)").append(getDetailedPattern()), str);
@@ -84,7 +88,7 @@ namespace pelib
 					std::ostringstream ss;
 					ss << e.getValue();
 					throw ParseException(std::string("Asked a decimal conversion, but \"").append(ss.str()).append("\" is integer."));
-				}
+				}*/
 
 				Scalar<Value> *scalar = new Scalar<Value>(match[1], AlgebraDataParser::convert<Value>(match[2], strict));
 				return scalar;
