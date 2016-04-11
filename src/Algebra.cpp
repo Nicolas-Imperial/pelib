@@ -145,4 +145,19 @@ namespace pelib
 			records.erase(erase);
 		}
 	}
+
+	Algebra
+	Algebra::filter(const set<string> &list) const
+	{
+		Algebra copy;
+		for(std::map<std::string, const AlgebraData * const>::const_iterator i = this->records.begin(); i != this->records.end(); i++)
+		{
+			if(list.find(i->first) != list.end())
+			{
+				copy.insert(i->second->clone());
+			}
+		}
+
+		return copy;
+	}
 }

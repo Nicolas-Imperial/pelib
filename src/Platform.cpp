@@ -100,8 +100,10 @@ namespace pelib
 		//this->shared.insert(shared);
 	}
 
-	Platform::Platform(const Platform *arch)
+	void
+	Platform::copy(const Platform *arch)
 	{
+		this->cores.clear();
 		for(set<const Core*>::const_iterator i = arch->getCores().begin(); i != arch->getCores().end(); i++)
 		{
 			this->cores.insert((*i)->clone());
@@ -167,6 +169,16 @@ namespace pelib
 
 			this->freq.insert(island);
 		}
+	}
+
+	Platform::Platform(const Platform *arch)
+	{
+		copy(arch);
+	}
+
+	Platform::Platform(const Platform &pt)
+	{
+		copy(&pt);
 	}
 
 	Platform::Platform(const Algebra &arch)
@@ -501,5 +513,17 @@ namespace pelib
 		}
 
 		throw CastException("Cannot find core in any Platform::island of the platform.");
+	}
+
+	Platform&
+	Platform::operator=(const Platform& cpy)
+	{
+		for(set<const Core*>::const_iterator i = this->getCores().begin(); i != this->getCores().end(); i++)
+		{
+			delete *i;
+		}
+
+		copy(&cpy);
+		return *this;
 	}
 }

@@ -62,6 +62,9 @@ namespace pelib
 			/** Copy constructor **/
 			Platform(const Platform *arch);
 
+			/** Copy constructor **/
+			Platform(const Platform &arch);
+
 			/** Constructor
 				@param arch Algebraic representation of a platform: Scalar p is the number of cores, set F is the set of frequency each core can run at. Each core is its own shared memory, main memory, private memory, voltage and frequency island
 			**/
@@ -118,12 +121,15 @@ namespace pelib
 
 			/** Destructor **/
 			virtual	~Platform();
+			virtual Platform&
+			operator=(const Platform& copy);
 		protected:
 			/** Collection of cores **/
 			std::set<const Core*> cores;
 			/** Islands **/
 			std::set<island> shared, main, priv, voltage, freq;
 		private:		
+			void copy(const Platform *pt);
 	};
 }
 

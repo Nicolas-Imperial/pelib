@@ -92,6 +92,23 @@ parse_args(char** argv)
 			string cmd = string("ls $(dirname $(realpath $(which ").append(self).append(")))/../share/pelib/pelib-*.tar.gz | sort -rV | head -1 | xargs realpath");
 			exit(system(cmd.c_str()));
 		}
+
+		if(string(*argv).compare("--seed") == 0)
+		{
+			argv++;
+			size_t seed;
+			if(string(*argv).compare("--random") == 0)
+			{
+				seed = (size_t)time(NULL);
+			}
+			else
+			{
+				stringstream str(argv[0]);
+				str >> seed;
+			}
+			srand(seed);
+		}
+
 	}
 
 	return conversion;
