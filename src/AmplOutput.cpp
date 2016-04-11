@@ -37,13 +37,11 @@
 #include <pelib/CastException.hpp>
 #include <pelib/PelibException.hpp>
 
-#ifndef debug
-#if 0
+#ifdef debug
+#undef debug
+#endif
+
 #define debug(var) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << endl;
-#else
-#define debug(var)
-#endif
-#endif
 
 using namespace std;
 using namespace boost::algorithm;
@@ -140,7 +138,11 @@ namespace pelib
 							.append(parser->getGlobalPattern())
 							.append(")(?:\\s*)");
 						
-						boost::cmatch match = AlgebraDataParser::match(regex, line);
+						boost::cmatch match; // = AlgebraDataParser::match(regex, line);
+						if(!boost::regex_match(line.c_str(), match, boost::regex(regex)))
+						{
+							throw ParseException(std::string("String \"").append(line).append("\" doesn't match regex \"").append(regex).append("\". "));
+						}
 
 						std::stringstream token;
 						token.str(match[2]);
@@ -180,7 +182,12 @@ namespace pelib
 								.append(parser->getGlobalPattern())
 								.append(")(?:\\s*)");
 							
-							boost::cmatch match = AlgebraDataParser::match(regex, line);
+							boost::cmatch match; // = AlgebraDataParser::match(regex, line);
+							if(!boost::regex_match(line.c_str(), match, boost::regex(regex)))
+							{
+								throw ParseException(std::string("String \"").append(line).append("\" doesn't match regex \"").append(regex).append("\". "));
+							}
+				
 
 							std::stringstream token;
 							token.str(match[2]);

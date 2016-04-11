@@ -68,7 +68,11 @@ namespace pelib
 				VectorType values;
 				
 				std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-				boost::cmatch match = AlgebraDataParser::match(getDetailedPattern(), str);
+				boost::cmatch match; // = AlgebraDataParser::match(getDetailedPattern(), str);
+				if(!boost::regex_match(str.c_str(), match, boost::regex(getDetailedPattern())))
+				{
+					throw ParseException(std::string("String \"").append(str).append("\" doesn't match regex \"").append(getDetailedPattern()).append("\". "));
+				}
 				
 				boost::regex param_vector("(?:\\s*([^\\s]+)\\s+([^\\s]+))");
 				std::string remain = match[2];
