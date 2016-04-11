@@ -26,6 +26,7 @@
 #include <boost/regex.hpp>
 #include <iomanip>
 #include <map>
+#include <set>
 
 #include <pelib/AlgebraData.hpp>
 #include <pelib/Record.hpp>
@@ -118,6 +119,9 @@ namespace pelib
 					return NULL;
 				}
 			}
+
+			/** Removes all records whose name does not appear in the list **/
+			Algebra filter(const std::set<std::string> &list) const;
 
 			/** Does nothing at all **/
 			void insert(const Data *data) {}

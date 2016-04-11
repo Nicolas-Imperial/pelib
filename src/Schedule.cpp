@@ -21,9 +21,6 @@
 #include <set>
 #include <string>
 
-#include <pelib/AmplOutput.hpp>
-#include <pelib/AmplInputVector.hpp>
-
 #include <pelib/Schedule.hpp>
 #include <pelib/Scalar.hpp>
 #include <pelib/Vector.hpp>
@@ -122,7 +119,7 @@ namespace pelib
 	
 		if(start == NULL || tau == NULL || wi == NULL || sched == NULL || freq == NULL || task_name == NULL)
 		{
-			throw CastException("Missing some input data structure instance. Check start, tau, wi, sched, freq and name.");
+			throw CastException("Missing some input data structure instance. Check start, Tau, wi, schedule, frequency and name.");
 		}
 		else
 		{
@@ -595,7 +592,6 @@ namespace pelib
 			i->second = 0;
 		}
 
-		std::cout << std::setprecision(10);
 		for(map<int, map<int, float> >::const_iterator i = map_sched.begin(); i != map_sched.end(); i++)
 		{
 			double mystart = 0;

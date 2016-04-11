@@ -24,11 +24,18 @@
 #include <pelib/CastException.hpp>
 #include <pelib/ParseException.hpp>
 #include <pelib/NoDecimalFloatException.hpp>
-
 #ifndef PELIB_AMPLINPUTSCALAR
 #define PELIB_AMPLINPUTSCALAR
 
+<<<<<<< HEAD
 #define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << (var) << "\"" << std::endl;
+=======
+#if 01
+#define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << std::endl;
+#else
+#define debug(var)
+#endif
+>>>>>>> 43a2cf2bff724f0fad09fdac490cedf850a4451b
 
 namespace pelib
 {
@@ -96,7 +103,13 @@ namespace pelib
 				const Scalar<Value> *scalar = dynamic_cast<const Scalar<Value>* >(data);
 				if(scalar == NULL) throw CastException("parameter \"data\" was not of type \"Scalar<Value>\".");
 
-				stream << "param " << scalar->getName() << " := " << scalar->getValue() << ";" << std::endl;
+				Value val = scalar->getValue();
+				if(scalar->getPrecision() == AlgebraData::higher)
+				{
+					val = AlgebraData::fixPrecision(val, stream.precision());
+				}
+
+				stream << "param " << scalar->getName() << " := " << val << ";" << std::endl;
 			}
 
 			/** Matches a data structure written in AMPL input data format and extract its name and content **/

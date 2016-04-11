@@ -92,6 +92,23 @@ parse_args(char** argv)
 			string cmd = string("ls $(dirname $(realpath $(which ").append(self).append(")))/../share/pelib/pelib-*.tar.gz | sort -rV | head -1 | xargs realpath");
 			exit(system(cmd.c_str()));
 		}
+
+		if(string(*argv).compare("--seed") == 0)
+		{
+			argv++;
+			size_t seed;
+			if(string(*argv).compare("--random") == 0)
+			{
+				seed = (size_t)time(NULL);
+			}
+			else
+			{
+				stringstream str(argv[0]);
+				str >> seed;
+			}
+			srand(seed);
+		}
+
 	}
 
 	return conversion;
@@ -107,7 +124,7 @@ main(int argc, char **argv)
 
 	conversion_t conversion = parse_args(argv);
 
-	size_t counter = 0;
+	size_t counter = 1;
 	for(vector<pelib_argument_stream_t>::const_iterator i = conversion.inputs.begin(); i != conversion.inputs.end(); i++, counter++)
 	{
 		/* Load functions from shared libraries */
@@ -218,7 +235,7 @@ main(int argc, char **argv)
 		}
 	}
 
-	counter = 0;
+	counter = 1;
 	for(vector<pelib_argument_stream_t>::const_iterator i = conversion.outputs.begin(); i != conversion.outputs.end() && inputs.size() > 0; i++, counter++)
 	{
 		/* Load functions from shared libraries */
@@ -229,7 +246,7 @@ main(int argc, char **argv)
 		}
 		else
 		{
-			cerr << "[WARNING] No parser library specified for output #" << counter << ". Skipping." << endl;
+			cerr << "[WARNING] No output library specified for output #" << counter << ". Skipping." << endl;
 			continue;
 		}
 
