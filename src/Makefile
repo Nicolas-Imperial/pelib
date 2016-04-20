@@ -51,6 +51,8 @@ include Makefile.in
 ## Make all targets called dependent on some action to be run beforehand
 $(TARGETS): $(FIRST)
 
+REBUILD_UPON_CHANGE = #Makefile Makefile.in
+
 ####################################################################
 ##### Here begin the region you really don't want to mess with #####
 ####################################################################
@@ -292,7 +294,7 @@ test_list = $(testcc_list) $(testcxx_list)
 all: submake-all $(bin_list) $(lib_pkgconfig)
 
 ## Force rebuild upon Makefile update
-(cc_object) $(cxx_object) $(embed_object) $(bin_list) $(lib_list) $(shared_list) $(shared_linkername) $(shared_soname) $(lib_pkgconfig) $(drake_schedule_src) $(drake_schedule_text) $(drake_taskgraph_text)): Makefile Makefile.in
+(cc_object) $(cxx_object) $(embed_object) $(bin_list) $(lib_list) $(shared_list) $(shared_linkername) $(shared_soname) $(lib_pkgconfig) $(drake_schedule_src) $(drake_schedule_text) $(drake_taskgraph_text)): $(REBUILD_UPON_CHANGE)
 
 $(drake_taskgraph_text): $$(if $$(call $$(patsubst %.$(drake_schedule).$(drake_schedule_extension),%,$$@)_platform),$$(if $$($$(call $$(patsubst %.$(drake_schedule).$(drake_schedule_extension),%,$$@)_schedule)),,FORCE),$$(call drake_$$(patsubst %.$(drake_schedule).$(drake_schedule_extension),%,$$@)_platform)) $$(firstword $$(foreach type,cc cxx,$$(if $$(call $$(patsubst %$$(type).$(drake_schedule).$(drake_schedule_extension),%,$$@)_taskgraph),$$(if $$($$(call $$(patsubst %.$(drake_schedule).$(drake_schedule_extension),%,$$@)_schedule)),,FORCE),$$(call drake_$$(patsubst %$$(type).$(drake_schedule).$(drake_schedule_extension),%,$$@)_taskgraph))))
 $(drake_schedule_text): $$(if $$(call $$(patsubst %.$(drake_schedule).$(drake_schedule_extension),%,$$@)_platform),$$(if $$($$(call $$(patsubst %.$(drake_schedule).$(drake_schedule_extension),%,$$@)_schedule)),,FORCE),$$(call drake_$$(patsubst %.$(drake_schedule).$(drake_schedule_extension),%,$$@)_platform)) $$(firstword $$(foreach type,cc cxx,$$(if $$(call $$(patsubst %$$(type).$(drake_schedule).$(drake_schedule_extension),%,$$@)_taskgraph),$$(if $$($$(call $$(patsubst %.$(drake_schedule).$(drake_schedule_extension),%,$$@)_schedule)),,FORCE),$$(call drake_$$(patsubst %$$(type).$(drake_schedule).$(drake_schedule_extension),%,$$@)_taskgraph))))
