@@ -27,7 +27,6 @@
 extern "C"{
 #include <igraph.h>
 }
-#include <cairommconfig.h>
 #include <cairomm/context.h>
 #include <cairomm/surface.h>
 #include <cmath>

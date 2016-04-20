@@ -199,7 +199,7 @@ namespace pelib
 		if(set_Fi != NULL)
 		{
 			Set<float>::SetOfSetsType Fi = set_Fi->getSubsets();
-			for(typename Set<float>::SetOfSetsType::iterator i = Fi.begin(); i != Fi.end(); i++)
+			for(Set<float>::SetOfSetsType::iterator i = Fi.begin(); i != Fi.end(); i++)
 			{
 				frequency.push_back(set<const Core*>());
 			}
@@ -223,7 +223,7 @@ namespace pelib
 
 				// Find the frequency island that holds this core
 				Set<float>::SetOfSetsType Fi = set_Fi->getSubsets();
-				for(typename Set<float>::SetOfSetsType::iterator j = Fi.begin(); j != Fi.end(); j++)
+				for(Set<float>::SetOfSetsType::iterator j = Fi.begin(); j != Fi.end(); j++)
 				{
 					if(j->second.find(core_id) != j->second.end())
 					{
