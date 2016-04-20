@@ -26,11 +26,12 @@ export
 ## Fills configure directory variables with default values if necessary and define environment variables
 final_prefix=$(if $(prefix),$(prefix),$(HOME)/.local)
 final_libdir=$(if $(libdir),$(libdir),$(prefix)/lib)
+final_sharedir=$(if $(libdir),$(libdir),$(prefix)/share/$(package))
 final_includedir=$(if $(includedir),$(includedir),$(prefix)/include)
 final_bindir=$(if $(bindir),$(bindir),$(prefix)/bin)
 
 export LIBRARY_PATH := $(LIBRARY_PATH):$(final_libdir)
-export LD_LIBRARY_PATH := $(LD_LIBRARY_PATH):$(final_libdir)
+export LD_RUN_PATH := $(LD_RUN_PATH):$(final_libdir)
 export PKG_CONFIG_PATH := $(PKG_CONFIG_PATH):$(final_libdir)/pkgconfig
 export C_INCLUDE_PATH := $(C_INCLUDE_PATH):$(final_includedir)
 export CPLUS_INCLUDE_PATH := $(CPLUS_INCLUDE_PATH):$(final_includedir)
@@ -51,7 +52,8 @@ include Makefile.in
 ## Make all targets called dependent on some action to be run beforehand
 $(TARGETS): $(FIRST)
 
-REBUILD_UPON_CHANGE = #Makefile Makefile.in
+## Rebuild all project if any of the files in the list was modified since last build
+REBUILD_ON_UPDATE = Makefile Makefile.in
 
 ####################################################################
 ##### Here begin the region you really don't want to mess with #####
@@ -61,6 +63,8 @@ drake_schedule = schedule
 drake_schedule_extension = xml
 drake_taskgraph = taskgraph
 drake_taskgraph_extension = graphml
+
+shared_package = $(sort $(sharedcc_package) $(sharedcxx_package))
 
 ## Gives the longest prefix in the prefix list (all elements must have the same character at the same index, or no character at that index)
 define longest
@@ -294,7 +298,7 @@ test_list = $(testcc_list) $(testcxx_list)
 all: submake-all $(bin_list) $(lib_pkgconfig)
 
 ## Force rebuild upon Makefile update
-(cc_object) $(cxx_object) $(embed_object) $(bin_list) $(lib_list) $(shared_list) $(shared_linkername) $(shared_soname) $(lib_pkgconfig) $(drake_schedule_src) $(drake_schedule_text) $(drake_taskgraph_text)): $(REBUILD_UPON_CHANGE)
+(cc_object) $(cxx_object) $(embed_object) $(bin_list) $(lib_list) $(shared_list) $(shared_linkername) $(shared_soname) $(lib_pkgconfig) $(drake_schedule_src) $(drake_schedule_text) $(drake_taskgraph_text)): $(REBUILD_ON_UPDATE)
 
 $(drake_taskgraph_text): $$(if $$(call $$(patsubst %.$(drake_schedule).$(drake_schedule_extension),%,$$@)_platform),$$(if $$($$(call $$(patsubst %.$(drake_schedule).$(drake_schedule_extension),%,$$@)_schedule)),,FORCE),$$(call drake_$$(patsubst %.$(drake_schedule).$(drake_schedule_extension),%,$$@)_platform)) $$(firstword $$(foreach type,cc cxx,$$(if $$(call $$(patsubst %$$(type).$(drake_schedule).$(drake_schedule_extension),%,$$@)_taskgraph),$$(if $$($$(call $$(patsubst %.$(drake_schedule).$(drake_schedule_extension),%,$$@)_schedule)),,FORCE),$$(call drake_$$(patsubst %$$(type).$(drake_schedule).$(drake_schedule_extension),%,$$@)_taskgraph))))
 $(drake_schedule_text): $$(if $$(call $$(patsubst %.$(drake_schedule).$(drake_schedule_extension),%,$$@)_platform),$$(if $$($$(call $$(patsubst %.$(drake_schedule).$(drake_schedule_extension),%,$$@)_schedule)),,FORCE),$$(call drake_$$(patsubst %.$(drake_schedule).$(drake_schedule_extension),%,$$@)_platform)) $$(firstword $$(foreach type,cc cxx,$$(if $$(call $$(patsubst %$$(type).$(drake_schedule).$(drake_schedule_extension),%,$$@)_taskgraph),$$(if $$($$(call $$(patsubst %.$(drake_schedule).$(drake_schedule_extension),%,$$@)_schedule)),,FORCE),$$(call drake_$$(patsubst %$$(type).$(drake_schedule).$(drake_schedule_extension),%,$$@)_taskgraph))))
@@ -302,7 +306,7 @@ $(drake_schedule_text): $$(if $$(call $$(patsubst %.$(drake_schedule).$(drake_sc
 
 ## Generate drake schedules
 $(drake_schedule_src): $$(if $$(call $$(patsubst %.$(drake_schedule).$$(if $$(filter %.c,$$@),c,$$(if $$(filter %.cpp,$$@),cpp)),%,$$@)_platform),,$$(call drake_$$(patsubst %.$(drake_schedule).$$(if $$(filter %.c,$$@),c,$$(if $$(filter %.cpp,$$@),cpp)),%,$$@)_platform)) $$(if $$(call $$(patsubst %.$(drake_schedule).$$(if $$(filter %.c,$$@),c,$$(if $$(filter %.cpp,$$@),cpp)),%,$$@)_schedule),,$$(patsubst %.$(drake_schedule).$$(if $$(filter %.c,$$@),c,$$(if $$(filter %.cpp,$$@),cpp)),%,$$@).$(drake_schedule).$(drake_schedule_extension)) $$(if $$(call $$(patsubst %.$(drake_schedule).$$(if $$(filter %.c,$$@),c,$$(if $$(filter %.cpp,$$@),cpp)),%,$$@)$$(if $$(filter %.c,$$@),cc,$$(if $$(filter %.cpp,$$@),cxx))_taskgraph),,$$(patsubst %.$(drake_schedule).$$(if $$(filter %.c,$$@),c,$$(if $$(filter %.cpp,$$@),cxx)),%,$$@).$(drake_taskgraph).$(drake_taskgraph_extension)) $$(if $$(call $$(patsubst %.$(drake_schedule).$$(if $$(filter %.c,$$@),c,$$(if $$(filter %.cpp,$$@),cpp)),%,$$@)_platform),FORCE) $$(if $$(call $$(patsubst %.$(drake_schedule).$$(if $$(filter %.c,$$@),c,$$(if $$(filter %.cpp,$$@),cpp)),%,$$@)$$(if $$(filter %.c,$$@),cc,$$(if $$(filter %.cpp,$$@),cxx))_taskgraph),FORCE) $$(if $$(call $$(patsubst %.$(drake_schedule).$$(if $$(filter %.c,$$@),c,$$(if $$(filter %.cpp,$$@),cpp)),%,$$@)_schedule),FORCE)
-	pelib-convert --input --format platform-ampl_input --file $(if $(call $(patsubst %.$(drake_schedule).$(if $(filter %.c,$@),c,$(if $(filter %.cpp,$@),cpp)),%,$@)_platform),$(call $(patsubst %.$(drake_schedule).$(if $(filter %.c,$@),c,$(if $(filter %.cpp,$@),cpp)),%,$@)_platform),$(call drake_$(patsubst %.$(drake_schedule).$(if $(filter %.c,$@),c,$(if $(filter %.cpp,$@),cpp)),%,$@)_platform)) --input --format taskgraph-graphml --file $(call drake_graph,$(patsubst %.$(drake_schedule).$(if $(filter %.c,$@),c,$(if $(filter %.cpp,$@),cpp)),%,$@),$(if $(filter %.c,$@),cc,$(if $(filter %.cpp,$@),cxx))) --input --format schedule-xml --file $(if $(call $(patsubst %.$(drake_schedule).$(if $(filter %.c,$@),c,$(if $(filter %.cpp,$@),cpp)),%,$@)_schedule),$(call $(patsubst %.$(drake_schedule).$(if $(filter %.c,$@),c,$(if $(filter %.cpp,$@),cpp)),%,$@)_schedule),$(patsubst %.$(drake_schedule).$(if $(filter %.c,$@),c,$(if $(filter %.cpp,$@),cpp)),%,$@).$(drake_schedule).$(drake_schedule_extension)) --output --format schedule-drake --file $@
+	pelib-convert --input --lib platform-ampl_input --file $(if $(call $(patsubst %.$(drake_schedule).$(if $(filter %.c,$@),c,$(if $(filter %.cpp,$@),cpp)),%,$@)_platform),$(call $(patsubst %.$(drake_schedule).$(if $(filter %.c,$@),c,$(if $(filter %.cpp,$@),cpp)),%,$@)_platform),$(call drake_$(patsubst %.$(drake_schedule).$(if $(filter %.c,$@),c,$(if $(filter %.cpp,$@),cpp)),%,$@)_platform)) --input --lib taskgraph-graphml --file $(call drake_graph,$(patsubst %.$(drake_schedule).$(if $(filter %.c,$@),c,$(if $(filter %.cpp,$@),cpp)),%,$@),$(if $(filter %.c,$@),cc,$(if $(filter %.cpp,$@),cxx))) --input --lib schedule-xml --file $(if $(call $(patsubst %.$(drake_schedule).$(if $(filter %.c,$@),c,$(if $(filter %.cpp,$@),cpp)),%,$@)_schedule),$(call $(patsubst %.$(drake_schedule).$(if $(filter %.c,$@),c,$(if $(filter %.cpp,$@),cpp)),%,$@)_schedule),$(patsubst %.$(drake_schedule).$(if $(filter %.c,$@),c,$(if $(filter %.cpp,$@),cpp)),%,$@).$(drake_schedule).$(drake_schedule_extension)) --output --lib schedule-drake --file $@
 
 $(embed_object): $$(call embed_src,$$@)
 	$(LD) -r -b binary -o $@ $(patsubst %.o,%,$@)
