@@ -29,6 +29,7 @@ extern "C"{
 }
 #include <cairomm/context.h>
 #include <cairomm/surface.h>
+#include <sigc++/signal.h>
 #include <cmath>
 
 #include <pelib/Schedule.hpp>
