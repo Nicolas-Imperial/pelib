@@ -51,14 +51,16 @@ CXX_TEST_DEPS = $(CXX_DEPS)
 CXX_TEST_LDFLAGS =
 
 ## Enable shared and static libraries
-STATIC = 1
-SHARED = 1
+CORE++_STATIC = 0
+CORE++_SHARED = 1
+core++_extra = 
 
-## Enable text structure handling and c structure projects
-packages = text cstruct
+CORE_STATIC = 1
+CORE_SHARED = 1
+core_extra = 
 
 ## Packages source files
-text_src = PelibException.cpp ParseException.cpp CastException.cpp NoDecimalFloatException.cpp Record.cpp \
+core++_src = PelibException.cpp ParseException.cpp CastException.cpp NoDecimalFloatException.cpp Record.cpp \
 Data.cpp AlgebraData.cpp Algebra.cpp \
 AlgebraParser.cpp DataParser.cpp AlgebraDataParser.cpp \
 AlgebraOutput.cpp DataOutput.cpp AlgebraDataOutput.cpp \
@@ -78,9 +80,10 @@ RecordParser.cpp \
 DrakeCSchedule.cpp \
 \
 Solver.cpp AmplSolver.cpp \
-exprtk.cpp
+exprtk.cpp \
+argument_parsing.cpp dl.cpp
  
-cstruct_src = sort.c complex.c float.c integer.c monitor.c size_t.c pelib_string.c malloc.c
+core_src = sort.c complex.c float.c integer.c monitor.c size_t.c pelib_string.c malloc.c
 
 ## executables
 bincxx_project = pelib-convert demo run_record amplmatrixtoraw
@@ -130,25 +133,26 @@ bin_amplmatrixtoraw_static = 0
 ## Cpp format classes: base class, data structure base class, output data structure classes; no parser because of lack of cpp parser base class
 
 ## dynamic library packages and their sources
-sharedcxx_project = pelib-platform-ampl_input pelib-platform-ampl_output pelib-taskgraph-graphml pelib-taskgraph-streamit pelib-taskgraph-ampl_input pelib-taskgraph-ampl_output pelib-schedule-xml pelib-schedule-tetris pelib-schedule-drake pelib-schedule-ampl_input pelib-schedule-ampl_output pelib-ampl_input pelib-ampl_output pelib-schedule pelib-solve pelib-ampl
-sharedcxx_package = $(if $(filter 1,$(SHARED)),pelib $(if $(filter text,$(packages)),$(sharedcxx_project)),$(if $(filter 1,$(STATIC)),$(if $(filter text,$(packages)),$(sharedcxx_project))))
+core++ = pelib-core++ pelib-platform-ampl_input pelib-platform-ampl_output pelib-taskgraph-graphml pelib-taskgraph-streamit pelib-taskgraph-ampl_input pelib-taskgraph-ampl_output pelib-schedule-xml pelib-schedule-tetris pelib-schedule-drake pelib-schedule-ampl_input pelib-schedule-ampl_output pelib-ampl_input pelib-ampl_output pelib-schedule pelib-solve pelib-ampl
+sharedcxx_package = $(if $(filter 1,$(CORE++_SHARED)),$(core++))
+sharedcc_package = $(if $(filter 1,$(CORE_SHARED)),pelib-core)
 
-sharedcxx_pelib_src = $(if $(filter text,$(packages)),$(text_src)) argument_parsing.cpp dl.cpp
-sharedcc_pelib_src = $(if $(filter cstruct,$(packages)),$(cstruct_src)) time.c
-shared_pelib_export = $(sharedcxx_pelib_embed) $(sharedcxx_pelib_src)
-shared_pelib_libs = -lboost_regex -lboost_graph -lexpat
-shared_pelib_ldflags = -pthread
-shared_pelib_cxxflags = -fPIC
-shared_pelib_deps =
-shared_pelib_pkg = igraph libxml++-2.6 cairomm-1.0
-shared_pelib_pkg_url = http://www.ida.liu.se/~nicme26
-shared_pelib_pkg_ld = 
-shared_pelib_pkg_libs = -lm
-shared_pelib_pkg_igraph_version = >= 0.7.1
-shared_pelib_pkg_requires = 
-shared_pelib_pkg_requires_igraph_version = >= 0.7.1
-shared_pelib_pkg_description = General research utility library used in PELAB
-shared_pelib_embed = 
+sharedcxx_pelib-core++_src = $(core++_src)
+sharedcc_pelib-core++_src = time.c $(if $(filter core,$(core++_extra)),$(core_src))
+shared_pelib-core++_export = $(sharedcxx_pelib-core++_embed) $(sharedcc_pelib-core++_src) time.c
+shared_pelib-core++_libs = -lboost_regex -lboost_graph -lexpat
+shared_pelib-core++_ldflags = -pthread
+shared_pelib-core++_cxxflags = -fPIC
+shared_pelib-core++_deps =
+shared_pelib-core++_pkg = igraph libxml++-2.6 cairomm-1.0
+shared_pelib-core++_pkg_url = http://www.ida.liu.se/~nicme26
+shared_pelib-core++_pkg_ld = 
+shared_pelib-core++_pkg_libs = -lm
+shared_pelib-core++_pkg_igraph_version = >= 0.7.1
+shared_pelib-core++_pkg_requires = 
+shared_pelib-core++_pkg_requires_igraph_version = >= 0.7.1
+shared_pelib-core++_pkg_description = General research utility library used in PELAB
+shared_pelib-core++_embed = 
 
 sharedcxx_pelib-platform-ampl_input_src = platform-ampl_input.cpp
 shared_pelib-platform-ampl_input_export = $(sharedcxx_pelib-platform-ampl_input_embed) $(sharedcxx_pelib-platform-ampl_input_src)
@@ -374,65 +378,38 @@ shared_pelib-ampl_pkg_description = Platform parser and output in AMPL input for
 shared_pelib-ampl_embed = 
 
 ## static library packages and their sources
-lib_package = $(if $(filter 1,$(STATIC)),pelib) pelib-schedule pelib-solve pelib-ampl
+lib_package = $(if $(filter 1,$(CORE++_STATIC)),$(core++)) $(if $(filter 1,$(CORE_STATIC)), pelib-core)
 
-libcxx_pelib-ampl_src = ampl.cpp
-lib_pelib-ampl_export = $(libcxx_pelib-ampl_embed) $(libcxx_pelib-ampl_src)
-lib_pelib-ampl_libs = 
-lib_pelib-ampl_ldflags = 
-lib_pelib-ampl_deps = 
-lib_pelib-ampl_pkg = igraph pelib
-lib_pelib-ampl_pkg_igraph_version = >= 0.7.1
-lib_pelib-ampl_pkg_url = http://www.ida.liu.se/~nicme26
-lib_pelib-ampl_pkg_ld = 
-lib_pelib-ampl_pkg_libs = 
-lib_pelib-ampl_cxxflags = 
-lib_pelib-ampl_pkg_description = Platform parser and output in AMPL input format
-lib_pelib-ampl_embed = 
+libcxx_pelib-core_src = 
+libcc_pelib-core_src = $(core_src) time.c
+lib_pelib-core_libs = -lboost_regex -lboost_graph -lexpat
+lib_pelib-core_export = $(lib_pelib-core_embed) $(libcxx_pelib-core_src) $(libcc_pelib-core_src) time.c
+lib_pelib-core_cxxflags =
+lib_pelib-core_ldflags = -pthread 
+lib_pelib-core_deps = 
+lib_pelib-core_pkg = igraph libxml++-2.6 cairomm-1.0
+lib_pelib-core_pkg_url = http://www.ida.liu.se/~nicme26
+lib_pelib-core_pkg_ld = 
+lib_pelib-core_pkg_libs = -lboost_regex -lboost_graph -lm
+lib_pelib-core_pkg_igraph_version = >= 0.7.1
+lib_pelib-core_pkg_description = General research utility library used in PELAB
+lib_pelib-core_embed = 
 
-libcxx_pelib-solve_src = solve.cpp
-lib_pelib-solve_export = $(libcxx_pelib-solve_embed) $(libcxx_pelib-solve_src)
-lib_pelib-solve_libs = 
-lib_pelib-solve_ldflags = 
-lib_pelib-solve_deps = 
-lib_pelib-solve_pkg = igraph pelib
-lib_pelib-solve_pkg_igraph_version = >= 0.7.1
-lib_pelib-solve_pkg_url = http://www.ida.liu.se/~nicme26
-lib_pelib-solve_pkg_ld = 
-lib_pelib-solve_pkg_libs = 
-lib_pelib-solve_cxxflags = 
-lib_pelib-solve_pkg_description = Platform parser and output in AMPL input format
-lib_pelib-solve_embed = 
-
-libcxx_pelib-schedule_src = schedule.cpp
-libcc_pelib-schedule_src = $(if $(filter cstruct,$(packages)),$(cstruct_src))
-lib_pelib-schedule_libs = 
-lib_pelib-schedule_export = $(lib_pelib-schedule_embed) $(libcxx_pelib-schedule_src) $(libcc_pelib-schedule_src)
-lib_pelib-schedule_cxxflags =
-lib_pelib-schedule_ldflags =  
-lib_pelib-schedule_deps = 
-lib_pelib-schedule_pkg = igraph pelib
-lib_pelib-schedule_pkg_url = http://www.ida.liu.se/~nicme26
-lib_pelib-schedule_pkg_ld = 
-lib_pelib-schedule_pkg_libs = 
-lib_pelib-schedule_pkg_cxxflags = 
-lib_pelib-schedule_pkg_description = General research utility library used in PELAB
-lib_pelib-schedule_embed = 
-
-libcxx_pelib_src = #$(if $(filter text,$(packages)),$(text_src)) argument_parsing.cpp dl.cpp
-libcc_pelib_src = $(if $(filter cstruct,$(packages)),$(cstruct_src)) time.c
-lib_pelib_libs = -lboost_regex -lboost_graph -lexpat
-lib_pelib_export = $(lib_pelib_embed) $(libcxx_pelib_src) $(libcc_pelib_src)
-lib_pelib_cxxflags =
-lib_pelib_ldflags = -pthread 
-lib_pelib_deps = 
-lib_pelib_pkg = igraph libxml++-2.6 cairomm-1.0
-lib_pelib_pkg_url = http://www.ida.liu.se/~nicme26
-lib_pelib_pkg_ld = 
-lib_pelib_pkg_libs = -lboost_regex -lboost_graph -lm
-lib_pelib_pkg_igraph_version = >= 0.7.1
-lib_pelib_pkg_description = General research utility library used in PELAB
-lib_pelib_embed = 
+sharedcxx_pelib-core_src = 
+sharedcc_pelib-core_src = $(core_src) time.c
+shared_pelib-core_libs = -lboost_regex -lboost_graph -lexpat
+shared_pelib-core_export = $(shared_pelib-core_embed) $(sharedcxx_pelib-core_src) $(sharedcc_pelib-core_src) time.c
+shared_pelib-core_cxxflags =
+shared_pelib-core_ldflags = -pthread 
+shared_pelib-core_deps = 
+shared_pelib-core_pkg = igraph libxml++-2.6 cairomm-1.0
+shared_pelib-core_pkg_url = http://www.ida.liu.se/~nicme26
+shared_pelib-core_pkg_ld = 
+shared_pelib-core_pkg_libs = -lboost_regex -lboost_graph -lm
+shared_pelib-core_pkg_igraph_version = >= 0.7.1
+shared_pelib-core_cflags = -fPIC
+shared_pelib-core_pkg_description = General research utility sharedrary used in PELAB
+shared_pelib-core_embed = 
 
 ## test packages and their sources
 testcxx_project = parser 
