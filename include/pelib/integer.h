@@ -26,18 +26,44 @@
 
 #define STRUCT_T int
 #include <pelib/structure.h>
-#define DONE_int
+#define DONE_int 1 
 
 #define ARRAY_T int
 #include <pelib/array.h>
-#define DONE_array_int
+#define DONE_array_int 1
+
+#define SET_ELEMENT_T int
+#include <pelib/set_element.h>
+#define DONE_set_element_int 1
+
+#define SET_T int
+#include <pelib/set.h>
+#define DONE_set_int 1
+
+#define PAIR_KEY_T int
+#define PAIR_VALUE_T int
+#include <pelib/pair.h>
+#define DONE_pair_int_int 1 
+
+#define SET_ELEMENT_T pair_t(int, int)
+#include <pelib/set_element.h>
+#define DONE_set_element_pair_int_int 1 
+
+#define MAP_KEY_T int
+#define MAP_VALUE_T int
+#include <pelib/map.h>
+#define DONE_map_int_int 1
+
+#define SET_T pair_t(int, int)
+#include <pelib/set.h>
+#define DONE_set_int_int 1
 
 #define CFIFO_T int
 #include <pelib/fifo.h>
-#define DONE_cfifo_int
+#define DONE_cfifo_int 1 
 
 #define CFIFO_ARRAY_T int
 #include <pelib/fifo_array.h>
-#define DONE_cfifo_array_int
+#define DONE_cfifo_array_int 1
 
 #endif /* INTEGER_H_ */

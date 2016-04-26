@@ -43,6 +43,13 @@ pelib_init(int)(int *val)
   }
 
 int
+pelib_destroy(int)(int val)
+  {
+	/* Do nothing */
+    return 1;
+  }
+
+int
 pelib_compare(int)(int a, int b)
   {
     return a - b;
@@ -106,6 +113,30 @@ pelib_printf(int)(FILE* stream, int a)
 // Now include the generic array implementation
 #define ARRAY_T int
 #include "pelib/array.c"
+
+// Now include the generic set implementation
+#define SET_T int
+#include "pelib/set.c"
+
+// Now include the generic set implementation
+#define PAIR_KEY_T int
+#define PAIR_VALUE_T int
+#include "pelib/pair.c"
+
+#define SET_ELEMENT_T int
+#include "pelib/set_element.c"
+
+#define SET_ELEMENT_T pair_t(int, int)
+#include "pelib/set_element.c"
+
+// Now include the generic set implementation
+#define MAP_KEY_T int
+#define MAP_VALUE_T int
+#include "pelib/map.c"
+
+// Now include the generic set implementation
+#define SET_T pair_t(int, int)
+#include "pelib/set.c"
 
 // Now include the generic fifo implementation
 #define CFIFO_T int

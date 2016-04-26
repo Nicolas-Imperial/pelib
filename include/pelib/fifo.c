@@ -43,7 +43,7 @@ static size_t continuous_write_length(CFIFO_T)(cfifo_t(CFIFO_T) *fifo);
 #define CFIFO_BEGIN "["
 #define CFIFO_END "]"
 
-#if 0
+#if 10
 #define debug(var) printf("[%s:%s:%d] %s = \"%s\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
 #define debug_addr(var) printf("[%s:%s:%d] %s = \"%p\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
 #define debug_int(var) printf("[%s:%s:%d] %s = \"%d\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
@@ -154,6 +154,11 @@ pelib_printf_detail(cfifo_t(CFIFO_T))(FILE* stream, cfifo_t(CFIFO_T) fifo, int l
 static state_t
 state(CFIFO_T)(cfifo_t(CFIFO_T) *cfifo)
 {
+/*
+	debug_size_t((size_t)cfifo->read);
+	debug_size_t((size_t)cfifo->write);
+	debug_size_t((size_t)cfifo->last_op);
+*/
     if (cfifo->read == cfifo->write)
       {
         if (cfifo->last_op == PELIB_CFIFO_POP)
@@ -327,7 +332,7 @@ pelib_cfifo_fill(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, size_t num)
 CFIFO_T*
 pelib_cfifo_peekaddr(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, size_t offset, size_t *num, CFIFO_T **addr)
   {
-    if ((fifo->capacity > 0 && offset < pelib_cfifo_length(CFIFO_T)(fifo) && state(CFIFO_T)(fifo) != EMPTY) || 1)
+    if ((fifo->capacity > 0 && offset < pelib_cfifo_length(CFIFO_T)(fifo) && state(CFIFO_T)(fifo) != EMPTY))
       {
 	size_t avail = continuous_read_length(CFIFO_T)(fifo);
 	if(num != NULL)

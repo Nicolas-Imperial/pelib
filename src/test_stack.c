@@ -238,11 +238,8 @@ test_pushpop_safe_managed()
   assert(res);
 
   // Test case
-  debug_str("Hello world");
   pelib_stack_push_safe_managed(complex_t)(stack, pool, data);
-  debug_str("Hello world");
   pelib_stack_pop_safe_managed(complex_t)(stack, pool, &data);
-  debug_str("Hello world");
 
   // Checking
   res &= !pelib_stack_isempty(complex_t)(pool);

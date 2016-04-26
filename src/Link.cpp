@@ -17,15 +17,21 @@
  along with Pelib. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <string>
 
 #include <pelib/Link.hpp>
 
+using namespace std;
+
 namespace pelib
 {
-	Link::Link(const Task &producer, const Task &consumer)
+	Link::Link(const Task &producer, const Task &consumer, const std::string &type, size_t consume, size_t produce)
 	{
 		this->producer = (Task*)&producer;
 		this->consumer = (Task*)&consumer;
+		this->type = string(type);
+		this->consume = consume;
+		this->produce = produce;
 	}
 
 	Task*
@@ -38,6 +44,24 @@ namespace pelib
 	Link::getConsumer() const
 	{
 		return this->consumer;
+	}
+
+	size_t
+	Link::getConsumerRate() const
+	{
+		return this->consume;
+	}
+
+	size_t
+	Link::getProducerRate() const
+	{
+		return this->produce;
+	}
+
+	std::string
+	Link::getDataType() const
+	{
+		return this->type;
 	}
 
 	bool

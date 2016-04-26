@@ -83,7 +83,7 @@ Solver.cpp AmplSolver.cpp \
 exprtk.cpp \
 argument_parsing.cpp dl.cpp
  
-core_src = sort.c complex.c float.c integer.c monitor.c size_t.c pelib_string.c malloc.c
+core_src = sort.c complex.c float.c integer.c string.c string_integer.c monitor.c size_t.c pelib_string.c malloc.c
 
 ## executables
 bincxx_project = pelib-convert demo run_record amplmatrixtoraw
@@ -424,8 +424,8 @@ test_parser_ldflags = -L.
 test_parser_embed = fft_n15_1.graphml fft_n15_1_input.dat fft_n15_1_output.dat p8.dat schedule.xml crown.dat schedule.dat platform.dat
 test_parser_static = 1
 
-testcc_project = sort-test array-test fifo-test stack-test fifo_array-test
-testcc_package = $(if $(filter 1,$(SHARED)),$(if $(filter cstruct,$(packages)),$(testcc_project)),$(if $(filter 1,$(STATIC)),$(if $(filter text,$(packages)),$(testcc_project))))
+testcc_project = sort-test array-test fifo-test stack-test fifo_array-test set-test map-test
+testcc_package = $(if $(filter 1,$(CORE_SHARED))$(filter 1,$(CORE_STATIC)),$(testcc_project))
 
 testcc_sort-test_src = test_sort.c
 test_sort-test_export = $(testcc_sort-test_src)
@@ -474,6 +474,22 @@ test_fifo_array-test_pkg = pelib-core
 test_fifo_array-test_libs = 
 test_fifo_array-test_ldflags = -L.
 test_fifo_array-test_static = 0
+
+testcc_set-test_src = test_set.c
+test_set-test_export = $(testcc_set-test_src) 
+test_set-test_deps = libpelib-core.so.$(version).$(minor).$(release)
+test_set-test_pkg = pelib-core
+test_set-test_libs = 
+test_set-test_ldflags = -L.
+test_set-test_static = 0
+
+testcc_map-test_src = test_map.c
+test_map-test_export = $(testcc_map-test_src) 
+test_map-test_deps = libpelib-core.so.$(version).$(minor).$(release)
+test_map-test_pkg = pelib-core
+test_map-test_libs = 
+test_map-test_ldflags = -L.
+test_map-test_static = 0
 
 ## Uncomment this to run target "first" before any target explicetly called
 #FIRST = first
