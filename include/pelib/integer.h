@@ -32,9 +32,9 @@
 #include <pelib/array.h>
 #define DONE_array_int 1
 
-#define SET_ELEMENT_T int
-#include <pelib/set_element.h>
-#define DONE_set_element_int 1
+#define ITERATOR_T int
+#include <pelib/iterator.h>
+#define DONE_iterator_int 1
 
 #define SET_T int
 #include <pelib/set.h>
@@ -45,9 +45,9 @@
 #include <pelib/pair.h>
 #define DONE_pair_int_int 1 
 
-#define SET_ELEMENT_T pair_t(int, int)
-#include <pelib/set_element.h>
-#define DONE_set_element_pair_int_int 1 
+#define ITERATOR_T pair_t(int, int)
+#include <pelib/iterator.h>
+#define DONE_iterator_pair_int_int 1 
 
 #define MAP_KEY_T int
 #define MAP_VALUE_T int

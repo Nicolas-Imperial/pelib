@@ -83,7 +83,7 @@ namespace pelib
 			const Task &producer = *this->tasks.find(*i->getProducer());
 			const Task &consumer = *this->tasks.find(*i->getConsumer());
 
-			Link link(producer, consumer, i->getDataType(), i->getConsumerRate(), i->getProducerRate());
+			Link link(producer, consumer, i->getProducerName(), i->getConsumerName(), i->getDataType(), i->getProducerRate(), i->getConsumerRate());
 			this->links.insert(link);
 		}
 
@@ -105,7 +105,7 @@ namespace pelib
 			{
 				Task *producer = (*j)->getProducer();
 				Task *consumer = (*j)->getConsumer();
-				Link newLink(*this->tasks.find(*producer), *this->tasks.find(*consumer), (*j)->getDataType(), (*j)->getConsumerRate(), (*j)->getProducerRate());
+				Link newLink(*this->tasks.find(*producer), *this->tasks.find(*consumer), (*j)->getProducerName(), (*j)->getConsumerName(), (*j)->getDataType(), (*j)->getProducerRate(), (*j)->getConsumerRate());
 				const Link &link = *this->links.find(newLink);
 				t.getProducers().insert(&link);
 			}
@@ -115,7 +115,7 @@ namespace pelib
 			{
 				Task *producer = (*j)->getProducer();
 				Task *consumer = (*j)->getConsumer();
-				Link newLink(*this->tasks.find(*producer), *this->tasks.find(*consumer), (*j)->getDataType(), (*j)->getConsumerRate(), (*j)->getProducerRate());
+				Link newLink(*this->tasks.find(*producer), *this->tasks.find(*consumer), (*j)->getProducerName(), (*j)->getConsumerName(), (*j)->getDataType(), (*j)->getProducerRate(), (*j)->getConsumerRate());
 				const Link &link = *this->links.find(newLink);
 				t.getConsumers().insert(&link);
 			}
@@ -202,7 +202,7 @@ namespace pelib
 						set<Task>::const_iterator from = this->getTasks().begin(), to = this->getTasks().begin();
 						std::advance(from, (size_t)i->first - 1);
 						std::advance(to, (size_t)j->first - 1);
-						this->links.insert(Link(*from, *to));
+						this->links.insert(Link(*from, *to, from->getName(), to->getName()));
 					}
 				}
 			}
@@ -270,11 +270,17 @@ namespace pelib
 			map<int, float> task_c;
 			for(set<Task>::const_iterator j = getTasks().begin(); j != getTasks().end(); j++)
 			{
-				if(this->getLinks().find(Link(*i, *j)) != this->getLinks().end())
+				set<Link>::const_iterator k;
+				for(k = this->getLinks().begin(); k != this->getLinks().end(); k++)
 				{
-					task_c.insert(pair<int, float>((int)std::distance(this->getTasks().begin(), j) + 1, 1));
+					if(*k->getProducer() == *i && *k->getConsumer() == *j)
+					//if(this->this->getLinks().find(Link(*i, *j)) != this->getLinks().end())
+					{
+						task_c.insert(pair<int, float>((int)std::distance(this->getTasks().begin(), j) + 1, 1));
+						break;
+					}
 				}
-				else
+				if(k == this->getLinks().end())
 				{
 					task_c.insert(pair<int, float>((int)std::distance(this->getTasks().begin(), j) + 1, 0));
 				}

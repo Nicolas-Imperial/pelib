@@ -25,8 +25,10 @@ using namespace std;
 
 namespace pelib
 {
-	Link::Link(const Task &producer, const Task &consumer, const std::string &type, size_t consume, size_t produce)
+	Link::Link(const Task &producer, const Task &consumer, const string &producerName, const string &consumerName, const std::string &type, size_t consume, size_t produce)
 	{
+		this->producerName = producerName;
+		this->consumerName = consumerName;
 		this->producer = (Task*)&producer;
 		this->consumer = (Task*)&consumer;
 		this->type = string(type);
@@ -64,6 +66,18 @@ namespace pelib
 		return this->type;
 	}
 
+	std::string
+	Link::getProducerName() const
+	{
+		return this->producerName;
+	}
+
+	std::string
+	Link::getConsumerName() const
+	{
+		return this->consumerName;
+	}
+
 	bool
 	Link::operator<(const Link &other) const
 	{
@@ -85,6 +99,6 @@ namespace pelib
 	bool
 	Link::operator==(const Link &other) const
 	{	
-		return (*this->getProducer() == *other.getProducer()) && (*this->getConsumer() == *other.getConsumer());
+		return (*this->getProducer() == *other.getProducer()) && (*this->getConsumer() == *other.getConsumer()) && (this->getProducerName().compare(other.getProducerName()) == 0) && (this->getConsumerName().compare(other.getConsumerName()) == 0);
 	}
 }

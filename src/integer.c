@@ -123,11 +123,11 @@ pelib_printf(int)(FILE* stream, int a)
 #define PAIR_VALUE_T int
 #include "pelib/pair.c"
 
-#define SET_ELEMENT_T int
-#include "pelib/set_element.c"
+#define ITERATOR_T int
+#include "pelib/iterator.c"
 
-#define SET_ELEMENT_T pair_t(int, int)
-#include "pelib/set_element.c"
+#define ITERATOR_T pair_t(int, int)
+#include "pelib/iterator.c"
 
 // Now include the generic set implementation
 #define MAP_KEY_T int
