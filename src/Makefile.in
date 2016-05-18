@@ -159,7 +159,7 @@ shared_pelib-platform-ampl_input_export = $(sharedcxx_pelib-platform-ampl_input_
 shared_pelib-platform-ampl_input_libs = 
 shared_pelib-platform-ampl_input_ldflags = -L. 
 shared_pelib-platform-ampl_input_deps = 
-shared_pelib-platform-ampl_input_pkg = pelib-core++ igraph
+shared_pelib-platform-ampl_input_pkg = igraph
 shared_pelib-platform-ampl_input_pkg_igraph_version = >= 0.7.1
 shared_pelib-platform-ampl_input_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-platform-ampl_input_pkg_ld = 
@@ -173,7 +173,7 @@ shared_pelib-platform-ampl_output_export = $(sharedcxx_pelib-platform-ampl_outpu
 shared_pelib-platform-ampl_output_libs = 
 shared_pelib-platform-ampl_output_ldflags = -L.
 shared_pelib-platform-ampl_output_deps = 
-shared_pelib-platform-ampl_output_pkg = pelib-core++ igraph
+shared_pelib-platform-ampl_output_pkg = igraph
 shared_pelib-platform-ampl_output_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-platform-ampl_output_pkg_ld = 
 shared_pelib-platform-ampl_output_pkg_libs = 
@@ -186,7 +186,7 @@ shared_pelib-taskgraph-graphml_export = $(sharedcxx_pelib-taskgraph-graphml_embe
 shared_pelib-taskgraph-graphml_libs = 
 shared_pelib-taskgraph-graphml_ldflags = -L.
 shared_pelib-taskgraph-graphml_deps = 
-shared_pelib-taskgraph-graphml_pkg = pelib-core++ igraph
+shared_pelib-taskgraph-graphml_pkg = igraph
 shared_pelib-taskgraph-graphml_pkg_igraph_version = >= 0.7.1
 shared_pelib-taskgraph-graphml_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-taskgraph-graphml_pkg_ld = 
@@ -200,7 +200,7 @@ shared_pelib-taskgraph-streamit_export = $(sharedcxx_pelib-taskgraph-streamit_em
 shared_pelib-taskgraph-streamit_libs = 
 shared_pelib-taskgraph-streamit_ldflags = -L.
 shared_pelib-taskgraph-streamit_deps = 
-shared_pelib-taskgraph-streamit_pkg = pelib-core++ igraph
+shared_pelib-taskgraph-streamit_pkg = igraph
 shared_pelib-taskgraph-streamit_pkg_igraph_version = >= 0.7.1
 shared_pelib-taskgraph-streamit_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-taskgraph-streamit_pkg_ld = 
@@ -214,7 +214,7 @@ shared_pelib-taskgraph-ampl_input_export = $(sharedcxx_pelib-taskgraph-ampl_inpu
 shared_pelib-taskgraph-ampl_input_libs = 
 shared_pelib-taskgraph-ampl_input_ldflags = -L.
 shared_pelib-taskgraph-ampl_input_deps = 
-shared_pelib-taskgraph-ampl_input_pkg = pelib-core++ igraph
+shared_pelib-taskgraph-ampl_input_pkg = igraph
 shared_pelib-taskgraph-ampl_input_pkg_igraph_version = >= 0.7.1
 shared_pelib-taskgraph-ampl_input_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-taskgraph-ampl_input_pkg_ld = 
@@ -228,7 +228,7 @@ shared_pelib-taskgraph-ampl_output_export = $(sharedcxx_pelib-taskgraph-ampl_out
 shared_pelib-taskgraph-ampl_output_libs = 
 shared_pelib-taskgraph-ampl_output_ldflags = -L.
 shared_pelib-taskgraph-ampl_output_deps = 
-shared_pelib-taskgraph-ampl_output_pkg = pelib-core++ igraph
+shared_pelib-taskgraph-ampl_output_pkg = igraph
 shared_pelib-taskgraph-ampl_output_pkg_igraph_version = >= 0.7.1
 shared_pelib-taskgraph-ampl_output_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-taskgraph-ampl_output_pkg_ld = 
@@ -242,7 +242,7 @@ shared_pelib-ampl_output_export = $(sharedcxx_pelib-ampl_output_embed) $(sharedc
 shared_pelib-ampl_output_libs = 
 shared_pelib-ampl_output_ldflags = -L.
 shared_pelib-ampl_output_deps = 
-shared_pelib-ampl_output_pkg = pelib-core++ igraph
+shared_pelib-ampl_output_pkg = igraph
 shared_pelib-ampl_output_pkg_igraph_version = >= 0.7.1
 shared_pelib-ampl_output_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-ampl_output_pkg_ld = 
@@ -256,7 +256,7 @@ shared_pelib-ampl_input_export = $(sharedcxx_pelib-ampl_input_embed) $(sharedcxx
 shared_pelib-ampl_input_libs = 
 shared_pelib-ampl_input_ldflags = -L.
 shared_pelib-ampl_input_deps = 
-shared_pelib-ampl_input_pkg = pelib-core++ igraph
+shared_pelib-ampl_input_pkg = igraph
 shared_pelib-ampl_input_pkg_igraph_version = >= 0.7.1
 shared_pelib-ampl_input_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-ampl_input_pkg_ld = 
@@ -270,7 +270,7 @@ shared_pelib-schedule-xml_export = $(sharedcxx_pelib-schedule-xml_embed) $(share
 shared_pelib-schedule-xml_libs = 
 shared_pelib-schedule-xml_ldflags = -L.
 shared_pelib-schedule-xml_deps = 
-shared_pelib-schedule-xml_pkg = pelib-core++ igraph
+shared_pelib-schedule-xml_pkg = igraph
 shared_pelib-schedule-xml_pkg_igraph_version = >= 0.7.1
 shared_pelib-schedule-xml_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-schedule-xml_pkg_ld = 
@@ -284,7 +284,7 @@ shared_pelib-schedule-tetris_export = $(sharedcxx_pelib-schedule-tetris_embed) $
 shared_pelib-schedule-tetris_libs = 
 shared_pelib-schedule-tetris_ldflags = -L.
 shared_pelib-schedule-tetris_deps = 
-shared_pelib-schedule-tetris_pkg = pelib-core++ igraph cairomm-1.0
+shared_pelib-schedule-tetris_pkg = igraph cairomm-1.0
 shared_pelib-schedule-tetris_pkg_igraph_version = >= 0.7.1
 shared_pelib-schedule-tetris_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-schedule-tetris_pkg_ld = 
@@ -298,7 +298,7 @@ shared_pelib-schedule-drake_export = $(sharedcxx_pelib-schedule-drake_embed) $(s
 shared_pelib-schedule-drake_libs = 
 shared_pelib-schedule-drake_ldflags = -L.
 shared_pelib-schedule-drake_deps = 
-shared_pelib-schedule-drake_pkg = pelib-core++ igraph
+shared_pelib-schedule-drake_pkg = igraph
 shared_pelib-schedule-drake_pkg_igraph_version = >= 0.7.1
 shared_pelib-schedule-drake_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-schedule-drake_pkg_ld = 
@@ -312,7 +312,7 @@ shared_pelib-schedule-ampl_input_export = $(sharedcxx_pelib-schedule-ampl_input_
 shared_pelib-schedule-ampl_input_libs = 
 shared_pelib-schedule-ampl_input_ldflags = -L.
 shared_pelib-schedule-ampl_input_deps = 
-shared_pelib-schedule-ampl_input_pkg = pelib-core++ igraph
+shared_pelib-schedule-ampl_input_pkg = igraph
 shared_pelib-schedule-ampl_input_pkg_igraph_version = >= 0.7.1
 shared_pelib-schedule-ampl_input_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-schedule-ampl_input_pkg_ld = 
@@ -326,7 +326,7 @@ shared_pelib-schedule-ampl_output_export = $(sharedcxx_pelib-schedule-ampl_outpu
 shared_pelib-schedule-ampl_output_libs = 
 shared_pelib-schedule-ampl_output_ldflags = -L.
 shared_pelib-schedule-ampl_output_deps = 
-shared_pelib-schedule-ampl_output_pkg = pelib-core++ igraph
+shared_pelib-schedule-ampl_output_pkg = igraph
 shared_pelib-schedule-ampl_output_pkg_igraph_version = >= 0.7.1
 shared_pelib-schedule-ampl_output_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-schedule-ampl_output_pkg_ld = 
@@ -340,7 +340,7 @@ shared_pelib-schedule_export = $(sharedcxx_pelib-schedule_embed) $(sharedcxx_pel
 shared_pelib-schedule_libs = 
 shared_pelib-schedule_ldflags = 
 shared_pelib-schedule_deps = 
-shared_pelib-schedule_pkg = igraph pelib-core++
+shared_pelib-schedule_pkg = igraph
 shared_pelib-schedule_pkg_igraph_version = >= 0.7.1
 shared_pelib-schedule_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-schedule_pkg_ld = 
@@ -354,7 +354,7 @@ shared_pelib-solve_export = $(sharedcxx_pelib-solve_embed) $(sharedcxx_pelib-sol
 shared_pelib-solve_libs = 
 shared_pelib-solve_ldflags = 
 shared_pelib-solve_deps = 
-shared_pelib-solve_pkg = igraph pelib-core++
+shared_pelib-solve_pkg = igraph
 shared_pelib-solve_pkg_igraph_version = >= 0.7.1
 shared_pelib-solve_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-solve_pkg_ld = 
@@ -368,7 +368,7 @@ shared_pelib-ampl_export = $(sharedcxx_pelib-ampl_embed) $(sharedcxx_pelib-ampl_
 shared_pelib-ampl_libs = 
 shared_pelib-ampl_ldflags = 
 shared_pelib-ampl_deps = 
-shared_pelib-ampl_pkg = igraph pelib-core++
+shared_pelib-ampl_pkg = igraph
 shared_pelib-ampl_pkg_igraph_version = >= 0.7.1
 shared_pelib-ampl_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-ampl_pkg_ld = 
@@ -419,7 +419,7 @@ testcxx_parser_src = test_parser.cpp
 test_parser_export = $(testcxx_parser_embed) $(testcxx_parser_src) make_algebra.cpp 
 test_parser_deps = 
 test_parser_libs = -lpelib-core++ 
-test_parser_pkg = pelib-core++
+test_parser_pkg =
 test_parser_ldflags = -L.
 test_parser_embed = fft_n15_1.graphml fft_n15_1_input.dat fft_n15_1_output.dat p8.dat schedule.xml crown.dat schedule.dat platform.dat
 test_parser_static = 1
