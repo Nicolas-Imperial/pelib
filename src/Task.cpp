@@ -37,6 +37,8 @@ using namespace std;
 
 namespace pelib
 {
+	const float Task::very_small = 1e-6;
+
 	Task::Task(const std::string &name)
 	{
 		this->name = name;

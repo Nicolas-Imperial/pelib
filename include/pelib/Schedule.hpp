@@ -98,6 +98,11 @@ namespace pelib
 			virtual const Task&
 			getTask(int id) const;
 
+			multiset<const Task*> getRemoteProducers(int core, const Taskgraph &tg, const Platform &pt) const;
+			multiset<const Task*> getRemoteConsumers(int core, const Taskgraph &tg, const Platform &pt) const;
+			multiset<const Task*> getRemoteTaskProducers(const Task&, const Taskgraph &tg, const Platform &pt) const;
+			multiset<const Task*> getRemoteTaskConsumers(const Task&, const Taskgraph &tg, const Platform &pt) const;
+			
 			/** Returns the tasks contained in a shared memory island, identified by the set of cores that forms this island.
 				@param islands Set of core id (starting from 1) that form a shared memory island 
 				@param pt Execution platform that corresponds to this schedule

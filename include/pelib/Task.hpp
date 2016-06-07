@@ -155,7 +155,7 @@ namespace pelib
 			std::set<const Link*> consumers, producers;
 
 			/** Default efficiency value when computing efficiency for more cores that this task can support **/			
-			static const float very_small = 1e-6;
+			static const float very_small;
 			
 		private:
 	};

@@ -185,9 +185,11 @@ namespace pelib
 	{
 		const Scalar<float> *scalar_p = arch.find<Scalar<float> >("p");
 		const Scalar<float> *scalar_fin = arch.find<Scalar<float> >("Fin");
+		const Scalar<float> *scalar_sin = arch.find<Scalar<float> >("Sin");
 		const Scalar<float> *f_unit = arch.find<Scalar<float> >("Funit");
 		const Set<float> *set_F = arch.find<Set<float> >("F");
 		const Set<float> *set_Fi = arch.find<Set<float> >("Fi");
+		const Set<float> *set_Si = arch.find<Set<float> >("Si");
 
 		if(scalar_p == NULL || set_F == NULL || f_unit == NULL || set_Fi == NULL || scalar_fin == NULL)
 		{
@@ -205,6 +207,17 @@ namespace pelib
 			}
 		}
 
+		// Create empty frequency islands, if a description is given
+		vector<island> shared;
+		if(set_Si != NULL)
+		{
+			Set<float>::SetOfSetsType Si = set_Si->getSubsets();
+			for(Set<float>::SetOfSetsType::iterator i = Si.begin(); i != Si.end(); i++)
+			{
+				shared.push_back(set<const Core*>());
+			}
+		}
+
 		for(size_t i = 0; i < scalar_p->getValue(); i++)
 		{
 			const Core *core = new DummyCore(set_F->getValues(), f_unit == NULL ? 1 : f_unit->getValue());
@@ -213,7 +226,7 @@ namespace pelib
 			island.insert(core);
 
 			// Each core is its own shared mamory island
-			this->shared.insert(set<const Core*>(island));
+			main.insert(set<const Core*>(island));
 
 			// If frequency islands are provided, then insert core in the right island
 			if(set_Fi != NULL)
@@ -237,16 +250,37 @@ namespace pelib
 				}
 			}
 
-			this->main = shared;
-			this->priv = shared;
+			// If shared memory islands are provided, then insert core in the right island
+			if(set_Si != NULL)
+			{
+				size_t core_id = i + 1;
+				vector<Platform::island>::iterator jj = shared.begin();
+
+				// Find the frequency island that holds this core
+				Set<float>::SetOfSetsType Si = set_Si->getSubsets();
+				for(Set<float>::SetOfSetsType::iterator j = Si.begin(); j != Si.end(); j++)
+				{
+					if(j->second.find(core_id) != j->second.end())
+					{
+						size_t island_id = std::distance(Si.begin(), j);
+						std::advance(jj, island_id);
+						set<const Core*> island = *jj;
+						shared[island_id].insert(core);
+
+						break;
+					}
+				}
+			}
+
+			this->priv = main;
 
 			// If voltage/frequency islands are provided, then copy the
 			// frequency island set computed above to voltage and frequency
 			// islands
 			if(set_Fi == NULL)
 			{
-				this->voltage = shared;
-				this->freq = shared;
+				this->voltage = main;
+				this->freq = main;
 			}
 			else
 			{
@@ -257,6 +291,23 @@ namespace pelib
 				}
 				this->voltage = islands;
 				this->freq = islands;
+			}
+
+			// If ishared memory islands are provided, then copy the
+			// frequency island set computed above to voltage and frequency
+			// islands
+			if(set_Si == NULL)
+			{
+				this->shared = main;
+			}
+			else
+			{
+				set<Platform::island> islands;
+				for(vector<Platform::island>::iterator i = shared.begin(); i != shared.end(); i++)
+				{
+					islands.insert(*i);
+				}
+				this->shared = islands;
 			}
 		}
 	}
