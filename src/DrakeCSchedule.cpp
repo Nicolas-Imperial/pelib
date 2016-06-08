@@ -259,8 +259,17 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		for(Schedule::sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 		{
 			os << "	schedule->schedule[" << i->first - 1 << "][" << counter << "].id = " << std::distance(tg->getTasks().begin(), tg->getTasks().find(*j->second.first)) + 1 << ";" << endl
-				<< "	schedule->schedule[" << i->first - 1 << "][" << counter << "].start_time = " << j->second.first->getStartTime() << ";" << endl
-				<< "	schedule->schedule[" << i->first - 1 << "][" << counter << "].frequency = " << j->second.first->getFrequency() << ";" << endl;
+				<< "	schedule->schedule[" << i->first - 1 << "][" << counter << "].start_time = " << j->second.first->getStartTime() << ";" << endl;
+
+			set<float>::iterator iter = (*pt->getCores().begin())->getFrequencies().find(j->second.first->getFrequency());
+			if(iter != (*pt->getCores().begin())->getFrequencies().end())
+			{
+				os << "	schedule->schedule[" << i->first - 1 << "][" << counter << "].frequency = " << std::distance((*pt->getCores().begin())->getFrequencies().begin(), iter) << ";" << endl;
+			}
+			else
+			{
+				throw PelibException("Trying to schedule a task to run on frequency not supported by target platform");
+			}
 			counter++;
 		}
 	}
