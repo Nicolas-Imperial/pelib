@@ -310,10 +310,13 @@ namespace pelib
 	bool
 	Task::operator<(const Task &other) const
 	{
-		const char* me = this->getName().c_str();
-		const char* ot = other.getName().c_str();
+		string Me(this->getName());
+		string Ot(other.getName());
+		const char* me = Me.c_str(); //string(this->getName()).c_str();
+		const char* ot = Ot.c_str(); //string(other.getName()).c_str();
 		
-		if(string(me).compare(string(ot)) == 0)
+		//if(string(me).compare(string(ot)) == 0)
+		if(this->getName().compare(other.getName()) == 0)
 		{
 			return false;
 		}
@@ -361,7 +364,7 @@ namespace pelib
 	bool
 	Task::operator==(const Task &other) const
 	{
-		return getName().compare(other.getName()) == 0;
+		return getName().compare(other.getName());
 	}
 
 	std::string

@@ -346,7 +346,7 @@ GraphML::parse(istream &is) const
 			task.setEfficiencyString(string("exprtk:p <= ") + ss.str() + "? 1 : 1e-6");
 		}
 
-		tasks.insert(task).second;
+		tasks.insert(Task(task));
 	}
 
 	// Add edges between tasks

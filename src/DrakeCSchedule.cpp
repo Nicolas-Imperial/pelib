@@ -66,7 +66,7 @@ DrakeCSchedule::dump(ostream& os, const Schedule &data, const Taskgraph &tg, con
 void
 DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const Platform *pt) const
 {
-	size_t p = sched->getSchedule().size();
+	size_t p = pt->getCores().size();
 	size_t n = tg->getTasks().size();
 	map<int, set<const Task*> > tasks, producers, consumers;
 	os << "#include <stdlib.h> " << endl << endl;
