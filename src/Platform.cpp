@@ -185,7 +185,7 @@ namespace pelib
 	{
 		const Scalar<float> *scalar_p = arch.find<Scalar<float> >("p");
 		const Scalar<float> *scalar_fin = arch.find<Scalar<float> >("Fin");
-		const Scalar<float> *scalar_sin = arch.find<Scalar<float> >("Sin");
+		//const Scalar<float> *scalar_sin = arch.find<Scalar<float> >("Sin");
 		const Scalar<float> *f_unit = arch.find<Scalar<float> >("Funit");
 		const Set<float> *set_F = arch.find<Set<float> >("F");
 		const Set<float> *set_Fi = arch.find<Set<float> >("Fi");

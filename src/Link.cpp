@@ -18,8 +18,15 @@
 */
 
 #include <string>
+#include <iostream>
 
 #include <pelib/Link.hpp>
+
+#ifdef debug
+#undef debug
+#endif
+
+#define debug(expr) cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << (expr) << "\"." << endl;
 
 using namespace std;
 
@@ -85,6 +92,7 @@ namespace pelib
 		Task otherProducer = *other.getProducer();
 		Task thisConsumer = *this->getConsumer();
 		Task otherConsumer = *other.getConsumer();
+
 
 		if(thisProducer == otherProducer)
 		{

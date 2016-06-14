@@ -364,7 +364,7 @@ namespace pelib
 	bool
 	Task::operator==(const Task &other) const
 	{
-		return getName().compare(other.getName());
+		return getName().compare(other.getName()) == 0;
 	}
 
 	std::string
