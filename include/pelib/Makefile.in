@@ -30,6 +30,7 @@ DeadlineConstant.hpp DeadlineFormula.hpp DeadlineCalculator.hpp \
 AmplDataParser.hpp AmplDataOutput.hpp GraphML.hpp \
 AmplInput.hpp AmplInputData.hpp AmplInputScalar.hpp AmplInputVector.hpp AmplInputSet.hpp AmplInputMatrix.hpp \
 AmplOutput.hpp AmplOutputData.hpp AmplOutputScalar.hpp AmplOutputVector.hpp AmplOutputSet.hpp AmplOutputMatrix.hpp XMLSchedule.hpp TetrisSchedule.hpp \
+AlgebraRawOutput.hpp RawData.hpp RawDataOutput.hpp RawMatrix.hpp RawScalar.hpp RawSet.hpp RawVector.hpp \
 CppDataOutput.hpp \
 Cpp.hpp CppData.hpp CppScalar.hpp CppVector.hpp CppSet.hpp CppMatrix.hpp \
 RecordParser.hpp constraints.hpp RecordOutput.hpp AlgebraDataParser.hpp AlgebraDataOutput.hpp AmplInputDataParser.hpp \

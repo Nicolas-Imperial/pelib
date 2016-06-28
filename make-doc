@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -o xtrace
+set -o xtrace 
 if [ "$package" == "" ]
 then
 	echo '['ERROR']' '$'package is undefined or null. Run make doc instead of calling this script directly
