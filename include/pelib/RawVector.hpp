@@ -49,16 +49,13 @@ namespace pelib
 			{				
 				const Vector<Key, Value> *vector = dynamic_cast<const Vector<Key, Value>*>(data);
 				if(vector == NULL) throw CastException("parameter \"data\" was not of type \"Vector<Key, Value>\".");
-				
-				o << vector->getName() << " [*] := " << std::endl;
-
 				// warning: "iter++" makes valgrind unhappy, dealing with free'd memory
 				for(typename std::map<Key, Value>::const_iterator iter = vector->getValues().begin(); iter != vector->getValues().end(); iter++)
 				{
-					o << iter->first << "\t" << iter->second << std::endl;
+					o << iter->second << " ";
 				}
 				
-				o << ";" << std::endl;		
+				o << std::endl;		
 			}
 
 		protected:

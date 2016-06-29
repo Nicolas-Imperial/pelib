@@ -55,22 +55,13 @@ namespace pelib
 				
 				for(typename Set<Value, Key>::SetOfSetsType::const_iterator i = set->getSubsets().begin(); i != set->getSubsets().end(); i++)
 				{
-					if(set->isOneSet())
-					{
-						o << "set " << set->getName() << " :=";
-					}
-					else
-					{
-						o << "set " << set->getName() << "[" << i->first << "] :=";
-					}
-					
 					SetType values = i->second;
 					for(typename std::set<Value>::const_iterator iter = values.begin(); iter != values.end(); iter++)
 					{
-						o << " " << *iter;
+						o << *iter << " ";
 					}
 
-					o << ";" << std::endl;
+					o << std::endl;
 				}
 			}
 

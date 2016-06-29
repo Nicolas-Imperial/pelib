@@ -40,8 +40,13 @@ extern "C" {
 void
 pelib_dump(std::ostream& cout, std::map<const char*, Record*> records, size_t argc, char **argv)
 {
+	vector<string> list;
+	for(size_t i = 0; i < argc; i++)
+	{
+		list.push_back(argv[i]);
+	}
 	Algebra al = *(Algebra*)(records.find(typeid(Algebra).name())->second);
-	AlgebraRawOutput(AlgebraRawOutput::intFloatOutputs()).dump(cout, al);
+	AlgebraRawOutput(AlgebraRawOutput::intFloatOutputs(), list).dump(cout, al);
 }
 
 void

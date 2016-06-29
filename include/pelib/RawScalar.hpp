@@ -58,7 +58,7 @@ namespace pelib
 					val = AlgebraData::fixPrecision(val, stream.precision());
 				}
 
-				stream << scalar->getName() << " = " << val << std::endl;
+				stream << val << std::endl;
 			}
 	
 		protected:

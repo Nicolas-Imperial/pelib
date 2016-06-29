@@ -52,6 +52,12 @@ namespace pelib
 		this->outputs = handlers;
 	}
 
+	AlgebraRawOutput::AlgebraRawOutput(std::vector<RawDataOutput*> handlers, const std::vector<std::string> &list)
+	{
+		this->outputs = handlers;
+		this->output_list = list;
+	}
+
 	AlgebraRawOutput::~AlgebraRawOutput()
 	{
 		deleteOutputs();			
@@ -83,9 +89,23 @@ namespace pelib
 	AlgebraRawOutput::dump(std::ostream& o, const Algebra &record) const
 	{
 		std::map<std::string, const AlgebraData * const> records = record.getAllRecords();
-		for (std::map<std::string, const AlgebraData * const>::const_iterator rec = records.begin(); rec != records.end(); rec++)
+		if(output_list.size() > 0)
 		{
-			dump(o, rec->second);
+			for(std::vector<std::string>::const_iterator i = output_list.begin(); i != output_list.end(); i++)
+			{
+				std::map<std::string, const AlgebraData * const>::const_iterator rec = records.find(*i);
+				if(rec != records.end())
+				{
+					dump(o, rec->second);
+				}
+			}
+		}
+		else
+		{
+			for (std::map<std::string, const AlgebraData * const>::const_iterator rec = records.begin(); rec != records.end(); rec++)
+			{
+				dump(o, rec->second);
+			}
 		}
 	}
 

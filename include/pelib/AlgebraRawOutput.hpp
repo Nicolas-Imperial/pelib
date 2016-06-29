@@ -41,6 +41,11 @@ namespace pelib
 				@param handlers A pair of collections of Algebraic Data parsers and Output. May include parsers and output for scalars, vector, set or matrices for int, float, double or any other basic type.
 			**/
 			AlgebraRawOutput(std::vector<RawDataOutput*> handlers);
+			/** Constructor
+				@param handlers A pair of collections of Algebraic Data parsers and Output. May include parsers and output for scalars, vector, set or matrices for int, float, double or any other basic type.
+				@param list List of element is algebra container to produce in output
+			**/
+			AlgebraRawOutput(std::vector<RawDataOutput*> handlers, const std::vector<std::string> &list);
 
 			/** Destructor **/
 			virtual
@@ -77,6 +82,7 @@ namespace pelib
 			/** Flushes all outputs in this instance. used by assignement operator **/
 			void
 			deleteOutputs();
+			std::vector<std::string> output_list;
 		private:
 	};
 }
