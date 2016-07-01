@@ -666,7 +666,7 @@ namespace pelib
 		{
 			stringstream ss;
 			ss << "Task \"" << t.getName() << "\" does not figure in schedule.";
-			throw CastException(ss.str());
+			throw PelibException(ss.str());
 		}
 		const Task &tt = *this->getTasks().find(t);
 
