@@ -42,7 +42,8 @@ XMLScheduleParser.hpp XMLScheduleOutput.hpp \
 TetrisScheduleOutput.hpp \
 DrakeCSchedule.hpp DrakeCScheduleOutput.hpp \
 \
-Solver.hpp AlgebraSolver.hpp AmplSolver.hpp Scheduler.hpp \
+Solver.hpp AlgebraSolver.hpp AmplSolver.hpp \
+Scheduler.hpp generate.hpp \
 calculus.h \
 \
 exprtk.hpp pelib_exprtk.hpp

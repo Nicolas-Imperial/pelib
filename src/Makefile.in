@@ -127,7 +127,7 @@ bin_run_record_static = 0
 ## Cpp format classes: base class, data structure base class, output data structure classes; no parser because of lack of cpp parser base class
 
 ## dynamic library packages and their sources
-corepp = pelib-core++ pelib-platform-ampl_input pelib-platform-ampl_output pelib-taskgraph-graphml pelib-taskgraph-streamit pelib-taskgraph-ampl_input pelib-taskgraph-ampl_output pelib-schedule-xml pelib-schedule-tetris pelib-schedule-drake pelib-schedule-ampl_input pelib-schedule-ampl_output pelib-ampl_input pelib-ampl_output pelib-schedule pelib-solve pelib-ampl pelib-raw
+corepp = pelib-core++ pelib-platform-ampl_input pelib-platform-ampl_output pelib-taskgraph-graphml pelib-taskgraph-streamit pelib-taskgraph-ampl_input pelib-taskgraph-ampl_output pelib-schedule-xml pelib-schedule-tetris pelib-schedule-drake pelib-schedule-ampl_input pelib-schedule-ampl_output pelib-ampl_input pelib-ampl_output pelib-schedule pelib-solve pelib-ampl pelib-raw pelib-generate
 sharedcxx_package = $(if $(filter 1,$(CORE++_SHARED)),$(corepp))
 sharedcc_package = $(if $(filter 1,$(CORE_SHARED)),pelib-core)
 
@@ -356,6 +356,19 @@ shared_pelib-schedule_pkg_libs =
 shared_pelib-schedule_cxxflags = -fPIC
 shared_pelib-schedule_pkg_description = Platform parser and output in AMPL input format
 shared_pelib-schedule_embed = 
+
+sharedcxx_pelib-generate_src = generate.cpp
+shared_pelib-generate_export = $(sharedcxx_pelib-generate_embed) $(sharedcxx_pelib-generate_src)
+shared_pelib-generate_libs = 
+shared_pelib-generate_ldflags = 
+shared_pelib-generate_deps = 
+shared_pelib-generate_pkg = 
+shared_pelib-generate_pkg_url = http://www.ida.liu.se/~nicme26
+shared_pelib-generate_pkg_ld = 
+shared_pelib-generate_pkg_libs = 
+shared_pelib-generate_cxxflags = -fPIC
+shared_pelib-generate_pkg_description = Platform parser and output in AMPL input format
+shared_pelib-generate_embed = 
 
 sharedcxx_pelib-solve_src = solve.cpp
 shared_pelib-solve_export = $(sharedcxx_pelib-solve_embed) $(sharedcxx_pelib-solve_src)
