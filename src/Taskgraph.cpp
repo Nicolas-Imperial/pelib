@@ -220,7 +220,7 @@ namespace pelib
 	{
 		set<float> f;
 		f.insert(1);
-		set<const Core*> cores;
+		set<const Core*, Core::LessCorePtrByCoreId> cores;
 		cores.insert(new DummyCore(f, 1));
 		Platform arch(cores);
 		

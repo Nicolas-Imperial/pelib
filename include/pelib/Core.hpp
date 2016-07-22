@@ -17,18 +17,31 @@
  along with Pelib. If not, see <http://www.gnu.org/licenses/>.
 */
 
-
+#include <iostream>
+#include <stddef.h>
 #include <set>
 
 #ifndef PELIB_CORE
 #define PELIB_CORE
 
+#define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << (var) << "\"" << std::endl;
 namespace pelib
 {
 	/** Models a processor Core **/
 	class Core
 	{
 		public:
+			struct LessCorePtrByCoreId 
+			{
+				bool operator() (const Core *x, const Core *y) const
+				{
+					return x->id < y->id;
+				}
+			};
+
+			/** Constructor **/
+			Core();
+			Core(size_t id);
 			/** Returns a pointer to a copy of this Core **/
 			virtual Core* clone() const = 0;
 			/** Destructor **/
@@ -37,10 +50,16 @@ namespace pelib
 			virtual const std::set<float>& getFrequencies() const = 0;
 			/** Returns the frequency multiplier of the frequency set to obtain frequencies in Hertz **/
 			virtual float getFrequencyUnit() const = 0;
+			virtual bool
+			operator<(const Core &other) const;
+	    		virtual bool
+			operator==(const Core &other) const;
+			int id;
 		protected:
+			static size_t counter;
 			float frequencyUnit;
 		private:
 	};
 }
-
+#undef debug
 #endif

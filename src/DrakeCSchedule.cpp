@@ -121,7 +121,7 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 
 	for(Schedule::table::const_iterator i = sched->getSchedule().begin(); i != sched->getSchedule().end(); i++)
 	{
-		const set<Platform::island> i1 = pt->getSharedMemoryIslands(i->first);
+		const Platform::islands i1 = pt->getSharedMemoryIslands(i->first);
 		const set<int> islands = pt->getSharedMemoryIslands(i1);
 		//os << "	schedule->consumers_in_core[" << i->first - 1 << "] = " << sched->getRemoteSharedMemoryIslandConsumers(islands, *tg, *pt).size() << ";" << endl;
 		os << "	schedule->consumers_in_core[" << i->first - 1 << "] = " << sched->getRemoteConsumers(i->first, *tg, *pt).size() << ";" << endl;
@@ -131,7 +131,7 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 
 	for(Schedule::table::const_iterator i = sched->getSchedule().begin(); i != sched->getSchedule().end(); i++)
 	{
-		const set<Platform::island> i1 = pt->getSharedMemoryIslands(i->first);
+		const Platform::islands i1 = pt->getSharedMemoryIslands(i->first);
 		const set<int> islands = pt->getSharedMemoryIslands(i1);
 		//os << "	schedule->producers_in_core[" << i->first - 1 << "] = " << sched->getRemoteSharedMemoryIslandProducers(islands, *tg, *pt).size() << ";" << endl;
 		os << "	schedule->producers_in_core[" << i->first - 1 << "] = " << sched->getRemoteProducers(i->first, *tg, *pt).size() << ";" << endl;

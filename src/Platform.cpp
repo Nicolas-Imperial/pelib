@@ -39,37 +39,37 @@ namespace pelib
 		f.insert(1);
 		Core *core = new DummyCore(f, 1);
 		this->cores.insert(core);
-		set<const Core*> island;
-		island.insert(core);
-		main.insert(set<const Core*>(island));
-		shared.insert(set<const Core*>(island));
-		priv.insert(set<const Core*>(island));
-		voltage.insert(set<const Core*>(island));
-		freq.insert(set<const Core*>(island));
+		island isl;
+		isl.insert(core);
+		main.insert(island(isl));
+		shared.insert(island(isl));
+		priv.insert(island(isl));
+		voltage.insert(island(isl));
+		freq.insert(island(isl));
 	}
 
-	Platform::Platform(const set<const Core*>& cores)
+	Platform::Platform(const island &cores)
 	{
 		//set<const Core*> shared;
 		for(set<const Core*>::const_iterator i = cores.begin(); i != cores.end(); i++)
 		{
 			Core *core = (*i)->clone();
 			this->cores.insert(core);
-			set<const Core*> island;
-			island.insert(core);
+			island isl;
+			isl.insert(core);
 			//shared.insert(core);
 
 			// Each core is its own Platform::island of anything
-			this->shared.insert(set<const Core*>(island));
-			this->main.insert(set<const Core*>(island));
-			this->priv.insert(set<const Core*>(island));
-			this->voltage.insert(set<const Core*>(island));
-			this->freq.insert(set<const Core*>(island));
+			this->shared.insert(island(isl));
+			this->main.insert(island(isl));
+			this->priv.insert(island(isl));
+			this->voltage.insert(island(isl));
+			this->freq.insert(island(isl));
 		}
 		//this->shared.insert(set<const Core*>(shared));
 	}
 	
-	Platform::Platform(const std::set<const Core*>& cores, const std::set<std::set <const Core*> >& shared, const std::set<std::set <const Core*> >& main, const std::set<std::set <const Core*> >& priv, const std::set<std::set <const Core*> >& voltage, const std::set<std::set <const Core*> >& freq)
+	Platform::Platform(const island& cores, const islands &shared, const islands &main, const islands &priv, const islands &voltage, const islands &freq)
 	{
 		this->cores = cores;
 		this->shared = shared;
@@ -86,16 +86,16 @@ namespace pelib
 		{
 			Core *core = ref->clone();
 			this->cores.insert(core);
-			set<const Core*> island;
-			island.insert(core);
+			island isl;
+			isl.insert(core);
 			//shared.insert(core);
 
 			// Each core is its own Platform::island of anything
-			this->shared.insert(set<const Core*>(island));
-			this->main.insert(set<const Core*>(island));
-			this->priv.insert(set<const Core*>(island));
-			this->voltage.insert(set<const Core*>(island));
-			this->freq.insert(set<const Core*>(island));
+			this->shared.insert(island(isl));
+			this->main.insert(island(isl));
+			this->priv.insert(island(isl));
+			this->voltage.insert(island(isl));
+			this->freq.insert(island(isl));
 		}
 		//this->shared.insert(shared);
 	}
@@ -104,7 +104,7 @@ namespace pelib
 	Platform::copy(const Platform *arch)
 	{
 		this->cores.clear();
-		for(set<const Core*>::const_iterator i = arch->getCores().begin(); i != arch->getCores().end(); i++)
+		for(island::const_iterator i = arch->getCores().begin(); i != arch->getCores().end(); i++)
 		{
 			this->cores.insert((*i)->clone());
 		}
@@ -115,59 +115,59 @@ namespace pelib
 		this->voltage.clear();
 		this->freq.clear();
 
-		for(set<set<const Core*> >::const_iterator i = arch->getSharedMemoryIslands().begin(); i != arch->getSharedMemoryIslands().end(); i++)
+		for(islands::const_iterator i = arch->getSharedMemoryIslands().begin(); i != arch->getSharedMemoryIslands().end(); i++)
 		{
-			set<const Core*> island;
-			for(set<const Core*>::const_iterator j = i->begin(); j != i->end(); j++)
+			island isl;
+			for(island::const_iterator j = i->begin(); j != i->end(); j++)
 			{
-				island.insert(this->getCore(arch->getCoreId(*arch->getCores().find(*j))));
+				isl.insert(this->getCore(arch->getCoreId(*arch->getCores().find(*j))));
 			}
 
-			this->shared.insert(island);
+			this->shared.insert(isl);
 		}
 
-		for(set<set<const Core*> >::const_iterator i = arch->getMainMemoryIslands().begin(); i != arch->getMainMemoryIslands().end(); i++)
+		for(islands::const_iterator i = arch->getMainMemoryIslands().begin(); i != arch->getMainMemoryIslands().end(); i++)
 		{
-			set<const Core*>  island;
-			for(set<const Core*>::const_iterator j = i->begin(); j != i->end(); j++)
+			island isl;
+			for(island::const_iterator j = i->begin(); j != i->end(); j++)
 			{
-				island.insert(this->getCore(arch->getCoreId(*arch->getCores().find(*j))));
+				isl.insert(this->getCore(arch->getCoreId(*arch->getCores().find(*j))));
 			}
 
-			this->main.insert(island);
+			this->main.insert(isl);
 		}
 
-		for(set<set<const Core*> >::const_iterator i = arch->getPrivateMemoryIslands().begin(); i != arch->getPrivateMemoryIslands().end(); i++)
+		for(islands::const_iterator i = arch->getPrivateMemoryIslands().begin(); i != arch->getPrivateMemoryIslands().end(); i++)
 		{
-			set<const Core*>  island;
-			for(set<const Core*>::const_iterator j = i->begin(); j != i->end(); j++)
+			island isl;
+			for(island::const_iterator j = i->begin(); j != i->end(); j++)
 			{
-				island.insert(this->getCore(arch->getCoreId(*arch->getCores().find(*j))));
+				isl.insert(this->getCore(arch->getCoreId(*arch->getCores().find(*j))));
 			}
 
-			this->priv.insert(island);
+			this->priv.insert(isl);
 		}
 
-		for(set<set<const Core*> >::const_iterator i = arch->getVoltageIslands().begin(); i != arch->getVoltageIslands().end(); i++)
+		for(islands::const_iterator i = arch->getVoltageIslands().begin(); i != arch->getVoltageIslands().end(); i++)
 		{
-			set<const Core*>  island;
-			for(set<const Core*>::const_iterator j = i->begin(); j != i->end(); j++)
+			island isl;
+			for(island::const_iterator j = i->begin(); j != i->end(); j++)
 			{
-				island.insert(this->getCore(arch->getCoreId(*arch->getCores().find(*j))));
+				isl.insert(this->getCore(arch->getCoreId(*arch->getCores().find(*j))));
 			}
 
-			this->voltage.insert(island);
+			this->voltage.insert(isl);
 		}
 
-		for(set<set<const Core*> >::const_iterator i = arch->getFrequencyIslands().begin(); i != arch->getFrequencyIslands().end(); i++)
+		for(islands::const_iterator i = arch->getFrequencyIslands().begin(); i != arch->getFrequencyIslands().end(); i++)
 		{
-			set<const Core*>  island;
-			for(set<const Core*>::const_iterator j = i->begin(); j != i->end(); j++)
+			island isl;
+			for(island::const_iterator j = i->begin(); j != i->end(); j++)
 			{
-				island.insert(this->getCore(arch->getCoreId(*arch->getCores().find(*j))));
+				isl.insert(this->getCore(arch->getCoreId(*arch->getCores().find(*j))));
 			}
 
-			this->freq.insert(island);
+			this->freq.insert(isl);
 		}
 	}
 
@@ -203,7 +203,7 @@ namespace pelib
 			Set<float>::SetOfSetsType Fi = set_Fi->getSubsets();
 			for(Set<float>::SetOfSetsType::iterator i = Fi.begin(); i != Fi.end(); i++)
 			{
-				frequency.push_back(set<const Core*>());
+				frequency.push_back(island());
 			}
 		}
 
@@ -214,19 +214,19 @@ namespace pelib
 			Set<float>::SetOfSetsType Si = set_Si->getSubsets();
 			for(Set<float>::SetOfSetsType::iterator i = Si.begin(); i != Si.end(); i++)
 			{
-				shared.push_back(set<const Core*>());
+				shared.push_back(island());
 			}
 		}
 
 		for(size_t i = 0; i < scalar_p->getValue(); i++)
 		{
-			const Core *core = new DummyCore(set_F->getValues(), f_unit == NULL ? 1 : f_unit->getValue());
+			const Core *core = new DummyCore(i + 1, set_F->getValues(), f_unit == NULL ? 1 : f_unit->getValue());
 			this->cores.insert(core);
-			set<const Core*> island;
-			island.insert(core);
+			island isl;
+			isl.insert(core);
 
 			// Each core is its own shared mamory island
-			main.insert(set<const Core*>(island));
+			main.insert(island(isl));
 
 			// If frequency islands are provided, then insert core in the right island
 			if(set_Fi != NULL)
@@ -242,7 +242,7 @@ namespace pelib
 					{
 						size_t island_id = std::distance(Fi.begin(), j);
 						std::advance(jj, island_id);
-						set<const Core*> island = *jj;
+						island isl = *jj;
 						frequency[island_id].insert(core);
 
 						break;
@@ -264,7 +264,7 @@ namespace pelib
 					{
 						size_t island_id = std::distance(Si.begin(), j);
 						std::advance(jj, island_id);
-						set<const Core*> island = *jj;
+						island isl = *jj;
 						shared[island_id].insert(core);
 
 						break;
@@ -284,13 +284,13 @@ namespace pelib
 			}
 			else
 			{
-				set<Platform::island> islands;
+				islands isls;
 				for(vector<Platform::island>::iterator i = frequency.begin(); i != frequency.end(); i++)
 				{
-					islands.insert(*i);
+					isls.insert(*i);
 				}
-				this->voltage = islands;
-				this->freq = islands;
+				this->voltage = isls;
+				this->freq = isls;
 			}
 
 			// If ishared memory islands are provided, then copy the
@@ -302,19 +302,19 @@ namespace pelib
 			}
 			else
 			{
-				set<Platform::island> islands;
+				islands isls;
 				for(vector<Platform::island>::iterator i = shared.begin(); i != shared.end(); i++)
 				{
-					islands.insert(*i);
+					isls.insert(*i);
 				}
-				this->shared = islands;
+				this->shared = isls;
 			}
 		}
 	}
 
 	Platform::~Platform()
 	{
-		for(set<const Core*>::const_iterator i = this->getCores().begin(); i != this->getCores().end(); i++)
+		for(island::const_iterator i = this->getCores().begin(); i != this->getCores().end(); i++)
 		{
 			delete *i;
 		}
@@ -326,7 +326,7 @@ namespace pelib
 		return new Platform(this);
 	}
 
-	const std::set<const Core*>&
+	const Platform::island&
 	Platform::getCores() const
 	{
 		return this->cores;
@@ -337,7 +337,7 @@ namespace pelib
 	{
 		const char* type = NULL;
 		
-		for(set<const Core*>::const_iterator i = this->getCores().begin(); i != this->getCores().end(); i++)
+		for(island::const_iterator i = this->getCores().begin(); i != this->getCores().end(); i++)
 		{
 			if(type != NULL)
 			{
@@ -371,13 +371,13 @@ namespace pelib
 		Set<float>::SetOfSetsType Fi;
 		for(set<island>::iterator i = this->freq.begin(); i != this->freq.end(); i++)
 		{
-			Set<float>::SetType island;
-			for(set<const Core*>::const_iterator j = i->begin(); j != i->end(); j++)
+			Set<float>::SetType isl;
+			for(island::const_iterator j = i->begin(); j != i->end(); j++)
 			{
-				set<const Core*>::iterator core_iter = cores.find(*j);
-				island.insert(std::distance(cores.begin(), core_iter) + 1);
+				island::iterator core_iter = cores.find(*j);
+				isl.insert(std::distance(cores.begin(), core_iter) + 1);
 			}
-			Fi.insert(pair<size_t, Set<float>::SetType>((size_t)(std::distance(this->freq.begin(), i) + 1), island));
+			Fi.insert(pair<size_t, Set<float>::SetType>((size_t)(std::distance(this->freq.begin(), i) + 1), isl));
 		}
 		Set<float> set_Fi("Fi", Fi);
 
@@ -398,7 +398,7 @@ namespace pelib
 		{
 			throw CastException("Requesting core beyond the number of core in the platform.");
 		}
-		std::set<const Core*>::iterator it = this->cores.begin();
+		island::iterator it = this->cores.begin();
 		std::advance(it, id - 1);
 		return *it;
 	}
@@ -414,37 +414,37 @@ namespace pelib
 		return std::distance(this->cores.begin(), this->cores.find(core)) + 1;
 	}
 
-	const std::set<Platform::island>&
+	const Platform::islands&
 	Platform::getSharedMemoryIslands() const
 	{
 		return this->shared;
 	}
 
-	const std::set<Platform::island>
+	const Platform::islands
 	Platform::getSharedMemoryIslands(size_t id) const
 	{
 		if(id > this->getCores().size())
 		{
 			throw CastException("Requesting shared memory island beyond the number of islands in the platform.");
 		}
-		set<Platform::island> islands;
+		islands isls;
 		const Core* core = this->getCore(id);
-		for(set<Platform::island >::const_iterator i = this->getSharedMemoryIslands().begin(); i != this->getSharedMemoryIslands().end(); i++)
+		for(islands::const_iterator i = this->getSharedMemoryIslands().begin(); i != this->getSharedMemoryIslands().end(); i++)
 		{
 			if(i->find(core) != i->end())
 			{
-				islands.insert(*i);
+				isls.insert(*i);
 			}
 		}
 
-		return islands;
+		return isls;
 	}
 
 	const std::set<int>
-	Platform::getSharedMemoryIslands(const std::set<Platform::island>& islands) const
+	Platform::getSharedMemoryIslands(const islands& isls) const
 	{
 		set<int> indexes;
-		for(set<Platform::island>::const_iterator i = islands.begin(); i != islands.end(); i++)
+		for(Platform::islands::const_iterator i = isls.begin(); i != isls.end(); i++)
 		{
 			if(this->getSharedMemoryIslands().find(*i) != this->getSharedMemoryIslands().end())
 			{
@@ -459,11 +459,11 @@ namespace pelib
 		return indexes;
 	}
 
-	const std::set<Platform::island>
-	Platform::getSharedMemoryIslands(const std::set<int>& islands) const
+	const Platform::islands
+	Platform::getSharedMemoryIslands(const std::set<int>& isls) const
 	{
-		std::set<island> out;
-		for(std::set<int>::const_iterator i = islands.begin(); i != islands.end(); i++)
+		Platform::islands out;
+		for(std::set<int>::const_iterator i = isls.begin(); i != isls.end(); i++)
 		{
 			set<island>::const_iterator ii = this->getSharedMemoryIslands().begin();
 			if(*i > (ptrdiff_t)this->getSharedMemoryIslands().size())
@@ -477,51 +477,51 @@ namespace pelib
 		return out;
 	}
 
-	const std::set<Platform::island>&
+	const Platform::islands&
 	Platform::getMainMemoryIslands() const
 	{
 		return this->main;
 	}
 
-	const std::set<Platform::island>
+	const Platform::islands
 	Platform::getMainMemoryIslands(size_t id) const
 	{
-		set<Platform::island> islands;
+		islands isls;
 		const Core* core = this->getCore(id);
-		for(set<Platform::island>::const_iterator i = this->getMainMemoryIslands().begin(); i != this->getMainMemoryIslands().end(); i++)
+		for(Platform::islands::const_iterator i = this->getMainMemoryIslands().begin(); i != this->getMainMemoryIslands().end(); i++)
 		{
 			if(i->find(core) != i->end())
 			{
-				islands.insert(*i);
+				isls.insert(*i);
 			}
 		}
 
-		return islands;
+		return isls;
 	}
 
-	const std::set<Platform::island>&
+	const Platform::islands&
 	Platform::getPrivateMemoryIslands() const
 	{
 		return this->priv;
 	}
 
-	const std::set<Platform::island>
+	const Platform::islands
 	Platform::getPrivateMemoryIslands(size_t id) const
 	{
-		set<Platform::island> islands;
+		Platform::islands isls;
 		const Core* core = this->getCore(id);
-		for(set<Platform::island>::const_iterator i = this->getPrivateMemoryIslands().begin(); i != this->getPrivateMemoryIslands().end(); i++)
+		for(Platform::islands::const_iterator i = this->getPrivateMemoryIslands().begin(); i != this->getPrivateMemoryIslands().end(); i++)
 		{
 			if(i->find(core) != i->end())
 			{
-				islands.insert(*i);
+				isls.insert(*i);
 			}
 		}
 
-		return islands;
+		return isls;
 	}
 
-	const std::set<Platform::island>&
+	const Platform::islands&
 	Platform::getVoltageIslands() const
 	{
 		return this->voltage;
@@ -531,7 +531,7 @@ namespace pelib
 	Platform::getVoltageIsland(size_t id) const
 	{
 		const Core* core = this->getCore(id);
-		for(set<Platform::island>::const_iterator i = this->getVoltageIslands().begin(); i != this->getVoltageIslands().end(); i++)
+		for(Platform::islands::const_iterator i = this->getVoltageIslands().begin(); i != this->getVoltageIslands().end(); i++)
 		{
 			if(i->find(core) != i->end())
 			{
@@ -542,7 +542,7 @@ namespace pelib
 		throw CastException("Cannot find core in any Platform::island of the platform.");
 	}
 
-	const std::set<Platform::island>&
+	const Platform::islands&
 	Platform::getFrequencyIslands() const
 	{
 		return this->freq;
@@ -552,7 +552,7 @@ namespace pelib
 	Platform::getFrequencyIsland(size_t id) const
 	{
 		const Core* core = this->getCore(id);
-		for(set<Platform::island>::const_iterator i = this->getFrequencyIslands().begin(); i != this->getFrequencyIslands().end(); i++)
+		for(Platform::islands::const_iterator i = this->getFrequencyIslands().begin(); i != this->getFrequencyIslands().end(); i++)
 		{
 			if(i->find(core) != i->end())
 			{
@@ -566,7 +566,7 @@ namespace pelib
 	Platform&
 	Platform::operator=(const Platform& cpy)
 	{
-		for(set<const Core*>::const_iterator i = this->getCores().begin(); i != this->getCores().end(); i++)
+		for(island::const_iterator i = this->getCores().begin(); i != this->getCores().end(); i++)
 		{
 			delete *i;
 		}
