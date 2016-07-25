@@ -144,6 +144,7 @@ namespace pelib
 		const Scalar<float> *M = algebra.find<Scalar<float> >("M");
 		const Scalar<float> *n = algebra.find<Scalar<float> >("n");
 		const Vector<int, float> *tau = algebra.find<Vector<int, float> >("Tau");
+		const Vector<int, float> *stau = algebra.find<Vector<int, float> >("sTau");
 		const Vector<int, float> *Wi = algebra.find<Vector<int, float> >("Wi");
 		const Matrix<int, int, float> *e = algebra.find<Matrix<int, int, float> >("e");
 		const Matrix<int, int, float> *c = algebra.find<Matrix<int, int, float> >("c");
@@ -165,6 +166,15 @@ namespace pelib
 		{
 			float id = i->first;
 			float work = i->second;
+			float swork;
+			if(stau != NULL)
+			{
+				swork = stau->getValues().find((int)id)->second;
+			}
+			else
+			{
+				swork = 0;
+			}
 			float max_wi = Wi->getValues().find((int)id)->second;
 
 			stringstream ss;
@@ -185,6 +195,7 @@ namespace pelib
 
 			Task t(task_name->getValues().find(id)->second);
 			t.setWorkload(work);
+			t.setStartWorkload(swork);
 			t.setMaxWidth(max_wi);
 			t.setEfficiencyString(ss.str());
 
@@ -236,6 +247,7 @@ namespace pelib
 		map<int, map<int, float> > map_e;
 		map<int, map<int, float> > map_c;
 		map<int, float> map_tau;
+		map<int, float> map_stau;
 		map<int, float> map_Wi;
 		map<int, string> map_name;
 
@@ -247,6 +259,7 @@ namespace pelib
 		for(set<Task>::const_iterator i = getTasks().begin(); i != getTasks().end(); i++)
 		{
 			map_tau.insert(pair<int, float>(std::distance(this->getTasks().begin(), i) + 1, i->getWorkload()));
+			map_stau.insert(pair<int, float>(std::distance(this->getTasks().begin(), i) + 1, i->getStartWorkload()));
 			map_name.insert(pair<int, string>(std::distance(this->getTasks().begin(), i) + 1, i->getName()));
 			float max_width = 0;
 			if(i->getMaxWidth() > arch.getCores().size())
@@ -290,6 +303,7 @@ namespace pelib
 		}
 
 		Vector<int, float> tau("Tau", map_tau);
+		Vector<int, float> stau("sTau", map_stau);
 		Vector<int, float> Wi("Wi", map_Wi);
 		Vector<int, string> name("name", map_name);
 		Matrix<int, int, float> e("e", map_e);
@@ -300,6 +314,7 @@ namespace pelib
 		out.insert(&n);
 		out.insert(&name);
 		out.insert(&tau);
+		out.insert(&stau);
 		out.insert(&Wi);
 		out.insert(&e);
 		out.insert(&c);

@@ -91,10 +91,16 @@ namespace pelib
 			virtual double
 			getWorkload() const;
 
+			virtual double
+			getStartWorkload() const;
+
 			/** Sets the workload, in number of instructions, of the task **/
 			virtual void
 			setWorkload(double workload);
 			
+			virtual void
+			setStartWorkload(double workload);
+
 			/** Gets the maximum number of cores that can run this task in parallel in an efficient manner **/
 			virtual double
 			getMaxWidth() const;
@@ -117,6 +123,9 @@ namespace pelib
 			**/
 			virtual double
 			runtime(double width = 1, double frequency = 1) const;
+
+			virtual double
+			startRuntime(double width = 1, double frequency = 1) const;
 
 			/** Allows the comparison of tasks. Used with ==, allows the test of difference **/
 			virtual bool
@@ -146,7 +155,7 @@ namespace pelib
 			/** Frequency and width allocated to this task **/
 			double frequency, width;
 			/** Workload in number of instructions and maximum number of cores able to run this task **/
-			double workload, maxWidth;
+			double workload, start_workload, maxWidth;
 			/** Time at which this task starts **/
 			float start_time;
 			/** Name, source code module name and efficiency formula of the task **/

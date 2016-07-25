@@ -323,7 +323,8 @@ namespace pelib
 	Platform*
 	Platform::clone() const
 	{
-		return new Platform(this);
+		Platform* res = new Platform(this);
+		return res;
 	}
 
 	const std::set<const Core*>&

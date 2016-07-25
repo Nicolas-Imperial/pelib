@@ -155,6 +155,7 @@ GraphML::dump(ostream& os, const Taskgraph *data, const Platform *arch) const
 		SETVAS(graph, "name", counter, task.getName().c_str());
 		SETVAS(graph, "module", counter, task.getModule().c_str());
 		SETVAN(graph, "workload", counter, task.getWorkload());
+		SETVAN(graph, "start_workload", counter, task.getStartWorkload());
 		stringstream max_width;
 
 		// If no platform is provided, just dump efficiency and max width as is.
@@ -305,6 +306,14 @@ GraphML::parse(istream &is) const
 		Task task(strcmp(VAS(the_graph, "name", id), "") != 0 ? VAS(the_graph, "name", id) : estr.str());
 		task.setModule(strcmp(VAS(the_graph, "module", id),"") != 0 ? VAS(the_graph, "module", id) : "dummy");
 		task.setWorkload(!isnan((float)VAN(the_graph, "workload", id)) ? VAN(the_graph, "workload", id): 1.0);
+		if(igraph_cattribute_has_attr(the_graph, IGRAPH_ATTRIBUTE_VERTEX, "start_workload"))
+		{
+			task.setStartWorkload(!isnan((float)VAN(the_graph, "start_workload", id)) ? VAN(the_graph, "start_workload", id): 1.0);
+		}
+		else
+		{
+			task.setStartWorkload(0);
+		}
 		const char *str = VAS(the_graph, "max_width", id);
 		string max_width_str(str);
 		boost::algorithm::to_lower(max_width_str);

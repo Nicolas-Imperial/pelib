@@ -40,7 +40,7 @@ using namespace pelib;
 struct conversion
 {
 	vector<pelib_argument_stream_t> inputs;
-	pelib_argument_stream_t process;
+	vector<pelib_argument_stream_t> process;
 	vector<pelib_argument_stream_t> outputs;
 };
 typedef struct conversion conversion_t;
@@ -50,7 +50,7 @@ parse_args(char** argv)
 {
 	conversion_t conversion;
 	string self(argv[0]);
-	conversion.process.library = NULL;
+	//conversion.process.library = NULL;
 
 	for(argv++; *argv != NULL; argv++)
 	{
@@ -72,7 +72,7 @@ parse_args(char** argv)
 			argv++;
 			size_t num = pelib_argument_stream_parse(argv, &process);
 			argv = argv + num - 1;
-			conversion.process = process;
+			conversion.process.push_back(process);
 			continue;
 		}
 
@@ -117,7 +117,7 @@ parse_args(char** argv)
 int
 main(int argc, char **argv)
 {
-	void *libProcess = 0;
+	vector<void*> process;
 	map<const char*, Record*> inputs;
 	map<const char*, void (*)(Record*)> freelist;
 	map<const char*, void*> parserList;
@@ -208,13 +208,14 @@ main(int argc, char **argv)
 		// Don't destroy the pelib_argument_stream descriptor yet as we still need input names
 	}
 
-	if(conversion.process.library != NULL)
+	for(vector<pelib_argument_stream_t>::const_iterator i = conversion.process.begin(); i != conversion.process.end(); i++)
 	{
-		libProcess = load_lib(conversion.process.library);
+		void *libProcess = load_lib(i->library);
+		process.push_back(libProcess);
 
 		/* Link function handles to function pointers */
 		std::map<const char*, Record*> (*process)(std::map<const char*, Record*> records, size_t, char**) = (std::map<const char*, Record*> (*)(std::map<const char*, Record*> records, size_t, char**))load_function(libProcess, "pelib_process");
-		std::map<const char*, Record*> transform = process(inputs, conversion.process.argc, conversion.process.argv);
+		std::map<const char*, Record*> transform = process(inputs, i->argc, i->argv);
 
 		// Free data structure parsed
 		for(map<const char*, void (*)(Record*)>::iterator i = freelist.begin(); i != freelist.end(); i++)
@@ -297,9 +298,9 @@ main(int argc, char **argv)
 	}
 
 	// Delete processing dynamic library
-	if(conversion.process.library != NULL)
+	for(vector<void*>::const_iterator i = process.begin(); i != process.end(); i++)
 	{
-		destroy_lib(libProcess);
+		destroy_lib(*i);
 	}
 
 	// Destroy input arguments
@@ -308,3 +309,4 @@ main(int argc, char **argv)
 		pelib_argument_stream_destroy(*i);
 	}
 }
+

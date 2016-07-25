@@ -47,6 +47,7 @@ namespace pelib
 		this->width = 1;
 		this->maxWidth = 1;
 		this->workload = 1;
+		this->start_workload = 0;
 		this->efficiencyString = "exprtk:p <= 1 ? 1 : 1e-6";
 		this->start_time = 0;
 	}
@@ -59,6 +60,7 @@ namespace pelib
 		this->width = task.getWidth();
 		this->maxWidth = task.getMaxWidth();
 		this->workload = task.getWorkload();
+		this->start_workload = task.getStartWorkload();
 		this->efficiencyString = task.getEfficiencyString();
 		this->start_time = task.getStartTime();
 
@@ -189,6 +191,18 @@ namespace pelib
 	Task::setWorkload(double workload)
 	{
 		this->workload = workload;
+	}
+
+	double
+	Task::getStartWorkload() const
+	{
+		return this->start_workload;
+	}
+
+	void
+	Task::setStartWorkload(double workload)
+	{
+		this->start_workload = workload;
 	}
 
 	double
@@ -395,6 +409,16 @@ namespace pelib
 	Task::runtime(double width, double frequency) const
 	{
 		double work = getWorkload();
+		work = work / (width * getEfficiency((int)width));
+		work = work / frequency;
+		
+		return work; 
+	}
+	
+	double
+	Task::startRuntime(double width, double frequency) const
+	{
+		double work = getStartWorkload();
 		work = work / (width * getEfficiency((int)width));
 		work = work / frequency;
 		
