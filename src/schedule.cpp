@@ -23,6 +23,7 @@
 #include <vector>
 #include <map>
 
+#include <pelib/AmplInput.hpp>
 #include <pelib/Taskgraph.hpp>
 #include <pelib/Platform.hpp>
 #include <pelib/Schedule.hpp>
