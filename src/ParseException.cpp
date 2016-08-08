@@ -44,6 +44,10 @@ namespace pelib
 	const char*
 	ParseException::what() const throw()
 	{
-		return std::string("Parsing exception: ").append(this->msg).c_str();
+		std::string fin = std::string("Parsing exception: ").append(this->msg).c_str();
+		const char *message = fin.c_str();
+		char *cpy = (char*)malloc(sizeof(char) * (strlen(message) + 1));
+		strcpy(cpy, message);
+		return cpy;
 	}
 }

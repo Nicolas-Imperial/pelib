@@ -112,6 +112,14 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 	}
 	os << endl;
 
+	os << endl << "	schedule->task_workload = malloc(sizeof(double) * schedule->task_number);" << endl;
+
+	for(set<Task>::const_iterator i = tg->getTasks().begin(); i != tg->getTasks().end(); i++)
+	{
+		os << "	schedule->task_workload[" << std::distance(tg->getTasks().begin(), i) << "] = " << i->getWorkload() << ";" << endl;
+	}
+	os << endl;
+
 	for(Schedule::table::const_iterator i = sched->getSchedule().begin(); i != sched->getSchedule().end(); i++)
 	{
 		os << "	schedule->tasks_in_core[" << i->first - 1 << "] = " << sched->getTasks(i->first).size() << ";" << endl;
@@ -319,6 +327,7 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 
 	os << "	free(schedule->producers_id);" << endl
 		<< "	free(schedule->producers_name);" << endl
+		<< "	free(schedule->task_workload);" << endl
 		<< "	free(schedule->remote_producers_in_task);" << endl
 		<< "	free(schedule->remote_consumers_in_task);" << endl
 		<< "	free(schedule->producers_in_task);" << endl
