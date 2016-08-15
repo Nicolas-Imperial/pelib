@@ -431,6 +431,8 @@ lib_pelib_pkg_url = http://www.ida.liu.se/~nicme26
 lib_pelib_pkg_ld = 
 lib_pelib_pkg_libs = -lboost_regex -lboost_graph -lm
 lib_pelib_pkg_igraph_version = >= 0.7.1
+lib_pelib_pkg_libxml++-2.6_version = >= 2.20
+lib_pelib_pkg_cairomm-1.0_version = >= 1.8.0
 lib_pelib_pkg_description = General research utility library used in PELAB
 lib_pelib_embed = 
 
