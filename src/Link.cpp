@@ -93,6 +93,17 @@ namespace pelib
 		Task thisConsumer = *this->getConsumer();
 		Task otherConsumer = *other.getConsumer();
 
+		if(thisProducer == otherProducer && thisConsumer == otherConsumer)
+		{
+			if(this->getProducerName().compare(other.getProducerName()) == 0)
+			{
+				return this->getConsumerName() < other.getConsumerName();
+			}
+			else
+			{
+				return this->getProducerName() < other.getProducerName();
+			}
+		}
 
 		if(thisProducer == otherProducer)
 		{
