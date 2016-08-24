@@ -30,6 +30,7 @@ DeadlineConstant.hpp DeadlineFormula.hpp DeadlineCalculator.hpp \
 AmplDataParser.hpp AmplDataOutput.hpp GraphML.hpp \
 AmplInput.hpp AmplInputData.hpp AmplInputScalar.hpp AmplInputVector.hpp AmplInputSet.hpp AmplInputMatrix.hpp \
 AmplOutput.hpp AmplOutputData.hpp AmplOutputScalar.hpp AmplOutputVector.hpp AmplOutputSet.hpp AmplOutputMatrix.hpp XMLSchedule.hpp TetrisSchedule.hpp \
+AlgebraRawOutput.hpp RawData.hpp RawDataOutput.hpp RawMatrix.hpp RawScalar.hpp RawSet.hpp RawVector.hpp \
 CppDataOutput.hpp \
 Cpp.hpp CppData.hpp CppScalar.hpp CppVector.hpp CppSet.hpp CppMatrix.hpp \
 RecordParser.hpp constraints.hpp RecordOutput.hpp AlgebraDataParser.hpp AlgebraDataOutput.hpp AmplInputDataParser.hpp \
@@ -41,12 +42,13 @@ XMLScheduleParser.hpp XMLScheduleOutput.hpp \
 TetrisScheduleOutput.hpp \
 DrakeCSchedule.hpp DrakeCScheduleOutput.hpp \
 \
-Solver.hpp AlgebraSolver.hpp AmplSolver.hpp Scheduler.hpp \
+Solver.hpp AlgebraSolver.hpp AmplSolver.hpp \
+Scheduler.hpp generate.hpp \
 calculus.h \
 \
 exprtk.hpp pelib_exprtk.hpp
 
-cstruct = array.h fifo_array.h integer.h float.h pelib_string.h monitor.h sort.h structure.h complex.h fifo.h size_t.h stack.h template.h array.c fifo.c fifo_array.c stack.c malloc.h 
+cstruct = array.h fifo_array.h integer.h float.h pelib_string.h monitor.h sort.h structure.h complex.h fifo.h size_t.h stack.h template.h array.c fifo.c fifo_array.c stack.c malloc.h iterator.h iterator.c set.h set.c pair.h pair.c map.h map.c string.h
 
 attach = $(text) $(cstruct) time.h
 

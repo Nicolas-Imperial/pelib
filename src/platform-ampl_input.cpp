@@ -48,7 +48,6 @@ pelib_parse(std::istream& cin, size_t argc, char **argv)
 
 	Platform *arch = new Platform(alg_arch);
 
-	
 	return arch;
 }
 

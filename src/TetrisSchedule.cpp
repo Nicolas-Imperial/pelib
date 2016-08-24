@@ -420,7 +420,8 @@ class Canvas
 			{
 				Task task = *i;
 				task.setWorkload(tg->getTasks().find(task)->getWorkload());
-				double runtime = task.runtime(i->getWidth(), i->getFrequency());
+				task.setStartWorkload(tg->getTasks().find(task)->getStartWorkload());
+				double runtime = task.runtime(i->getWidth(), i->getFrequency()) + task.startRuntime(task.getWidth(), task.getFrequency());
 				double width = i->getWidth();
 				string name;
 				if(useTaskName)
@@ -596,9 +597,10 @@ class Canvas
 					if(done < task.getWidth() && core >= next)
 					{
 						task.setWorkload(tg->getTasks().find(task)->getWorkload());
+						task.setStartWorkload(tg->getTasks().find(task)->getStartWorkload());
 						task.setMaxWidth(tg->getTasks().find(task)->getMaxWidth());
 						task.setEfficiencyString(tg->getTasks().find(task)->getEfficiencyString());
-						double runtime = task.runtime(task.getWidth(), task.getFrequency());
+						double runtime = task.runtime(task.getWidth(), task.getFrequency()) + task.startRuntime(task.getWidth(), task.getFrequency());
 
 						// Looks for the number of cores through the task can be drawn in a continuous manner
 						// Instead of the task's width, because mapping may not be to contiguous cores
@@ -824,9 +826,10 @@ TetrisSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		{
 			Task task = *j->second.first;
 			task.setWorkload(tg->getTasks().find(task)->getWorkload());
+			task.setStartWorkload(tg->getTasks().find(task)->getStartWorkload());
 			task.setMaxWidth(tg->getTasks().find(task)->getMaxWidth());
 			task.setEfficiencyString(tg->getTasks().find(task)->getEfficiencyString());
-			double stop_time = task.getStartTime() + task.runtime(task.getWidth(), task.getFrequency());
+			double stop_time = task.getStartTime() + task.runtime(task.getWidth(), task.getFrequency()) + task.startRuntime(task.getWidth(), task.getFrequency());
 			if(stop_time > max_stop_time)
 			{
 				max_stop_time = stop_time;

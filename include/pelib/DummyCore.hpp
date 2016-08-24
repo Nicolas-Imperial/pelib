@@ -33,6 +33,7 @@ namespace pelib
 				@param f Set of frequency that this core can run at
 			**/
 			DummyCore(const std::set<float> &f, float unit);
+			DummyCore(size_t id, const std::set<float> &f, float unit);
 			/** Copy constructor **/
 			DummyCore(const DummyCore*);
 			/** Copy constructor **/

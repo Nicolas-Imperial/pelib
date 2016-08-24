@@ -47,6 +47,10 @@ namespace pelib
 	const char*
 	CastException::what() const throw()
 	{
-		return std::string("Casting exception: ").append(this->msg).c_str();
+		std::string fin = std::string("Cast exception: ").append(this->msg).c_str();
+		const char *message = fin.c_str();
+		char *cpy = (char*)malloc(sizeof(char) * (strlen(message) + 1));
+		strcpy(cpy, message);
+		return cpy;
 	}
 }

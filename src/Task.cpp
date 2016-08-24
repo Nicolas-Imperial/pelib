@@ -37,6 +37,8 @@ using namespace std;
 
 namespace pelib
 {
+	const float Task::very_small = 1e-6;
+
 	Task::Task(const std::string &name)
 	{
 		this->name = name;
@@ -45,6 +47,7 @@ namespace pelib
 		this->width = 1;
 		this->maxWidth = 1;
 		this->workload = 1;
+		this->start_workload = 0;
 		this->efficiencyString = "exprtk:p <= 1 ? 1 : 1e-6";
 		this->start_time = 0;
 	}
@@ -57,6 +60,7 @@ namespace pelib
 		this->width = task.getWidth();
 		this->maxWidth = task.getMaxWidth();
 		this->workload = task.getWorkload();
+		this->start_workload = task.getStartWorkload();
 		this->efficiencyString = task.getEfficiencyString();
 		this->start_time = task.getStartTime();
 
@@ -190,6 +194,18 @@ namespace pelib
 	}
 
 	double
+	Task::getStartWorkload() const
+	{
+		return this->start_workload;
+	}
+
+	void
+	Task::setStartWorkload(double workload)
+	{
+		this->start_workload = workload;
+	}
+
+	double
 	Task::getMaxWidth() const
 	{
 		return this->maxWidth;
@@ -308,10 +324,13 @@ namespace pelib
 	bool
 	Task::operator<(const Task &other) const
 	{
-		const char* me = this->getName().c_str();
-		const char* ot = other.getName().c_str();
+		string Me(this->getName());
+		string Ot(other.getName());
+		const char* me = Me.c_str(); //string(this->getName()).c_str();
+		const char* ot = Ot.c_str(); //string(other.getName()).c_str();
 		
-		if(string(me).compare(string(ot)) == 0)
+		//if(string(me).compare(string(ot)) == 0)
+		if(this->getName().compare(other.getName()) == 0)
 		{
 			return false;
 		}
@@ -390,6 +409,16 @@ namespace pelib
 	Task::runtime(double width, double frequency) const
 	{
 		double work = getWorkload();
+		work = work / (width * getEfficiency((int)width));
+		work = work / frequency;
+		
+		return work; 
+	}
+	
+	double
+	Task::startRuntime(double width, double frequency) const
+	{
+		double work = getStartWorkload();
 		work = work / (width * getEfficiency((int)width));
 		work = work / frequency;
 		

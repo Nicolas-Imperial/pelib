@@ -59,6 +59,12 @@ struct reader_args
 };
 typedef struct reader_args reader_args_t;
 
+const string GraphML::producerName = "producer_name";
+const string GraphML::consumerName = "consumer_name";
+const string GraphML::type = "type";
+const string GraphML::consumerRate = "consume";
+const string GraphML::producerRate = "produce";
+
 static void*
 thread_reader(void* aux)
 {
@@ -149,6 +155,7 @@ GraphML::dump(ostream& os, const Taskgraph *data, const Platform *arch) const
 		SETVAS(graph, "name", counter, task.getName().c_str());
 		SETVAS(graph, "module", counter, task.getModule().c_str());
 		SETVAN(graph, "workload", counter, task.getWorkload());
+		SETVAN(graph, "start_workload", counter, task.getStartWorkload());
 		stringstream max_width;
 
 		// If no platform is provided, just dump efficiency and max width as is.
@@ -181,10 +188,26 @@ GraphML::dump(ostream& os, const Taskgraph *data, const Platform *arch) const
 		SETVAS(graph, "max_width", counter, max_width.str().c_str());
 	}
 
-	for(set<Link>::const_iterator i = tg->getLinks().begin(); i != tg->getLinks().end(); i++)
+	counter = 0;
+	for(set<Link>::const_iterator i = tg->getLinks().begin(); i != tg->getLinks().end(); i++, counter++)
 	{
+		//SETGAS(graph, "test", counter, "this is a test");
 		int ret = igraph_add_edge(graph, std::distance(tg->getTasks().begin(), tg->getTasks().find(*i->getProducer())), std::distance(tg->getTasks().begin(), tg->getTasks().find(*i->getConsumer())));
 		if(ret == IGRAPH_EINVAL) throw CastException("Could not add vertices to igraph.");
+		SETEAS(graph, producerName.c_str(), counter, i->getProducerName().c_str());
+		SETEAS(graph, consumerName.c_str(), counter, i->getConsumerName().c_str());
+		if(i->getDataType().compare(string()) != 0)
+		{
+			SETEAS(graph, type.c_str(), counter, i->getDataType().c_str());
+		}
+		if(i->getConsumerRate() > 0)
+		{
+			SETEAN(graph, consumerRate.c_str(), counter, i->getConsumerRate());
+		}
+		if(i->getProducerRate() > 0)
+		{
+			SETEAN(graph, producerRate.c_str(), counter, i->getProducerRate());
+		}
 	}
 
 	// Dump data to stream os
@@ -283,6 +306,14 @@ GraphML::parse(istream &is) const
 		Task task(strcmp(VAS(the_graph, "name", id), "") != 0 ? VAS(the_graph, "name", id) : estr.str());
 		task.setModule(strcmp(VAS(the_graph, "module", id),"") != 0 ? VAS(the_graph, "module", id) : "dummy");
 		task.setWorkload(!isnan((float)VAN(the_graph, "workload", id)) ? VAN(the_graph, "workload", id): 1.0);
+		if(igraph_cattribute_has_attr(the_graph, IGRAPH_ATTRIBUTE_VERTEX, "start_workload"))
+		{
+			task.setStartWorkload(!isnan((float)VAN(the_graph, "start_workload", id)) ? VAN(the_graph, "start_workload", id): 1.0);
+		}
+		else
+		{
+			task.setStartWorkload(0);
+		}
 		const char *str = VAS(the_graph, "max_width", id);
 		string max_width_str(str);
 		boost::algorithm::to_lower(max_width_str);
@@ -324,7 +355,7 @@ GraphML::parse(istream &is) const
 			task.setEfficiencyString(string("exprtk:p <= ") + ss.str() + "? 1 : 1e-6");
 		}
 
-		tasks.insert(task).second;
+		tasks.insert(Task(task));
 	}
 
 	// Add edges between tasks
@@ -337,8 +368,25 @@ GraphML::parse(istream &is) const
 		igraph_edge(the_graph, i, &producer_id, &consumer_id);
 		Task producer(VAS(the_graph, "name", producer_id));
 		Task consumer(VAS(the_graph, "name", consumer_id));
+		string producerName = string(EAS(the_graph, GraphML::producerName.c_str(), i));
+		string consumerName = string(EAS(the_graph, GraphML::consumerName.c_str(), i));
+		string type("");
+		if(igraph_cattribute_has_attr(the_graph, IGRAPH_ATTRIBUTE_EDGE, GraphML::type.c_str()))
+		{
+			type = string(EAS(the_graph, GraphML::type.c_str(), i));
+		}
+		size_t consume = 0;
+		if(igraph_cattribute_has_attr(the_graph, IGRAPH_ATTRIBUTE_EDGE, consumerRate.c_str()))
+		{
+			consume = EAN(the_graph, consumerRate.c_str(), i);
+		}
+		size_t produce = 0;
+		if(igraph_cattribute_has_attr(the_graph, IGRAPH_ATTRIBUTE_EDGE, producerRate.c_str()))
+		{
+			produce = EAN(the_graph, producerRate.c_str(), i);
+		}
 
-		Link link(*tasks.find(producer), *tasks.find(consumer));
+		Link link(*tasks.find(producer), *tasks.find(consumer), producerName, consumerName, type, consume, produce);
 		links.insert(link);
 
 		const Link &link_ref = *links.find(link);

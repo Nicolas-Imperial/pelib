@@ -56,7 +56,7 @@ pelib_parse(std::istream& cin, size_t argc, char **argv)
 		throw ParseException(std::string("Missing core number scalar \"p\" or frequency set \"F\" in input."));
 	}
 
-	set<const Core*> cores;
+	set<const Core*, Core::LessCorePtrByCoreId> cores;
 	for(size_t i = 0; i < (size_t)scalar_p->getValue(); i++)
 	{
 		cores.insert(new DummyCore(set_F->getValues(), f_unit->getValue()));

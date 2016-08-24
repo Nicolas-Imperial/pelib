@@ -488,7 +488,10 @@ pelib_array_checkascending(ARRAY_T)(array_t(ARRAY_T)* array)
 int
 pelib_free_buffer(array_t(ARRAY_T))(array_t(ARRAY_T)* array)
 {
-  free(array->data);
+  if(array->capacity > 0)
+  {
+    free(array->data);
+  }
   array->data = NULL;
 
   return 0;
