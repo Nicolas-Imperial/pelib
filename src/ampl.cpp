@@ -46,7 +46,7 @@ parse(char **args)
 {
 	args_t out;
 	out.model = NULL;
-	out.model_file = (char*)"model.dat";
+	out.model_file = (char*)"model.mod";
 	out.run = NULL;
 	out.showError = false;
 	out.showOutput = false;
