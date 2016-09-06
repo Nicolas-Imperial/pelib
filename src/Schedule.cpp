@@ -721,7 +721,7 @@ namespace pelib
 					}
 
 					double tau = workload.find((int)n)->second;
-					size_t wi = (size_t)width.find((int)n)->second;
+					size_t wi = (size_t)floor((width.find((int)n)->second + 0.5));
 					size_t Wi = (size_t)max_width.find((int)n)->second;
 					double e = wi <= Wi ? efficiency.find((int)n)->second.find((int)wi)->second : 1e-06;
 					double f = frequency.find((int)n)->second;
