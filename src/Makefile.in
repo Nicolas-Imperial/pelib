@@ -16,7 +16,7 @@
 # along with pelib. If not, see <http://www.gnu.org/licenses/>.
 #
 
-attach=
+attach = pelib-scheduler
 
 subdirs = 
 
@@ -512,6 +512,10 @@ test_map-test_libs =
 test_map-test_ldflags = -L.
 test_map-test_static = 0
 
+post-install: do-post-install dist
+
+do-post-install:
+	install -m 755 pelib-scheduler $(DESTDIR)$(final_bindir)/pelib-scheduler
 ## Uncomment this to run target "first" before any target explicetly called
 #FIRST = first
 
