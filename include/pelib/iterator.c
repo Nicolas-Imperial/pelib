@@ -146,7 +146,6 @@ pelib_free(iterator_t(ITERATOR_T))(iterator_t(ITERATOR_T)* iterator)
 int
 pelib_free_struct(iterator_t(ITERATOR_T))(iterator_t(ITERATOR_T)* iterator)
 {
-	pelib_destroy(ITERATOR_T)(iterator->value);
 	free(iterator);
 	return 0;
 }

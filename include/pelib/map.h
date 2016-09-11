@@ -46,6 +46,7 @@
 #define pelib_map_insert(key, value) PELIB_CONCAT_3(pelib_, map(key, value), _insert)
 #define pelib_map_find(key, value) PELIB_CONCAT_3(pelib_, map(key, value), _find)
 #define pelib_map_compare(key, value) PELIB_CONCAT_3(pelib_, map(key, value), _compare)
+#define pelib_map_size(key, value) PELIB_CONCAT_3(pelib_, map(key, value), _size)
 
 /** Generic static map **/
 struct map(MAP_KEY_T, MAP_VALUE_T)
@@ -85,6 +86,10 @@ pelib_map_next(MAP_KEY_T, MAP_VALUE_T)(iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)
 
 pair_t(MAP_KEY_T, MAP_VALUE_T)
 pelib_map_read(MAP_KEY_T, MAP_VALUE_T)(iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T))*);
+
+size_t
+pelib_map_size(MAP_KEY_T, MAP_VALUE_T)(map_t(MAP_KEY_T, MAP_VALUE_T)*);
+
 #endif
 
 // Make sure the symbol does not propagate any further

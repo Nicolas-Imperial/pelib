@@ -33,15 +33,15 @@ namespace pelib
 				@param message Human-readable message that explains the error
 				@param floating point value parsed
 			**/
-			NoDecimalFloatException(std::string message, float value) throw();
+			explicit NoDecimalFloatException(std::string message, float value);
 
 			/** Destructor **/
 			virtual
 			~NoDecimalFloatException() throw();
 
 			/** Returns a mesasge that explain why the exception was thrown **/
-			const char*
-			what();
+			virtual const char*
+			what() const throw();
 
 			/** Return the floating-point value that was parsed **/
 			const float

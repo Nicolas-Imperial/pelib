@@ -36,6 +36,13 @@
 //#define ITERATOR_T SET_T
 //#include "pelib/iterator.c"
 
+#ifdef debug
+#undef debug
+#undef debug_addr
+#undef debug_int
+#undef debug_size_t
+#endif
+
 #if 10
 #define debug(var) printf("[%s:%s:%d] %s = \"%s\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
 #define debug_addr(var) printf("[%s:%s:%d] %s = \"%p\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
