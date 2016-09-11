@@ -38,15 +38,20 @@ extern "C" {
 
 // /!\ the content of argv is freed after this function is run
 void
-pelib_dump(std::ostream& cout, std::map<const char*, Record*> records, size_t argc, char **argv)
+pelib_dump(std::ostream& out, std::map<const char*, Record*> records, size_t argc, char **argv)
 {
+	//out.precision(6);
+	//out << std::ios::fixed;
+
+	out.setf(ios::fixed);
+	out << setprecision(6);
 	vector<string> list;
 	for(size_t i = 0; i < argc; i++)
 	{
 		list.push_back(argv[i]);
 	}
 	Algebra al = *(Algebra*)(records.find(typeid(Algebra).name())->second);
-	AlgebraRawOutput(AlgebraRawOutput::intFloatOutputs(), list).dump(cout, al);
+	AlgebraRawOutput(AlgebraRawOutput::intFloatOutputs(), list).dump(out, al);
 }
 
 void
