@@ -103,6 +103,10 @@ namespace pelib
 			multiset<const Task*> getRemoteTaskProducers(const Task&, const Taskgraph &tg, const Platform &pt) const;
 			multiset<const Task*> getRemoteTaskConsumers(const Task&, const Taskgraph &tg, const Platform &pt) const;
 			
+			multiset<const Link*> getRemoteProducersLink(int core, const Taskgraph &tg, const Platform &pt) const;
+			multiset<const Link*> getRemoteConsumersLink(int core, const Taskgraph &tg, const Platform &pt) const;
+			multimap<const Task*, const Link*> getRemoteProducersTaskLink(int core, const Taskgraph &tg, const Platform &pt) const;
+			multimap<const Task*, const Link*> getRemoteConsumersTaskLink(int core, const Taskgraph &tg, const Platform &pt) const;
 			/** Returns the tasks contained in a shared memory island, identified by the set of cores that forms this island.
 				@param islands Set of core id (starting from 1) that form a shared memory island 
 				@param pt Execution platform that corresponds to this schedule

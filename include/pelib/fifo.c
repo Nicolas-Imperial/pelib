@@ -358,6 +358,14 @@ pelib_cfifo_peekaddr(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, size_t offset, size_t *num
 		}
 	}
 
+/*
+	debug_size_t(fifo->read);
+	debug_size_t(offset);
+	debug_size_t(fifo->read + offset);
+	debug_size_t((fifo->read + offset) % fifo->capacity);
+        debug_size_t(fifo->buffer);
+        debug_size_t(&(fifo->buffer[(fifo->read + offset) % fifo->capacity]));
+*/
         return (CFIFO_T*)&(fifo->buffer[(fifo->read + offset) % fifo->capacity]);
       }
     else

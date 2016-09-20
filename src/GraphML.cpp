@@ -62,8 +62,7 @@ typedef struct reader_args reader_args_t;
 const string GraphML::producerName = "producer_name";
 const string GraphML::consumerName = "consumer_name";
 const string GraphML::type = "type";
-const string GraphML::consumerRate = "consume";
-const string GraphML::producerRate = "produce";
+const string GraphML::rate = "rate";
 
 static void*
 thread_reader(void* aux)
@@ -191,7 +190,6 @@ GraphML::dump(ostream& os, const Taskgraph *data, const Platform *arch) const
 	counter = 0;
 	for(set<Link>::const_iterator i = tg->getLinks().begin(); i != tg->getLinks().end(); i++, counter++)
 	{
-		//SETGAS(graph, "test", counter, "this is a test");
 		int ret = igraph_add_edge(graph, std::distance(tg->getTasks().begin(), tg->getTasks().find(*i->getProducer())), std::distance(tg->getTasks().begin(), tg->getTasks().find(*i->getConsumer())));
 		if(ret == IGRAPH_EINVAL) throw CastException("Could not add vertices to igraph.");
 		SETEAS(graph, producerName.c_str(), counter, i->getProducerName().c_str());
@@ -200,13 +198,9 @@ GraphML::dump(ostream& os, const Taskgraph *data, const Platform *arch) const
 		{
 			SETEAS(graph, type.c_str(), counter, i->getDataType().c_str());
 		}
-		if(i->getConsumerRate() > 0)
+		if(i->getRate() > 0)
 		{
-			SETEAN(graph, consumerRate.c_str(), counter, i->getConsumerRate());
-		}
-		if(i->getProducerRate() > 0)
-		{
-			SETEAN(graph, producerRate.c_str(), counter, i->getProducerRate());
+			SETEAN(graph, GraphML::rate.c_str(), counter, i->getRate());
 		}
 	}
 
@@ -375,18 +369,13 @@ GraphML::parse(istream &is) const
 		{
 			type = string(EAS(the_graph, GraphML::type.c_str(), i));
 		}
-		size_t consume = 0;
-		if(igraph_cattribute_has_attr(the_graph, IGRAPH_ATTRIBUTE_EDGE, consumerRate.c_str()))
+		size_t rate = 0;
+		if(igraph_cattribute_has_attr(the_graph, IGRAPH_ATTRIBUTE_EDGE, GraphML::rate.c_str()))
 		{
-			consume = EAN(the_graph, consumerRate.c_str(), i);
-		}
-		size_t produce = 0;
-		if(igraph_cattribute_has_attr(the_graph, IGRAPH_ATTRIBUTE_EDGE, producerRate.c_str()))
-		{
-			produce = EAN(the_graph, producerRate.c_str(), i);
+			rate = EAN(the_graph, GraphML::rate.c_str(), i);
 		}
 
-		Link link(*tasks.find(producer), *tasks.find(consumer), producerName, consumerName, type, consume, produce);
+		Link link(*tasks.find(producer), *tasks.find(consumer), producerName, consumerName, type, rate);
 		links.insert(link);
 
 		const Link &link_ref = *links.find(link);

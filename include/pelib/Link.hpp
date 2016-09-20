@@ -29,7 +29,7 @@ namespace pelib
 	{
 		public:
 			/** Constructor. Takes the producer and consumer tasks at both ends of the link **/
-			Link(const Task &producer, const Task &consumer, const std::string &producerName, const std::string &consumerName, const std::string &type = "", size_t produce = 0, size_t consume = 0);
+			Link(const Task &producer, const Task &consumer, const std::string &producerName, const std::string &consumerName, const std::string &type = "", size_t rate = 0);
 
 			/** Returns a pointer to the producer task **/
 			virtual Task* getProducer() const;
@@ -50,10 +50,7 @@ namespace pelib
 			operator==(const Link &other) const;
 
 			size_t
-			getConsumerRate() const;
-
-			size_t
-			getProducerRate() const;
+			getRate() const;
 
 			std::string
 			getDataType() const;
@@ -67,7 +64,7 @@ namespace pelib
 			/** Producer and consumer task pointers **/
 			Task *producer, *consumer;
 			std::string producerName, consumerName, type;
-			size_t consume, produce;
+			size_t rate;
 
 		private:		
 	};

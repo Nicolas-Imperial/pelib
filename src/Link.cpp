@@ -32,15 +32,14 @@ using namespace std;
 
 namespace pelib
 {
-	Link::Link(const Task &producer, const Task &consumer, const string &producerName, const string &consumerName, const std::string &type, size_t consume, size_t produce)
+	Link::Link(const Task &producer, const Task &consumer, const string &producerName, const string &consumerName, const std::string &type, size_t rate)
 	{
 		this->producerName = producerName;
 		this->consumerName = consumerName;
 		this->producer = (Task*)&producer;
 		this->consumer = (Task*)&consumer;
 		this->type = string(type);
-		this->consume = consume;
-		this->produce = produce;
+		this->rate = rate;
 	}
 
 	Task*
@@ -56,15 +55,9 @@ namespace pelib
 	}
 
 	size_t
-	Link::getConsumerRate() const
+	Link::getRate() const
 	{
-		return this->consume;
-	}
-
-	size_t
-	Link::getProducerRate() const
-	{
-		return this->produce;
+		return this->rate;
 	}
 
 	std::string

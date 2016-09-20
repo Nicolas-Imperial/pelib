@@ -479,6 +479,20 @@ namespace pelib
 	multiset<const Task*>
 	Schedule::getRemoteConsumers(int core, const Taskgraph &tg, const Platform &pt) const
 	{
+		multiset<const Link*> links = getRemoteConsumersLink(core, tg, pt);
+		multiset<const Task*> tasks;
+		for(multiset<const Link*>::iterator i = links.begin(); i != links.end(); i++)
+		{
+			const Link* link = *i;
+			tasks.insert(link->getConsumer());
+		}
+
+		return tasks;
+	}
+
+	multiset<const Link*>
+	Schedule::getRemoteConsumersLink(int core, const Taskgraph &tg, const Platform &pt) const
+	{
 		table::const_iterator iter = this->getSchedule().find(core);
 		if(iter == this->getSchedule().end())
 		{
@@ -487,7 +501,7 @@ namespace pelib
 
 		const sequence &seq = iter->second;
 
-		multiset<const Task*> consumers;
+		multiset<const Link*> consumers;
 		for(sequence::const_iterator i = seq.begin(); i != seq.end(); i++)
 		{
 			set<Task>::const_iterator iter = tg.getTasks().find(*i->second.first);
@@ -502,7 +516,7 @@ namespace pelib
 				const Task *consumer = (*j)->getConsumer();
 				if(this->getCores(*i->second.first) != this->getCores(*consumer))
 				{
-					consumers.insert(consumer);
+					consumers.insert(*j);
 				}
 			}
 		}
@@ -510,8 +524,36 @@ namespace pelib
 		return consumers;
 	}
 
+	multimap<const Task*, const Link*>
+	Schedule::getRemoteConsumersTaskLink(int core, const Taskgraph &tg, const Platform &pt) const
+	{
+		multiset<const Link*> links = getRemoteConsumersLink(core, tg, pt);
+		multimap<const Task*, const Link*> tasklink;
+		for(multiset<const Link*>::iterator i = links.begin(); i != links.end(); i++)
+		{
+			const Link* link = *i;
+			tasklink.insert(pair<const Task*, const Link*>(link->getConsumer(), *i));
+		}
+
+		return tasklink;
+	}
+
 	multiset<const Task*>
 	Schedule::getRemoteProducers(int core, const Taskgraph &tg, const Platform &pt) const
+	{
+		multiset<const Link*> links = getRemoteProducersLink(core, tg, pt);
+		multiset<const Task*> tasks;
+		for(multiset<const Link*>::iterator i = links.begin(); i != links.end(); i++)
+		{
+			const Link* link = *i;
+			tasks.insert(link->getProducer());
+		}
+
+		return tasks;
+	}
+
+	multiset<const Link*>
+	Schedule::getRemoteProducersLink(int core, const Taskgraph &tg, const Platform &pt) const
 	{
 		table::const_iterator iter = this->getSchedule().find(core);
 		if(iter == this->getSchedule().end())
@@ -521,7 +563,7 @@ namespace pelib
 
 		const sequence &seq = iter->second;
 
-		multiset<const Task*> producers;
+		multiset<const Link*> producers;
 		for(sequence::const_iterator i = seq.begin(); i != seq.end(); i++)
 		{
 			set<Task>::const_iterator iter = tg.getTasks().find(*i->second.first);
@@ -536,12 +578,26 @@ namespace pelib
 				const Task *producer = (*j)->getProducer();
 				if(this->getCores(*i->second.first) != this->getCores(*producer))
 				{
-					producers.insert(producer);
+					producers.insert(*j);
 				}
 			}
 		}
 	
 		return producers;
+	}
+
+	multimap<const Task*, const Link*>
+	Schedule::getRemoteProducersTaskLink(int core, const Taskgraph &tg, const Platform &pt) const
+	{
+		multiset<const Link*> links = getRemoteProducersLink(core, tg, pt);
+		multimap<const Task*, const Link*> tasklink;
+		for(multiset<const Link*>::iterator i = links.begin(); i != links.end(); i++)
+		{
+			const Link* link = *i;
+			tasklink.insert(pair<const Task*, const Link*>(link->getProducer(), *i));
+		}
+
+		return tasklink;
 	}
 
 	multiset<const Task*>

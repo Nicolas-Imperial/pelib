@@ -175,4 +175,20 @@ pelib_iterator_read(ITERATOR_T)(iterator_t(ITERATOR_T) *el)
 	return el->value;
 }
 
+size_t
+pelib_iterator_distance(ITERATOR_T)(iterator_t(ITERATOR_T) *start, iterator_t(ITERATOR_T) *stop)
+{
+	size_t distance = 0;
+
+	iterator_t(ITERATOR_T) *i = start;
+
+	while(pelib_compare(iterator_t(ITERATOR_T))(*i, *stop) != 0)
+	{
+		i = pelib_iterator_next(ITERATOR_T)(start);
+		distance++;
+	}
+	
+	return distance;
+}
+
 #undef ITERATOR_T
