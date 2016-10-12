@@ -12,3 +12,4 @@ pelib 4.0.0
 * Added support for Voltage/Frequency islands in AMPL platform representations
 * Added edge annotation in Taskgraphs and GraphML format
 * Added set and map pelib c containers
+* Added distinction between streaming (repeating) and non-streaming (non-repeating) tasks

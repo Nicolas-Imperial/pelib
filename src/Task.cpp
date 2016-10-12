@@ -39,7 +39,7 @@ namespace pelib
 {
 	const float Task::very_small = 1e-6;
 
-	Task::Task(const std::string &name)
+	Task::Task(const std::string &name, bool is_streaming)
 	{
 		this->name = name;
 		this->module = "dummy";
@@ -47,7 +47,7 @@ namespace pelib
 		this->width = 1;
 		this->maxWidth = 1;
 		this->workload = 1;
-		this->start_workload = 0;
+		this->streaming = is_streaming;
 		this->efficiencyString = "exprtk:p <= 1 ? 1 : 1e-6";
 		this->start_time = 0;
 	}
@@ -60,7 +60,7 @@ namespace pelib
 		this->width = task.getWidth();
 		this->maxWidth = task.getMaxWidth();
 		this->workload = task.getWorkload();
-		this->start_workload = task.getStartWorkload();
+		this->streaming = task.isStreaming();
 		this->efficiencyString = task.getEfficiencyString();
 		this->start_time = task.getStartTime();
 
@@ -194,18 +194,6 @@ namespace pelib
 	}
 
 	double
-	Task::getStartWorkload() const
-	{
-		return this->start_workload;
-	}
-
-	void
-	Task::setStartWorkload(double workload)
-	{
-		this->start_workload = workload;
-	}
-
-	double
 	Task::getMaxWidth() const
 	{
 		return this->maxWidth;
@@ -215,6 +203,12 @@ namespace pelib
 	Task::setMaxWidth(double maxWidth)
 	{
 		this->maxWidth = maxWidth;
+	}
+
+	bool
+	Task::isStreaming() const
+	{
+		return this->streaming;
 	}
 
 	// Write in *number the address of the first character of the number found, or the end of the string str if no number was found.
@@ -409,16 +403,6 @@ namespace pelib
 	Task::runtime(double width, double frequency) const
 	{
 		double work = getWorkload();
-		work = work / (width * getEfficiency((int)width));
-		work = work / frequency;
-		
-		return work; 
-	}
-	
-	double
-	Task::startRuntime(double width, double frequency) const
-	{
-		double work = getStartWorkload();
 		work = work / (width * getEfficiency((int)width));
 		work = work / frequency;
 		
