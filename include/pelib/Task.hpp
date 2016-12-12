@@ -37,7 +37,7 @@ namespace pelib
 			/** Constructor
 				@param id Identifier of the task
 			**/
-			Task(const std::string &id);
+			Task(const std::string &id, bool is_streaming = true);
 			/** Copy constructor **/
 			Task(const Task&);
 
@@ -141,6 +141,9 @@ namespace pelib
 			/** Allows the comparison of tasks. Used with <, allows the test of difference **/
 	    		virtual bool
 			operator==(const Task &other) const;
+
+			bool
+			isStreaming() const;
 			
 		protected:
 			/** Frequency and width allocated to this task **/
@@ -149,6 +152,7 @@ namespace pelib
 			double workload, maxWidth;
 			/** Time at which this task starts **/
 			float start_time;
+			bool streaming;
 			/** Name, source code module name and efficiency formula of the task **/
 			std::string name, module, efficiencyString;
 			/** Sets of producers and consumers linked to this task **/

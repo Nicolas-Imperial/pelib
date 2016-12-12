@@ -29,18 +29,21 @@
 
 namespace pelib
 {
-	NoDecimalFloatException::NoDecimalFloatException(std::string message, float value) throw()
+	NoDecimalFloatException::NoDecimalFloatException(std::string message, float value) : message(message) 
 	{
-		this->message = message;
 		this->value = value;
 	}
 
 	NoDecimalFloatException::~NoDecimalFloatException() throw() {}
 
 	const char*
-	NoDecimalFloatException::what()
+	NoDecimalFloatException::what() const throw() 
 	{
-		return std::string("Float parsing exception: ").append(this->message).c_str();
+		std::string fin = std::string("Float parsing exception: ").append(this->message).c_str();
+		const char *message = fin.c_str();
+		char *cpy = (char*)malloc(sizeof(char) * (strlen(message) + 1));
+		strcpy(cpy, message);
+		return cpy;
 	}
 
 	const float

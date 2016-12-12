@@ -1,9 +1,10 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <pelib/malloc.h>
 
 #if 0
 #define debug(var) printf("[%s:%s:%d] %s = \"%s\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
-#define debug_addr(var) printf("[%s:%s:%d] %s = \"%X\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
+#define debug_addr(var) printf("[%s:%s:%d] %s = \"%p\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
 #define debug_int(var) printf("[%s:%s:%d] %s = \"%d\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
 #define debug_size_t(var) printf("[%s:%s:%d] %s = \"%zu\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
 #else
@@ -40,7 +41,11 @@ pelib_mem_malloc(pelib_malloc_queue_t *spacep, size_t size, int alignment)
 
 	pelib_malloc_block_t *b1, *b2, *b3;	 // running pointers for blocks
 
-	if (size == 0) return NULL;
+	if (size == 0) 
+	{
+		debug_addr(NULL);
+		return NULL;
+	}
 
 	// always first check if the tail block has enough space, because that
 	// is the most likely. If it does and it is exactly enough, we still
@@ -48,6 +53,7 @@ pelib_mem_malloc(pelib_malloc_queue_t *spacep, size_t size, int alignment)
 	// zero. This acts as a marker of where free space of predecessor ends
 	b1 = spacep->tail;
 	// If we request (alignment > 1) memory, then it's ok if the tail free memory can handle the size requested. Otherwise, we need to check if the tail can handle the size requested even after skipping as many bytes as necessary to get some (alignment > 1) address.
+	/*
 	debug_addr(b1);
 	debug_size_t(b1->free_size);
 	debug_size_t(size);
@@ -57,7 +63,8 @@ pelib_mem_malloc(pelib_malloc_queue_t *spacep, size_t size, int alignment)
 	debug_int((b1->free_size >= size && !(alignment > 1)));
 	debug_addr(b1->space);
 	debug_size_t(b1->free_size);
-	if ((b1->free_size >= size && !(alignment > 1)) || (((((size_t)b1->space % alignment) == 0) || (b1->free_size - alignment + ((size_t)b1->space % alignment) >= size)) && (alignment > 1)))
+	*/
+	if ((b1->free_size >= size && !(alignment > 1)) || ((alignment > 1) && ((((size_t)b1->space % alignment) == 0) || (b1->free_size - alignment + ((size_t)b1->space % alignment) >= size))))
 	{
 		// need to insert new block; new order is: b1->b2 (= new tail)
 		b2 = (pelib_malloc_block_t*) malloc(sizeof(pelib_malloc_block_t));
@@ -76,6 +83,9 @@ pelib_mem_malloc(pelib_malloc_queue_t *spacep, size_t size, int alignment)
 			spacep->tail = b2;
 
 			b1->free_size = 0;
+			debug_addr(spacep->mem);
+			debug_size_t(b1->space - spacep->mem);
+			debug_size_t(size);
 			return b1->space;
 		}
 		else
@@ -99,18 +109,21 @@ pelib_mem_malloc(pelib_malloc_queue_t *spacep, size_t size, int alignment)
 
 			b3->free_size = 0;
 
-	debug_addr(spacep->tail);
-	debug_addr(spacep->tail->next);
-	debug_addr(spacep->tail->space);
-	debug_addr(spacep->tail->next->space);
-	if(spacep->tail->next >= spacep->tail)
-	{
-		debug_size_t(spacep->tail->next->space - spacep->tail->space);
-	}
-	else
-	{
-		debug_size_t(spacep->tail->space - spacep->tail->next->space);
-	}
+			/*
+			debug_addr(spacep->tail);
+			debug_addr(spacep->tail->next);
+			debug_addr(spacep->tail->space);
+			debug_addr(spacep->tail->next->space);
+			*/
+			if(spacep->tail->next >= spacep->tail)
+			{
+				debug_size_t(spacep->tail->next->space - spacep->tail->space);
+			}
+			else
+			{
+				debug_size_t(spacep->tail->space - spacep->tail->next->space);
+			}
+			debug_addr(b3->space);
 			return b3->space;
 		}
 	}
@@ -162,6 +175,7 @@ pelib_mem_malloc(pelib_malloc_queue_t *spacep, size_t size, int alignment)
 
 	// Now b2 is the exact size and (alignment > 1) as requested
 	b2->free_size = 0; // block b2 is completely used
+	debug_addr(b2->space);
 	return b2->space;
 }
 

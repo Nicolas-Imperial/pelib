@@ -300,7 +300,7 @@ namespace pelib
 
 		for(set<int>::const_iterator i = islands.begin(); i != islands.end(); i++)
 		{
-			set<Platform::island>::const_iterator ii = pt.getSharedMemoryIslands().begin();
+			Platform::islands::const_iterator ii = pt.getSharedMemoryIslands().begin();
 			std::advance(ii, *i - 1);
 
 			for(Platform::island::const_iterator j = ii->begin(); j != ii->end(); j++)
@@ -341,7 +341,7 @@ namespace pelib
 			const Task &task_tg = *tg.getTasks().find(*task_p);
 			set<int> consumer_cores = this->getCores(task_tg);
 			set<int>::const_iterator j = consumer_cores.begin();
-			set<Platform::island> consumer_core_islands = pt.getSharedMemoryIslands(*j);
+			Platform::islands consumer_core_islands = pt.getSharedMemoryIslands(*j);
 			for(; j != consumer_cores.end(); j++)
 			{
 				if(pt.getSharedMemoryIslands(*j) != consumer_core_islands)
@@ -356,7 +356,7 @@ namespace pelib
 				const Task *producer = l->getProducer();
 				set<int> producer_cores = this->getCores(*producer);
 				set<int>::const_iterator k = producer_cores.begin();
-				set<Platform::island> producer_core_islands = pt.getSharedMemoryIslands(*k);
+				Platform::islands producer_core_islands = pt.getSharedMemoryIslands(*k);
 				for(; k != producer_cores.end(); k++)
 				{
 					if(pt.getSharedMemoryIslands(*k) != producer_core_islands)
@@ -396,7 +396,7 @@ namespace pelib
 		const Task &task_tg = *tg.getTasks().find(t);
 		set<int> consumer_cores = this->getCores(task_tg);
 		set<int>::const_iterator j = consumer_cores.begin();
-		set<Platform::island> consumer_core_islands = pt.getSharedMemoryIslands(*j);
+		Platform::islands consumer_core_islands = pt.getSharedMemoryIslands(*j);
 		for(; j != consumer_cores.end(); j++)
 		{
 			if(pt.getSharedMemoryIslands(*j) != consumer_core_islands)
@@ -412,7 +412,7 @@ namespace pelib
 			set<int> producer_cores = this->getCores(*producer);
 			set<int>::const_iterator k = producer_cores.begin();
 
-			set<Platform::island> producer_core_islands = pt.getSharedMemoryIslands(*k);
+			Platform::islands producer_core_islands = pt.getSharedMemoryIslands(*k);
 			for(; k != producer_cores.end(); k++)
 			{
 				if(pt.getSharedMemoryIslands(*k) != producer_core_islands)
@@ -479,6 +479,20 @@ namespace pelib
 	multiset<const Task*>
 	Schedule::getRemoteConsumers(int core, const Taskgraph &tg, const Platform &pt) const
 	{
+		multiset<const Link*> links = getRemoteConsumersLink(core, tg, pt);
+		multiset<const Task*> tasks;
+		for(multiset<const Link*>::iterator i = links.begin(); i != links.end(); i++)
+		{
+			const Link* link = *i;
+			tasks.insert(link->getConsumer());
+		}
+
+		return tasks;
+	}
+
+	multiset<const Link*>
+	Schedule::getRemoteConsumersLink(int core, const Taskgraph &tg, const Platform &pt) const
+	{
 		table::const_iterator iter = this->getSchedule().find(core);
 		if(iter == this->getSchedule().end())
 		{
@@ -487,7 +501,7 @@ namespace pelib
 
 		const sequence &seq = iter->second;
 
-		multiset<const Task*> consumers;
+		multiset<const Link*> consumers;
 		for(sequence::const_iterator i = seq.begin(); i != seq.end(); i++)
 		{
 			set<Task>::const_iterator iter = tg.getTasks().find(*i->second.first);
@@ -502,7 +516,7 @@ namespace pelib
 				const Task *consumer = (*j)->getConsumer();
 				if(this->getCores(*i->second.first) != this->getCores(*consumer))
 				{
-					consumers.insert(consumer);
+					consumers.insert(*j);
 				}
 			}
 		}
@@ -510,8 +524,36 @@ namespace pelib
 		return consumers;
 	}
 
+	multimap<const Task*, const Link*>
+	Schedule::getRemoteConsumersTaskLink(int core, const Taskgraph &tg, const Platform &pt) const
+	{
+		multiset<const Link*> links = getRemoteConsumersLink(core, tg, pt);
+		multimap<const Task*, const Link*> tasklink;
+		for(multiset<const Link*>::iterator i = links.begin(); i != links.end(); i++)
+		{
+			const Link* link = *i;
+			tasklink.insert(pair<const Task*, const Link*>(link->getConsumer(), *i));
+		}
+
+		return tasklink;
+	}
+
 	multiset<const Task*>
 	Schedule::getRemoteProducers(int core, const Taskgraph &tg, const Platform &pt) const
+	{
+		multiset<const Link*> links = getRemoteProducersLink(core, tg, pt);
+		multiset<const Task*> tasks;
+		for(multiset<const Link*>::iterator i = links.begin(); i != links.end(); i++)
+		{
+			const Link* link = *i;
+			tasks.insert(link->getProducer());
+		}
+
+		return tasks;
+	}
+
+	multiset<const Link*>
+	Schedule::getRemoteProducersLink(int core, const Taskgraph &tg, const Platform &pt) const
 	{
 		table::const_iterator iter = this->getSchedule().find(core);
 		if(iter == this->getSchedule().end())
@@ -521,7 +563,7 @@ namespace pelib
 
 		const sequence &seq = iter->second;
 
-		multiset<const Task*> producers;
+		multiset<const Link*> producers;
 		for(sequence::const_iterator i = seq.begin(); i != seq.end(); i++)
 		{
 			set<Task>::const_iterator iter = tg.getTasks().find(*i->second.first);
@@ -536,12 +578,26 @@ namespace pelib
 				const Task *producer = (*j)->getProducer();
 				if(this->getCores(*i->second.first) != this->getCores(*producer))
 				{
-					producers.insert(producer);
+					producers.insert(*j);
 				}
 			}
 		}
 	
 		return producers;
+	}
+
+	multimap<const Task*, const Link*>
+	Schedule::getRemoteProducersTaskLink(int core, const Taskgraph &tg, const Platform &pt) const
+	{
+		multiset<const Link*> links = getRemoteProducersLink(core, tg, pt);
+		multimap<const Task*, const Link*> tasklink;
+		for(multiset<const Link*>::iterator i = links.begin(); i != links.end(); i++)
+		{
+			const Link* link = *i;
+			tasklink.insert(pair<const Task*, const Link*>(link->getProducer(), *i));
+		}
+
+		return tasklink;
 	}
 
 	multiset<const Task*>
@@ -569,7 +625,7 @@ namespace pelib
 			const Task &task_tg = *tg.getTasks().find(*task_p);
 			set<int> producer_cores = this->getCores(task_tg);
 			set<int>::const_iterator j = producer_cores.begin();
-			set<Platform::island> producer_core_islands = pt.getSharedMemoryIslands(*j);
+			Platform::islands producer_core_islands = pt.getSharedMemoryIslands(*j);
 			for(; j != producer_cores.end(); j++)
 			{
 				if(pt.getSharedMemoryIslands(*j) != producer_core_islands)
@@ -585,7 +641,7 @@ namespace pelib
 				set<int> consumer_cores = this->getCores(*consumer);
 				set<int>::const_iterator k = consumer_cores.begin();
 
-				set<Platform::island> consumer_core_islands = pt.getSharedMemoryIslands(*k);
+				Platform::islands consumer_core_islands = pt.getSharedMemoryIslands(*k);
 				for(; k != consumer_cores.end(); k++)
 				{
 					if(pt.getSharedMemoryIslands(*k) != consumer_core_islands)
@@ -625,7 +681,7 @@ namespace pelib
 		const Task &task_tg = *tg.getTasks().find(t);
 		set<int> producer_cores = this->getCores(task_tg);
 		set<int>::const_iterator j = producer_cores.begin();
-		set<Platform::island> producer_core_islands = pt.getSharedMemoryIslands(*j);
+		Platform::islands producer_core_islands = pt.getSharedMemoryIslands(*j);
 		for(; j != producer_cores.end(); j++)
 		{
 			if(pt.getSharedMemoryIslands(*j) != producer_core_islands)
@@ -641,7 +697,7 @@ namespace pelib
 			set<int> consumer_cores = this->getCores(*this->getTasks().find(*consumer));
 			set<int>::const_iterator k = consumer_cores.begin();
 
-			set<Platform::island> consumer_core_islands = pt.getSharedMemoryIslands(*k);
+			Platform::islands consumer_core_islands = pt.getSharedMemoryIslands(*k);
 			for(; k != consumer_cores.end(); k++)
 			{
 				if(pt.getSharedMemoryIslands(*k) != consumer_core_islands)
@@ -721,7 +777,7 @@ namespace pelib
 					}
 
 					double tau = workload.find((int)n)->second;
-					size_t wi = (size_t)width.find((int)n)->second;
+					size_t wi = (size_t)floor((width.find((int)n)->second + 0.5));
 					size_t Wi = (size_t)max_width.find((int)n)->second;
 					double e = wi <= Wi ? efficiency.find((int)n)->second.find((int)wi)->second : 1e-06;
 					double f = frequency.find((int)n)->second;

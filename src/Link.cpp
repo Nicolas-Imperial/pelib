@@ -32,15 +32,15 @@ using namespace std;
 
 namespace pelib
 {
-	Link::Link(const Task &producer, const Task &consumer, const string &producerName, const string &consumerName, const std::string &type, size_t consume, size_t produce)
+	Link::Link(const Task &producer, const Task &consumer, const string &producerName, const string &consumerName, const std::string &type, size_t producer_rate, size_t consumer_rate)
 	{
 		this->producerName = producerName;
 		this->consumerName = consumerName;
 		this->producer = (Task*)&producer;
 		this->consumer = (Task*)&consumer;
 		this->type = string(type);
-		this->consume = consume;
-		this->produce = produce;
+		this->producer_rate = producer_rate;
+		this->consumer_rate = consumer_rate;
 	}
 
 	Task*
@@ -56,15 +56,15 @@ namespace pelib
 	}
 
 	size_t
-	Link::getConsumerRate() const
+	Link::getProducerRate() const
 	{
-		return this->consume;
+		return this->producer_rate;
 	}
 
 	size_t
-	Link::getProducerRate() const
+	Link::getConsumerRate() const
 	{
-		return this->produce;
+		return this->consumer_rate;
 	}
 
 	std::string
@@ -93,6 +93,17 @@ namespace pelib
 		Task thisConsumer = *this->getConsumer();
 		Task otherConsumer = *other.getConsumer();
 
+		if(thisProducer == otherProducer && thisConsumer == otherConsumer)
+		{
+			if(this->getProducerName().compare(other.getProducerName()) == 0)
+			{
+				return this->getConsumerName() < other.getConsumerName();
+			}
+			else
+			{
+				return this->getProducerName() < other.getProducerName();
+			}
+		}
 
 		if(thisProducer == otherProducer)
 		{

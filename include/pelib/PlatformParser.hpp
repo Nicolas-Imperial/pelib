@@ -27,7 +27,7 @@
 namespace pelib
 {
 	/** Base class of any parser class that produces instances of pelib::Platform from an input stream **/
-	class PlatformParser : public DataParser
+	class PlatformParser : public RecordParser
 	{
 		public:
 			/** Reads input stream and produces and instance of pelib::Platform **/

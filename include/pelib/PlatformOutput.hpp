@@ -27,7 +27,7 @@
 namespace pelib
 {
 	/** Base class for a Platform output class **/
-	class PlatformOutput : public DataOutput
+	class PlatformOutput : public RecordOutput
 	{
 		public:	
 			/** Writes the platform in output stream

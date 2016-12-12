@@ -104,6 +104,11 @@ pelib_process(std::map<const char*, pelib::Record*> records, size_t argc, char**
 	void *libGenerator = load_lib(library);
 	map<const char*, Record*> output;
 
+	for(map<const char*, Record*>::const_iterator i = records.begin(); i != records.end(); i++)
+	{
+		output.insert(pair<const char*, Record*>(i->first, i->second->clone()));
+	}
+
 	if(!args.showDescription)
 	{
 		Record* (*generate)(size_t argc, char **argv) = (Record* (*)(size_t argc, char **argv))load_function(libGenerator, "pelib_generate");

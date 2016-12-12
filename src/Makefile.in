@@ -16,7 +16,7 @@
 # along with pelib. If not, see <http://www.gnu.org/licenses/>.
 #
 
-attach=
+attach = pelib-scheduler
 
 subdirs = 
 
@@ -143,6 +143,8 @@ shared_pelib-core++_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-core++_pkg_ld = 
 shared_pelib-core++_pkg_libs = -lm
 shared_pelib-core++_pkg_igraph_version = >= 0.7.1
+shared_pelib_pkg_libxml++-2.6_version = >= 2.20
+shared_pelib_pkg_cairomm-1.0_version = >= 1.8.0
 shared_pelib-core++_pkg_requires = 
 shared_pelib-core++_pkg_requires_igraph_version = >= 0.7.1
 shared_pelib-core++_pkg_description = General research utility library used in PELAB
@@ -362,7 +364,7 @@ shared_pelib-generate_export = $(sharedcxx_pelib-generate_embed) $(sharedcxx_pel
 shared_pelib-generate_libs = 
 shared_pelib-generate_ldflags = 
 shared_pelib-generate_deps = 
-shared_pelib-generate_pkg = 
+shared_pelib-generate_pkg = igraph 
 shared_pelib-generate_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-generate_pkg_ld = 
 shared_pelib-generate_pkg_libs = 
@@ -512,6 +514,10 @@ test_map-test_libs =
 test_map-test_ldflags = -L.
 test_map-test_static = 0
 
+post-install: do-post-install dist
+
+do-post-install:
+	install -m 755 pelib-scheduler $(DESTDIR)$(final_bindir)/pelib-scheduler
 ## Uncomment this to run target "first" before any target explicetly called
 #FIRST = first
 

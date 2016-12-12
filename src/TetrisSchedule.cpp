@@ -298,20 +298,28 @@ TetrisSchedule::defaultTaskLabel()
 	return false;
 }
 
+bool
+TetrisSchedule::defaultTaskId()
+{
+	return true;
+}
+
 TetrisSchedule::TetrisSchedule()
 {
 	this->ratio = defaultRatio();
 	this->showFrequencies = defaultFrequencyLegend();
+	this->showTaskId = defaultTaskId();
 	this->useTaskName = defaultTaskLabel();
 	this->colors = defaultFrequencyColors();
 	this->strokeSize = defaultStrokeSize();
 }
 
-TetrisSchedule::TetrisSchedule(float ratio, bool showFrequencies, bool useTaskName, vector<uint32_t> frequency_colors, float strokeSize)
+TetrisSchedule::TetrisSchedule(float ratio, bool showFrequencies, bool showTaskId, bool useTaskName, vector<uint32_t> frequency_colors, float strokeSize)
 {
 	this->ratio = ratio;
 	this->showFrequencies = showFrequencies;
 	this->colors = frequency_colors;
+	this->showTaskId = showTaskId;
 	this->useTaskName = useTaskName;
 	this->strokeSize = strokeSize;
 }
@@ -373,7 +381,7 @@ class Canvas
 		}
 		
 		void
-		dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const Platform *pt, bool useTaskName, float strokeSize)
+		dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const Platform *pt, bool show_task_id, bool useTaskName, float strokeSize)
 		{
 #ifdef CAIRO_HAS_SVG_SURFACE
 			// Compute canvas size, taking thickness and magnification into account
@@ -633,7 +641,7 @@ class Canvas
 							ss << (std::distance(sched->getTasks().begin(), sched->getTasks().find(task)) + 1);
 							name = ss.str();
 						}
-						this->drawTask(runtime, width, task.getFrequency(), start, core, name);
+						this->drawTask(runtime, width, task.getFrequency(), start, core, name, show_task_id);
 						drawn.insert(pair<Task, pair<size_t, size_t> >(task, pair<size_t, size_t>(done + width, core + width)));
 					}
 				}
@@ -651,7 +659,7 @@ class Canvas
 		}
 
 		void
-		drawTask(double time, double width, double frequency, double start, double firstCore, string label)
+		drawTask(double time, double width, double frequency, double start, double firstCore, string label, bool show_task_id)
 		{
 #ifdef CAIRO_HAS_SVG_SURFACE
 			// Task rectangle
@@ -665,7 +673,7 @@ class Canvas
 			cr->stroke();
 
 			// Add task name
-			if(this->fontSize > 0)
+			if(this->fontSize > 0 && show_task_id)
 			{
 				cr->set_font_size(this->fontSize);
 				cairo_text_extents_t te;
@@ -837,7 +845,7 @@ TetrisSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 	double deadline = tg->getDeadline(pt);
 	bool drawDeadline = deadline > 0;
 	deadline = deadline > 0 ? deadline : max_stop_time;
-	Canvas(deadline, deadline * ratio, thickness, magnify, makeGradient(colors, frequencies), drawDeadline, this->showFrequencies).dump(os, sched, tg, pt, useTaskName, strokeSize);
+	Canvas(deadline, deadline * ratio, thickness, magnify, makeGradient(colors, frequencies), drawDeadline, this->showFrequencies).dump(os, sched, tg, pt, showTaskId, useTaskName, strokeSize);
 }
 
 TetrisSchedule*

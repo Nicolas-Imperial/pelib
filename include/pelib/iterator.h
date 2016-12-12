@@ -29,6 +29,7 @@
 
 #define pelib_iterator_next(value) PELIB_CONCAT_3(pelib_, iterator(value), _next)
 #define pelib_iterator_read(value) PELIB_CONCAT_3(pelib_, iterator(value), _read)
+#define pelib_iterator_distance(value) PELIB_CONCAT_3(pelib_, iterator(value), _distance)
 
 /** Generic static iterator **/
 struct iterator(ITERATOR_T)
@@ -43,6 +44,9 @@ pelib_iterator_next(ITERATOR_T)(iterator_t(ITERATOR_T)*);
 
 ITERATOR_T
 pelib_iterator_read(ITERATOR_T)(iterator_t(ITERATOR_T)*);
+
+size_t
+pelib_iterator_distance(ITERATOR_T)(iterator_t(ITERATOR_T) *start, iterator_t(ITERATOR_T) *stop);
 
 #define STRUCT_T iterator_t(ITERATOR_T)
 #include <pelib/structure.h>

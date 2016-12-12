@@ -53,6 +53,17 @@ namespace pelib
 		*this = rhs;
 	}
 
+	Algebra::Algebra(const Algebra *rhs)
+	{
+		*this = *rhs;
+	}
+
+	Algebra*
+	Algebra::clone() const
+	{
+		return new Algebra(this);
+	}
+
 	Algebra
 	Algebra::merge(const Algebra& record) const
 	{

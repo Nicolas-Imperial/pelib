@@ -43,11 +43,18 @@ static size_t continuous_write_length(CFIFO_T)(cfifo_t(CFIFO_T) *fifo);
 #define CFIFO_BEGIN "["
 #define CFIFO_END "]"
 
+#ifdef debug
+#undef debug
+#undef debug_addr
+#undef debug_int
+#undef debug_size_t
+#endif
+
 #if 10
 #define debug(var) printf("[%s:%s:%d] %s = \"%s\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
 #define debug_addr(var) printf("[%s:%s:%d] %s = \"%p\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
 #define debug_int(var) printf("[%s:%s:%d] %s = \"%d\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
-#define debug_size_t(var) printf("[%s:%s:%d] %s = \"%zu\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
+#define debug_size_t(var) printf("[%s:%s:%d] %s = \"%zu\"\n", __FILE__, __FUNCTION__, __LINE__, #var, (size_t)(var)); fflush(NULL)
 #else
 #define debug(var)
 #define debug_addr(var)
@@ -351,10 +358,22 @@ pelib_cfifo_peekaddr(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, size_t offset, size_t *num
 		}
 	}
 
+/*
+	debug_size_t(fifo->read);
+	debug_size_t(offset);
+	debug_size_t(fifo->read + offset);
+	debug_size_t((fifo->read + offset) % fifo->capacity);
+        debug_size_t(fifo->buffer);
+        debug_size_t(&(fifo->buffer[(fifo->read + offset) % fifo->capacity]));
+*/
         return (CFIFO_T*)&(fifo->buffer[(fifo->read + offset) % fifo->capacity]);
       }
     else
       {
+	if(num != NULL)
+	{
+		*num = 0;
+	}
         return NULL;
       }
   }

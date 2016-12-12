@@ -52,6 +52,7 @@ pelib_dump(std::ostream& cout, std::map<const char*, Record*> records, size_t ar
 		vector<unsigned int> colors = TetrisSchedule::defaultFrequencyColors();
 		bool showFrequencies = true;
 		bool useTaskName = false;
+		bool showTaskId = true;
 		
 		for(; argv[0] != NULL; argv++)
 		{
@@ -72,6 +73,11 @@ pelib_dump(std::ostream& cout, std::map<const char*, Record*> records, size_t ar
 			{
 				showFrequencies = false;
 				continue;
+			}
+
+			if(strcmp(argv[0], "--no-task-id") == 0)
+			{
+				showTaskId = false;
 			}
 
 			if(strcmp(argv[0], "--use-task-name") == 0)
@@ -131,7 +137,7 @@ pelib_dump(std::ostream& cout, std::map<const char*, Record*> records, size_t ar
 			}
 		}
 
-		TetrisSchedule(ratio, showFrequencies, useTaskName, colors, stroke_size).dump(cout, sc, tg, pt);
+		TetrisSchedule(ratio, showFrequencies, showTaskId, useTaskName, colors, stroke_size).dump(cout, sc, tg, pt);
 	}
 	else	
 	{

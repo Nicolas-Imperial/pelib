@@ -19,7 +19,7 @@
 
 
 #include <pelib/Schedule.hpp>
-#include <pelib/DataParser.hpp>
+#include <pelib/RecordParser.hpp>
 
 #ifndef PELIB_SCHEDULEPARSER
 #define PELIB_SCHEDULEPARSER
@@ -27,7 +27,7 @@
 namespace pelib
 {
 	/** Superclass of any parser able to read an input stream and produce an instance of pelib::Schedule from the data read **/
-	class ScheduleParser : public DataParser
+	class ScheduleParser : public RecordParser
 	{
 		public:
 			/** Read the content of input stream and produces an instance of pelib::Schedule **/

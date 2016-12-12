@@ -62,8 +62,8 @@ typedef struct reader_args reader_args_t;
 const string GraphML::producerName = "producer_name";
 const string GraphML::consumerName = "consumer_name";
 const string GraphML::type = "type";
-const string GraphML::consumerRate = "consume";
-const string GraphML::producerRate = "produce";
+const string GraphML::producer_rate = "producer_rate";
+const string GraphML::consumer_rate = "consumer_rate";
 
 static void*
 thread_reader(void* aux)
@@ -155,6 +155,7 @@ GraphML::dump(ostream& os, const Taskgraph *data, const Platform *arch) const
 		SETVAS(graph, "name", counter, task.getName().c_str());
 		SETVAS(graph, "module", counter, task.getModule().c_str());
 		SETVAN(graph, "workload", counter, task.getWorkload());
+		SETVAN(graph, "streaming", counter, task.isStreaming());
 		stringstream max_width;
 
 		// If no platform is provided, just dump efficiency and max width as is.
@@ -190,7 +191,6 @@ GraphML::dump(ostream& os, const Taskgraph *data, const Platform *arch) const
 	counter = 0;
 	for(set<Link>::const_iterator i = tg->getLinks().begin(); i != tg->getLinks().end(); i++, counter++)
 	{
-		//SETGAS(graph, "test", counter, "this is a test");
 		int ret = igraph_add_edge(graph, std::distance(tg->getTasks().begin(), tg->getTasks().find(*i->getProducer())), std::distance(tg->getTasks().begin(), tg->getTasks().find(*i->getConsumer())));
 		if(ret == IGRAPH_EINVAL) throw CastException("Could not add vertices to igraph.");
 		SETEAS(graph, producerName.c_str(), counter, i->getProducerName().c_str());
@@ -199,13 +199,13 @@ GraphML::dump(ostream& os, const Taskgraph *data, const Platform *arch) const
 		{
 			SETEAS(graph, type.c_str(), counter, i->getDataType().c_str());
 		}
-		if(i->getConsumerRate() > 0)
-		{
-			SETEAN(graph, consumerRate.c_str(), counter, i->getConsumerRate());
-		}
 		if(i->getProducerRate() > 0)
 		{
-			SETEAN(graph, producerRate.c_str(), counter, i->getProducerRate());
+			SETEAN(graph, GraphML::producer_rate.c_str(), counter, i->getProducerRate());
+		}
+		if(i->getConsumerRate() > 0)
+		{
+			SETEAN(graph, GraphML::consumer_rate.c_str(), counter, i->getConsumerRate());
 		}
 	}
 
@@ -302,9 +302,15 @@ GraphML::parse(istream &is) const
 	{
 		stringstream estr;
 		estr << "task_" << id;
-		Task task(strcmp(VAS(the_graph, "name", id), "") != 0 ? VAS(the_graph, "name", id) : estr.str());
+		bool streaming = true;
+		if(igraph_cattribute_has_attr(the_graph, IGRAPH_ATTRIBUTE_VERTEX, "streaming"))
+		{
+			streaming = (bool)VAN(the_graph, "streaming", id);
+		}
+		Task task(strcmp(VAS(the_graph, "name", id), "") != 0 ? VAS(the_graph, "name", id) : estr.str(), streaming);
 		task.setModule(strcmp(VAS(the_graph, "module", id),"") != 0 ? VAS(the_graph, "module", id) : "dummy");
 		task.setWorkload(!isnan((float)VAN(the_graph, "workload", id)) ? VAN(the_graph, "workload", id): 1.0);
+
 		const char *str = VAS(the_graph, "max_width", id);
 		string max_width_str(str);
 		boost::algorithm::to_lower(max_width_str);
@@ -366,18 +372,17 @@ GraphML::parse(istream &is) const
 		{
 			type = string(EAS(the_graph, GraphML::type.c_str(), i));
 		}
-		size_t consume = 0;
-		if(igraph_cattribute_has_attr(the_graph, IGRAPH_ATTRIBUTE_EDGE, consumerRate.c_str()))
+		size_t producer_rate = 0, consumer_rate = 0;
+		if(igraph_cattribute_has_attr(the_graph, IGRAPH_ATTRIBUTE_EDGE, GraphML::producer_rate.c_str()))
 		{
-			consume = EAN(the_graph, consumerRate.c_str(), i);
+			producer_rate = EAN(the_graph, GraphML::producer_rate.c_str(), i);
 		}
-		size_t produce = 0;
-		if(igraph_cattribute_has_attr(the_graph, IGRAPH_ATTRIBUTE_EDGE, producerRate.c_str()))
+		if(igraph_cattribute_has_attr(the_graph, IGRAPH_ATTRIBUTE_EDGE, GraphML::consumer_rate.c_str()))
 		{
-			produce = EAN(the_graph, producerRate.c_str(), i);
+			consumer_rate = EAN(the_graph, GraphML::consumer_rate.c_str(), i);
 		}
 
-		Link link(*tasks.find(producer), *tasks.find(consumer), producerName, consumerName, type, consume, produce);
+		Link link(*tasks.find(producer), *tasks.find(consumer), producerName, consumerName, type, producer_rate, consumer_rate);
 		links.insert(link);
 
 		const Link &link_ref = *links.find(link);

@@ -20,12 +20,37 @@
 
 #include <pelib/Core.hpp>
 
+#define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << (var) << "\"" << std::endl;
 using namespace std;
 
 namespace pelib
-{	
+{
+	size_t Core::counter = 0;
+	Core::Core()
+	{
+		this->id = Core::counter++;
+	}	
+
+	Core::Core(size_t id)
+	{
+		this->id = id;
+	}
+
 	Core::~Core()
 	{
 		// Do nothing
+	}
+
+	
+	bool
+	Core::operator<(const Core &other) const
+	{
+		return this->id < other.id;
+	}
+
+	bool
+	Core::operator==(const Core &other) const
+	{
+		return this->id == other.id;
 	}
 }

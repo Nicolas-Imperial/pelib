@@ -50,6 +50,7 @@ namespace pelib
 
 			/** Copy constructor **/
 			Algebra(const Algebra &rhs);
+			Algebra(const Algebra *rhs);
 
 			/** Destroys all elements in the collection and destroys the collection itself **/
 			virtual	~Algebra();
@@ -137,6 +138,8 @@ namespace pelib
 			virtual
 			Algebra&
 			operator=(const Algebra &rhs);
+
+			virtual Algebra* clone() const;
 			
 		protected:
 			/** Map container of all elements in the collection **/

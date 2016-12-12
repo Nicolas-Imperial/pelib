@@ -19,7 +19,7 @@
 
 
 #include <pelib/Taskgraph.hpp>
-#include <pelib/DataParser.hpp>
+#include <pelib/RecordParser.hpp>
 
 #ifndef PELIB_TASKGRAPHPARSER
 #define PELIB_TASKGRAPHPARSER
@@ -27,7 +27,7 @@
 namespace pelib
 {
 	/** Superclass of all Taskgraph parsers **/
-	class TaskgraphParser : public DataParser
+	class TaskgraphParser : public RecordParser
 	{
 		public:
 			/** Parses any input stream and produce an instance of pelib::Taskgraph that contains the data read **/

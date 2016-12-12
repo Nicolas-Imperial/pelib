@@ -368,7 +368,9 @@ pelib_string_detail(array_t(ARRAY_T))(array_t(ARRAY_T) array, int level)
 {
 	if(level == 0)
 	{
-		return pelib_string(array_t(ARRAY_T))(array);
+		char *str = malloc(sizeof(char) * ((array.length > 0 ? floor(log10(array.length)) + 1 : 1) + 1));
+		sprintf(str, "%zu", array.length);
+		return str;
 	}
 	else
 	{

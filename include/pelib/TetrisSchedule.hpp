@@ -33,7 +33,7 @@ namespace pelib
 	{
 		public:
 			TetrisSchedule();
-			TetrisSchedule(float ratio, bool showFrequencies, bool useTaskName, vector<unsigned int> colors, float strokeSize);
+			TetrisSchedule(float ratio, bool showFrequencies, bool showTaskId, bool useTaskName, vector<unsigned int> colors, float strokeSize);
 			/** Destructor **/
 			virtual ~TetrisSchedule();
 			/** Writes the content of instance of pelib::Schedule into output stream in Tetris format, using additional information from associated taskgraph and platform **/
@@ -46,11 +46,13 @@ namespace pelib
 			static float defaultStrokeSize();
 			static bool defaultFrequencyLegend();
 			static bool defaultTaskLabel();
+			static bool defaultTaskId();
 			static vector<uint32_t> defaultFrequencyColors();
 		protected:
 			float ratio, strokeSize;
 			bool showFrequencies;
 			bool useTaskName;
+			bool showTaskId;
 			vector<uint32_t> colors;
 	};
 }
