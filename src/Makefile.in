@@ -133,7 +133,7 @@ sharedcc_package = $(if $(filter 1,$(CORE_SHARED)),pelib-core)
 
 sharedcxx_pelib-core++_src = $(corepp_src)
 sharedcc_pelib-core++_src = time.c $(if $(filter core,$(corepp_extra)),$(core_src))
-shared_pelib-core++_export = $(sharedcxx_pelib-core++_embed) $(sharedcc_pelib-core++_src) time.c
+shared_pelib-core++_export = $(sharedcxx_pelib-core++_embed) $(sharedcxx_pelib-core++_src) $(sharedcc_pelib-core++_src) time.c
 shared_pelib-core++_libs = -lboost_regex -lboost_graph -lexpat
 shared_pelib-core++_ldflags = -pthread
 shared_pelib-core++_cxxflags = -fPIC

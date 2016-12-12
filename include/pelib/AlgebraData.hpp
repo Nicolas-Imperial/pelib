@@ -26,11 +26,7 @@
 #ifndef PELIB_ALGEBRADATA
 #define PELIB_ALGEBRADATA
 
-#if 01
 #define debug(var) std::cout << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #var << " = \"" << var << "\"" << std::endl;
-#else
-#define debug(var)
-#endif
 
 namespace pelib
 {
