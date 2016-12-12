@@ -83,7 +83,7 @@ namespace pelib
 			const Task &producer = *this->tasks.find(*i->getProducer());
 			const Task &consumer = *this->tasks.find(*i->getConsumer());
 
-			Link link(producer, consumer, i->getProducerName(), i->getConsumerName(), i->getDataType(), i->getRate());
+			Link link(producer, consumer, i->getProducerName(), i->getConsumerName(), i->getDataType(), i->getProducerRate(), i->getConsumerRate());
 			this->links.insert(link);
 		}
 
@@ -105,7 +105,7 @@ namespace pelib
 			{
 				Task *producer = (*j)->getProducer();
 				Task *consumer = (*j)->getConsumer();
-				Link newLink(*this->tasks.find(*producer), *this->tasks.find(*consumer), (*j)->getProducerName(), (*j)->getConsumerName(), (*j)->getDataType(), (*j)->getRate());
+				Link newLink(*this->tasks.find(*producer), *this->tasks.find(*consumer), (*j)->getProducerName(), (*j)->getConsumerName(), (*j)->getDataType(), (*j)->getProducerRate(), (*j)->getConsumerRate());
 				const Link &link = *this->links.find(newLink);
 				t.getProducers().insert(&link);
 			}
@@ -115,7 +115,7 @@ namespace pelib
 			{
 				Task *producer = (*j)->getProducer();
 				Task *consumer = (*j)->getConsumer();
-				Link newLink(*this->tasks.find(*producer), *this->tasks.find(*consumer), (*j)->getProducerName(), (*j)->getConsumerName(), (*j)->getDataType(), (*j)->getRate());
+				Link newLink(*this->tasks.find(*producer), *this->tasks.find(*consumer), (*j)->getProducerName(), (*j)->getConsumerName(), (*j)->getDataType(), (*j)->getProducerRate(), (*j)->getConsumerRate());
 				const Link &link = *this->links.find(newLink);
 				t.getConsumers().insert(&link);
 			}

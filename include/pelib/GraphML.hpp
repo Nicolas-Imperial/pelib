@@ -67,7 +67,8 @@ namespace pelib
 
 			static const std::string producerName, consumerName;
 			static const std::string type;
-			static const std::string rate;
+			static const std::string producer_rate;
+			static const std::string consumer_rate;
 		protected:
 	};
 }

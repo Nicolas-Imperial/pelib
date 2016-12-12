@@ -219,7 +219,7 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 			for(set<const Link*>::const_iterator j = i->getProducers().begin(); j != i->getProducers().end(); j++)
 			{
 				const Link *link = *j;
-				os << "	schedule->producers_rate[" << std::distance(tg->getTasks().begin(), i) << "][" << counter << "] = " << (float)link->getRate() << ";" << endl;
+				os << "	schedule->producers_rate[" << std::distance(tg->getTasks().begin(), i) << "][" << counter << "] = " << (float)link->getProducerRate() << ";" << endl;
 				counter++;
 			}
 		}
@@ -279,7 +279,7 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 			for(set<const Link*>::const_iterator j = i->getConsumers().begin(); j != i->getConsumers().end(); j++)
 			{
 				const Link *link = *j;
-				os << "	schedule->consumers_rate[" << std::distance(tg->getTasks().begin(), i) << "][" << counter << "] = " << link->getRate() << ";" << endl;
+				os << "	schedule->consumers_rate[" << std::distance(tg->getTasks().begin(), i) << "][" << counter << "] = " << link->getConsumerRate() << ";" << endl;
 				counter++;
 			}
 		}

@@ -62,7 +62,8 @@ typedef struct reader_args reader_args_t;
 const string GraphML::producerName = "producer_name";
 const string GraphML::consumerName = "consumer_name";
 const string GraphML::type = "type";
-const string GraphML::rate = "rate";
+const string GraphML::producer_rate = "producer_rate";
+const string GraphML::consumer_rate = "consumer_rate";
 
 static void*
 thread_reader(void* aux)
@@ -198,9 +199,13 @@ GraphML::dump(ostream& os, const Taskgraph *data, const Platform *arch) const
 		{
 			SETEAS(graph, type.c_str(), counter, i->getDataType().c_str());
 		}
-		if(i->getRate() > 0)
+		if(i->getProducerRate() > 0)
 		{
-			SETEAN(graph, GraphML::rate.c_str(), counter, i->getRate());
+			SETEAN(graph, GraphML::producer_rate.c_str(), counter, i->getProducerRate());
+		}
+		if(i->getConsumerRate() > 0)
+		{
+			SETEAN(graph, GraphML::consumer_rate.c_str(), counter, i->getConsumerRate());
 		}
 	}
 
@@ -367,13 +372,17 @@ GraphML::parse(istream &is) const
 		{
 			type = string(EAS(the_graph, GraphML::type.c_str(), i));
 		}
-		size_t rate = 0;
-		if(igraph_cattribute_has_attr(the_graph, IGRAPH_ATTRIBUTE_EDGE, GraphML::rate.c_str()))
+		size_t producer_rate = 0, consumer_rate = 0;
+		if(igraph_cattribute_has_attr(the_graph, IGRAPH_ATTRIBUTE_EDGE, GraphML::producer_rate.c_str()))
 		{
-			rate = EAN(the_graph, GraphML::rate.c_str(), i);
+			producer_rate = EAN(the_graph, GraphML::producer_rate.c_str(), i);
+		}
+		if(igraph_cattribute_has_attr(the_graph, IGRAPH_ATTRIBUTE_EDGE, GraphML::consumer_rate.c_str()))
+		{
+			consumer_rate = EAN(the_graph, GraphML::consumer_rate.c_str(), i);
 		}
 
-		Link link(*tasks.find(producer), *tasks.find(consumer), producerName, consumerName, type, rate);
+		Link link(*tasks.find(producer), *tasks.find(consumer), producerName, consumerName, type, producer_rate, consumer_rate);
 		links.insert(link);
 
 		const Link &link_ref = *links.find(link);
