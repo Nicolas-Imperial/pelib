@@ -101,7 +101,7 @@ bin_pelib-convert_static = 0
 
 bincxx_demo_src = demo.cpp
 bin_demo_export = $(bincxx_demo_embed) $(bincxx_demo_src) 
-bin_demo_deps = 
+bin_demo_deps = libpelib-core++.so
 bin_demo_libs = -lpelib-core++ $(shared_pelib_libs)
 bin_demo_pkg = $(shared_pelib_pkg)
 bin_demo_ldflags = -L.
@@ -109,7 +109,7 @@ bin_demo_static = 0
 
 bincxx_run_record_src = run_record.cpp
 bin_run_record_export = $(bincxx_run_record_embed) $(bincxx_run_record_src) make_algebra.cpp
-bin_run_record_deps = 
+bin_run_record_deps = libpelib-core++.so 
 bin_run_record_libs = -lpelib-core++ $(shared_pelib_libs)
 bin_run_record_pkg = $(shared_pelib_pkg)
 bin_run_record_ldflags = -L.
