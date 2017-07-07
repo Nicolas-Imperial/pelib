@@ -18,10 +18,6 @@
 
 
 ## Fills configure directory variables with default values if necessary and define environment variables
-final_prefix=$(if $(prefix),$(prefix),$(HOME)/.local)
-final_libdir=$(if $(libdir),$(libdir),$(prefix)/lib)
-final_includedir=$(if $(includedir),$(includedir),$(prefix)/include)
-final_bindir=$(if $(bindir),$(bindir),$(prefix)/bin)
 
 ## Default target
 DEFAULT=all

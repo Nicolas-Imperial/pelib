@@ -36,7 +36,7 @@ extern "C" {
 #undef debug
 #endif
 
-#if 0
+#if defined DEBUG && DEBUG != 0
 #define debug(expr) cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] " << #expr << " = \"" << expr << "\"." << endl;
 #else
 #define debug(expr)

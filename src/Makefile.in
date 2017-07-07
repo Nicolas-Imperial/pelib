@@ -28,7 +28,7 @@ CFLAGS_CONFIG_DEBUG = -g -O0 -DDEBUG=1
 CFLAGS_SHARED = 
 CC_PKG = 
 CC_DEPS =
-CC_LIBS =
+CC_LIBS = 
 CC_LDFLAGS =
 CC_TEST_PKG = unit
 CC_TEST_LIBS = $(CC_LIBS) -lrt
@@ -91,27 +91,32 @@ core_src = sort.c complex.c float.c integer.c string.c string_integer.c monitor.
 bincxx_project = pelib-convert demo run_record
 bincxx_package = $(if $(filter 1,$(CORE++_SHARED) $(CORE++_STATIC)),$(bincxx_project))
 
+#asan_cflags = -fsanitize=address
+#asan_libs = -lasan
+asan_cflags = 
+asan_libs = 
+
 bincxx_pelib-convert_src = pelib-convert.cpp
 bin_pelib-convert_export = $(bincxx_pelib-convert_embed) $(bincxx_pelib-convert_src) 
 bin_pelib-convert_deps = libpelib-core++.so
-bin_pelib-convert_libs = -ldl -lpelib-core++ $(shared_pelib_libs)
-bin_pelib-convert_pkg = $(shared_pelib_pkg)
+bin_pelib-convert_libs = -ldl -lpelib-core++ $(shared_pelib-core++_libs)
+bin_pelib-convert_pkg = $(shared_pelib-core++_pkg)
 bin_pelib-convert_ldflags = -L.
 bin_pelib-convert_static = 0
 
 bincxx_demo_src = demo.cpp
 bin_demo_export = $(bincxx_demo_embed) $(bincxx_demo_src) 
 bin_demo_deps = libpelib-core++.so
-bin_demo_libs = -lpelib-core++ $(shared_pelib_libs)
-bin_demo_pkg = $(shared_pelib_pkg)
+bin_demo_libs = -lpelib-core++ $(shared_pelib-core++_libs)
+bin_demo_pkg = $(shared_pelib-core++_pkg)
 bin_demo_ldflags = -L.
 bin_demo_static = 0
 
 bincxx_run_record_src = run_record.cpp
 bin_run_record_export = $(bincxx_run_record_embed) $(bincxx_run_record_src) make_algebra.cpp
 bin_run_record_deps = libpelib-core++.so 
-bin_run_record_libs = -lpelib-core++ $(shared_pelib_libs)
-bin_run_record_pkg = $(shared_pelib_pkg)
+bin_run_record_libs = -lpelib-core++ $(shared_pelib-core++_libs)
+bin_run_record_pkg = $(shared_pelib-core++_pkg)
 bin_run_record_ldflags = -L.
 bin_run_record_static = 0
 
@@ -134,9 +139,9 @@ sharedcc_package = $(if $(filter 1,$(CORE_SHARED)),pelib-core)
 sharedcxx_pelib-core++_src = $(corepp_src)
 sharedcc_pelib-core++_src = time.c $(if $(filter core,$(corepp_extra)),$(core_src))
 shared_pelib-core++_export = $(sharedcxx_pelib-core++_embed) $(sharedcxx_pelib-core++_src) $(sharedcc_pelib-core++_src) time.c
-shared_pelib-core++_libs = -lboost_regex -lboost_graph -lexpat
+shared_pelib-core++_libs = -lboost_regex -lboost_graph -lexpat $(asan_libs)
 shared_pelib-core++_ldflags = -pthread
-shared_pelib-core++_cxxflags = -fPIC
+shared_pelib-core++_cxxflags = -fPIC -std=c++11 $(asan_cflags)
 shared_pelib-core++_deps =
 shared_pelib-core++_pkg = igraph libxml++-2.6 cairomm-1.0
 shared_pelib-core++_pkg_url = http://www.ida.liu.se/~nicme26
@@ -405,9 +410,9 @@ lib_package = $(if $(filter 1,$(CORE++_STATIC)),$(corepp)) $(if $(filter 1,$(COR
 
 libcxx_pelib-core_src = 
 libcc_pelib-core_src = $(core_src) time.c
-lib_pelib-core_libs = -lboost_regex -lboost_graph -lexpat
+lib_pelib-core_libs = -lboost_regex -lboost_graph -lexpat $(asan_libs)
 lib_pelib-core_export = $(lib_pelib-core_embed) $(libcxx_pelib-core_src) $(libcc_pelib-core_src) time.c
-lib_pelib-core_cxxflags =
+lib_pelib-core_cflags = $(asan_cflags)
 lib_pelib-core_ldflags = -pthread 
 lib_pelib-core_deps = 
 lib_pelib-core_pkg = #igraph libxml++-2.6 cairomm-1.0
@@ -420,7 +425,7 @@ lib_pelib-core_embed =
 
 sharedcxx_pelib-core_src = 
 sharedcc_pelib-core_src = $(core_src) time.c
-shared_pelib-core_libs = -lboost_regex -lboost_graph -lexpat
+shared_pelib-core_libs = -lboost_regex -lboost_graph -lexpat $(asan_libs)
 shared_pelib-core_export = $(shared_pelib-core_embed) $(sharedcxx_pelib-core_src) $(sharedcc_pelib-core_src) time.c
 shared_pelib-core_cxxflags =
 shared_pelib-core_ldflags = -pthread 
@@ -430,7 +435,7 @@ shared_pelib-core_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-core_pkg_ld = 
 shared_pelib-core_pkg_libs = -lboost_regex -lboost_graph -lm
 shared_pelib-core_pkg_igraph_version = >= 0.7.1
-shared_pelib-core_cflags = -fPIC
+shared_pelib-core_cflags = -fPIC $(asan_cflags)
 shared_pelib-core_pkg_description = General research utility sharedrary used in PELAB
 shared_pelib-core_embed = 
 

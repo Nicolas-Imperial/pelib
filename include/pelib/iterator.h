@@ -21,6 +21,11 @@
  * 
  */
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <pelib/template.h>
 #if PELIB_CONCAT_2(DONE_iterator_, ITERATOR_T) == 0
 
@@ -55,3 +60,7 @@ pelib_iterator_distance(ITERATOR_T)(iterator_t(ITERATOR_T) *start, iterator_t(IT
 
 // Make sure the symbol does not propagate any further
 #undef ITERATOR_T
+
+#ifdef __cplusplus
+}
+#endif

@@ -156,3 +156,6 @@ pelib_destroy(pair_t(PAIR_KEY_T, PAIR_VALUE_T))(pair_t(PAIR_KEY_T, PAIR_VALUE_T)
 	pelib_destroy(PAIR_VALUE_T)(set.value);
 	return 1;
 }
+
+#undef PAIR_KEY_T
+#undef PAIR_VALUE_T

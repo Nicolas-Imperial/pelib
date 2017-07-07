@@ -21,6 +21,10 @@
  * 
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef INTEGER_H_
 #define INTEGER_H_
 
@@ -67,3 +71,7 @@
 #define DONE_cfifo_array_int 1
 
 #endif /* INTEGER_H_ */
+
+#ifdef __cplusplus
+}
+#endif

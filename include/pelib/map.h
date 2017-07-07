@@ -21,7 +21,13 @@
  * 
  */
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <pelib/template.h>
+
 #if PELIB_CONCAT_4(DONE_map_, MAP_KEY_T, _, MAP_VALUE_T) == 0
 #define map(key, value) PELIB_CONCAT_4(map_, key, _, value)
 #define map_t(key, value) PELIB_CONCAT_2(map(key, value), _t)
@@ -95,3 +101,7 @@ pelib_map_size(MAP_KEY_T, MAP_VALUE_T)(map_t(MAP_KEY_T, MAP_VALUE_T)*);
 // Make sure the symbol does not propagate any further
 #undef MAP_KEY_T 
 #undef MAP_VALUE_T
+
+#ifdef __cplusplus
+}
+#endif

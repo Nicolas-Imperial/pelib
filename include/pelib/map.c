@@ -41,7 +41,12 @@
 #include "pelib/iterator.c"
 */
 
-#if 10
+#undef debug
+#undef debug_addr
+#undef debug_int
+#undef debug_size_t
+
+#if 0
 #define debug(var) printf("[%s:%s:%d] %s = \"%s\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
 #define debug_addr(var) printf("[%s:%s:%d] %s = \"%p\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
 #define debug_int(var) printf("[%s:%s:%d] %s = \"%d\"\n", __FILE__, __FUNCTION__, __LINE__, #var, var); fflush(NULL)
@@ -52,8 +57,6 @@
 #define debug_int(var)
 #define debug_size_t(var)
 #endif
-
-static map_t(MAP_KEY_T, MAP_VALUE_T) *stuff;
 
 map_t(MAP_KEY_T, MAP_VALUE_T)*
 pelib_alloc_struct(map_t(MAP_KEY_T, MAP_VALUE_T))()

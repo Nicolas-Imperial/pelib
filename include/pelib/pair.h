@@ -21,6 +21,11 @@
  * 
  */
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <pelib/template.h>
 #if PELIB_CONCAT_4(DONE_pair_, PAIR_KEY_T, _, PAIR_VALUE_T) == 0
 
@@ -43,3 +48,6 @@ typedef struct pair(PAIR_KEY_T, PAIR_VALUE_T) pair_t(PAIR_KEY_T, PAIR_VALUE_T);
 // Make sure the symbol does not propagate any further
 #undef PAIR_KEY_T
 #undef PAIR_VALUE_T
+#ifdef __cplusplus
+}
+#endif

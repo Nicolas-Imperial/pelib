@@ -27,46 +27,46 @@
 //#define ITERATOR_T SET_T
 //#include <pelib/iterator.h>
 
-#define set(elem) PELIB_CONCAT_2(set_, elem)
-#define set_t(elem) PELIB_CONCAT_2(set(elem), _t)
+#define pelib_set(elem) PELIB_CONCAT_2(pelib_set_, elem)
+#define pelib_set_t(elem) PELIB_CONCAT_2(pelib_set(elem), _t)
 
-#define pelib_set_first(elem) PELIB_CONCAT_3(pelib_, set(elem), _first)
-#define pelib_set_last(elem) PELIB_CONCAT_3(pelib_, set(elem), _last)
-#define pelib_set_insert(elem) PELIB_CONCAT_3(pelib_, set(elem), _insert)
-#define pelib_set_find(elem) PELIB_CONCAT_3(pelib_, set(elem), _find)
-#define pelib_set_compare(elem) PELIB_CONCAT_3(pelib_, set(elem), _compare)
+#define pelib_set_first(elem) PELIB_CONCAT_3(pelib_, pelib_set(elem), _first)
+#define pelib_set_last(elem) PELIB_CONCAT_3(pelib_, pelib_set(elem), _last)
+#define pelib_set_insert(elem) PELIB_CONCAT_3(pelib_, pelib_set(elem), _insert)
+#define pelib_set_find(elem) PELIB_CONCAT_3(pelib_, pelib_set(elem), _find)
+#define pelib_set_compare(elem) PELIB_CONCAT_3(pelib_, pelib_set(elem), _compare)
 
 /** Generic static set **/
-struct set(SET_T)
+struct pelib_set(SET_T)
 {
 	iterator_t(SET_T) *first, *last, *middle; /** Address where elements are stored **/
 };
-typedef struct set(SET_T) set_t(SET_T);
+typedef struct pelib_set(SET_T) pelib_set_t(SET_T);
 
-#define STRUCT_T set_t(SET_T)
+#define STRUCT_T pelib_set_t(SET_T)
 #include <pelib/structure.h>
 
 /* Returns the first element in set */
 SET_T*
-pelib_set_first(SET_T)(set_t(SET_T)*);
+pelib_set_first(SET_T)(pelib_set_t(SET_T)*);
 
 /* Returns the first element in set */
 SET_T*
-pelib_set_last(SET_T)(set_t(SET_T)*);
+pelib_set_last(SET_T)(pelib_set_t(SET_T)*);
 
 /* Places an element in set */
 int
-pelib_set_insert(SET_T)(set_t(SET_T)*, SET_T);
+pelib_set_insert(SET_T)(pelib_set_t(SET_T)*, SET_T);
 
 /* Find an element in set */
 SET_T*
-pelib_set_find(SET_T)(set_t(SET_T)*, SET_T);
+pelib_set_find(SET_T)(pelib_set_t(SET_T)*, SET_T);
 
 /** Compares all elements of two sets one by one
 	@return If a1 and a2 have the same number of elements, for the first pair of elements from both sets a1 and a2 that are different, return -1 if the element of a1 is lower than the element of a2, 1 otherwise. Returns 0 if all elements are identical. If a1 has less elements than a2, then returns -1 other wise returns 1.
 **/
 int
-pelib_set_compare(SET_T)(set_t(SET_T)* a1, set_t(SET_T)* a2);
+pelib_set_compare(SET_T)(pelib_set_t(SET_T)* a1, pelib_set_t(SET_T)* a2);
 
 #endif /* SET_H_ */
 

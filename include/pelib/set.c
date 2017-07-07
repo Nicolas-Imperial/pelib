@@ -55,30 +55,30 @@
 #define debug_size_t(var)
 #endif
 
-set_t(SET_T)*
-pelib_alloc_struct(set_t(SET_T))()
+pelib_set_t(SET_T)*
+pelib_alloc_struct(pelib_set_t(SET_T))()
 {
-	set_t(SET_T)* set;
+	pelib_set_t(SET_T)* set;
 
-	set = malloc(sizeof(set_t(SET_T)));
+	set = malloc(sizeof(pelib_set_t(SET_T)));
 	assert(set != NULL);
 
 	return set;
 }
 
-set_t(SET_T)*
-pelib_alloc(set_t(SET_T))()
+pelib_set_t(SET_T)*
+pelib_alloc(pelib_set_t(SET_T))()
 {
-	set_t(SET_T)* set;
+	pelib_set_t(SET_T)* set;
 
-	set = malloc(sizeof(set_t(SET_T)));
+	set = malloc(sizeof(pelib_set_t(SET_T)));
 	assert(set != NULL);
 
 	return set;
 }
 
 int
-pelib_init(set_t(SET_T))(set_t(SET_T)* set)
+pelib_init(pelib_set_t(SET_T))(pelib_set_t(SET_T)* set)
 {
 	set->first = NULL;
 	set->middle = NULL;
@@ -87,10 +87,10 @@ pelib_init(set_t(SET_T))(set_t(SET_T)* set)
 	return 1;
 }
 
-#define pelib_set_insert_element(elem) PELIB_CONCAT_3(pelib_, set(elem), _insert_element)
+#define pelib_set_insert_element(elem) PELIB_CONCAT_3(pelib_, pelib_set(elem), _insert_element)
 static
 int
-pelib_set_insert_element(SET_T)(set_t(SET_T) *set, iterator_t(SET_T) *elem)
+pelib_set_insert_element(SET_T)(pelib_set_t(SET_T) *set, iterator_t(SET_T) *elem)
 {
 	iterator_t(SET_T) *current = set->first, *previous = NULL;
 
@@ -149,7 +149,7 @@ pelib_set_insert_element(SET_T)(set_t(SET_T) *set, iterator_t(SET_T) *elem)
 }
 
 int
-pelib_set_insert(SET_T)(set_t(SET_T)* set, SET_T value)
+pelib_set_insert(SET_T)(pelib_set_t(SET_T)* set, SET_T value)
 {
 	iterator_t(SET_T) *new = pelib_alloc(iterator_t(SET_T))();
 	pelib_init(iterator_t(SET_T))(new);
@@ -166,7 +166,7 @@ pelib_set_insert(SET_T)(set_t(SET_T)* set, SET_T value)
 }
 
 int
-pelib_copy(set_t(SET_T))(set_t(SET_T) src, set_t(SET_T)* dst)
+pelib_copy(pelib_set_t(SET_T))(pelib_set_t(SET_T) src, pelib_set_t(SET_T)* dst)
 {
 	size_t i;
 
@@ -185,7 +185,7 @@ pelib_copy(set_t(SET_T))(set_t(SET_T) src, set_t(SET_T)* dst)
 #define set_length_debug printf("[PELIB:%s:%s:%d] i = %d\n", __FILE__, __FUNCTION__, __LINE__, i);
 #define set_length_pre_debug printf("[PELIB:%s:%s:%d] length = %d\n", __FILE__, __FUNCTION__, __LINE__, pelib_set_length(SET_T)(&set));
 char*
-pelib_string(set_t(SET_T))(set_t(SET_T) set)
+pelib_string(pelib_set_t(SET_T))(pelib_set_t(SET_T) set)
 {
 	char *str, *grow, *elem;
 	size_t i;
@@ -230,11 +230,11 @@ pelib_string(set_t(SET_T))(set_t(SET_T) set)
 }
 
 char*
-pelib_string_detail(set_t(SET_T))(set_t(SET_T) set, int level)
+pelib_string_detail(pelib_set_t(SET_T))(pelib_set_t(SET_T) set, int level)
 {
 	if(level == 0)
 	{
-		return pelib_string(set_t(SET_T))(set);
+		return pelib_string(pelib_set_t(SET_T))(set);
 	}
 	else
 	{
@@ -280,10 +280,10 @@ pelib_string_detail(set_t(SET_T))(set_t(SET_T) set, int level)
 }
 
 FILE*
-pelib_printf(set_t(SET_T))(FILE* stream, set_t(SET_T) set)
+pelib_printf(pelib_set_t(SET_T))(FILE* stream, pelib_set_t(SET_T) set)
 {
 	char * str;
-	str = pelib_string(set_t(SET_T))(set);
+	str = pelib_string(pelib_set_t(SET_T))(set);
 
 	fprintf(stream, "%s\n", str);
 	free(str);
@@ -292,10 +292,10 @@ pelib_printf(set_t(SET_T))(FILE* stream, set_t(SET_T) set)
 }
 
 FILE*
-pelib_printf_detail(set_t(SET_T))(FILE* stream, set_t(SET_T) set, int level)
+pelib_printf_detail(pelib_set_t(SET_T))(FILE* stream, pelib_set_t(SET_T) set, int level)
 {
 	char * str;
-	str = pelib_string_detail(set_t(SET_T))(set, level);
+	str = pelib_string_detail(pelib_set_t(SET_T))(set, level);
 
 	fprintf(stream, "%s\n", str);
 	free(str);
@@ -304,7 +304,7 @@ pelib_printf_detail(set_t(SET_T))(FILE* stream, set_t(SET_T) set, int level)
 }
 
 int
-pelib_destroy(set_t(SET_T))(set_t(SET_T) set)
+pelib_destroy(pelib_set_t(SET_T))(pelib_set_t(SET_T) set)
 {
 	iterator_t(SET_T) *elem = set.first;
 	while(elem != NULL)
@@ -318,7 +318,7 @@ pelib_destroy(set_t(SET_T))(set_t(SET_T) set)
 }
 
 int
-pelib_free_buffer(set_t(SET_T))(set_t(SET_T)* set)
+pelib_free_buffer(pelib_set_t(SET_T))(pelib_set_t(SET_T)* set)
 {
 	iterator_t(SET_T) *elem = set->first;
 	while(elem != NULL)
@@ -332,22 +332,22 @@ pelib_free_buffer(set_t(SET_T))(set_t(SET_T)* set)
 }
 
 int
-pelib_free_struct(set_t(SET_T))(set_t(SET_T)* set)
+pelib_free_struct(pelib_set_t(SET_T))(pelib_set_t(SET_T)* set)
 {
 	free(set);
 	return 1;
 }
 
 int
-pelib_free(set_t(SET_T))(set_t(SET_T)* set)
+pelib_free(pelib_set_t(SET_T))(pelib_set_t(SET_T)* set)
 {
-	pelib_free_buffer(set_t(SET_T))(set);
-	pelib_free_struct(set_t(SET_T))(set);
+	pelib_free_buffer(pelib_set_t(SET_T))(set);
+	pelib_free_struct(pelib_set_t(SET_T))(set);
 	return 1;
 }
 
 int
-pelib_compare(set_t(SET_T))(set_t(SET_T) a1, set_t(SET_T) a2)
+pelib_compare(pelib_set_t(SET_T))(pelib_set_t(SET_T) a1, pelib_set_t(SET_T) a2)
 {
 	iterator_t(SET_T) *e1 = a1.first;
 	iterator_t(SET_T) *e2 = a2.first;
