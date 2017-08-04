@@ -31,13 +31,13 @@
 #endif
 
 /*
-#define PAIR_KEY_T MAP_KEY_T
-#define PAIR_VALUE_T MAP_VALUE_T
-#include "pelib/pair.c"
+#define PELIB_PAIR_KEY_T MAP_KEY_T
+#define PELIB_PAIR_VALUE_T MAP_VALUE_T
+#include "pelib/pelib_pair.c"
 */
 
 /*
-#define ITERATOR_T pair_t(MAP_KEY_T, MAP_VALUE_T)
+#define PELIB_ITERATOR_T pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)
 #include "pelib/iterator.c"
 */
 
@@ -93,9 +93,9 @@ pelib_init(map_t(MAP_KEY_T, MAP_VALUE_T))(map_t(MAP_KEY_T, MAP_VALUE_T)* map)
 #define pelib_map_insert_element(key, value) PELIB_CONCAT_3(pelib_, map(key, value), _insert_element)
 static
 int
-pelib_map_insert_element(MAP_KEY_T, MAP_VALUE_T)(map_t(MAP_KEY_T, MAP_VALUE_T) *map, iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)) *elem)
+pelib_map_insert_element(MAP_KEY_T, MAP_VALUE_T)(map_t(MAP_KEY_T, MAP_VALUE_T) *map, pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)) *elem)
 {
-	iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)) *current = map->first, *previous = NULL;
+	pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)) *current = map->first, *previous = NULL;
 
 	// If there is at least one element, then browse the list until we find the right spot
 	// Otherwise, place the element as first and last, that is first and last pointers point
@@ -152,14 +152,14 @@ pelib_map_insert_element(MAP_KEY_T, MAP_VALUE_T)(map_t(MAP_KEY_T, MAP_VALUE_T) *
 }
 
 int
-pelib_map_insert(MAP_KEY_T, MAP_VALUE_T)(map_t(MAP_KEY_T, MAP_VALUE_T)* map, pair_t(MAP_KEY_T, MAP_VALUE_T) value)
+pelib_map_insert(MAP_KEY_T, MAP_VALUE_T)(map_t(MAP_KEY_T, MAP_VALUE_T)* map, pelib_pair_t(MAP_KEY_T, MAP_VALUE_T) value)
 {
-	iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)) *new = pelib_alloc(iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)))();
-	pelib_init(iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)))(new);
-	pelib_copy(pair_t(MAP_KEY_T, MAP_VALUE_T))(value, &new->value);
+	pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)) *new = pelib_alloc(pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)))();
+	pelib_init(pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)))(new);
+	pelib_copy(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T))(value, &new->value);
 	if(!pelib_map_insert_element(MAP_KEY_T, MAP_VALUE_T)(map, new))
 	{
-		pelib_free(iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)))(new);
+		pelib_free(pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)))(new);
 		return 0;
 	}
 	else
@@ -173,11 +173,11 @@ pelib_copy(map_t(MAP_KEY_T, MAP_VALUE_T))(map_t(MAP_KEY_T, MAP_VALUE_T) src, map
 {
 	size_t i;
 
-	iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)) *elem = src.last;
+	pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)) *elem = src.last;
 	while(elem != NULL)
 	{
-		iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)) *cpy = pelib_alloc(iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)))();
-		pelib_copy(pair_t(MAP_KEY_T, MAP_VALUE_T))(elem->value, &cpy->value);
+		pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)) *cpy = pelib_alloc(pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)))();
+		pelib_copy(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T))(elem->value, &cpy->value);
 		pelib_map_insert_element(MAP_KEY_T, MAP_VALUE_T)(dst, cpy);
 		elem = elem->previous;
 	}
@@ -195,10 +195,10 @@ pelib_string(map_t(MAP_KEY_T, MAP_VALUE_T))(map_t(MAP_KEY_T, MAP_VALUE_T) map)
 	str = malloc(3 * sizeof(char));
 	sprintf(str, "[");
 
-	iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)) *el = map.first;
+	pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)) *el = map.first;
 	while(el != NULL && el->next != NULL)
 	{
-		elem = pelib_string(pair_t(MAP_KEY_T, MAP_VALUE_T))(el->value);
+		elem = pelib_string(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T))(el->value);
 		grow = malloc((strlen(str) + 1) * sizeof(char));
 		sprintf(grow, "%s", str);
 
@@ -211,7 +211,7 @@ pelib_string(map_t(MAP_KEY_T, MAP_VALUE_T))(map_t(MAP_KEY_T, MAP_VALUE_T) map)
 	}
 	while(el != NULL)
 	{
-		elem = pelib_string(pair_t(MAP_KEY_T, MAP_VALUE_T))(el->value);
+		elem = pelib_string(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T))(el->value);
 		grow = malloc((strlen(str) + 1) * sizeof(char));
 		sprintf(grow, "%s", str);
 
@@ -246,11 +246,11 @@ pelib_string_detail(map_t(MAP_KEY_T, MAP_VALUE_T))(map_t(MAP_KEY_T, MAP_VALUE_T)
 		size_t i;
 		str = malloc(3 * sizeof(char));
 		sprintf(str, "[");
-		iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)) *el = map.first;
+		pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)) *el = map.first;
 		
 		while(el != NULL && el->next != NULL)
 		{
-			elem = pelib_string_detail(pair_t(MAP_KEY_T, MAP_VALUE_T))(el->value, level);
+			elem = pelib_string_detail(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T))(el->value, level);
 			grow = malloc((strlen(str) + 1) * sizeof(char));
 			sprintf(grow, "%s", str);
 
@@ -262,7 +262,7 @@ pelib_string_detail(map_t(MAP_KEY_T, MAP_VALUE_T))(map_t(MAP_KEY_T, MAP_VALUE_T)
 		}
 		while(el != NULL)
 		{
-			elem = pelib_string_detail(pair_t(MAP_KEY_T, MAP_VALUE_T))(el->value, level);
+			elem = pelib_string_detail(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T))(el->value, level);
 			grow = malloc((strlen(str) + 1) * sizeof(char));
 			sprintf(grow, "%s", str);
 
@@ -309,12 +309,12 @@ pelib_printf_detail(map_t(MAP_KEY_T, MAP_VALUE_T))(FILE* stream, map_t(MAP_KEY_T
 int
 pelib_destroy(map_t(MAP_KEY_T, MAP_VALUE_T))(map_t(MAP_KEY_T, MAP_VALUE_T) map)
 {
-	iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)) *elem = map.first;
+	pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)) *elem = map.first;
 	while(elem != NULL)
 	{
-		iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)) *current = elem;
+		pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)) *current = elem;
 		elem = elem->next;
-		pelib_destroy(iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)))(*current);
+		pelib_destroy(pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)))(*current);
 	}
 	return 1;
 }
@@ -322,12 +322,12 @@ pelib_destroy(map_t(MAP_KEY_T, MAP_VALUE_T))(map_t(MAP_KEY_T, MAP_VALUE_T) map)
 int
 pelib_free_buffer(map_t(MAP_KEY_T, MAP_VALUE_T))(map_t(MAP_KEY_T, MAP_VALUE_T)* map)
 {
-	iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)) *elem = map->first;
+	pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)) *elem = map->first;
 	while(elem != NULL)
 	{
-		iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)) *current = elem;
+		pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)) *current = elem;
 		elem = elem->next;
-		pelib_free(iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)))(current);		
+		pelib_free(pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)))(current);		
 	}
 	return 1;
 }
@@ -350,10 +350,10 @@ pelib_free(map_t(MAP_KEY_T, MAP_VALUE_T))(map_t(MAP_KEY_T, MAP_VALUE_T)* map)
 int
 pelib_compare(map_t(MAP_KEY_T, MAP_VALUE_T))(map_t(MAP_KEY_T, MAP_VALUE_T) a1, map_t(MAP_KEY_T, MAP_VALUE_T) a2)
 {
-	iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)) *e1 = a1.first;
-	iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)) *e2 = a2.first;
+	pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)) *e1 = a1.first;
+	pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)) *e2 = a2.first;
 
-	while(e1 != NULL && e2 != NULL && pelib_compare(pair_t(MAP_KEY_T, MAP_VALUE_T))(e1->value, e2->value) == 0)
+	while(e1 != NULL && e2 != NULL && pelib_compare(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T))(e1->value, e2->value) == 0)
 	{
 		e1 = e1->next;
 		e2 = e2->next;
@@ -367,39 +367,39 @@ pelib_compare(map_t(MAP_KEY_T, MAP_VALUE_T))(map_t(MAP_KEY_T, MAP_VALUE_T) a1, m
 	{
 		return -1;
 	}
-	else return pelib_compare(pair_t(MAP_KEY_T, MAP_VALUE_T))(e1->value, e2->value);
+	else return pelib_compare(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T))(e1->value, e2->value);
 }
 
 /* Returns the first element in map */
-iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T))*
+pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T))*
 pelib_map_begin(MAP_KEY_T, MAP_VALUE_T)(map_t(MAP_KEY_T, MAP_VALUE_T) *map)
 {
 	return map->first;
 }
 
 /* Returns the first element in map */
-iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T))*
+pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T))*
 pelib_map_end(MAP_KEY_T, MAP_VALUE_T)(map_t(MAP_KEY_T, MAP_VALUE_T) *map)
 {
 	return NULL;
 }
 
-iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T))*
-pelib_map_next(MAP_KEY_T, MAP_VALUE_T)(iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)) *i)
+pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T))*
+pelib_map_next(MAP_KEY_T, MAP_VALUE_T)(pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)) *i)
 {
-	return pelib_iterator_next(pair_t(MAP_KEY_T, MAP_VALUE_T))(i);
+	return pelib_pelib_iterator_next(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T))(i);
 }
 
-pair_t(MAP_KEY_T, MAP_VALUE_T)
-pelib_map_read(MAP_KEY_T, MAP_VALUE_T)(iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)) *i)
+pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)
+pelib_map_read(MAP_KEY_T, MAP_VALUE_T)(pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)) *i)
 {
-	return pelib_iterator_read(pair_t(MAP_KEY_T, MAP_VALUE_T))(i);
+	return pelib_pelib_iterator_read(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T))(i);
 }
 
-iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T))*
+pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T))*
 pelib_map_find(MAP_KEY_T, MAP_VALUE_T)(map_t(MAP_KEY_T, MAP_VALUE_T) *map, MAP_KEY_T key)
 {
-	map_iterator_t(MAP_KEY_T, MAP_VALUE_T) *i;
+	map_pelib_iterator_t(MAP_KEY_T, MAP_VALUE_T) *i;
 	for(i = pelib_map_begin(MAP_KEY_T, MAP_VALUE_T)(map); i != pelib_map_end(MAP_KEY_T, MAP_VALUE_T)(map); i = pelib_map_next(MAP_KEY_T, MAP_VALUE_T)(i))
 	{
 		MAP_KEY_T elem_key = pelib_map_read(MAP_KEY_T, MAP_VALUE_T)(i).key;
@@ -416,7 +416,7 @@ size_t
 pelib_map_size(MAP_KEY_T, MAP_VALUE_T)(map_t(MAP_KEY_T, MAP_VALUE_T) *map)
 {
 	size_t size = 0;
-	iterator_t(pair_t(MAP_KEY_T, MAP_VALUE_T)) *i;
+	pelib_iterator_t(pelib_pair_t(MAP_KEY_T, MAP_VALUE_T)) *i;
 
 	// Iterate from the beginning until we find the end
 	for(i = pelib_map_begin(MAP_KEY_T, MAP_VALUE_T)(map); i != pelib_map_end(MAP_KEY_T, MAP_VALUE_T)(map); i = pelib_map_next(MAP_KEY_T, MAP_VALUE_T)(i), size++);

@@ -1,5 +1,5 @@
 /*
- * iterator.c
+ * pelib_iterator.c
  *
  *  Created on: 5 Sep 2011
  *  Copyright 2011 Nicolas Melot
@@ -26,55 +26,55 @@
 #include <assert.h>
 #include <string.h>
 
-#ifndef ITERATOR_T
-#error Using generic iterator without a type
+#ifndef PELIB_ITERATOR_T
+#error Using generic pelib_iterator without a type
 #endif
 
-iterator_t(ITERATOR_T)*
-pelib_alloc_struct(iterator_t(ITERATOR_T))()
+pelib_iterator_t(PELIB_ITERATOR_T)*
+pelib_alloc_struct(pelib_iterator_t(PELIB_ITERATOR_T))()
 {
-	iterator_t(ITERATOR_T)* iterator;
+	pelib_iterator_t(PELIB_ITERATOR_T)* pelib_iterator;
 
-	iterator = malloc(sizeof(iterator_t(ITERATOR_T)));
-	assert(iterator != NULL);
+	pelib_iterator = malloc(sizeof(pelib_iterator_t(PELIB_ITERATOR_T)));
+	assert(pelib_iterator != NULL);
 
-	return iterator;
+	return pelib_iterator;
 }
 
-iterator_t(ITERATOR_T)*
-pelib_alloc(iterator_t(ITERATOR_T))()
+pelib_iterator_t(PELIB_ITERATOR_T)*
+pelib_alloc(pelib_iterator_t(PELIB_ITERATOR_T))()
 {
-	iterator_t(ITERATOR_T)* iterator;
+	pelib_iterator_t(PELIB_ITERATOR_T)* pelib_iterator;
 
-	iterator = malloc(sizeof(iterator_t(ITERATOR_T)));
-	assert(iterator != NULL);
+	pelib_iterator = malloc(sizeof(pelib_iterator_t(PELIB_ITERATOR_T)));
+	assert(pelib_iterator != NULL);
 
-	return iterator;
-}
-
-int
-pelib_init(iterator_t(ITERATOR_T))(iterator_t(ITERATOR_T)* iterator)
-{
-	iterator->previous = NULL;
-	iterator->next = NULL;
-	return pelib_init(ITERATOR_T)(&iterator->value);
+	return pelib_iterator;
 }
 
 int
-pelib_copy(iterator_t(ITERATOR_T))(iterator_t(ITERATOR_T) src, iterator_t(ITERATOR_T)* dst)
+pelib_init(pelib_iterator_t(PELIB_ITERATOR_T))(pelib_iterator_t(PELIB_ITERATOR_T)* pelib_iterator)
+{
+	pelib_iterator->previous = NULL;
+	pelib_iterator->next = NULL;
+	return pelib_init(PELIB_ITERATOR_T)(&pelib_iterator->value);
+}
+
+int
+pelib_copy(pelib_iterator_t(PELIB_ITERATOR_T))(pelib_iterator_t(PELIB_ITERATOR_T) src, pelib_iterator_t(PELIB_ITERATOR_T)* dst)
 {
 	size_t i;
 
 	*dst = src;
-	return pelib_copy(ITERATOR_T)(src.value, &dst->value);
+	return pelib_copy(PELIB_ITERATOR_T)(src.value, &dst->value);
 }
 
-#define iterator_length_debug printf("[PELIB:%s:%s:%d] i = %d\n", __FILE__, __FUNCTION__, __LINE__, i);
-#define iterator_length_pre_debug printf("[PELIB:%s:%s:%d] length = %d\n", __FILE__, __FUNCTION__, __LINE__, pelib_iterator_length(ITERATOR_T)(&iterator));
+#define pelib_iterator_length_debug printf("[PELIB:%s:%s:%d] i = %d\n", __FILE__, __FUNCTION__, __LINE__, i);
+#define pelib_iterator_length_pre_debug printf("[PELIB:%s:%s:%d] length = %d\n", __FILE__, __FUNCTION__, __LINE__, pelib_pelib_iterator_length(PELIB_ITERATOR_T)(&pelib_iterator));
 char*
-pelib_string(iterator_t(ITERATOR_T))(iterator_t(ITERATOR_T) iterator)
+pelib_string(pelib_iterator_t(PELIB_ITERATOR_T))(pelib_iterator_t(PELIB_ITERATOR_T) pelib_iterator)
 {
-	char *value = pelib_string(ITERATOR_T)(iterator.value);
+	char *value = pelib_string(PELIB_ITERATOR_T)(pelib_iterator.value);
 	char *elem = malloc((strlen(value) + 3) * sizeof(char*));
 	strcpy(&elem[1], value);
 	elem[0] = '{';
@@ -86,15 +86,15 @@ pelib_string(iterator_t(ITERATOR_T))(iterator_t(ITERATOR_T) iterator)
 }
 
 char*
-pelib_string_detail(iterator_t(ITERATOR_T))(iterator_t(ITERATOR_T) iterator, int level)
+pelib_string_detail(pelib_iterator_t(PELIB_ITERATOR_T))(pelib_iterator_t(PELIB_ITERATOR_T) pelib_iterator, int level)
 {
 	if(level == 0)
 	{
-		return pelib_string(iterator_t(ITERATOR_T))(iterator);
+		return pelib_string(pelib_iterator_t(PELIB_ITERATOR_T))(pelib_iterator);
 	}
 	else
 	{
-		char *value = pelib_string_detail(ITERATOR_T)(iterator.value, level);
+		char *value = pelib_string_detail(PELIB_ITERATOR_T)(pelib_iterator.value, level);
 		char *elem = malloc((strlen(value) + 3) * sizeof(char*));
 		strcpy(&elem[1], value);
 		elem[0] = '{';
@@ -107,10 +107,10 @@ pelib_string_detail(iterator_t(ITERATOR_T))(iterator_t(ITERATOR_T) iterator, int
 }
 
 FILE*
-pelib_printf(iterator_t(ITERATOR_T))(FILE* stream, iterator_t(ITERATOR_T) iterator)
+pelib_printf(pelib_iterator_t(PELIB_ITERATOR_T))(FILE* stream, pelib_iterator_t(PELIB_ITERATOR_T) pelib_iterator)
 {
 	char * str;
-	str = pelib_string(iterator_t(ITERATOR_T))(iterator);
+	str = pelib_string(pelib_iterator_t(PELIB_ITERATOR_T))(pelib_iterator);
 
 	fprintf(stream, "%s\n", str);
 	free(str);
@@ -119,10 +119,10 @@ pelib_printf(iterator_t(ITERATOR_T))(FILE* stream, iterator_t(ITERATOR_T) iterat
 }
 
 FILE*
-pelib_printf_detail(iterator_t(ITERATOR_T))(FILE* stream, iterator_t(ITERATOR_T) iterator, int level)
+pelib_printf_detail(pelib_iterator_t(PELIB_ITERATOR_T))(FILE* stream, pelib_iterator_t(PELIB_ITERATOR_T) pelib_iterator, int level)
 {
 	char * str;
-	str = pelib_string_detail(iterator_t(ITERATOR_T))(iterator, level);
+	str = pelib_string_detail(pelib_iterator_t(PELIB_ITERATOR_T))(pelib_iterator, level);
 
 	fprintf(stream, "%s\n", str);
 	free(str);
@@ -131,33 +131,33 @@ pelib_printf_detail(iterator_t(ITERATOR_T))(FILE* stream, iterator_t(ITERATOR_T)
 }
 
 int
-pelib_destroy(iterator_t(ITERATOR_T))(iterator_t(ITERATOR_T) iterator)
+pelib_destroy(pelib_iterator_t(PELIB_ITERATOR_T))(pelib_iterator_t(PELIB_ITERATOR_T) pelib_iterator)
 {
-	pelib_destroy(ITERATOR_T)(iterator.value);
+	pelib_destroy(PELIB_ITERATOR_T)(pelib_iterator.value);
 	return 1;
 }
 
 int
-pelib_free(iterator_t(ITERATOR_T))(iterator_t(ITERATOR_T)* iterator)
+pelib_free(pelib_iterator_t(PELIB_ITERATOR_T))(pelib_iterator_t(PELIB_ITERATOR_T)* pelib_iterator)
 {
-	return pelib_free_struct(iterator_t(ITERATOR_T))(iterator);
+	return pelib_free_struct(pelib_iterator_t(PELIB_ITERATOR_T))(pelib_iterator);
 }
 
 int
-pelib_free_struct(iterator_t(ITERATOR_T))(iterator_t(ITERATOR_T)* iterator)
+pelib_free_struct(pelib_iterator_t(PELIB_ITERATOR_T))(pelib_iterator_t(PELIB_ITERATOR_T)* pelib_iterator)
 {
-	free(iterator);
+	free(pelib_iterator);
 	return 0;
 }
 
 int
-pelib_compare(iterator_t(ITERATOR_T))(iterator_t(ITERATOR_T) a1, iterator_t(ITERATOR_T) a2)
+pelib_compare(pelib_iterator_t(PELIB_ITERATOR_T))(pelib_iterator_t(PELIB_ITERATOR_T) a1, pelib_iterator_t(PELIB_ITERATOR_T) a2)
 {
-	return pelib_compare(ITERATOR_T)(a1.value, a2.value);
+	return pelib_compare(PELIB_ITERATOR_T)(a1.value, a2.value);
 }
 
-iterator_t(ITERATOR_T)*
-pelib_iterator_next(ITERATOR_T)(iterator_t(ITERATOR_T) *el)
+pelib_iterator_t(PELIB_ITERATOR_T)*
+pelib_pelib_iterator_next(PELIB_ITERATOR_T)(pelib_iterator_t(PELIB_ITERATOR_T) *el)
 {
 	if(el != NULL)
 	{
@@ -169,26 +169,26 @@ pelib_iterator_next(ITERATOR_T)(iterator_t(ITERATOR_T) *el)
 	}
 }
 
-ITERATOR_T
-pelib_iterator_read(ITERATOR_T)(iterator_t(ITERATOR_T) *el)
+PELIB_ITERATOR_T
+pelib_pelib_iterator_read(PELIB_ITERATOR_T)(pelib_iterator_t(PELIB_ITERATOR_T) *el)
 {
 	return el->value;
 }
 
 size_t
-pelib_iterator_distance(ITERATOR_T)(iterator_t(ITERATOR_T) *start, iterator_t(ITERATOR_T) *stop)
+pelib_pelib_iterator_distance(PELIB_ITERATOR_T)(pelib_iterator_t(PELIB_ITERATOR_T) *start, pelib_iterator_t(PELIB_ITERATOR_T) *stop)
 {
 	size_t distance = 0;
 
-	iterator_t(ITERATOR_T) *i = start;
+	pelib_iterator_t(PELIB_ITERATOR_T) *i = start;
 
-	while(pelib_compare(iterator_t(ITERATOR_T))(*i, *stop) != 0)
+	while(pelib_compare(pelib_iterator_t(PELIB_ITERATOR_T))(*i, *stop) != 0)
 	{
-		i = pelib_iterator_next(ITERATOR_T)(start);
+		i = pelib_pelib_iterator_next(PELIB_ITERATOR_T)(start);
 		distance++;
 	}
 	
 	return distance;
 }
 
-#undef ITERATOR_T
+#undef PELIB_ITERATOR_T

@@ -24,7 +24,7 @@
 #include <pelib/template.h>
 #if PELIB_CONCAT_2(DONE_set_, SET_T) == 0
 
-//#define ITERATOR_T SET_T
+//#define PELIB_ITERATOR_T SET_T
 //#include <pelib/iterator.h>
 
 #define pelib_set(elem) PELIB_CONCAT_2(pelib_set_, elem)
@@ -39,7 +39,7 @@
 /** Generic static set **/
 struct pelib_set(SET_T)
 {
-	iterator_t(SET_T) *first, *last, *middle; /** Address where elements are stored **/
+	pelib_iterator_t(SET_T) *first, *last, *middle; /** Address where elements are stored **/
 };
 typedef struct pelib_set(SET_T) pelib_set_t(SET_T);
 
@@ -63,7 +63,7 @@ SET_T*
 pelib_set_find(SET_T)(pelib_set_t(SET_T)*, SET_T);
 
 /** Compares all elements of two sets one by one
-	@return If a1 and a2 have the same number of elements, for the first pair of elements from both sets a1 and a2 that are different, return -1 if the element of a1 is lower than the element of a2, 1 otherwise. Returns 0 if all elements are identical. If a1 has less elements than a2, then returns -1 other wise returns 1.
+	@return If a1 and a2 have the same number of elements, for the first pelib_pair of elements from both sets a1 and a2 that are different, return -1 if the element of a1 is lower than the element of a2, 1 otherwise. Returns 0 if all elements are identical. If a1 has less elements than a2, then returns -1 other wise returns 1.
 **/
 int
 pelib_set_compare(SET_T)(pelib_set_t(SET_T)* a1, pelib_set_t(SET_T)* a2);

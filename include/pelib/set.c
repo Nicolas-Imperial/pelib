@@ -33,7 +33,7 @@
 #endif
 
 // Now include the generic set implementation
-//#define ITERATOR_T SET_T
+//#define PELIB_ITERATOR_T SET_T
 //#include "pelib/iterator.c"
 
 #ifdef debug
@@ -90,9 +90,9 @@ pelib_init(pelib_set_t(SET_T))(pelib_set_t(SET_T)* set)
 #define pelib_set_insert_element(elem) PELIB_CONCAT_3(pelib_, pelib_set(elem), _insert_element)
 static
 int
-pelib_set_insert_element(SET_T)(pelib_set_t(SET_T) *set, iterator_t(SET_T) *elem)
+pelib_set_insert_element(SET_T)(pelib_set_t(SET_T) *set, pelib_iterator_t(SET_T) *elem)
 {
-	iterator_t(SET_T) *current = set->first, *previous = NULL;
+	pelib_iterator_t(SET_T) *current = set->first, *previous = NULL;
 
 	// If there is at least one element, then browse the list until we find the right spot
 	// Otherwise, place the element as first and last, that is first and last pointers point
@@ -151,12 +151,12 @@ pelib_set_insert_element(SET_T)(pelib_set_t(SET_T) *set, iterator_t(SET_T) *elem
 int
 pelib_set_insert(SET_T)(pelib_set_t(SET_T)* set, SET_T value)
 {
-	iterator_t(SET_T) *new = pelib_alloc(iterator_t(SET_T))();
-	pelib_init(iterator_t(SET_T))(new);
+	pelib_iterator_t(SET_T) *new = pelib_alloc(pelib_iterator_t(SET_T))();
+	pelib_init(pelib_iterator_t(SET_T))(new);
 	pelib_copy(SET_T)(value, &new->value);
 	if(!pelib_set_insert_element(SET_T)(set, new))
 	{
-		pelib_free(iterator_t(SET_T))(new);
+		pelib_free(pelib_iterator_t(SET_T))(new);
 		return 0;
 	}
 	else
@@ -170,10 +170,10 @@ pelib_copy(pelib_set_t(SET_T))(pelib_set_t(SET_T) src, pelib_set_t(SET_T)* dst)
 {
 	size_t i;
 
-	iterator_t(SET_T) *elem = src.last;
+	pelib_iterator_t(SET_T) *elem = src.last;
 	while(elem != NULL)
 	{
-		iterator_t(SET_T) *cpy = pelib_alloc(iterator_t(SET_T))();
+		pelib_iterator_t(SET_T) *cpy = pelib_alloc(pelib_iterator_t(SET_T))();
 		pelib_copy(SET_T)(elem->value, &cpy->value);
 		pelib_set_insert_element(SET_T)(dst, cpy);
 		elem = elem->previous;
@@ -192,7 +192,7 @@ pelib_string(pelib_set_t(SET_T))(pelib_set_t(SET_T) set)
 	str = malloc(3 * sizeof(char));
 	sprintf(str, "[");
 
-	iterator_t(SET_T) *el = set.first;
+	pelib_iterator_t(SET_T) *el = set.first;
 	while(el != NULL && el->next != NULL)
 	{
 		elem = pelib_string(SET_T)(el->value);
@@ -243,7 +243,7 @@ pelib_string_detail(pelib_set_t(SET_T))(pelib_set_t(SET_T) set, int level)
 		size_t i;
 		str = malloc(3 * sizeof(char));
 		sprintf(str, "[");
-		iterator_t(SET_T) *el = set.first;
+		pelib_iterator_t(SET_T) *el = set.first;
 		
 		while(el != NULL && el->next != NULL)
 		{
@@ -306,13 +306,13 @@ pelib_printf_detail(pelib_set_t(SET_T))(FILE* stream, pelib_set_t(SET_T) set, in
 int
 pelib_destroy(pelib_set_t(SET_T))(pelib_set_t(SET_T) set)
 {
-	iterator_t(SET_T) *elem = set.first;
+	pelib_iterator_t(SET_T) *elem = set.first;
 	while(elem != NULL)
 	{
-		iterator_t(SET_T) *current = elem;
+		pelib_iterator_t(SET_T) *current = elem;
 		elem = elem->next;
-		pelib_destroy(iterator_t(SET_T))(*current);
-		pelib_free(iterator_t(SET_T))(current);		
+		pelib_destroy(pelib_iterator_t(SET_T))(*current);
+		pelib_free(pelib_iterator_t(SET_T))(current);		
 	}
 	return 1;
 }
@@ -320,13 +320,13 @@ pelib_destroy(pelib_set_t(SET_T))(pelib_set_t(SET_T) set)
 int
 pelib_free_buffer(pelib_set_t(SET_T))(pelib_set_t(SET_T)* set)
 {
-	iterator_t(SET_T) *elem = set->first;
+	pelib_iterator_t(SET_T) *elem = set->first;
 	while(elem != NULL)
 	{
-		iterator_t(SET_T) *current = elem;
+		pelib_iterator_t(SET_T) *current = elem;
 		elem = elem->next;
-		pelib_destroy(iterator_t(SET_T))(*current);
-		pelib_free(iterator_t(SET_T))(current);		
+		pelib_destroy(pelib_iterator_t(SET_T))(*current);
+		pelib_free(pelib_iterator_t(SET_T))(current);		
 	}
 	return 1;
 }
@@ -349,10 +349,10 @@ pelib_free(pelib_set_t(SET_T))(pelib_set_t(SET_T)* set)
 int
 pelib_compare(pelib_set_t(SET_T))(pelib_set_t(SET_T) a1, pelib_set_t(SET_T) a2)
 {
-	iterator_t(SET_T) *e1 = a1.first;
-	iterator_t(SET_T) *e2 = a2.first;
+	pelib_iterator_t(SET_T) *e1 = a1.first;
+	pelib_iterator_t(SET_T) *e2 = a2.first;
 
-	while(e1 != NULL && e2 != NULL && pelib_compare(iterator_t(SET_T))(*e1, *e2) == 0)
+	while(e1 != NULL && e2 != NULL && pelib_compare(pelib_iterator_t(SET_T))(*e1, *e2) == 0)
 	{
 		e1 = e1->next;
 		e2 = e2->next;
@@ -366,7 +366,7 @@ pelib_compare(pelib_set_t(SET_T))(pelib_set_t(SET_T) a1, pelib_set_t(SET_T) a2)
 	{
 		return -1;
 	}
-	else return pelib_compare(iterator_t(SET_T))(*e1, *e2);
+	else return pelib_compare(pelib_iterator_t(SET_T))(*e1, *e2);
 }
 
 #undef SET_T

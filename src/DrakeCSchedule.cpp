@@ -96,12 +96,12 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		"{" << endl <<
 		"	return " << n << ";" << endl <<
 		"}" << endl << endl <<
-		"char* drake_task_name(size_t index)" << endl <<
+		"const char* drake_task_name(size_t index)" << endl <<
 		"{" << endl <<
 		"	switch(index - 1)" << endl << "	{" << endl;
 	for(set<Task>::const_iterator i = tg->getTasks().begin(); i != tg->getTasks().end(); i++)
 	{
-		os << "		case " << std::distance(tg->getTasks().begin(), i) << ":" << endl << "			return \"" << i->getName() << "\";" << endl << "		break;" << endl;
+		os << "		case " << std::distance(tg->getTasks().begin(), i) << ":" << endl << "			return (const char*)\"" << i->getName() << "\";" << endl << "		break;" << endl;
 	}
 	os << "		default:" << endl << "			return \"invalid task id\";" << endl << "		break;" << endl <<
 		"	}" << endl << "}" << endl << endl <<
@@ -110,17 +110,17 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		"	schedule->core_number = " << p << ";" << endl << 
 		"	schedule->task_number = " << n << ";" << endl <<
 		"	schedule->stage_time = " << tg->getDeadline(*pt) << ";" << endl << endl <<
-		"	schedule->tasks_in_core = malloc(sizeof(size_t) * schedule->core_number);" << endl;
+		"	schedule->tasks_in_core = (size_t*)malloc(sizeof(size_t) * schedule->core_number);" << endl;
 
-	os << endl << "	schedule->task_name = malloc(sizeof(size_t*) * schedule->task_number);" << endl;
+	os << endl << "	schedule->task_name = (const char**)malloc(sizeof(const char*) * schedule->task_number);" << endl;
 
 	for(set<Task>::const_iterator i = tg->getTasks().begin(); i != tg->getTasks().end(); i++)
 	{
-		os << "	schedule->task_name[" << std::distance(tg->getTasks().begin(), i) << "] = \"" << i->getName() << "\";" << endl;
+		os << "	schedule->task_name[" << std::distance(tg->getTasks().begin(), i) << "] = (const char*)\"" << i->getName() << "\";" << endl;
 	}
 	os << endl;
 
-	os << endl << "	schedule->task_workload = malloc(sizeof(double) * schedule->task_number);" << endl;
+	os << endl << "	schedule->task_workload = (double*)malloc(sizeof(double) * schedule->task_number);" << endl;
 
 	for(set<Task>::const_iterator i = tg->getTasks().begin(); i != tg->getTasks().end(); i++)
 	{
@@ -133,7 +133,7 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		os << "	schedule->tasks_in_core[" << i->first - 1 << "] = " << sched->getTasks(i->first).size() << ";" << endl;
 	}
 
-	os << endl << "	schedule->consumers_in_core = malloc(sizeof(size_t) * schedule->core_number);" << endl; 
+	os << endl << "	schedule->consumers_in_core = (size_t*)malloc(sizeof(size_t) * schedule->core_number);" << endl; 
 
 	for(Schedule::table::const_iterator i = sched->getSchedule().begin(); i != sched->getSchedule().end(); i++)
 	{
@@ -143,7 +143,7 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		os << "	schedule->consumers_in_core[" << i->first - 1 << "] = " << sched->getRemoteConsumers(i->first, *tg, *pt).size() << ";" << endl;
 	}
 
-	os << endl << "	schedule->producers_in_core = malloc(sizeof(size_t) * schedule->core_number);" << endl;
+	os << endl << "	schedule->producers_in_core = (size_t*)malloc(sizeof(size_t) * schedule->core_number);" << endl;
 
 	for(Schedule::table::const_iterator i = sched->getSchedule().begin(); i != sched->getSchedule().end(); i++)
 	{
@@ -153,21 +153,21 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		os << "	schedule->producers_in_core[" << i->first - 1 << "] = " << sched->getRemoteProducers(i->first, *tg, *pt).size() << ";" << endl;
 	}
 
-	os << endl << "	schedule->consumers_in_task = malloc(sizeof(size_t) * schedule->task_number);" << endl;
+	os << endl << "	schedule->consumers_in_task = (size_t*)malloc(sizeof(size_t) * schedule->task_number);" << endl;
 
 	for(set<Task>::const_iterator i = tg->getTasks().begin(); i != tg->getTasks().end(); i++)
 	{
 		os << "	schedule->consumers_in_task[" << std::distance(tg->getTasks().begin(), i) << "] = " << i->getConsumers().size() << ";" << endl;
 	}
 
-	os << endl << "	schedule->producers_in_task = malloc(sizeof(size_t) * schedule->task_number);" << endl;
+	os << endl << "	schedule->producers_in_task = (size_t*)malloc(sizeof(size_t) * schedule->task_number);" << endl;
 
 	for(set<Task>::const_iterator i = tg->getTasks().begin(); i != tg->getTasks().end(); i++)
 	{
 		os << "	schedule->producers_in_task[" << std::distance(tg->getTasks().begin(), i) << "] = " << i->getProducers().size() << ";" << endl;
 	}
 
-	os << endl << "	schedule->remote_consumers_in_task = malloc(sizeof(size_t) * schedule->task_number);" << endl;
+	os << endl << "	schedule->remote_consumers_in_task = (size_t*)malloc(sizeof(size_t) * schedule->task_number);" << endl;
 
 	for(set<Task>::const_iterator i = tg->getTasks().begin(); i != tg->getTasks().end(); i++)
 	{
@@ -175,7 +175,7 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		os << "	schedule->remote_consumers_in_task[" << std::distance(tg->getTasks().begin(), i) << "] = " << sched->getRemoteTaskConsumers(*i, *tg, *pt).size() << ";" << endl;
 	}
 
-	os << endl << "	schedule->remote_producers_in_task = malloc(sizeof(size_t) * schedule->task_number);" << endl;
+	os << endl << "	schedule->remote_producers_in_task = (size_t*)malloc(sizeof(size_t) * schedule->task_number);" << endl;
 
 	for(set<Task>::const_iterator i = tg->getTasks().begin(); i != tg->getTasks().end(); i++)
 	{
@@ -183,15 +183,15 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		os << "	schedule->remote_producers_in_task[" << std::distance(tg->getTasks().begin(), i) << "] = " << sched->getRemoteTaskProducers(*i, *tg, *pt).size() << ";" << endl;
 	}
 
-	os << endl << "	schedule->producers_id = malloc(sizeof(size_t*) * schedule->task_number);" << endl;
-	os << "	schedule->producers_rate = malloc(sizeof(size_t**) * schedule->task_number);" << endl;
-	os << "	schedule->producers_name = malloc(sizeof(char*) * schedule->task_number);" << endl;
-	os << "	schedule->input_name = malloc(sizeof(size_t**) * schedule->task_number);" << endl;
+	os << endl << "	schedule->producers_id = (size_t**)malloc(sizeof(size_t*) * schedule->task_number);" << endl;
+	os << "	schedule->producers_rate = (size_t**)malloc(sizeof(size_t*) * schedule->task_number);" << endl;
+	os << "	schedule->producers_name = (const char***)malloc(sizeof(const char**) * schedule->task_number);" << endl;
+	os << "	schedule->input_name = (const char***)malloc(sizeof(const char**) * schedule->task_number);" << endl;
 
 	for(set<Task>::const_iterator i = tg->getTasks().begin(); i != tg->getTasks().end(); i++)
 	{
 		// Producer's id
-		os << "	schedule->producers_id[" << std::distance(tg->getTasks().begin(), i) << "] = ";
+		os << "	schedule->producers_id[" << std::distance(tg->getTasks().begin(), i) << "] = (size_t*)";
 		if (i->getProducers().size() == 0)
 		{
 			os << "NULL;" << endl;
@@ -208,7 +208,7 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		}
 
 		// Producer's rate
-		os << "	schedule->producers_rate[" << std::distance(tg->getTasks().begin(), i) << "] = ";
+		os << "	schedule->producers_rate[" << std::distance(tg->getTasks().begin(), i) << "] = (size_t*)";
 		if (i->getProducers().size() == 0)
 		{
 			os << "NULL;" << endl;
@@ -226,49 +226,49 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		}
 
 		// Producer's name
-		os << "	schedule->producers_name[" << std::distance(tg->getTasks().begin(), i) << "] = ";
+		os << "	schedule->producers_name[" << std::distance(tg->getTasks().begin(), i) << "] = (const char**)";
 		if (i->getProducers().size() == 0)
 		{
 			os << "NULL;" << endl;
 		}
 		else
 		{
-			os << "malloc(sizeof(char*) * " << i->getProducers().size() << ");" << endl;
+			os << "malloc(sizeof(const char*) * " << i->getProducers().size() << ");" << endl;
 			size_t counter = 0;
 			for(set<const Link*>::const_iterator j = i->getProducers().begin(); j != i->getProducers().end(); j++)
 			{
 				const Link *link = *j;
-				os << "	schedule->producers_name[" << std::distance(tg->getTasks().begin(), i) << "][" << counter << "] = \"" << link->getProducerName() << "\";" << endl;
+				os << "	schedule->producers_name[" << std::distance(tg->getTasks().begin(), i) << "][" << counter << "] = (const char*)\"" << link->getProducerName() << "\";" << endl;
 				counter++;
 			}
 		}
-		os << "	schedule->input_name[" << std::distance(tg->getTasks().begin(), i) << "] = ";
+		os << "	schedule->input_name[" << std::distance(tg->getTasks().begin(), i) << "] = (const char**)";
 		if (i->getProducers().size() == 0)
 		{
 			os << "NULL;" << endl;
 		}
 		else
 		{
-			os << "malloc(sizeof(char*) * " << i->getProducers().size() << ");" << endl;
+			os << "malloc(sizeof(const char*) * " << i->getProducers().size() << ");" << endl;
 			size_t counter = 0;
 			for(set<const Link*>::const_iterator j = i->getProducers().begin(); j != i->getProducers().end(); j++)
 			{
 				const Link *link = *j;
-				os << "	schedule->input_name[" << std::distance(tg->getTasks().begin(), i) << "][" << counter << "] = \"" << link->getConsumerName() << "\";" << endl;
+				os << "	schedule->input_name[" << std::distance(tg->getTasks().begin(), i) << "][" << counter << "] = (const char*)\"" << link->getConsumerName() << "\";" << endl;
 				counter++;
 			}
 		}
 	}
 
-	os << endl << "	schedule->consumers_id = malloc(sizeof(size_t*) * schedule->task_number);" << endl;
-	os << "	schedule->consumers_rate = malloc(sizeof(size_t**) * schedule->task_number);" << endl;
-	os << "	schedule->consumers_name = malloc(sizeof(char*) * schedule->task_number);" << endl;
-	os << "	schedule->output_name = malloc(sizeof(size_t**) * schedule->task_number);" << endl;
+	os << endl << "	schedule->consumers_id = (size_t**)malloc(sizeof(size_t*) * schedule->task_number);" << endl;
+	os << "	schedule->consumers_rate = (size_t**)malloc(sizeof(size_t*) * schedule->task_number);" << endl;
+	os << "	schedule->consumers_name = (const char***)malloc(sizeof(const char**) * schedule->task_number);" << endl;
+	os << "	schedule->output_name = (const char***)malloc(sizeof(const char**) * schedule->task_number);" << endl;
 
 	for(set<Task>::const_iterator i = tg->getTasks().begin(); i != tg->getTasks().end(); i++)
 	{
 		// Consumer's ID
-		os << "	schedule->consumers_id[" << std::distance(tg->getTasks().begin(), i) << "] = ";
+		os << "	schedule->consumers_id[" << std::distance(tg->getTasks().begin(), i) << "] = (size_t*)";
 		if (i->getConsumers().size() == 0)
 		{
 			os << "NULL;" << endl;
@@ -285,7 +285,7 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		}
 
 		// Link rate
-		os << "	schedule->consumers_rate[" << std::distance(tg->getTasks().begin(), i) << "] = ";
+		os << "	schedule->consumers_rate[" << std::distance(tg->getTasks().begin(), i) << "] = (size_t*)";
 		if (i->getConsumers().size() == 0)
 		{
 			os << "NULL;" << endl;
@@ -303,45 +303,45 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		}
 
 		// Consumer's name
-		os << "	schedule->consumers_name[" << std::distance(tg->getTasks().begin(), i) << "] = ";
+		os << "	schedule->consumers_name[" << std::distance(tg->getTasks().begin(), i) << "] = (const char**)";
 		if (i->getConsumers().size() == 0)
 		{
 			os << "NULL;" << endl;
 		}
 		else
 		{
-			os << "malloc(sizeof(char*) * " << i->getConsumers().size() << ");" << endl;
+			os << "malloc(sizeof(const char*) * " << i->getConsumers().size() << ");" << endl;
 			size_t counter = 0;
 			for(set<const Link*>::const_iterator j = i->getConsumers().begin(); j != i->getConsumers().end(); j++)
 			{
 				const Link *link = *j;
-				os << "	schedule->consumers_name[" << std::distance(tg->getTasks().begin(), i) << "][" << counter << "] = \"" << link->getConsumerName() << "\";" << endl;
+				os << "	schedule->consumers_name[" << std::distance(tg->getTasks().begin(), i) << "][" << counter << "] = (const char*)\"" << link->getConsumerName() << "\";" << endl;
 				counter++;
 			}
 		}
-		os << "	schedule->output_name[" << std::distance(tg->getTasks().begin(), i) << "] = ";
+		os << "	schedule->output_name[" << std::distance(tg->getTasks().begin(), i) << "] = (const char**)";
 		if (i->getConsumers().size() == 0)
 		{
 			os << "NULL;" << endl;
 		}
 		else
 		{
-			os << "malloc(sizeof(char*) * " << i->getConsumers().size() << ");" << endl;
+			os << "malloc(sizeof(const char*) * " << i->getConsumers().size() << ");" << endl;
 			size_t counter = 0;
 			for(set<const Link*>::const_iterator j = i->getConsumers().begin(); j != i->getConsumers().end(); j++)
 			{
 				const Link *link = *j;
-				os << "	schedule->output_name[" << std::distance(tg->getTasks().begin(), i) << "][" << counter << "] = \"" << link->getProducerName() << "\";" << endl;
+				os << "	schedule->output_name[" << std::distance(tg->getTasks().begin(), i) << "][" << counter << "] = (const char*)\"" << link->getProducerName() << "\";" << endl;
 				counter++;
 			}
 		}
 	}
 
-	os << endl << "	schedule->schedule = malloc(sizeof(drake_schedule_task_t*) * schedule->core_number);" << endl;
+	os << endl << "	schedule->schedule = (drake_schedule_task_t**)malloc(sizeof(drake_schedule_task_t*) * schedule->core_number);" << endl;
 
 	for(Schedule::table::const_iterator i = sched->getSchedule().begin(); i != sched->getSchedule().end(); i++)
 	{
-		os << "	schedule->schedule[" << i->first - 1 << "] = malloc(sizeof(drake_schedule_task_t) * " << i->second.size() << ");" << endl;
+		os << "	schedule->schedule[" << i->first - 1 << "] = (drake_schedule_task_t*)malloc(sizeof(drake_schedule_task_t) * " << i->second.size() << ");" << endl;
 
 		size_t counter = 0;
 		for(Schedule::sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)

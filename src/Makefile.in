@@ -85,7 +85,7 @@ Solver.cpp AmplSolver.cpp \
 exprtk.cpp \
 argument_parsing.cpp dl.cpp
  
-core_src = sort.c complex.c float.c integer.c string.c string_integer.c monitor.c size_t.c pelib_string.c malloc.c
+core_src = sort.c complex.c float.c integer.c string.c const_string.c string_integer.c monitor.c size_t.c pelib_string.c malloc.c
 
 ## executables
 bincxx_project = pelib-convert demo run_record

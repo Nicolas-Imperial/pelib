@@ -30,29 +30,29 @@ typedef char* string;
 #include <pelib/structure.h>
 #define DONE_string 1 
 
-#define ITERATOR_T string
+#define PELIB_ITERATOR_T string
 #include <pelib/iterator.h>
-#define DONE_iterator_string 1
+#define DONE_pelib_iterator_string 1
 
 #define SET_T string
 #include <pelib/set.h>
 #define DONE_set_string 1
 
-#define PAIR_KEY_T string
-#define PAIR_VALUE_T string
+#define PELIB_PAIR_KEY_T string
+#define PELIB_PAIR_VALUE_T string
 #include <pelib/pair.h>
-#define DONE_pair_string_string 1 
+#define DONE_pelib_pair_string_string 1 
 
-#define ITERATOR_T pair_t(string, string)
+#define PELIB_ITERATOR_T pelib_pair_t(string, string)
 #include <pelib/iterator.h>
-#define DONE_iterator_pair_string_string 1 
+#define DONE_pelib_iterator_pelib_pair_string_string 1 
 
 #define MAP_KEY_T string
 #define MAP_VALUE_T string
 #include <pelib/map.h>
 #define DONE_map_string_string 1
 
-#define SET_T pair_t(string, string)
+#define SET_T pelib_pair_t(string, string)
 #include <pelib/set.h>
 #define DONE_set_string_string 1
 

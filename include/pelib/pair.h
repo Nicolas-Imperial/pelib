@@ -1,5 +1,5 @@
 /*
- * pair.h
+ * pelib_pair.h
  *
  *  Created on: 5 Sep 2011
  *  Copyright 2011 Nicolas Melot
@@ -27,27 +27,27 @@ extern "C"
 #endif
 
 #include <pelib/template.h>
-#if PELIB_CONCAT_4(DONE_pair_, PAIR_KEY_T, _, PAIR_VALUE_T) == 0
+#if PELIB_CONCAT_4(DONE_pelib_pair_, PELIB_PAIR_KEY_T, _, PELIB_PAIR_VALUE_T) == 0
 
-#define pair(key, value) PELIB_CONCAT_4(pair_, key, _, value)
-#define pair_t(key, value) PELIB_CONCAT_2(pair(key, value), _t)
+#define pelib_pair(key, value) PELIB_CONCAT_4(pelib_pair_, key, _, value)
+#define pelib_pair_t(key, value) PELIB_CONCAT_2(pelib_pair(key, value), _t)
 
-/** Generic static pair **/
-struct pair(PAIR_KEY_T, PAIR_VALUE_T)
+/** Generic static pelib_pair **/
+struct pelib_pair(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T)
 {
-	PAIR_KEY_T key;
-	PAIR_VALUE_T value;
+	PELIB_PAIR_KEY_T key;
+	PELIB_PAIR_VALUE_T value;
 };
-typedef struct pair(PAIR_KEY_T, PAIR_VALUE_T) pair_t(PAIR_KEY_T, PAIR_VALUE_T);
+typedef struct pelib_pair(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T) pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T);
 
-#define STRUCT_T pair_t(PAIR_KEY_T, PAIR_VALUE_T)
+#define STRUCT_T pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T)
 #include <pelib/structure.h>
 
-#endif /* PAIR_H_ */
+#endif /* PELIB_PAIR_H_ */
 
 // Make sure the symbol does not propagate any further
-#undef PAIR_KEY_T
-#undef PAIR_VALUE_T
+#undef PELIB_PAIR_KEY_T
+#undef PELIB_PAIR_VALUE_T
 #ifdef __cplusplus
 }
 #endif

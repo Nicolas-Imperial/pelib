@@ -45,7 +45,7 @@
 #define debug_size_t(var)
 #endif
 
-pelib_set_t(pair_t(int, int)) set;
+pelib_set_t(pelib_pair_t(int, int)) set;
 int value;
 
 int insertion[] = {3, 6, 7, 5, 3, 5, 6, 2};
@@ -54,22 +54,22 @@ void
 init()
 {
 	unsigned int i;
-	pelib_init(pelib_set_t(pair_t(int, int)))(&set);
+	pelib_init(pelib_set_t(pelib_pair_t(int, int)))(&set);
 	value = VALUE;
 
 	for (i = 0; i < LENGTH; i++)
 	{
-		pair_t(int, int) pair;
-		pair.key = insertion[i];
-		pair.value = i;
-		pelib_set_insert(pair_t(int, int))(&set, pair);
+		pelib_pair_t(int, int) pelib_pair;
+		pelib_pair.key = insertion[i];
+		pelib_pair.value = i;
+		pelib_set_insert(pelib_pair_t(int, int))(&set, pelib_pair);
 	}
 }
 
 void
 cleanup()
 {
-	pelib_destroy(pelib_set_t(pair_t(int, int)))(set);
+	pelib_destroy(pelib_set_t(pelib_pair_t(int, int)))(set);
 }
 
 void setup() {};
@@ -79,7 +79,7 @@ static void
 test_string()
 {
 	char *ref = "[(2,7):(3,0):(3,4):(5,3):(5,5):(6,1):(6,6):(7,2)]";
-	char *str = pelib_string(pelib_set_t(pair_t(int, int)))(set);
+	char *str = pelib_string(pelib_set_t(pelib_pair_t(int, int)))(set);
 	assert_equals_str(str, ref);
 	free(str);
 }

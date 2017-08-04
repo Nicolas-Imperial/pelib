@@ -119,14 +119,14 @@ pelib_printf(int)(FILE* stream, int a)
 #include "pelib/set.c"
 
 // Now include the generic set implementation
-#define PAIR_KEY_T int
-#define PAIR_VALUE_T int
+#define PELIB_PAIR_KEY_T int
+#define PELIB_PAIR_VALUE_T int
 #include "pelib/pair.c"
 
-#define ITERATOR_T int
+#define PELIB_ITERATOR_T int
 #include "pelib/iterator.c"
 
-#define ITERATOR_T pair_t(int, int)
+#define PELIB_ITERATOR_T pelib_pair_t(int, int)
 #include "pelib/iterator.c"
 
 // Now include the generic set implementation
@@ -135,7 +135,7 @@ pelib_printf(int)(FILE* stream, int a)
 #include "pelib/map.c"
 
 // Now include the generic set implementation
-#define SET_T pair_t(int, int)
+#define SET_T pelib_pair_t(int, int)
 #include "pelib/set.c"
 
 // Now include the generic fifo implementation

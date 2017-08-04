@@ -1,5 +1,5 @@
 /*
- * pair.c
+ * pelib_pair.c
  *
  *  Created on: 5 Sep 2011
  *  Copyright 2011 Nicolas Melot
@@ -26,42 +26,42 @@
 #include <assert.h>
 #include <string.h>
 
-#if !(defined PAIR_KEY_T && defined PAIR_VALUE_T)
-#error Using generic pair without key or value types
+#if !(defined PELIB_PAIR_KEY_T && defined PELIB_PAIR_VALUE_T)
+#error Using generic pelib_pair without key or value types
 #endif
 
-pair_t(PAIR_KEY_T, PAIR_VALUE_T)*
-pelib_alloc_struct(pair_t(PAIR_KEY_T, PAIR_VALUE_T))()
+pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T)*
+pelib_alloc_struct(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T))()
 {
-	pair_t(PAIR_KEY_T, PAIR_VALUE_T)* pair;
+	pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T)* pelib_pair;
 
-	pair = malloc(sizeof(pair_t(PAIR_KEY_T, PAIR_VALUE_T)));
-	assert(pair != NULL);
+	pelib_pair = malloc(sizeof(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T)));
+	assert(pelib_pair != NULL);
 
-	return pair;
+	return pelib_pair;
 }
 
 int
-pelib_init(pair_t(PAIR_KEY_T, PAIR_VALUE_T))(pair_t(PAIR_KEY_T, PAIR_VALUE_T)* pair)
+pelib_init(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T))(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T)* pelib_pair)
 {
-	int a = pelib_init(PAIR_KEY_T)(&pair->key);
-	return a && pelib_init(PAIR_VALUE_T)(&pair->value);
+	int a = pelib_init(PELIB_PAIR_KEY_T)(&pelib_pair->key);
+	return a && pelib_init(PELIB_PAIR_VALUE_T)(&pelib_pair->value);
 }
 
 int
-pelib_copy(pair_t(PAIR_KEY_T, PAIR_VALUE_T))(pair_t(PAIR_KEY_T, PAIR_VALUE_T) src, pair_t(PAIR_KEY_T, PAIR_VALUE_T)* dst)
+pelib_copy(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T))(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T) src, pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T)* dst)
 {
-	int a = pelib_copy(PAIR_KEY_T)(src.key, &dst->key);	
-	return a && pelib_copy(PAIR_VALUE_T)(src.value, &dst->value);
+	int a = pelib_copy(PELIB_PAIR_KEY_T)(src.key, &dst->key);	
+	return a && pelib_copy(PELIB_PAIR_VALUE_T)(src.value, &dst->value);
 }
 
-#define pair_length_debug printf("[PELIB:%s:%s:%d] i = %d\n", __FILE__, __FUNCTION__, __LINE__, i);
-#define pair_length_pre_debug printf("[PELIB:%s:%s:%d] length = %d\n", __FILE__, __FUNCTION__, __LINE__, pelib_pair_length(PAIR_KEY_T, PAIR_VALUE_T)(&pair));
+#define pelib_pair_length_debug printf("[PELIB:%s:%s:%d] i = %d\n", __FILE__, __FUNCTION__, __LINE__, i);
+#define pelib_pair_length_pre_debug printf("[PELIB:%s:%s:%d] length = %d\n", __FILE__, __FUNCTION__, __LINE__, pelib_pelib_pair_length(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T)(&pelib_pair));
 char*
-pelib_string(pair_t(PAIR_KEY_T, PAIR_VALUE_T))(pair_t(PAIR_KEY_T, PAIR_VALUE_T) pair)
+pelib_string(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T))(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T) pelib_pair)
 {
-	char *key = pelib_string(PAIR_KEY_T)(pair.key);
-	char *value = pelib_string(PAIR_VALUE_T)(pair.value);
+	char *key = pelib_string(PELIB_PAIR_KEY_T)(pelib_pair.key);
+	char *value = pelib_string(PELIB_PAIR_VALUE_T)(pelib_pair.value);
 
 	char *elem = malloc((strlen(key) + strlen(value) + 4) * sizeof(char*));
 	elem[0] = '(';
@@ -77,16 +77,16 @@ pelib_string(pair_t(PAIR_KEY_T, PAIR_VALUE_T))(pair_t(PAIR_KEY_T, PAIR_VALUE_T) 
 }
 
 char*
-pelib_string_detail(pair_t(PAIR_KEY_T, PAIR_VALUE_T))(pair_t(PAIR_KEY_T, PAIR_VALUE_T) pair, int level)
+pelib_string_detail(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T))(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T) pelib_pair, int level)
 {
 	if(level == 0)
 	{
-		return pelib_string(pair_t(PAIR_KEY_T, PAIR_VALUE_T))(pair);
+		return pelib_string(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T))(pelib_pair);
 	}
 	else
 	{
-		char *key = pelib_string(PAIR_KEY_T)(pair.key);
-		char *value = pelib_string(PAIR_VALUE_T)(pair.value);
+		char *key = pelib_string(PELIB_PAIR_KEY_T)(pelib_pair.key);
+		char *value = pelib_string(PELIB_PAIR_VALUE_T)(pelib_pair.value);
 
 		char *elem = malloc((strlen(key) + strlen(value) + 4) * sizeof(char*));
 		elem[0] = '(';
@@ -103,10 +103,10 @@ pelib_string_detail(pair_t(PAIR_KEY_T, PAIR_VALUE_T))(pair_t(PAIR_KEY_T, PAIR_VA
 }
 
 FILE*
-pelib_printf(pair_t(PAIR_KEY_T, PAIR_VALUE_T))(FILE* stream, pair_t(PAIR_KEY_T, PAIR_VALUE_T) pair)
+pelib_printf(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T))(FILE* stream, pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T) pelib_pair)
 {
 	char * str;
-	str = pelib_string(pair_t(PAIR_KEY_T, PAIR_VALUE_T))(pair);
+	str = pelib_string(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T))(pelib_pair);
 
 	fprintf(stream, "%s\n", str);
 	free(str);
@@ -115,10 +115,10 @@ pelib_printf(pair_t(PAIR_KEY_T, PAIR_VALUE_T))(FILE* stream, pair_t(PAIR_KEY_T, 
 }
 
 FILE*
-pelib_printf_detail(pair_t(PAIR_KEY_T, PAIR_VALUE_T))(FILE* stream, pair_t(PAIR_KEY_T, PAIR_VALUE_T) pair, int level)
+pelib_printf_detail(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T))(FILE* stream, pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T) pelib_pair, int level)
 {
 	char * str;
-	str = pelib_string_detail(pair_t(PAIR_KEY_T, PAIR_VALUE_T))(pair, level);
+	str = pelib_string_detail(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T))(pelib_pair, level);
 
 	fprintf(stream, "%s\n", str);
 	free(str);
@@ -127,35 +127,35 @@ pelib_printf_detail(pair_t(PAIR_KEY_T, PAIR_VALUE_T))(FILE* stream, pair_t(PAIR_
 }
 
 int
-pelib_free(pair_t(PAIR_KEY_T, PAIR_VALUE_T))(pair_t(PAIR_KEY_T, PAIR_VALUE_T)* pair)
+pelib_free(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T))(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T)* pelib_pair)
 {
-	return pelib_free_struct(pair_t(PAIR_KEY_T, PAIR_VALUE_T))(pair);
+	return pelib_free_struct(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T))(pelib_pair);
 }
 
 int
-pelib_free_struct(pair_t(PAIR_KEY_T, PAIR_VALUE_T))(pair_t(PAIR_KEY_T, PAIR_VALUE_T)* pair)
+pelib_free_struct(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T))(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T)* pelib_pair)
 {
-	pelib_destroy(PAIR_KEY_T)(pair->key);
-	pelib_destroy(PAIR_VALUE_T)(pair->value);
-	free(pair);
+	pelib_destroy(PELIB_PAIR_KEY_T)(pelib_pair->key);
+	pelib_destroy(PELIB_PAIR_VALUE_T)(pelib_pair->value);
+	free(pelib_pair);
 	return 0;
 }
 
 int
-pelib_compare(pair_t(PAIR_KEY_T, PAIR_VALUE_T))(pair_t(PAIR_KEY_T, PAIR_VALUE_T) a1, pair_t(PAIR_KEY_T, PAIR_VALUE_T) a2)
+pelib_compare(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T))(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T) a1, pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T) a2)
 {
-	int a = pelib_compare(PAIR_KEY_T)(a1.key, a2.key);
-	int b = pelib_compare(PAIR_VALUE_T)(a1.value, a2.value);
+	int a = pelib_compare(PELIB_PAIR_KEY_T)(a1.key, a2.key);
+	int b = pelib_compare(PELIB_PAIR_VALUE_T)(a1.value, a2.value);
 	return a == 0 ? b : a;
 }
 
 int
-pelib_destroy(pair_t(PAIR_KEY_T, PAIR_VALUE_T))(pair_t(PAIR_KEY_T, PAIR_VALUE_T) set)
+pelib_destroy(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T))(pelib_pair_t(PELIB_PAIR_KEY_T, PELIB_PAIR_VALUE_T) set)
 {
-	pelib_destroy(PAIR_KEY_T)(set.key);
-	pelib_destroy(PAIR_VALUE_T)(set.value);
+	pelib_destroy(PELIB_PAIR_KEY_T)(set.key);
+	pelib_destroy(PELIB_PAIR_VALUE_T)(set.value);
 	return 1;
 }
 
-#undef PAIR_KEY_T
-#undef PAIR_VALUE_T
+#undef PELIB_PAIR_KEY_T
+#undef PELIB_PAIR_VALUE_T

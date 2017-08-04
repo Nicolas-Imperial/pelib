@@ -36,29 +36,29 @@ extern "C" {
 #include <pelib/array.h>
 #define DONE_array_int 1
 
-#define ITERATOR_T int
+#define PELIB_ITERATOR_T int
 #include <pelib/iterator.h>
-#define DONE_iterator_int 1
+#define DONE_pelib_iterator_int 1
 
 #define SET_T int
 #include <pelib/set.h>
 #define DONE_set_int 1
 
-#define PAIR_KEY_T int
-#define PAIR_VALUE_T int
+#define PELIB_PAIR_KEY_T int
+#define PELIB_PAIR_VALUE_T int
 #include <pelib/pair.h>
-#define DONE_pair_int_int 1 
+#define DONE_pelib_pair_int_int 1 
 
-#define ITERATOR_T pair_t(int, int)
+#define PELIB_ITERATOR_T pelib_pair_t(int, int)
 #include <pelib/iterator.h>
-#define DONE_iterator_pair_int_int 1 
+#define DONE_pelib_iterator_pelib_pair_int_int 1 
 
 #define MAP_KEY_T int
 #define MAP_VALUE_T int
 #include <pelib/map.h>
 #define DONE_map_int_int 1
 
-#define SET_T pair_t(int, int)
+#define SET_T pelib_pair_t(int, int)
 #include <pelib/set.h>
 #define DONE_set_int_int 1
 

@@ -64,11 +64,11 @@ init()
 		string key;
 		pelib_alloc_buffer(string)(&key, (size_t)(log10(LENGTH) + 0.5 + 1));
 		sprintf(key, "%i", insertion[i]);
-		pair_t(string, int) pair;
-		pelib_alloc_buffer(string)(&pair.key, (strlen(key) + 1) * sizeof(char));
-		pelib_copy(string)(key, &pair.key);
-		pair.value = i;
-		pelib_map_insert(string, int)(&map, pair);
+		pelib_pair_t(string, int) pelib_pair;
+		pelib_alloc_buffer(string)(&pelib_pair.key, (strlen(key) + 1) * sizeof(char));
+		pelib_copy(string)(key, &pelib_pair.key);
+		pelib_pair.value = i;
+		pelib_map_insert(string, int)(&map, pelib_pair);
 	}
 }
 

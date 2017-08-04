@@ -94,7 +94,7 @@ pelib_array_length(ARRAY_T)(array_t(ARRAY_T)*);
 size_t
 pelib_array_capacity(ARRAY_T)(array_t(ARRAY_T)*);
 /** Compares all elements of two arrays one by one
-	@return If a1 and a2 have the same number of elements, for the first pair of elements from both arrays a1 and a2 that are different, return -1 if the element of a1 is lower than the element of a2, 1 otherwise. Returns 0 if all elements are identical. If a1 has less elements than a2, then returns -1 other wise returns 1.
+	@return If a1 and a2 have the same number of elements, for the first pelib_pair of elements from both arrays a1 and a2 that are different, return -1 if the element of a1 is lower than the element of a2, 1 otherwise. Returns 0 if all elements are identical. If a1 has less elements than a2, then returns -1 other wise returns 1.
 **/
 int
 pelib_array_compare(ARRAY_T)(array_t(ARRAY_T)* a1, array_t(ARRAY_T)* a2);
