@@ -80,7 +80,7 @@ namespace pelib
 
 			/** Return the set of tasks scheduled in this class instance **/
 			virtual const set<Task>&
-			getTasks() const;
+			getUniqueTasks() const;
 
 			/** Flushes this schedule instance and copies an instance of Schedule in this instance **/
 			virtual Schedule&

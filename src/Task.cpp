@@ -50,6 +50,7 @@ namespace pelib
 		this->streaming = is_streaming;
 		this->efficiencyString = "exprtk:p <= 1 ? 1 : 1e-6";
 		this->start_time = 0;
+		this->instance = 0;
 	}
 
 	Task::Task(const Task &task)
@@ -66,6 +67,7 @@ namespace pelib
 
 		this->consumers = task.getConsumers();
 		this->producers = task.getProducers();
+		this->instance = task.getInstance();
 	}
 
 	Task::~Task()
@@ -211,6 +213,17 @@ namespace pelib
 		return this->streaming;
 	}
 
+	unsigned int
+	Task::getInstance() const
+	{
+		return this->instance;
+	}
+	
+	void
+	Task::setInstance(unsigned int instance)
+	{
+		this->instance = instance;
+	}
 	// Write in *number the address of the first character of the number found, or the end of the string str if no number was found.
 	// Returns the number of characters to parse as number
 	static size_t

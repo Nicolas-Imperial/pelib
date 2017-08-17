@@ -144,10 +144,14 @@ namespace pelib
 
 			bool
 			isStreaming() const;
+
+			unsigned int getInstance() const;
+			void setInstance(unsigned int instance);
 			
 		protected:
 			/** Frequency and width allocated to this task **/
 			double frequency, width;
+			unsigned int instance;
 			/** Workload in number of instructions and maximum number of cores able to run this task **/
 			double workload, maxWidth;
 			/** Time at which this task starts **/

@@ -69,7 +69,7 @@ namespace pelib
 				const Task *task = j->second.first;
 				Task t = *task;
 				this->tasks.insert(t);
-				const Task &task_ref = *(this->getTasks().find(t));
+				const Task &task_ref = *(this->getUniqueTasks().find(t));
 				pair<float, work> new_pair = pair<float, work>(j->first, work(&task_ref, j->second.second));
 				new_sequence.insert(new_pair);
 
@@ -98,7 +98,7 @@ namespace pelib
 	{
 		this->name = src.getName();
 		this->appName = src.getName();
-		this->tasks = src.getTasks();
+		this->tasks = src.getUniqueTasks();
 		this->setSchedule(src.getSchedule());
 	}
 
@@ -193,7 +193,7 @@ namespace pelib
 		{
 			for(sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 			{
-				taskid2id.insert(pair<string, int>(j->second.first->getName(), std::distance(this->getTasks().begin(), this->getTasks().find(*j->second.first)) + 1));
+				taskid2id.insert(pair<string, int>(j->second.first->getName(), std::distance(this->getUniqueTasks().begin(), this->getUniqueTasks().find(*j->second.first)) + 1));
 			}
 		}
 
@@ -215,7 +215,7 @@ namespace pelib
 				frequencies.insert(pair<int, float>(id, j->second.first->getFrequency()));
 
 				max_tasks = ordering > max_tasks ? ordering : max_tasks;
-				start.insert(pair<int, float>(std::distance(this->getTasks().begin(), this->getTasks().find(j->second.first->getName())), j->second.first->getStartTime())); 
+				start.insert(pair<int, float>(std::distance(this->getUniqueTasks().begin(), this->getUniqueTasks().find(j->second.first->getName())), j->second.first->getStartTime())); 
 			}
 
 			sched.insert(pair<int, map<int, float> >(core, schedule_row));
@@ -261,7 +261,7 @@ namespace pelib
 	}
 	
 	const set<Task>&
-	Schedule::getTasks() const
+	Schedule::getUniqueTasks() const
 	{
 		return this->tasks;
 	}
@@ -269,7 +269,7 @@ namespace pelib
 	const Task&
 	Schedule::getTask(int id) const
 	{
-		set<Task>::const_iterator it = this->getTasks().begin();
+		set<Task>::const_iterator it = this->getUniqueTasks().begin();
 		std::advance(it, id - 1);
 		return *it;
 	}
@@ -279,7 +279,8 @@ namespace pelib
 	{
 		this->name = name;
 		this->appName = appName;
-		this->tasks = copy.getTasks();
+#warning Update this line when non-unique task set is implemented
+		this->tasks = copy.getUniqueTasks();
 	
 		// Copy taskgraph	
 		this->setSchedule(schedule);
@@ -379,7 +380,7 @@ namespace pelib
 	Schedule::getRemoteSharedMemoryIslandTaskProducers(const Task &t, const Taskgraph &tg, const Platform &pt) const
 	{
 		multiset<const Task*> producers;
-		if(this->getTasks().find(t) == this->getTasks().end())
+		if(this->getUniqueTasks().find(t) == this->getUniqueTasks().end())
 		{
 			stringstream ss;
 			ss << "Task \"" << t.getName() << "\" does not figure in schedule.";
@@ -664,7 +665,7 @@ namespace pelib
 	Schedule::getRemoteSharedMemoryIslandTaskConsumers(const Task &t, const Taskgraph &tg, const Platform &pt) const
 	{
 		multiset<const Task*> consumers;
-		if(this->getTasks().find(t) == this->getTasks().end())
+		if(this->getUniqueTasks().find(t) == this->getUniqueTasks().end())
 		{
 			stringstream ss;
 			ss << "Task \"" << t.getName() << "\" does not figure in schedule.";
@@ -694,7 +695,7 @@ namespace pelib
 		{
 			const Link *l = *j;
 			const Task *consumer = l->getConsumer();
-			set<int> consumer_cores = this->getCores(*this->getTasks().find(*consumer));
+			set<int> consumer_cores = this->getCores(*this->getUniqueTasks().find(*consumer));
 			set<int>::const_iterator k = consumer_cores.begin();
 
 			Platform::islands consumer_core_islands = pt.getSharedMemoryIslands(*k);
@@ -718,13 +719,13 @@ namespace pelib
 	const set<int>
 	Schedule::getCores(const Task &t) const
 	{
-		if(this->getTasks().find(t) == this->getTasks().end())
+		if(this->getUniqueTasks().find(t) == this->getUniqueTasks().end())
 		{
 			stringstream ss;
 			ss << "Task \"" << t.getName() << "\" does not figure in schedule.";
 			throw PelibException(ss.str());
 		}
-		const Task &tt = *this->getTasks().find(t);
+		const Task &tt = *this->getUniqueTasks().find(t);
 
 		set<int> cores;
 		for(table::const_iterator i = this->getSchedule().begin(); i != this->getSchedule().end(); i++)

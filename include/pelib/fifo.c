@@ -348,7 +348,7 @@ pelib_cfifo_peekaddr(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, size_t offset, size_t *num
 	}
 	if(addr != NULL)
 	{
- 		if((fifo->read + offset + avail) % fifo->capacity != fifo->write)
+ 		if((fifo->read + offset + avail) % fifo->capacity != fifo->write || fifo->last_op == PELIB_CFIFO_PUSH)
 		{
 			*addr = (CFIFO_T*)&(fifo->buffer[(fifo->read + offset + avail) % fifo->capacity]);
 		}
@@ -390,7 +390,7 @@ pelib_cfifo_writeaddr(CFIFO_T)(cfifo_t(CFIFO_T)* fifo, size_t *num, CFIFO_T **ad
 	}
 	if(addr != NULL)
 	{
- 		if((fifo->write + avail) % fifo->capacity != fifo->read)
+ 		if((fifo->write + avail) % fifo->capacity != fifo->read || fifo->last_op == PELIB_CFIFO_POP)
 		{
 			*addr = (CFIFO_T*)&(fifo->buffer[(fifo->write + avail) % fifo->capacity]);
 		}

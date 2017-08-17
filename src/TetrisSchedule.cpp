@@ -424,7 +424,8 @@ class Canvas
 			// Browse all tasks to determine the biggest font size that fits all tasks to draw
 			double startSize = this->getHeight() > this->getWidth() ? this->getHeight() : this->getWidth();
 			double fontSize = startSize;
-			for(set<Task>::iterator i = sched->getTasks().begin(); i != sched->getTasks().end(); i++)
+#warning Update this line to use all tasks in a schedule instead?
+			for(set<Task>::iterator i = sched->getUniqueTasks().begin(); i != sched->getUniqueTasks().end(); i++)
 			{
 				Task task = *i;
 				task.setWorkload(tg->getTasks().find(task)->getWorkload());
@@ -438,7 +439,8 @@ class Canvas
 				else
 				{
 					stringstream ss;
-					ss << std::distance(sched->getTasks().begin(), i) + 1;
+#warning Check if this reference should be to unique tasks set or to task multiset (taking instances into account)
+					ss << std::distance(sched->getUniqueTasks().begin(), i) + 1;
 					name = ss.str();
 				}
 				double idealSize = this->idealFontSize(runtime, width, name, startSize);
@@ -638,7 +640,8 @@ class Canvas
 						else
 						{
 							stringstream ss;
-							ss << (std::distance(sched->getTasks().begin(), sched->getTasks().find(task)) + 1);
+#warning check if getTasks() or getUnique task should be used
+							ss << (std::distance(sched->getUniqueTasks().begin(), sched->getUniqueTasks().find(task)) + 1);
 							name = ss.str();
 						}
 						this->drawTask(runtime, width, task.getFrequency(), start, core, name, show_task_id);

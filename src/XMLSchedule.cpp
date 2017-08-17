@@ -154,7 +154,7 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 		{
 			Task t = *j->second.first;
 			string taskid = t.getName();
-			size_t task_index = std::distance(sched->getTasks().begin(), sched->getTasks().find(t));
+			size_t task_index = std::distance(sched->getUniqueTasks().begin(), sched->getUniqueTasks().find(t));
 			
 			os << "  <task name=\"" << taskid << "\" ";
 			os << setprecision(max_start_precision);
@@ -162,7 +162,8 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 			os << setprecision(old_precision);
 			os << "frequency=\"" << (float)t.getFrequency() << "\" ";
 			os << "width=\"" << t.getWidth() << "\" ";
-			os << "workload=\"" << t.getWorkload() << "\"";
+			os << "workload=\"" << t.getWorkload() << "\" ";
+			os << "instance=\"" << t.getInstance() << "\"";
 			os << "/>" << endl;
 
 			set<Task>::iterator iter = tasks.begin();
@@ -247,6 +248,7 @@ XMLSchedule::parse(istream &is) const
 
 				task.setFrequency(atof(igraph_task->get_attribute_value("frequency").c_str()));
 				task.setWidth(atof(igraph_task->get_attribute_value("width").c_str()));
+				task.setInstance(atoi(igraph_task->get_attribute_value("instance").c_str()));
 				//task.setWorkload(atof(igraph_task->get_attribute_value("workload").c_str()));
 				task.setStartTime(atof(igraph_task->get_attribute_value("start").c_str()));
 				tasks.insert(task);

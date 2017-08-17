@@ -110,6 +110,7 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		"	schedule->core_number = " << p << ";" << endl << 
 		"	schedule->task_number = " << n << ";" << endl <<
 		"	schedule->stage_time = " << tg->getDeadline(*pt) << ";" << endl << endl <<
+		"	schedule->unique_tasks_in_core = (size_t*)malloc(sizeof(size_t) * schedule->core_number);" << endl <<
 		"	schedule->tasks_in_core = (size_t*)malloc(sizeof(size_t) * schedule->core_number);" << endl;
 
 	os << endl << "	schedule->task_name = (const char**)malloc(sizeof(const char*) * schedule->task_number);" << endl;
@@ -132,6 +133,13 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 	{
 		os << "	schedule->tasks_in_core[" << i->first - 1 << "] = " << sched->getTasks(i->first).size() << ";" << endl;
 	}
+	os << endl;
+
+	for(Schedule::table::const_iterator i = sched->getSchedule().begin(); i != sched->getSchedule().end(); i++)
+	{
+		os << "	schedule->unique_tasks_in_core[" << i->first - 1 << "] = " << sched->getTasks(i->first).size() << ";" << endl;
+	}
+	os << endl;
 
 	os << endl << "	schedule->consumers_in_core = (size_t*)malloc(sizeof(size_t) * schedule->core_number);" << endl; 
 
@@ -426,6 +434,7 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		<< "	free(schedule->consumers_in_task);" << endl
 		<< "	free(schedule->producers_in_core);" << endl
 		<< "	free(schedule->consumers_in_core);" << endl
+		<< "	free(schedule->unique_tasks_in_core);" << endl
 		<< "	free(schedule->tasks_in_core);" << endl
 		<< "	free(schedule->task_name);" << endl
 		<< "}" << endl
@@ -435,7 +444,7 @@ DrakeCSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 		<< "{" << endl
 		<< "	size_t task_width[" << tg->getTasks().size() << "] = {";
 
-		for(set<Task>::const_iterator i = sched->getTasks().begin(); i != sched->getTasks().end(); i++)
+		for(set<Task>::const_iterator i = sched->getUniqueTasks().begin(); i != sched->getUniqueTasks().end(); i++)
 		{
 			os << sched->getCores(*i).size() << ", ";
 		}
