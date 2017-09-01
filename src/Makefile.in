@@ -70,7 +70,7 @@ AmplDataParser.cpp AmplDataOutput.cpp \
 AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp GraphML.cpp Schedule.cpp \
 AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
 AlgebraRawOutput.cpp RawOutputData.cpp RawOutputMatrix.cpp RawOutputScalar.cpp RawOutputSet.cpp RawOutputVector.cpp \
-Task.cpp Link.cpp Taskgraph.cpp Schedule.cpp \
+Task.cpp Link.cpp Buffer.cpp Taskgraph.cpp Schedule.cpp \
 Platform.cpp Core.cpp DummyCore.cpp \
 DeadlineCalculator.cpp DeadlineFormula.cpp DeadlineConstant.cpp \
 AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp \
@@ -79,13 +79,12 @@ XMLSchedule.cpp TetrisSchedule.cpp GraphML.cpp \
 CppDataOutput.cpp \
 Cpp.cpp CppData.cpp CppScalar.cpp CppVector.cpp CppSet.cpp CppMatrix.cpp \
 RecordParser.cpp \
-DrakeCSchedule.cpp \
 \
 Solver.cpp AmplSolver.cpp \
 exprtk.cpp \
 argument_parsing.cpp dl.cpp
  
-core_src = sort.c complex.c float.c integer.c string.c const_string.c string_integer.c monitor.c size_t.c pelib_string.c malloc.c
+core_src = sort.c complex.c float.c char.c integer.c string.c const_string.c string_integer.c monitor.c size_t.c pelib_string.c malloc.c
 
 ## executables
 bincxx_project = pelib-convert demo run_record
@@ -132,7 +131,7 @@ bin_run_record_static = 0
 ## Cpp format classes: base class, data structure base class, output data structure classes; no parser because of lack of cpp parser base class
 
 ## dynamic library packages and their sources
-corepp = pelib-core++ pelib-platform-ampl_input pelib-platform-ampl_output pelib-taskgraph-graphml pelib-taskgraph-streamit pelib-taskgraph-ampl_input pelib-taskgraph-ampl_output pelib-schedule-xml pelib-schedule-tetris pelib-schedule-drake pelib-schedule-ampl_input pelib-schedule-ampl_output pelib-ampl_input pelib-ampl_output pelib-schedule pelib-solve pelib-ampl pelib-raw pelib-generate
+corepp = pelib-core++ pelib-platform-ampl_input pelib-platform-ampl_output pelib-taskgraph-graphml pelib-taskgraph-streamit pelib-taskgraph-ampl_input pelib-taskgraph-ampl_output pelib-schedule-xml pelib-schedule-tetris pelib-schedule-ampl_input pelib-schedule-ampl_output pelib-ampl_input pelib-ampl_output pelib-schedule pelib-solve pelib-ampl pelib-raw pelib-generate
 sharedcxx_package = $(if $(filter 1,$(CORE++_SHARED)),$(corepp))
 sharedcc_package = $(if $(filter 1,$(CORE_SHARED)),pelib-core)
 
@@ -307,20 +306,6 @@ shared_pelib-schedule-tetris_pkg_libs =
 shared_pelib-schedule-tetris_cxxflags = -fPIC
 shared_pelib-schedule-tetris_pkg_description = Platform parser and input in AMPL input format
 shared_pelib-schedule-tetris_embed =
-
-sharedcxx_pelib-schedule-drake_src = schedule-drake.cpp
-shared_pelib-schedule-drake_export = $(sharedcxx_pelib-schedule-drake_embed) $(sharedcxx_pelib-schedule-drake_src)
-shared_pelib-schedule-drake_libs = 
-shared_pelib-schedule-drake_ldflags = -L.
-shared_pelib-schedule-drake_deps = 
-shared_pelib-schedule-drake_pkg = igraph
-shared_pelib-schedule-drake_pkg_igraph_version = >= 0.7.1
-shared_pelib-schedule-drake_pkg_url = http://www.ida.liu.se/~nicme26
-shared_pelib-schedule-drake_pkg_ld = 
-shared_pelib-schedule-drake_pkg_libs = 
-shared_pelib-schedule-drake_cxxflags = -fPIC
-shared_pelib-schedule-drake_pkg_description = Platform parser and input in AMPL input format
-shared_pelib-schedule-drake_embed =
 
 sharedcxx_pelib-schedule-ampl_input_src = schedule-ampl_input.cpp
 shared_pelib-schedule-ampl_input_export = $(sharedcxx_pelib-schedule-ampl_input_embed) $(sharedcxx_pelib-schedule-ampl_input_src)

@@ -49,7 +49,7 @@ namespace pelib
 		this->workload = 1;
 		this->streaming = is_streaming;
 		this->efficiencyString = "exprtk:p <= 1 ? 1 : 1e-6";
-		this->start_time = 0;
+		//this->start_time = 0;
 		this->instance = 0;
 	}
 
@@ -63,11 +63,10 @@ namespace pelib
 		this->workload = task.getWorkload();
 		this->streaming = task.isStreaming();
 		this->efficiencyString = task.getEfficiencyString();
-		this->start_time = task.getStartTime();
+		//this->start_time = task.getStartTime();
 
 		this->consumers = task.getConsumers();
 		this->producers = task.getProducers();
-		this->instance = task.getInstance();
 	}
 
 	Task::~Task()
@@ -213,17 +212,6 @@ namespace pelib
 		return this->streaming;
 	}
 
-	unsigned int
-	Task::getInstance() const
-	{
-		return this->instance;
-	}
-	
-	void
-	Task::setInstance(unsigned int instance)
-	{
-		this->instance = instance;
-	}
 	// Write in *number the address of the first character of the number found, or the end of the string str if no number was found.
 	// Returns the number of characters to parse as number
 	static size_t
@@ -400,6 +388,7 @@ namespace pelib
 		this->module = module;
 	}
 
+	/*
 	double
 	Task::getStartTime() const
 	{
@@ -410,7 +399,7 @@ namespace pelib
 	Task::setStartTime(double startTime)
 	{
 		this->start_time = startTime;
-	}
+	}*/
 
 	double
 	Task::runtime(double width, double frequency) const

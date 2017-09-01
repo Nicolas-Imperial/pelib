@@ -18,6 +18,7 @@
 */
 
 #include <pelib/Task.hpp>
+#include <pelib/Buffer.hpp>
 
 #ifndef PELIB_LINK
 #define PELIB_LINK
@@ -29,13 +30,19 @@ namespace pelib
 	{
 		public:
 			/** Constructor. Takes the producer and consumer tasks at both ends of the link **/
-			Link(const Task &producer, const Task &consumer, const std::string &producerName, const std::string &consumerName, const std::string &type = "", size_t producer_rate = 0, size_t consumer_rate = 0);
+			Link(const Task &producer, const Task &consumer, const std::string &producerName, const std::string &consumerName, const Buffer &queue, const Buffer &producer_buffer, const Buffer &consumer_buffer, size_t producer_rate = 0, size_t consumer_rate = 0);
 
 			/** Returns a pointer to the producer task **/
 			virtual Task* getProducer() const;
 
 			/** Returns a pointer to the consumer task **/
 			virtual Task* getConsumer() const;
+
+			/** Returns a pointer to the producer task **/
+			virtual void setProducer(Task*);
+
+			/** Returns a pointer to the consumer task **/
+			virtual void setConsumer(Task*);
 
 			/** Check if this link is striclty inferior to another link given 
 				@param other Other link to compare this instance to
@@ -63,12 +70,22 @@ namespace pelib
 
 			std::string
 			getConsumerName() const;
+
+			const Buffer&
+			getQueueBuffer() const;
+
+			const Buffer&
+			getProducerBuffer() const;
+
+			const Buffer&
+			getConsumerBuffer() const;
+
 		protected:
 			/** Producer and consumer task pointers **/
 			Task *producer, *consumer;
-			std::string producerName, consumerName, type;
+			std::string producerName, consumerName;
 			size_t producer_rate, consumer_rate;
-
+			Buffer queueBuffer, producerBuffer, consumerBuffer;
 		private:		
 	};
 }

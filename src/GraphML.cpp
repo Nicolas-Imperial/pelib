@@ -40,6 +40,7 @@ extern "C"{
 #include <pelib/Set.hpp>
 #include <pelib/Task.hpp>
 #include <pelib/Link.hpp>
+#include <pelib/Buffer.hpp>
 
 #include <pelib/CastException.hpp>
 #include <pelib/ParseException.hpp>
@@ -386,7 +387,8 @@ GraphML::parse(istream &is) const
 			consumer_rate = EAN(the_graph, GraphML::consumer_rate.c_str(), i);
 		}
 
-		Link link(*tasks.find(producer), *tasks.find(consumer), producerName, consumerName, type, producer_rate, consumer_rate);
+		Buffer nullBuffer = Buffer::nullBuffer();
+		Link link(*tasks.find(producer), *tasks.find(consumer), producerName, consumerName, nullBuffer, nullBuffer, nullBuffer, producer_rate, consumer_rate);
 		links.insert(link);
 
 		const Link &link_ref = *links.find(link);

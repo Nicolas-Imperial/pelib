@@ -39,13 +39,13 @@ using namespace std;
 
 namespace pelib
 {
-	Schedule::Schedule(const std::string &name, const std::string &appName, const table &schedule)
+	Schedule::Schedule(const std::string &name, const std::string &appName, const table &schedule, const std::set<Task> &tasks, const std::set<Link> &links)
 	{
 		this->name = name;
 		this->appName = appName;
 	
 		// Copy taskgraph	
-		this->setSchedule(schedule);
+		this->setSchedule(schedule, tasks, links);
 	}
 
 	Schedule::~Schedule()
@@ -54,11 +54,12 @@ namespace pelib
 	}
 
 	void
-	Schedule::setSchedule(const table &schedule)
+	Schedule::setSchedule(const table &schedule, const set<Task> &task, const set<Link> &links)
 	{
 		this->schedule = Schedule::table();
 		this->tasks.clear();
 		this->core_tasks.clear();
+		this->links = links;
 
 		for(table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 		{
@@ -82,6 +83,37 @@ namespace pelib
 			// Add the tasks list to the list of lists of tasks
 			this->core_tasks.insert(pair<int, set<const Task*> >(i->first, this_core_tasks));
 		}
+
+		for(set<Link>::iterator i = this->links.begin(); i != this->links.end(); i++)
+		{
+			Link &link = (Link&)*i;
+			bool producer_found = false, consumer_found = false;
+
+			for(set<Task>::iterator j = this->tasks.begin(); j != this->tasks.end(); j++)
+			{
+				const Task &task = *j;
+				if(link.getProducer()->getName().compare(task.getName()) == 0)
+				{
+					link.setProducer((Task*)&task);
+					producer_found = true;
+				}
+				
+				if(link.getConsumer()->getName().compare(task.getName()) == 0)
+				{
+					link.setConsumer((Task*)&task);
+					consumer_found = true;
+				}
+			}
+
+			if(!producer_found)
+			{
+				PelibException("Could not find link producer task in task set");
+			}
+			if(!consumer_found)
+			{
+				PelibException("Could not find link consumer task in task set");
+			}
+		}
 	}
 
 	Schedule::Schedule(const std::string &name, const Algebra &algebra)
@@ -99,7 +131,7 @@ namespace pelib
 		this->name = src.getName();
 		this->appName = src.getName();
 		this->tasks = src.getUniqueTasks();
-		this->setSchedule(src.getSchedule());
+		this->setSchedule(src.getSchedule(), src.tasks, src.getLinks());
 	}
 
 	void
@@ -112,6 +144,16 @@ namespace pelib
 		const Vector<int, float> *start = algebra.find<Vector<int, float> >("start");
 		const Vector<int, float> *wi = algebra.find<Vector<int, float> >("wi");
 		const Matrix<int, int, float> *sched = algebra.find<Matrix<int, int, float> >("schedule");
+		const Scalar<float> *f_unit_scalar = algebra.find<Scalar<float> >("Funit");
+		float f_unit;
+		if(f_unit_scalar == NULL)
+		{
+			f_unit = 1;
+		}
+		else
+		{
+			f_unit = f_unit_scalar->getValue();
+		}
 		const Vector<int, float> *freq = algebra.find<Vector<int, float> >("frequency");
 		const Vector<int, string> *task_name = algebra.find<Vector<int, string> >("name");
 
@@ -151,15 +193,16 @@ namespace pelib
 						if(task.getWorkload() > 0)
 						{
 							task.setWidth(wi->getValues().find((int)floor(j->second))->second);
-							task.setFrequency(freq->getValues().find((int)floor(j->second))->second);
+							task.setFrequency(freq->getValues().find((int)floor(j->second))->second * f_unit);
 							task.setWorkload(tau->getValues().find((int)floor(j->second))->second);
-							task.setStartTime(start->getValues().find((int)j->second)->second);
-							core_schedule.insert(pair<float, work>(task.getStartTime(), work(&task, tau->getValues().find((int)floor(j->second))->second)));
+							float start_time = start->getValues().find((int)j->second)->second;
+							//task.setStartTime(start->getValues().find((int)j->second)->second);
+							core_schedule.insert(pair<float, work>(start_time, work(&task, tau->getValues().find((int)floor(j->second))->second)));
 						}
 					}
 				}
 
-				schedule.insert(pair<int, sequence>(i->first, core_schedule));
+				schedule.insert(pair<int, sequence>(i->first - 1, core_schedule));
 			}
 		}
 
@@ -172,13 +215,13 @@ namespace pelib
 		}
 
 		this->tasks = tasks;
-		this->setSchedule(schedule);
+		this->setSchedule(schedule, tasks, set<Link>());
 	}
 	
 	Schedule*
 	Schedule::clone() const
 	{
-		Schedule *clone = new Schedule(getName(), getName(), getSchedule());
+		Schedule *clone = new Schedule(this->getName(), this->getName(), this->getSchedule(), this->tasks, this->getLinks());
 
 		return clone;
 	}
@@ -215,7 +258,8 @@ namespace pelib
 				frequencies.insert(pair<int, float>(id, j->second.first->getFrequency()));
 
 				max_tasks = ordering > max_tasks ? ordering : max_tasks;
-				start.insert(pair<int, float>(std::distance(this->getUniqueTasks().begin(), this->getUniqueTasks().find(j->second.first->getName())), j->second.first->getStartTime())); 
+				//start.insert(pair<int, float>(std::distance(this->getUniqueTasks().begin(), this->getUniqueTasks().find(j->second.first->getName())), j->second.first->getStartTime())); 
+				start.insert(pair<int, float>(std::distance(this->getUniqueTasks().begin(), this->getUniqueTasks().find(j->second.first->getName())), j->first)); 
 			}
 
 			sched.insert(pair<int, map<int, float> >(core, schedule_row));
@@ -281,11 +325,18 @@ namespace pelib
 		this->appName = appName;
 #warning Update this line when non-unique task set is implemented
 		this->tasks = copy.getUniqueTasks();
+		this->links = copy.getLinks();
 	
 		// Copy taskgraph	
-		this->setSchedule(schedule);
+		this->setSchedule(schedule, tasks, links);
 
 		return *this;
+	}
+
+	const set<Link>&
+	Schedule::getLinks() const
+	{
+		return this->links;
 	}
 
 	const set<const Task*>&

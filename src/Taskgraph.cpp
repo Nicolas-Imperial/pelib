@@ -83,7 +83,8 @@ namespace pelib
 			const Task &producer = *this->tasks.find(*i->getProducer());
 			const Task &consumer = *this->tasks.find(*i->getConsumer());
 
-			Link link(producer, consumer, i->getProducerName(), i->getConsumerName(), i->getDataType(), i->getProducerRate(), i->getConsumerRate());
+			//Link link(producer, consumer, i->getProducerName(), i->getConsumerName(), 0, 0, Link::MemoryType::undefined, i->getDataType(), i->getProducerRate(), i->getConsumerRate());
+			Link link(producer, consumer, i->getProducerName(), i->getConsumerName(), i->getQueueBuffer(), i->getProducerBuffer(), i->getConsumerBuffer(), i->getProducerRate(), i->getConsumerRate());
 			this->links.insert(link);
 		}
 
@@ -105,7 +106,7 @@ namespace pelib
 			{
 				Task *producer = (*j)->getProducer();
 				Task *consumer = (*j)->getConsumer();
-				Link newLink(*this->tasks.find(*producer), *this->tasks.find(*consumer), (*j)->getProducerName(), (*j)->getConsumerName(), (*j)->getDataType(), (*j)->getProducerRate(), (*j)->getConsumerRate());
+				Link newLink(*this->tasks.find(*producer), *this->tasks.find(*consumer), (*j)->getProducerName(), (*j)->getConsumerName(), (*j)->getQueueBuffer(), (*j)->getProducerBuffer(), (*j)->getConsumerBuffer(), (*j)->getProducerRate(), (*j)->getConsumerRate());
 				const Link &link = *this->links.find(newLink);
 				t.getProducers().insert(&link);
 			}
@@ -115,7 +116,7 @@ namespace pelib
 			{
 				Task *producer = (*j)->getProducer();
 				Task *consumer = (*j)->getConsumer();
-				Link newLink(*this->tasks.find(*producer), *this->tasks.find(*consumer), (*j)->getProducerName(), (*j)->getConsumerName(), (*j)->getDataType(), (*j)->getProducerRate(), (*j)->getConsumerRate());
+				Link newLink(*this->tasks.find(*producer), *this->tasks.find(*consumer), (*j)->getProducerName(), (*j)->getConsumerName(), (*j)->getQueueBuffer(), (*j)->getProducerBuffer(), (*j)->getConsumerBuffer(), (*j)->getProducerRate(), (*j)->getConsumerRate());
 				const Link &link = *this->links.find(newLink);
 				t.getConsumers().insert(&link);
 			}
@@ -208,7 +209,7 @@ namespace pelib
 						set<Task>::const_iterator from = this->getTasks().begin(), to = this->getTasks().begin();
 						std::advance(from, (size_t)i->first - 1);
 						std::advance(to, (size_t)j->first - 1);
-						this->links.insert(Link(*from, *to, from->getName(), to->getName()));
+						this->links.insert(Link(*from, *to, from->getName(), to->getName(), Buffer::nullBuffer(), Buffer::nullBuffer(), Buffer::nullBuffer()));
 					}
 				}
 			}

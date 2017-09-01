@@ -104,12 +104,12 @@ namespace pelib
 			setMaxWidth(double maxWidth);
 
 			/** Gets the time at which this task begins to work, relative to the beginning of a pipeline round **/
-			virtual double
-			getStartTime() const;
+			//virtual double
+			//getStartTime() const;
 
 			/** Sets the time at which this task begins to work, relative to the beginning of a pipeline round **/
-			virtual void
-			setStartTime(double startTime);
+			//virtual void
+			//setStartTime(double startTime);
 
 			/** Computes and returns the global run time of this task assuming a given width and frequency
 				@param width Assume the task run on that many cores
@@ -144,9 +144,6 @@ namespace pelib
 
 			bool
 			isStreaming() const;
-
-			unsigned int getInstance() const;
-			void setInstance(unsigned int instance);
 			
 		protected:
 			/** Frequency and width allocated to this task **/
@@ -155,7 +152,7 @@ namespace pelib
 			/** Workload in number of instructions and maximum number of cores able to run this task **/
 			double workload, maxWidth;
 			/** Time at which this task starts **/
-			float start_time;
+			//float start_time;
 			bool streaming;
 			/** Name, source code module name and efficiency formula of the task **/
 			std::string name, module, efficiencyString;

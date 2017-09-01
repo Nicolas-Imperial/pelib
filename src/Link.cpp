@@ -19,8 +19,11 @@
 
 #include <string>
 #include <iostream>
+#include <sstream>
+#include <string.h>
 
 #include <pelib/Link.hpp>
+#include <pelib/PelibException.hpp>
 
 #ifdef debug
 #undef debug
@@ -32,15 +35,17 @@ using namespace std;
 
 namespace pelib
 {
-	Link::Link(const Task &producer, const Task &consumer, const string &producerName, const string &consumerName, const std::string &type, size_t producer_rate, size_t consumer_rate)
+	Link::Link(const Task &producer, const Task &consumer, const std::string &producerName, const std::string &consumerName, const Buffer &queue_buffer, const Buffer &producer_buffer, const Buffer &consumer_buffer, size_t producer_rate, size_t consumer_rate): queueBuffer(queue_buffer), producerBuffer(producer_buffer), consumerBuffer(consumer_buffer)
 	{
 		this->producerName = producerName;
 		this->consumerName = consumerName;
 		this->producer = (Task*)&producer;
 		this->consumer = (Task*)&consumer;
-		this->type = string(type);
 		this->producer_rate = producer_rate;
 		this->consumer_rate = consumer_rate;
+		this->queueBuffer = queue_buffer;
+		this->producerBuffer = producer_buffer;
+		this->consumerBuffer = consumer_buffer;
 	}
 
 	Task*
@@ -53,6 +58,24 @@ namespace pelib
 	Link::getConsumer() const
 	{
 		return this->consumer;
+	}
+
+	std::string
+	Link::getDataType() const
+	{
+		return this->queueBuffer.getType();
+	}
+
+	void
+	Link::setProducer(Task* producer)
+	{
+		this->producer = producer;
+	}
+
+	void
+	Link::setConsumer(Task* consumer)
+	{
+		this->consumer = consumer;
 	}
 
 	size_t
@@ -68,12 +91,6 @@ namespace pelib
 	}
 
 	std::string
-	Link::getDataType() const
-	{
-		return this->type;
-	}
-
-	std::string
 	Link::getProducerName() const
 	{
 		return this->producerName;
@@ -83,6 +100,24 @@ namespace pelib
 	Link::getConsumerName() const
 	{
 		return this->consumerName;
+	}
+
+	const Buffer&
+	Link::getQueueBuffer() const
+	{
+		return this->queueBuffer;
+	}
+
+	const Buffer&
+	Link::getProducerBuffer() const
+	{
+		return this->producerBuffer;
+	}
+
+	const Buffer&
+	Link::getConsumerBuffer() const
+	{
+		return this->consumerBuffer;
 	}
 
 	bool

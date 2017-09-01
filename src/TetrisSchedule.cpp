@@ -614,6 +614,7 @@ class Canvas
 						// Instead of the task's width, because mapping may not be to contiguous cores
 						size_t width = 0;
 						int counter = core - 1;
+						double start;
 						for(Schedule::table::const_iterator k = i; k != sched->getSchedule().end(); k++, counter++)
 						{
 							bool task_found = false;
@@ -623,6 +624,7 @@ class Canvas
 								{
 									width++;
 									task_found = true;;
+									start = l->first;
 								}
 							}
 
@@ -631,7 +633,7 @@ class Canvas
 								break;
 							}
 						}
-						double start = task.getStartTime();
+						//double start = task.getStartTime();
 						string name;
 						if(useTaskName)
 						{
@@ -837,7 +839,8 @@ TetrisSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 			task.setWorkload(tg->getTasks().find(task)->getWorkload());
 			task.setMaxWidth(tg->getTasks().find(task)->getMaxWidth());
 			task.setEfficiencyString(tg->getTasks().find(task)->getEfficiencyString());
-			double stop_time = task.getStartTime() + task.runtime(task.getWidth(), task.getFrequency());
+			//double stop_time = task.getStartTime() + task.runtime(task.getWidth(), task.getFrequency());
+			double stop_time = j->first + task.runtime(task.getWidth(), task.getFrequency());
 			if(stop_time > max_stop_time)
 			{
 				max_stop_time = stop_time;

@@ -47,7 +47,7 @@ namespace pelib
 				@param appName name of the application this schedule is designed for
 				@param schedule collection of task sequences to run by each processor in the schedule
 			**/
-			Schedule(const std::string &name, const std::string &appName, const table &schedule);
+			Schedule(const std::string &name, const std::string &appName, const table &schedule, const std::set<Task> &tasks, const std::set<Link> &links);
 			/** Constructor 
 				@param algebra Collection of AlgebraData descendant class instances that describes a schedule in an algebraic form, used as basis to build the Schedule class instance
 			**/
@@ -91,6 +91,9 @@ namespace pelib
 			**/
 			virtual const set<const Task*>&
 			getTasks(int core) const;
+
+			virtual const set<Link>&
+			getLinks() const;
 
 			/** Returns the ith task in the Schedule tasks collection
 				@param id Index of the task, starting from 1, to be read from the Schedule's internal collection of Task
@@ -166,11 +169,12 @@ namespace pelib
 			table schedule;
 			set<Task> tasks;
 			std::map<int, set<const Task*> > core_tasks;
+			set<Link> links;
 
 			/** Set the schedule of this class instance from a collection of task sequences. This method duplicates the tasks so the Schedule instance owns all instances of Tasks that the schedule refers to
 			**/
 			virtual void
-			setSchedule(const table&);
+			setSchedule(const table&, const std::set<Task>&, const std::set<Link>&);
 		private:
 			void buildFromAlgebra(const string &name, const string &appName, const Algebra &data);
 	};
