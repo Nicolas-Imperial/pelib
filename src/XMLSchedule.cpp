@@ -262,7 +262,7 @@ XMLSchedule::parse(istream &is) const
 		{
 			if((*iter)->get_name().compare("core") == 0) //skip indentation characters et cetera
 			{
-				int core_id = atoi(dynamic_cast<xmlpp::Element*>(*iter)->get_attribute_value("core_id").c_str()) - 1;
+				int core_id = atoi(dynamic_cast<xmlpp::Element*>(*iter)->get_attribute_value("id").c_str()) - 1;
 				Schedule::sequence core_schedule_map;
 				//cout << "Core " << core_id << endl;
 
