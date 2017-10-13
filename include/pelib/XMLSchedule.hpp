@@ -40,7 +40,7 @@ namespace pelib
 			/** Writes the content of instance of pelib::Schedule into output stream in XML format, using additional information from associated taskgraph and platform **/
 			virtual	void dump(std::ostream &os, const Schedule &data, const Taskgraph &tg, const Platform &pt) const;
 			/** Read text input in XML format and creates an instance of pelib::Schedule containing all data read **/
-			virtual Schedule* parse(std::istream &is) const;
+			virtual Schedule* parse(std::istream &is, const Taskgraph &tg, const Platform &pt) const;
 			/** Returns a pointer to a copy of this schedule parser and output **/
 			virtual XMLSchedule* clone() const;
 	};

@@ -65,23 +65,20 @@ XMLSchedule::dump(ostream& os, const Schedule &data, const Taskgraph &tg, const 
 void
 XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const Platform *pt) const
 {
-	Schedule::table schedule = sched->getSchedule();
-	const set<Link> &links = sched->getLinks();
-	//float target_makespan = sched->getMakespan();
-	set<Task> &tasks = (set<Task>&)tg->getTasks();
+	Schedule::Table schedule = sched->getSchedule();
+	const set<AllotedLink> &links = sched->getLinks();
 	set<string> task_ids;
 	
-	for(Schedule::table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
+	for(Schedule::Table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 	{
-		for(Schedule::sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
+		for(set<ExecTask>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 		{
-			task_ids.insert(j->second.first->getName());
+			task_ids.insert(j->getTask().getName());
 		}
 	}
 
 	os << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << endl
 		<< "<schedule scheduler=\"" << sched->getName() << "\" application=\"" << sched->getAppName() << "\""
-		//<< "makespan=\"" << target_makespan << "\" "
 		<< ">" << endl;
 
 	// Finds and set the precision required for this schedule
@@ -89,17 +86,16 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 	std::streamsize max_work_precision = 0;
 	std::streamsize max_freq_precision = 0;
 	std::streamsize max_start_precision = 0;
-	for(Schedule::table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
+	for(Schedule::Table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 	{
 		float last_start = 0;
 		float last_time = 0;
-		for(Schedule::sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
+		for(set<ExecTask>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 		{
-			Task t = *j->second.first;
-			float start_time = j->first;
+			const ExecTask &t = *j;
+			float start_time = j->getStart();
 			if(start_time > 0)
 			{
-				//float delta = t.getStartTime() - last_start;
 				float delta = start_time - last_start;
 				delta = delta - floor(delta);
 				std::streamsize precision = (std::streamsize)(ceil(-log10(delta)) + 2);
@@ -107,10 +103,8 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 				{
 					max_start_precision = precision;
 				}
-				//last_start = t.getStartTime();
 				last_start = start_time;
 
-				//delta = abs(t.getStartTime() - (last_start + last_time));
 				delta = abs(start_time - (last_start + last_time));
 				delta = delta - floor(delta);
 				precision = (std::streamsize)(ceil(-log10(delta)) + 1);
@@ -118,10 +112,9 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 				{
 					max_start_precision = precision;
 				}
-				const Task &tgt = *tg->getTasks().find(t);
-				last_time = tgt.runtime(t.getWidth(), t.getFrequency());
+				last_time = t.getTask().runtime(t.getWidth(), t.getFrequency());
 
-				double work = t.getWorkload() - floor(t.getWorkload());
+				double work = t.getTask().getWorkload() - floor(t.getTask().getWorkload());
 				precision = (std::streamsize)(ceil(-log10(work)) + 1);
 				if(precision > max_work_precision)
 				{
@@ -134,72 +127,61 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 				{
 					max_freq_precision = precision;
 				}
-
-				/*
-				os << "<!-- core : " << i->first << " -->" << endl;
-				os << "<!-- task : " << t.getName() << " -->" << endl;
-				os << "<!-- start_time = " << t.getStartTime() << " -->" << endl;
-				os << "<!-- last_start = " << last_start << " -->" << endl;
-				*/
-
-				// update last time
 			}
 		}
 	}
 
-	for(Schedule::table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
+	for(Schedule::Table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 	{
 		int p = i->first;
 		os << " <core coreid=\"" << p + 1 << "\">" << endl;
-		Schedule::sequence core_schedule = i->second;
+		set<ExecTask> core_schedule = i->second;
 		int order = 0;
 
-		for(Schedule::sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++, order++)
+		for(set<ExecTask>::const_iterator j = i->second.begin(); j != i->second.end(); j++, order++)
 		{
-			Task t = *j->second.first;
-			float start = j->first;
-			string taskid = t.getName();
-			size_t task_index = std::distance(sched->getUniqueTasks().begin(), sched->getUniqueTasks().find(t));
+			const ExecTask &t = *j;
+			float start = t.getStart();
+			string taskid = t.getTask().getName();
 			
 			os << "  <task name=\"" << taskid << "\" ";
 			os << setprecision(max_start_precision);
-			//os << "start=\"" << std::fixed << (t.getStartTime() > 0 ? t.getStartTime() : start) << "\" ";
+			os << "instance=\"" << std::fixed << t.getInstance() << "\" ";
 			os << "start=\"" << std::fixed << start << "\" ";
 			os << setprecision(old_precision);
 			os << "frequency=\"" << (float)t.getFrequency() << "\" ";
-			os << "width=\"" << t.getWidth() << "\" ";
-			os << "workload=\"" << t.getWorkload() << "\"";
 			os << "/>" << endl;
 
-			set<Task>::iterator iter = tasks.begin();
-			std::advance(iter, task_index);
-			t.setMaxWidth(iter->getMaxWidth());
-			t.setEfficiencyString(string(iter->getEfficiencyString()));
-			string eff = string(iter->getEfficiencyString());
-			start += t.runtime(t.getWidth(), t.getFrequency());
+			start += t.getTask().runtime(t.getWidth(), t.getFrequency());
 		}
 		os << " </core>" << endl;
 	}
 
-	for(set<Link>::iterator i = links.begin(); i != links.end(); i++)
+	for(set<AllotedLink>::iterator i = links.begin(); i != links.end(); i++)
 	{
-		const Link &link = *i;
+		const AllotedLink &link = *i;
 
 		os << " <link>" << endl;
 		os << "  <producer ";
-		os << "name=\"" << link.getProducerName() << "\" ";
-		os << "task=\"" << link.getProducer()->getName() << "\" ";
-		os << "core=\"" << link.getProducerBuffer().getCore() + 1 << "\" ";
-		os << "memory=\"" << Buffer::memoryTypeToString(link.getProducerBuffer().getMemoryType()) << "\" ";
-		os << "level=\"" << link.getProducerBuffer().getLevel() << "\"";
+		os << "name=\"" << link.getLink().getProducerName() << "\" ";
+		os << "task=\"" << link.getLink().getProducer()->getName() << "\"";
+		if(((int)link.getProducerMemory().getFeature() & 3 & (int)Memory::Feature::distributed) == (int)Memory::Feature::distributed)
+		{
+			os << " core=\"" << link.getProducerMemory().getCore() + 1 << "\" ";
+			os << "memory=\"" << Memory::featureToString(link.getProducerMemory().getFeature()) << "\" ";
+			os << "level=\"" << link.getProducerMemory().getLevel() << "\"";
+		}
 		os << "/>" << endl;
 
 		os << "  <consumer ";
-		os << "name=\"" << link.getConsumerName() << "\" ";
-		os << "task=\"" << link.getConsumer()->getName() << "\"";
-		os << "core=\"" << link.getConsumerBuffer().getCore() + 1 << "\" ";
-		os << "memory=\"" << Buffer::memoryTypeToString(link.getConsumerBuffer().getMemoryType()) << "\" ";
-		os << "level=\"" << link.getConsumerBuffer().getLevel() << "\"";
+		os << "name=\"" << link.getLink().getConsumerName() << "\" ";
+		os << "task=\"" << link.getLink().getConsumer()->getName() << "\"";
+		if(((int)link.getConsumerMemory().getFeature() & 3 & (int)Memory::Feature::distributed) == (int)Memory::Feature::distributed)
+		{
+			os << " core=\"" << link.getConsumerMemory().getCore() + 1 << "\" ";
+			os << "memory=\"" << Memory::featureToString(link.getConsumerMemory().getFeature()) << "\" ";
+			os << "level=\"" << link.getConsumerMemory().getLevel() << "\"";
+		}
 		os << "/>" << endl;
 
 		os << "  <buffer type=\"" << link.getQueueBuffer().getType() << "\" ";
@@ -207,11 +189,13 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 		{
 			os << "header=\"" << link.getQueueBuffer().getHeader() << "\" ";
 		}
-		os << "size=\"" << link.getQueueBuffer().getSize() << "\" ";
-		os << "core=\"" << link.getQueueBuffer().getCore() + 1 << "\" ";
-		os << "memory=\"" << Buffer::memoryTypeToString(link.getQueueBuffer().getMemoryType()) << "\" ";
-		os << "level=\"" << link.getQueueBuffer().getLevel() << "\"";
+		os << "size=\"" << link.getQueueBuffer().getSize() << "\">" << endl;
+		os << "   <memory core=\"" << link.getQueueBuffer().getMemory().getCore() + 1 << "\" ";
+		os << "feature=\"" << Memory::featureToString(link.getQueueBuffer().getMemory().getFeature()) << "\" ";
+		os << "level=\"" << link.getQueueBuffer().getMemory().getLevel() << "\"";
 		os << "/>" << endl;
+		os << "  </buffer>" << endl;
+		
 
 		os << " </link>" << endl;
 
@@ -222,12 +206,9 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 }
 
 Schedule*
-XMLSchedule::parse(istream &is) const
+XMLSchedule::parse(istream &is, const Taskgraph &tg, const Platform &pt) const
 {
 	DomParser* theSchedule = new DomParser();
-	//theSchedule->set_throw_messages(false);
-	//igraph_set_error_handler(igraph_error_handler_t* new_handler);
-	//Taskgraph tg = taskgraph;
 	
 	try
 	{
@@ -237,16 +218,6 @@ XMLSchedule::parse(istream &is) const
 		throw ParseException(std::string("xmlpp::parse_error"));
 	}
 	
-	// Just like taskgraph conversion
-	// this involves turning the data structure
-	// inside out, and to convert from
-	// the taskids to id 1..n, in a 
-	// deterministic fashion.
-	// The latter is slightly more complex
-	// than taskgraph version
-	// since the tasks may appear more than one
-	// in the schedule.
-
 	Element *root = theSchedule->get_document()->get_root_node();
 	xmlpp::Node::NodeList processors = root->get_children();
 
@@ -255,128 +226,121 @@ XMLSchedule::parse(istream &is) const
 		std::string name = root->get_attribute_value("scheduler");
 		std::string aut_name = root->get_attribute_value("application");
 
-		Schedule::table schedule;
-		set<Task> tasks;
-		set<Link> links;
-		for(xmlpp::Node::NodeList::iterator iter = processors.begin(); iter != processors.end(); ++iter) //for each core
+		Schedule::Table schedule;
+		map<pair<Task, unsigned int>, unsigned int> task_width;
+		set<AllotedLink> links;
+		for(xmlpp::Node::NodeList::iterator piter = processors.begin(); piter != processors.end(); ++piter) //for each core
 		{
-			if((*iter)->get_name().compare("core") == 0) //skip indentation characters et cetera
+			if((*piter)->get_name().compare("core") == 0) //skip indentation characters et cetera
 			{
-				int core_id = atoi(dynamic_cast<xmlpp::Element*>(*iter)->get_attribute_value("id").c_str()) - 1;
-				Schedule::sequence core_schedule_map;
-				//cout << "Core " << core_id << endl;
+				unsigned int core_id = atoi(dynamic_cast<xmlpp::Element*>(*piter)->get_attribute_value("id").c_str()) - 1;
+				set<ExecTask> core_schedule_map;
 
-				std::list<xmlpp::Node*> itasks = (*iter)->get_children();
-				for(std::list<xmlpp::Node*>::iterator taskiter = itasks.begin(); taskiter != itasks.end(); ++taskiter)
+				std::list<xmlpp::Node*> tasks = (*piter)->get_children();
+				for(std::list<xmlpp::Node*>::iterator titer = tasks.begin(); titer != tasks.end(); ++titer)
 				{
-					if((*taskiter)->get_name().compare("task") != 0) //skip indentation characters et cetera
+					if((*titer)->get_name().compare("task") != 0) //skip indentation characters et cetera
 					{
-						//cout << "Skipping " << (*taskiter)->get_name() << endl;
 						continue;
 					}
 
-					Element *igraph_task = dynamic_cast<Element*>(*taskiter);
-					//cout << "Task " << igraph_task->get_attribute_value("name") << endl;
+					Element *task = dynamic_cast<Element*>(*titer);
 
-					//Task &task = (Task&) tg.findTask(igraph_task->get_attribute_value("taskid"));
-					Task task(igraph_task->get_attribute_value("name"));
-					//cout << "Counter = " << task_id << ", tg_task.getName() = " << tg_task.getName() << ", tg_task.getTaskId() = \"" << tg_task.getTaskId() << "." << endl; 
+					Task search(task->get_attribute_value("name"));
+					set<Task>::const_iterator task_search = tg.getTasks().find(search);
+					if(task_search == tg.getTasks().end())
+					{
+						throw PelibException("Found task in schedule that does not exist in taskgraph");
+					}
 
-					//Task task(tg_task.getName(), tg_task.getTaskId());
-					//Task& task_tg = (Task&)*tg.getTasks().find(task);
+					ExecTask etask(*task_search, 
+						set<AllotedLink>(), // First consider there are no links, will add them later
+						atof(task->get_attribute_value("frequency").c_str()),
+						0,
+						atof(task->get_attribute_value("start").c_str()),
+						atoi(task->get_attribute_value("instance").c_str())
+					);
 
-					task.setFrequency(atof(igraph_task->get_attribute_value("frequency").c_str()));
-					task.setWidth(atof(igraph_task->get_attribute_value("width").c_str()));
-					task.setWorkload(atof(igraph_task->get_attribute_value("workload").c_str()));
-					//task.setStartTime(atof(igraph_task->get_attribute_value("start").c_str()));
-					float start_time = atof(igraph_task->get_attribute_value("start").c_str());
-					tasks.insert(task);
-					const Task &t = *tasks.find(task);
-
-					core_schedule_map.insert(std::pair<float, Schedule::work>(start_time, pair<const Task*, double>(&t, atof(igraph_task->get_attribute_value("workload").c_str()))));
+					map<pair<Task, unsigned int>, unsigned int>::iterator i = task_width.find(pair<Task, unsigned int>(search, etask.getInstance()));
+					if(i == task_width.end())
+					{
+						i = task_width.insert(pair<pair<Task, unsigned int>, unsigned int>(pair<Task, unsigned int>(search, etask.getInstance()), 0)).first;
+					}
+					i->second++;
+					core_schedule_map.insert(etask);
 				}
 
-				schedule.insert(std::pair<int, Schedule::sequence>(core_id, core_schedule_map));
+				schedule.insert(std::pair<unsigned int, set<ExecTask>>(core_id, core_schedule_map));
 			}
-			else if((*iter)->get_name().compare("link") == 0) //skip indentation characters et cetera
+			else if((*piter)->get_name().compare("link") == 0) //skip indentation characters et cetera
 			{
-				/*
-				string type = dynamic_cast<xmlpp::Element*>(*iter)->get_attribute_value("type").c_str();
-				string header = dynamic_cast<xmlpp::Element*>(*iter)->get_attribute_value("header").c_str();
-				size_t size = atoi(dynamic_cast<xmlpp::Element*>(*iter)->get_attribute_value("size").c_str());
-				unsigned int core = atoi(dynamic_cast<xmlpp::Element*>(*iter)->get_attribute_value("core").c_str());
-				Buffer::MemoryType memory = Buffer::stringToMemoryType(dynamic_cast<xmlpp::Element*>(*iter)->get_attribute_value("memory").c_str());
-				unsigned int level = atoi(dynamic_cast<xmlpp::Element*>(*iter)->get_attribute_value("level").c_str());
-				*/
-
 				string queueType, queueHeader;
-				size_t queueSize;
-				unsigned int queueCore;
-				Buffer::MemoryType queueMemory;
-				unsigned int queueLevel;
-				string producer_name, consumer_name;
-				unsigned int producer_level, consumer_level;
-				unsigned int producer_core, consumer_core;
-				Buffer::MemoryType producer_type, consumer_type;
+				size_t queueSize = 0;
+				unsigned int queueCore = 0;
+				Memory::Feature queueMemory = Memory::nullMemory().getFeature();
+				unsigned int queueLevel = 0;
+				string producer_name = string(), consumer_name = string();
+				unsigned int producer_level = 0, consumer_level = 0;
+				unsigned int producer_core = 0, consumer_core = 0;
+				Memory::Feature producer_type = Memory::nullMemory().getFeature(), consumer_type = Memory::nullMemory().getFeature();
 				const Task *producer = NULL, *consumer = NULL;
 
-				std::list<xmlpp::Node*> itasks = (*iter)->get_children();
-				for(std::list<xmlpp::Node*>::iterator taskiter = itasks.begin(); taskiter != itasks.end(); ++taskiter)
+				std::list<xmlpp::Node*> allocs = (*piter)->get_children();
+				for(std::list<xmlpp::Node*>::iterator aiter = allocs.begin(); aiter != allocs.end(); ++aiter)
 				{
-					if((*taskiter)->get_name().compare("producer") == 0)
+					if((*aiter)->get_name().compare("producer") == 0)
 					{
-						Element *igraph_task = dynamic_cast<Element*>(*taskiter);
-						producer_name = igraph_task->get_attribute_value("name");
-						string task_name = igraph_task->get_attribute_value("task");
-						producer_level = atoi(igraph_task->get_attribute_value("level").c_str());
-						producer_core = atoi(igraph_task->get_attribute_value("core").c_str()) - 1;
-						producer_type = Buffer::stringToMemoryType(igraph_task->get_attribute_value("memory").c_str());
-						set<Task>::iterator i;
-						for(i = tasks.begin(); i != tasks.end(); i++)
-						{
-							if(i->getName().compare(task_name) == 0)
-							{
-								producer = &*i;
-								break;
-							}
-						}
-						if(i == tasks.end())
+						Element *alloc = dynamic_cast<Element*>(*aiter);
+						producer_name = alloc->get_attribute_value("name");
+						string task_name = alloc->get_attribute_value("task");
+						producer_level = atoi(alloc->get_attribute_value("level").c_str());
+						producer_core = atoi(alloc->get_attribute_value("core").c_str()) - 1;
+						producer_type = Memory::stringToFeature(alloc->get_attribute_value("feature").c_str());
+
+						set<Task>::iterator i = tg.getTasks().find(Task(task_name));
+						if(i == tg.getTasks().end())
 						{
 							throw PelibException("Could not find producer task in task set");
 						}
+						producer = &*i;
+						const Task &myTaskRef = *i;
+						Task myTask = myTaskRef;
 					}
-					else if((*taskiter)->get_name().compare("consumer") == 0)
+					else if((*aiter)->get_name().compare("consumer") == 0)
 					{
-						Element *igraph_task = dynamic_cast<Element*>(*taskiter);
-						consumer_name = igraph_task->get_attribute_value("name");
-						string task_name = igraph_task->get_attribute_value("task");
-						consumer_level = atoi(igraph_task->get_attribute_value("level").c_str());
-						consumer_core = atoi(igraph_task->get_attribute_value("core").c_str()) - 1;
-						consumer_type = Buffer::stringToMemoryType(igraph_task->get_attribute_value("memory").c_str());
-						set<Task>::iterator i;
-						for(i = tasks.begin(); i != tasks.end(); i++)
-						{
-							if(i->getName().compare(task_name) == 0)
-							{
-								consumer = &*i;
-								break;
-							}
-						}
-						if(i == tasks.end())
+						Element *alloc = dynamic_cast<Element*>(*aiter);
+						consumer_name = alloc->get_attribute_value("name");
+						string task_name = alloc->get_attribute_value("task");
+						consumer_level = atoi(alloc->get_attribute_value("level").c_str());
+						consumer_core = atoi(alloc->get_attribute_value("core").c_str()) - 1;
+						consumer_type = Memory::stringToFeature(alloc->get_attribute_value("memory").c_str());
+
+						set<Task>::iterator i = tg.getTasks().find(Task(task_name));
+						if(i == tg.getTasks().end())
 						{
 							throw PelibException("Could not find consumer task in task set");
 						}
+						consumer = &*i;
 					}
-					else if((*taskiter)->get_name().compare("buffer") == 0)
+					else if((*aiter)->get_name().compare("buffer") == 0)
 					{
+						Element *alloc = dynamic_cast<Element*>(*aiter);
+						queueType = alloc->get_attribute_value("type").c_str();
+						queueHeader = alloc->get_attribute_value("header").c_str();
+						queueSize = atoi(alloc->get_attribute_value("size").c_str());
 
-						Element *iter = dynamic_cast<Element*>(*taskiter);
-						queueType = iter->get_attribute_value("type").c_str();
-						queueHeader = iter->get_attribute_value("header").c_str();
-						queueSize = atoi(iter->get_attribute_value("size").c_str());
-						queueCore = atoi(iter->get_attribute_value("core").c_str()) - 1;
-						queueMemory = Buffer::stringToMemoryType(iter->get_attribute_value("memory").c_str());
-						queueLevel = atoi(iter->get_attribute_value("level").c_str());
+						std::list<xmlpp::Node*> mems = (*aiter)->get_children();
+						for(std::list<xmlpp::Node*>::iterator miter = mems.begin(); miter != mems.end(); ++miter)
+						{
+							if((*miter)->get_name().compare("memory") == 0)
+							{
+								Element *memory = dynamic_cast<Element*>(*miter);
+								queueCore = atoi(memory->get_attribute_value("core").c_str()) - 1;
+								string memoryStr = memory->get_attribute_value("feature").c_str();
+								queueMemory = Memory::stringToFeature(memoryStr.c_str());
+								queueLevel = atoi(memory->get_attribute_value("level").c_str());
+							}
+						}
 					}
 				}
 
@@ -385,12 +349,33 @@ XMLSchedule::parse(istream &is) const
 					throw PelibException("Missing either reference to producer or consumer task in link");
 				}
 
-				Link link(*producer, *consumer, producer_name, consumer_name, Buffer(queueSize, queueType, queueMemory, queueLevel, queueCore), Buffer(0, "", producer_type, producer_level, producer_core), Buffer(0, "", consumer_type, consumer_level, consumer_core));
+				AbstractLink linkKey(*producer, *consumer, producer_name, consumer_name);
+				const set<AbstractLink> &allLinks = tg.getLinks();
+				set<AbstractLink>::const_iterator linkIter = allLinks.find(linkKey);
+				if(linkIter == allLinks.end())
+				{
+					throw PelibException("Link in schedule does not exist in taskgraph");
+				}
+				const AbstractLink &actualLink = *linkIter;
+				AllotedLink link(actualLink, Buffer(queueSize, queueType, queueHeader, Memory(queueMemory, queueLevel, queueCore)), Memory(producer_type, producer_level, producer_core), Memory(consumer_type, consumer_level, consumer_core));
 				links.insert(link);
 			}
 		}
-		
-		Schedule *sched = new Schedule(name, aut_name, schedule, tasks, links);
+	
+		// Now rebuild task set with the actual link set
+		Schedule::Table finalSchedule;
+		for(Schedule::Table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
+		{
+			set<ExecTask> core_schedule;
+			for(set<ExecTask>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
+			{
+				ExecTask task(j->getTask(), links, j->getFrequency(), task_width.find(pair<Task, unsigned int>(j->getTask(), j->getInstance()))->second, j->getStart(), j->getInstance());
+				core_schedule.insert(task);
+			}
+			finalSchedule.insert(pair<unsigned int, set<ExecTask>>(i->first, core_schedule));
+		}
+	
+		Schedule *sched = new Schedule(name, aut_name, finalSchedule, links, tg, pt);
 
 		return sched;
 	}
@@ -405,3 +390,4 @@ XMLSchedule::clone() const
 {
 	return new XMLSchedule();
 }
+

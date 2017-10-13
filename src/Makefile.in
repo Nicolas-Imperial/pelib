@@ -16,7 +16,7 @@
 # along with pelib. If not, see <http://www.gnu.org/licenses/>.
 #
 
-attach = pelib-scheduler
+attach = pelib-scheduler schedule-parse.hpp
 
 subdirs = 
 
@@ -70,7 +70,7 @@ AmplDataParser.cpp AmplDataOutput.cpp \
 AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp GraphML.cpp Schedule.cpp \
 AmplOutput.cpp AmplOutputData.cpp AmplOutputScalar.cpp AmplOutputVector.cpp AmplOutputSet.cpp AmplOutputMatrix.cpp \
 AlgebraRawOutput.cpp RawOutputData.cpp RawOutputMatrix.cpp RawOutputScalar.cpp RawOutputSet.cpp RawOutputVector.cpp \
-Task.cpp Link.cpp Buffer.cpp Taskgraph.cpp Schedule.cpp \
+Task.cpp AbstractLink.cpp AllotedLink.cpp Buffer.cpp Memory.cpp ExecTask.cpp Taskgraph.cpp Schedule.cpp \
 Platform.cpp Core.cpp DummyCore.cpp \
 DeadlineCalculator.cpp DeadlineFormula.cpp DeadlineConstant.cpp \
 AmplInput.cpp AmplInputData.cpp AmplInputScalar.cpp AmplInputVector.cpp AmplInputSet.cpp AmplInputMatrix.cpp \
@@ -82,12 +82,12 @@ RecordParser.cpp \
 \
 Solver.cpp AmplSolver.cpp \
 exprtk.cpp \
-argument_parsing.cpp dl.cpp
+argument_parsing.cpp dl.cpp schedule-parse.cpp
  
 core_src = sort.c complex.c float.c char.c integer.c string.c const_string.c string_integer.c monitor.c size_t.c pelib_string.c malloc.c
 
 ## executables
-bincxx_project = pelib-convert demo run_record
+bincxx_project = pelib demo run_record
 bincxx_package = $(if $(filter 1,$(CORE++_SHARED) $(CORE++_STATIC)),$(bincxx_project))
 
 #asan_cflags = -fsanitize=address
@@ -95,13 +95,13 @@ bincxx_package = $(if $(filter 1,$(CORE++_SHARED) $(CORE++_STATIC)),$(bincxx_pro
 asan_cflags = 
 asan_libs = 
 
-bincxx_pelib-convert_src = pelib-convert.cpp
-bin_pelib-convert_export = $(bincxx_pelib-convert_embed) $(bincxx_pelib-convert_src) 
-bin_pelib-convert_deps = libpelib-core++.so
-bin_pelib-convert_libs = -ldl -lpelib-core++ $(shared_pelib-core++_libs)
-bin_pelib-convert_pkg = $(shared_pelib-core++_pkg)
-bin_pelib-convert_ldflags = -L.
-bin_pelib-convert_static = 0
+bincxx_pelib_src = pelib.cpp
+bin_pelib_export = $(bincxx_pelib_embed) $(bincxx_pelib_src) 
+bin_pelib_deps = libpelib-core++.so
+bin_pelib_libs = -ldl -lpelib-core++ $(shared_pelib-core++_libs)
+bin_pelib_pkg = $(shared_pelib-core++_pkg)
+bin_pelib_ldflags = -L.
+bin_pelib_static = 0
 
 bincxx_demo_src = demo.cpp
 bin_demo_export = $(bincxx_demo_embed) $(bincxx_demo_src) 

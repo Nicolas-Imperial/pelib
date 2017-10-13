@@ -17,26 +17,29 @@
  along with Pelib. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <pelib/Task.hpp>
 #include <pelib/Buffer.hpp>
+#include <pelib/Memory.hpp>
+#include <pelib/Task.hpp>
 
-#ifndef PELIB_LINK
-#define PELIB_LINK
+#ifndef PELIB_ABSTRACT_LINK
+#define PELIB_ABSTRACT_LINK
 
 namespace pelib
 {
 	/** Model a link between tasks of a streaming application **/
-	class Link
+	class AbstractLink
 	{
 		public:
 			/** Constructor. Takes the producer and consumer tasks at both ends of the link **/
-			Link(const Task &producer, const Task &consumer, const std::string &producerName, const std::string &consumerName, const Buffer &queue, const Buffer &producer_buffer, const Buffer &consumer_buffer, size_t producer_rate = 0, size_t consumer_rate = 0);
+			AbstractLink(const Task &producer, const Task &consumer, const std::string &producerName, const std::string &consumerName, size_t producer_rate = 0, size_t consumer_rate = 0);
+			AbstractLink(const AbstractLink& link);
+			virtual ~AbstractLink();
 
 			/** Returns a pointer to the producer task **/
-			virtual Task* getProducer() const;
+			virtual const Task* getProducer() const;
 
 			/** Returns a pointer to the consumer task **/
-			virtual Task* getConsumer() const;
+			virtual const Task* getConsumer() const;
 
 			/** Returns a pointer to the producer task **/
 			virtual void setProducer(Task*);
@@ -48,13 +51,13 @@ namespace pelib
 				@param other Other link to compare this instance to
 			**/
 			virtual bool
-			operator<(const Link &other) const;
+			operator<(const AbstractLink &other) const;
 
 			/** Returns true if this instance is considered equivalent to another link
 				@param other Other link to be compared
 			**/
 	    		virtual bool
-			operator==(const Link &other) const;
+			operator==(const AbstractLink &other) const;
 
 			size_t
 			getProducerRate() const;
@@ -62,30 +65,50 @@ namespace pelib
 			size_t
 			getConsumerRate() const;
 
-			std::string
+			const std::string&
 			getDataType() const;
 
-			std::string
+			const std::string&
+			getHeader() const;
+
+			const std::string&
 			getProducerName() const;
 
-			std::string
+			const std::string&
 			getConsumerName() const;
 
-			const Buffer&
-			getQueueBuffer() const;
+
+			const AbstractLink&
+			getLink() const
+			{
+				return *this;
+			}
 
 			const Buffer&
-			getProducerBuffer() const;
+			getQueueBuffer() const
+			{
+				Buffer *buffer = new Buffer();
+				return *buffer;
+			}
 
-			const Buffer&
-			getConsumerBuffer() const;
-
+			const Memory&
+			getProducerMemory() const
+			{
+				Memory *mem = new Memory();
+				return *mem;
+			}
+			const Memory&
+			getConsumerMemory() const
+			{
+				Memory *mem = new Memory();
+				return *mem;
+			}	
 		protected:
 			/** Producer and consumer task pointers **/
-			Task *producer, *consumer;
+			const Task *producer, *consumer;
 			std::string producerName, consumerName;
 			size_t producer_rate, consumer_rate;
-			Buffer queueBuffer, producerBuffer, consumerBuffer;
+			std::string dataType, header;
 		private:		
 	};
 }

@@ -425,28 +425,31 @@ class Canvas
 			double startSize = this->getHeight() > this->getWidth() ? this->getHeight() : this->getWidth();
 			double fontSize = startSize;
 #warning Update this line to use all tasks in a schedule instead?
-			for(set<Task>::iterator i = sched->getUniqueTasks().begin(); i != sched->getUniqueTasks().end(); i++)
+			for(Schedule::Table::const_iterator i = sched->getSchedule().begin(); i != sched->getSchedule().end(); i++)
 			{
-				Task task = *i;
-				task.setWorkload(tg->getTasks().find(task)->getWorkload());
-				double runtime = task.runtime(i->getWidth(), i->getFrequency());
-				double width = i->getWidth();
-				string name;
-				if(useTaskName)
+				for(set<ExecTask>::iterator j = i->second.begin(); j != i->second.end(); j++)
 				{
-					name = i->getName();
-				}
-				else
-				{
-					stringstream ss;
-#warning Check if this reference should be to unique tasks set or to task multiset (taking instances into account)
-					ss << std::distance(sched->getUniqueTasks().begin(), i) + 1;
-					name = ss.str();
-				}
-				double idealSize = this->idealFontSize(runtime, width, name, startSize);
-				if(idealSize <= fontSize)
-				{
-					fontSize = idealSize;
+					ExecTask task = *j;
+					double runtime = task.getTask().runtime(task.getWidth(), task.getFrequency());
+					double width = j->getWidth();
+					string name;
+
+					if(useTaskName)
+					{
+						name = j->getTask().getName();
+					}
+					else
+					{
+						stringstream ss;
+	#warning Check if this reference should be to unique tasks set or to task multiset (taking instances into account)
+						ss << std::distance(sched->getTaskgraph().getTasks().begin(), sched->getTaskgraph().getTasks().find(task.getTask())) + 1;
+						name = ss.str();
+					}
+					double idealSize = this->idealFontSize(runtime, width, name, startSize);
+					if(idealSize <= fontSize)
+					{
+						fontSize = idealSize;
+					}
 				}
 			}
 
@@ -576,27 +579,27 @@ class Canvas
 
 			// Browse all tasks in schedule to draw them
 			map<Task, pair<size_t, size_t> > drawn;
-			for(Schedule::table::const_iterator i = sched->getSchedule().begin(); i != sched->getSchedule().end(); i++)
+			for(Schedule::Table::const_iterator i = sched->getSchedule().begin(); i != sched->getSchedule().end(); i++)
 			{
-				for(Schedule::sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
+				for(set<ExecTask>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 				{
 					// Checks the number of core already covered when drawing this task
-					Task task = *j->second.first;
+					const ExecTask &task = *j;
 					// done is the number of cores already drawn for the task
 					// next is the first core after what has been already drawn for the task
 					size_t done = 0, next = 1;
 					size_t core = i->first;
 
 					// Find the task in the list of task already partially drawn
-					if(drawn.find(task) != drawn.end())
+					if(drawn.find(task.getTask()) != drawn.end())
 					{
-						done = drawn.find(task)->second.first;
-						next = drawn.find(task)->second.second;
+						done = drawn.find(task.getTask())->second.first;
+						next = drawn.find(task.getTask())->second.second;
 
 						// Remove task from list only if it will run again
 						if(done < task.getWidth() && core >= next)
 						{
-							drawn.erase(drawn.find(task));
+							drawn.erase(drawn.find(task.getTask()));
 						}
 					}
 
@@ -605,26 +608,21 @@ class Canvas
 					// core computed last time the task was partially drawn
 					if(done < task.getWidth() && core >= next)
 					{
-						task.setWorkload(tg->getTasks().find(task)->getWorkload());
-						task.setMaxWidth(tg->getTasks().find(task)->getMaxWidth());
-						task.setEfficiencyString(tg->getTasks().find(task)->getEfficiencyString());
-						double runtime = task.runtime(task.getWidth(), task.getFrequency());
+						double runtime = task.getTask().runtime(task.getWidth(), task.getFrequency());
 
 						// Looks for the number of cores through the task can be drawn in a continuous manner
 						// Instead of the task's width, because mapping may not be to contiguous cores
 						size_t width = 0;
-						int counter = core - 1;
-						double start;
-						for(Schedule::table::const_iterator k = i; k != sched->getSchedule().end(); k++, counter++)
+						unsigned int counter = core - 1;
+						for(Schedule::Table::const_iterator k = i; k != sched->getSchedule().end(); k++, counter++)
 						{
 							bool task_found = false;
-							for(Schedule::sequence::const_iterator l = k->second.begin(); l != k->second.end(); l++)
+							for(set<ExecTask>::const_iterator l = k->second.begin(); l != k->second.end(); l++)
 							{
-								if(*l->second.first == task && k->first == counter + 1)
+								if(l->getTask() == task.getTask() && k->first == counter + 1)
 								{
 									width++;
-									task_found = true;;
-									start = l->first;
+									task_found = true;
 								}
 							}
 
@@ -633,21 +631,21 @@ class Canvas
 								break;
 							}
 						}
-						//double start = task.getStartTime();
+						double start = task.getStart();
 						string name;
 						if(useTaskName)
 						{
-							name = task.getName();
+							name = task.getTask().getName();
 						}
 						else
 						{
 							stringstream ss;
 #warning check if getTasks() or getUnique task should be used
-							ss << (std::distance(sched->getUniqueTasks().begin(), sched->getUniqueTasks().find(task)) + 1);
+							ss << (std::distance(sched->getTaskgraph().getTasks().begin(), sched->getTaskgraph().getTasks().find(task.getTask())) + 1);
 							name = ss.str();
 						}
 						this->drawTask(runtime, width, task.getFrequency(), start, core, name, show_task_id);
-						drawn.insert(pair<Task, pair<size_t, size_t> >(task, pair<size_t, size_t>(done + width, core + width)));
+						drawn.insert(pair<Task, pair<size_t, size_t> >(task.getTask(), pair<size_t, size_t>(done + width, core + width)));
 					}
 				}
 			}
@@ -659,7 +657,7 @@ class Canvas
 				this->drawBarrier(this->height - this->absthick);
 			}
 #else
-#warning You must compile cairo with SVG support for this schedule output to work.
+#error TetrisSchedule requires Cairo to support SVG
 #endif
 		}
 
@@ -827,20 +825,16 @@ TetrisSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 	double thickness = 0.02;
 	double magnify = 100;
 
-	Schedule::table schedule = sched->getSchedule();
+	Schedule::Table schedule = sched->getSchedule();
 
 	// Browse all tasks to find the time the last task stops	
 	double max_stop_time = 0;
-	for(Schedule::table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
+	for(Schedule::Table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 	{
-		for(Schedule::sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
+		for(set<ExecTask>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 		{
-			Task task = *j->second.first;
-			task.setWorkload(tg->getTasks().find(task)->getWorkload());
-			task.setMaxWidth(tg->getTasks().find(task)->getMaxWidth());
-			task.setEfficiencyString(tg->getTasks().find(task)->getEfficiencyString());
-			//double stop_time = task.getStartTime() + task.runtime(task.getWidth(), task.getFrequency());
-			double stop_time = j->first + task.runtime(task.getWidth(), task.getFrequency());
+			const ExecTask &task = *j;
+			double stop_time = j->getStart() + task.getTask().runtime(task.getWidth(), task.getFrequency());
 			if(stop_time > max_stop_time)
 			{
 				max_stop_time = stop_time;

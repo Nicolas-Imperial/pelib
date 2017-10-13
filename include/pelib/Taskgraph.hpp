@@ -23,7 +23,7 @@
 
 #include <pelib/Algebra.hpp>
 #include <pelib/Task.hpp>
-#include <pelib/Link.hpp>
+#include <pelib/AbstractLink.hpp>
 #include <pelib/Platform.hpp>
 
 extern "C"{
@@ -52,7 +52,7 @@ namespace pelib
 				@param tasks Set of tasks in the application
 				@param links Set of links between tasks in the application
 			**/
-			Taskgraph(const set<Task> &tasks, const set<Link> &links);
+			Taskgraph(const set<Task> &tasks, const set<AbstractLink> &links);
 			/** Constructor
 				@param algebra Algebraic representation of a streaming application
 			**/
@@ -105,11 +105,11 @@ namespace pelib
 			findTask(const string &taskId) const;
 
 			/** Gets all links between tasks in this application **/
-			virtual const set<Link>&
+			virtual const set<AbstractLink>&
 			getLinks() const;
 
 			/** Gets all links between tasks in this application **/
-			virtual set<Link>&
+			virtual set<AbstractLink>&
 			getLinks();
 
 			/** Copies all tasks and set links to task copies in the taskgraph instance that receives the assignment **/
@@ -119,10 +119,10 @@ namespace pelib
 		protected:
 			string name, deadlineCalculator;
 			set<Task> tasks;
-			set<Link> links;
+			set<AbstractLink> links;
 			
 			virtual void
-			setLinks(const set<Link> &link);
+			setLinks(const set<AbstractLink> &link);
 		private:		
 	};
 }

@@ -39,7 +39,7 @@ extern "C" {
 
 // /!\ the content of argv is freed after this function is run
 pelib::Record*
-pelib_parse(std::istream& cin, size_t argc, char **argv)
+pelib_parse(std::istream& cin, size_t argc, char **argv, const map<string, Record*> &input)
 {
 	Algebra data = AmplOutput(AmplOutput::floatHandlers()).parse(cin);
 	return new Taskgraph(data);
@@ -47,7 +47,7 @@ pelib_parse(std::istream& cin, size_t argc, char **argv)
 
 // /!\ the content of argv is freed after this function is run
 void
-pelib_dump(std::ostream& cout, std::map<const char*, Record*> records, size_t argc, char **argv)
+pelib_dump(std::ostream& cout, const std::map<string, Record*> &records, size_t argc, char **argv)
 {
 	Taskgraph* tg = (Taskgraph*)records.find(typeid(Taskgraph).name())->second;
 	Platform* pf = (Platform*)records.find(typeid(Platform).name())->second;

@@ -38,7 +38,7 @@ extern "C" {
 
 // /!\ the content of argv is freed after this function is run
 void
-pelib_dump(std::ostream& out, std::map<const char*, Record*> records, size_t argc, char **argv)
+pelib_dump(std::ostream& out, const std::map<string, Record*> &records, size_t argc, char **argv)
 {
 	//out.precision(6);
 	//out << std::ios::fixed;

@@ -43,7 +43,7 @@ extern "C" {
 
 // /!\ the content of argv is freed after this function is run
 pelib::Record*
-pelib_parse(std::istream& cin, size_t argc, char **argv)
+pelib_parse(std::istream& cin, size_t argc, char **argv, const map<string, Record*> &inputs)
 {
 	using namespace std;
 	using namespace pelib;
@@ -60,7 +60,7 @@ pelib_parse(std::istream& cin, size_t argc, char **argv)
 	Algebra data = ai.parse(cin);
 	const Matrix<int, int, float> *taskworkcomm = data.find<Matrix<int, int, float> >("taskworkcomm");
 	set<Task> tasks;
-	set<Link> links;
+	set<AbstractLink> links;
 
 	for(map<int, map<int, float> >::const_iterator i = taskworkcomm->getValues().begin(); i != taskworkcomm->getValues().end(); i++)
 	{

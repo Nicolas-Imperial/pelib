@@ -26,6 +26,8 @@
 #include <pelib/AmplInput.hpp>
 #include <pelib/Schedule.hpp>
 
+#include "schedule-parse.hpp"
+
 using namespace std;
 using namespace pelib;
 
@@ -41,9 +43,16 @@ extern "C" {
 
 // /!\ the content of argv is freed after this function is run
 pelib::Record*
-pelib_parse(std::istream& cin, size_t argc, char **argv)
+pelib_parse(std::istream& cin, size_t argc, char **argv, const map<string, Record*> &inputs)
 {
+	schedule_parse_args_t args = parse_arguments(argc, argv);
+	Taskgraph &tg = getTaskgraph(args.taskgraph, inputs);
+	Platform &pt = getPlatform(args.platform, inputs);
+
 	Algebra al = AmplInput(AmplInput::floatHandlers()).parse(cin);
+	al = al.merge(tg.buildAlgebra());
+	al = al.merge(pt.buildAlgebra());
+
 	Schedule *sched = new Schedule("Converted from Algebra", al);
 
 	return sched;
@@ -57,7 +66,7 @@ pelib_delete(Record* rec)
 
 // /!\ the content of argv is freed after this function is run
 void
-pelib_dump(std::ostream& cout, std::map<const char*, Record*> records, size_t argc, char **argv)
+pelib_dump(std::ostream& cout, const std::map<string, Record*> &records, size_t argc, char **argv)
 {
 	Schedule *sc = (Schedule*)records.find(typeid(Schedule).name())->second;
 	AmplInput(AmplInput::floatHandlers()).dump(cout, sc->buildAlgebra());

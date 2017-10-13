@@ -28,6 +28,7 @@
 #include <pelib/Set.hpp>
 #include <pelib/CastException.hpp>
 #include <pelib/PelibException.hpp>
+#include <pelib/Task.hpp>
 
 #ifdef debug
 #undef debug
@@ -39,13 +40,13 @@ using namespace std;
 
 namespace pelib
 {
-	Schedule::Schedule(const std::string &name, const std::string &appName, const table &schedule, const std::set<Task> &tasks, const std::set<Link> &links)
+	Schedule::Schedule(const std::string &name, const std::string &appName, const std::map<unsigned int, std::set<ExecTask> > &schedule, const std::set<AllotedLink> &links, const Taskgraph &application, const Platform &platform)
 	{
 		this->name = name;
 		this->appName = appName;
 	
 		// Copy taskgraph	
-		this->setSchedule(schedule, tasks, links);
+		this->setSchedule(schedule, links, application, platform);
 	}
 
 	Schedule::~Schedule()
@@ -54,65 +55,45 @@ namespace pelib
 	}
 
 	void
-	Schedule::setSchedule(const table &schedule, const set<Task> &task, const set<Link> &links)
+	Schedule::setSchedule(const Table &schedule, const std::set<AllotedLink> &links, const Taskgraph &application, const Platform &platform)
 	{
-		this->schedule = Schedule::table();
-		this->tasks.clear();
-		this->core_tasks.clear();
-		this->links = links;
+		// First copy taskgraph and platform
+		this->taskgraph = application;
+		this->platform = platform;
 
-		for(table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
+		this->schedule = Schedule::Table();
+		this->links = set<AllotedLink>();
+
+		for(set<AllotedLink>::iterator i = links.begin(); i != links.end(); i++)
 		{
-			set<const Task*> this_core_tasks;
-			sequence new_sequence;
-			for(sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
+			set<AbstractLink>::const_iterator link = this->getTaskgraph().getLinks().find(i->getLink());
+			if(link == this->getTaskgraph().getLinks().end())
 			{
-				const Task *task = j->second.first;
-				Task t = *task;
-				this->tasks.insert(t);
-				const Task &task_ref = *(this->getUniqueTasks().find(t));
-				pair<float, work> new_pair = pair<float, work>(j->first, work(&task_ref, j->second.second));
-				new_sequence.insert(new_pair);
-
-				// Insert a reference to this task in the core's task list
-				this_core_tasks.insert(&task_ref);
+				throw PelibException("Schedule contains a link that does not exists in taskgraph");
 			}
+			AllotedLink allotedLink(*link, i->getQueueBuffer(), i->getProducerMemory(), i->getConsumerMemory());
 
-			this->schedule.insert(pair<int, sequence>(i->first, new_sequence));
+			this->links.insert(allotedLink);
 
-			// Add the tasks list to the list of lists of tasks
-			this->core_tasks.insert(pair<int, set<const Task*> >(i->first, this_core_tasks));
-		}
-
-		for(set<Link>::iterator i = this->links.begin(); i != this->links.end(); i++)
+		// Copy schedule with all exec task refering to tasks within internal copy of taskgraph
+		for(Table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 		{
-			Link &link = (Link&)*i;
-			bool producer_found = false, consumer_found = false;
-
-			for(set<Task>::iterator j = this->tasks.begin(); j != this->tasks.end(); j++)
+			set<ExecTask> core_schedule;
+			for(set<ExecTask>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 			{
-				const Task &task = *j;
-				if(link.getProducer()->getName().compare(task.getName()) == 0)
+				set<Task>::const_iterator task = this->getTaskgraph().getTasks().find(j->getTask());
+				if(task == this->getTaskgraph().getTasks().end())
 				{
-					link.setProducer((Task*)&task);
-					producer_found = true;
+					throw PelibException("Schedule contains a task that does not exists in taskgraph");
 				}
 				
-				if(link.getConsumer()->getName().compare(task.getName()) == 0)
-				{
-					link.setConsumer((Task*)&task);
-					consumer_found = true;
-				}
+				const ExecTask execTask(*task, this->links, j->getFrequency(), j->getWidth(), j->getStart(), j->getInstance());
+				core_schedule.insert(execTask);
 			}
 
-			if(!producer_found)
-			{
-				PelibException("Could not find link producer task in task set");
-			}
-			if(!consumer_found)
-			{
-				PelibException("Could not find link consumer task in task set");
-			}
+			this->schedule.insert(pair<unsigned int, set<ExecTask> >(i->first, core_schedule));
+		}
+
 		}
 	}
 
@@ -130,8 +111,7 @@ namespace pelib
 	{
 		this->name = src.getName();
 		this->appName = src.getName();
-		this->tasks = src.getUniqueTasks();
-		this->setSchedule(src.getSchedule(), src.tasks, src.getLinks());
+		this->setSchedule(src.getSchedule(), src.getLinks(), src.getTaskgraph(), src.getPlatform());
 	}
 
 	void
@@ -144,21 +124,14 @@ namespace pelib
 		const Vector<int, float> *start = algebra.find<Vector<int, float> >("start");
 		const Vector<int, float> *wi = algebra.find<Vector<int, float> >("wi");
 		const Matrix<int, int, float> *sched = algebra.find<Matrix<int, int, float> >("schedule");
-		const Scalar<float> *f_unit_scalar = algebra.find<Scalar<float> >("Funit");
-		float f_unit;
-		if(f_unit_scalar == NULL)
-		{
-			f_unit = 1;
-		}
-		else
-		{
-			f_unit = f_unit_scalar->getValue();
-		}
 		const Vector<int, float> *freq = algebra.find<Vector<int, float> >("frequency");
 		const Vector<int, string> *task_name = algebra.find<Vector<int, string> >("name");
 
-		table schedule;
-		set<Task> tasks;
+		Taskgraph taskgraph = Taskgraph(algebra);
+		Platform platform = Platform(algebra);
+
+		Table schedule;
+		set<ExecTask> tasks;
 	
 		if(start == NULL || tau == NULL || wi == NULL || sched == NULL || freq == NULL || task_name == NULL)
 		{
@@ -168,7 +141,7 @@ namespace pelib
 		{
 			for(map<int, map<int, float> >::const_iterator i = sched->getValues().begin(); i != sched->getValues().end(); i++)
 			{
-				sequence core_schedule;
+				set<ExecTask> core_schedule;
 				
 				for(map<int, float>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 				{
@@ -186,42 +159,33 @@ namespace pelib
 							task_str = string(task_name->getValues().find((int)j->second)->second);
 						}
 
-						tasks.insert(Task(task_str));
-						Task &task = (Task&)*tasks.find(task_str);
-						task.setModule("dummy");
+						set<Task>::const_iterator task_iter = this->getTaskgraph().getTasks().find(Task(task_str));
+						if(task_iter == this->getTaskgraph().getTasks().end())
+						{
+							throw PelibException("Schedule contains a task id that does not exist in taskgraph");
+						}
+						const Task &task = *task_iter;
 
 						if(task.getWorkload() > 0)
 						{
-							task.setWidth(wi->getValues().find((int)floor(j->second))->second);
-							task.setFrequency(freq->getValues().find((int)floor(j->second))->second * f_unit);
-							task.setWorkload(tau->getValues().find((int)floor(j->second))->second);
-							float start_time = start->getValues().find((int)j->second)->second;
-							//task.setStartTime(start->getValues().find((int)j->second)->second);
-							core_schedule.insert(pair<float, work>(start_time, work(&task, tau->getValues().find((int)floor(j->second))->second)));
+							// TODO: ?? How does the compiler even accept this?
+							Task exec(task);
+							core_schedule.insert(exec);
 						}
 					}
 				}
 
-				schedule.insert(pair<int, sequence>(i->first - 1, core_schedule));
+				schedule.insert(pair<unsigned int, set<ExecTask>>(i->first - 1, core_schedule));
 			}
 		}
 
-		for(Schedule::table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
-		{
-			for(Schedule::sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
-			{
-				string taskid = j->second.first->getName();
-			}
-		}
-
-		this->tasks = tasks;
-		this->setSchedule(schedule, tasks, set<Link>());
+		this->setSchedule(schedule, set<AllotedLink>(), taskgraph, platform);
 	}
 	
 	Schedule*
 	Schedule::clone() const
 	{
-		Schedule *clone = new Schedule(this->getName(), this->getName(), this->getSchedule(), this->tasks, this->getLinks());
+		Schedule *clone = new Schedule(this->getName(), this->getName(), this->getSchedule(), this->getLinks(), this->getTaskgraph(), this->getPlatform());
 
 		return clone;
 	}
@@ -232,41 +196,40 @@ namespace pelib
 		Algebra algebra;
 		
 		map<string, int> taskid2id; 
-		for(table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
+		for(Table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 		{
-			for(sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
+			for(set<ExecTask>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 			{
-				taskid2id.insert(pair<string, int>(j->second.first->getName(), std::distance(this->getUniqueTasks().begin(), this->getUniqueTasks().find(*j->second.first)) + 1));
+				taskid2id.insert(pair<string, int>(j->getTask().getName(), std::distance(this->getTaskgraph().getTasks().begin(), this->getTaskgraph().getTasks().find(j->getTask())) + 1));
 			}
 		}
 
 		map<int, map<int, float> > sched;
 		map<int, float> frequencies, start;
-		table schedule = getSchedule();
+		Table schedule = getSchedule();
 
 		size_t ordering, max_tasks = 0;
-		for(table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
+		for(Table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 		{
 			map<int, float> schedule_row;
 			int core = i->first;
 	
 			ordering = 0;
-			for(sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++, ordering++)
+			for(set<ExecTask>::const_iterator j = i->second.begin(); j != i->second.end(); j++, ordering++)
 			{
-				int id = taskid2id.find(j->second.first->getName())->second;
+				int id = taskid2id.find(j->getTask().getName())->second;
 				schedule_row.insert(pair<int, int>(ordering, id));
-				frequencies.insert(pair<int, float>(id, j->second.first->getFrequency()));
+				frequencies.insert(pair<int, float>(id, j->getFrequency()));
 
 				max_tasks = ordering > max_tasks ? ordering : max_tasks;
-				//start.insert(pair<int, float>(std::distance(this->getUniqueTasks().begin(), this->getUniqueTasks().find(j->second.first->getName())), j->second.first->getStartTime())); 
-				start.insert(pair<int, float>(std::distance(this->getUniqueTasks().begin(), this->getUniqueTasks().find(j->second.first->getName())), j->first)); 
+				start.insert(pair<int, float>(std::distance(this->getTaskgraph().getTasks().begin(), this->getTaskgraph().getTasks().find(j->getTask().getName())), j->getStart())); 
 			}
 
 			sched.insert(pair<int, map<int, float> >(core, schedule_row));
 		}
 
 		// pad with 0
-		for(table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
+		for(Table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 		{
 			size_t base = i->second.size();
 			for(ordering = base; ordering < max_tasks; ordering++)
@@ -282,8 +245,22 @@ namespace pelib
 		algebra.insert(&ampl_schedule);
 		algebra.insert(&ampl_frequencies);
 		algebra.insert(&ampl_start);
+		algebra = algebra.merge(this->getTaskgraph().buildAlgebra());
+		algebra = algebra.merge(this->getPlatform().buildAlgebra());
 
 		return algebra;
+	}
+
+	const Taskgraph&
+	Schedule::getTaskgraph() const
+	{
+		return this->taskgraph;
+	}
+
+	const Platform&
+	Schedule::getPlatform() const
+	{
+		return this->platform;
 	}
 
 	std::string
@@ -298,23 +275,23 @@ namespace pelib
 		return this->appName;
 	}
 
-	const Schedule::table&
+	const Schedule::Table&
 	Schedule::getSchedule() const
 	{
 		return schedule;
 	}
 	
-	const set<Task>&
-	Schedule::getUniqueTasks() const
-	{
-		return this->tasks;
-	}
-
 	const Task&
 	Schedule::getTask(int id) const
 	{
-		set<Task>::const_iterator it = this->getUniqueTasks().begin();
+		
+		set<Task>::const_iterator it = this->getTaskgraph().getTasks().begin();
 		std::advance(it, id - 1);
+		if(it == this->getTaskgraph().getTasks().end())
+		{
+			throw PelibException("Requested task by integer index beyond the number of task available in taskgraph");
+		}
+
 		return *it;
 	}
 
@@ -323,44 +300,46 @@ namespace pelib
 	{
 		this->name = name;
 		this->appName = appName;
-#warning Update this line when non-unique task set is implemented
-		this->tasks = copy.getUniqueTasks();
-		this->links = copy.getLinks();
 	
 		// Copy taskgraph	
-		this->setSchedule(schedule, tasks, links);
+		this->setSchedule(schedule, copy.getLinks(), copy.getTaskgraph(), copy.getPlatform());
 
 		return *this;
 	}
 
-	const set<Link>&
+	const set<AllotedLink>&
 	Schedule::getLinks() const
 	{
 		return this->links;
 	}
 
-	const set<const Task*>&
-	Schedule::getTasks(int core) const
+	const set<ExecTask>&
+	Schedule::getTasks(unsigned int core) const
 	{
-		return this->core_tasks.find(core)->second;
+		map<unsigned int, set<ExecTask>>::const_iterator i = this->schedule.find(core);
+		if(i == this->schedule.end())
+		{
+			throw PelibException("Requested core id that does not exist in schedule");
+		}
+		return i->second;
 	}
 
 	set<const Task*>
-	Schedule::getTasksSharedMemoryIsland(const set<int>& islands, const Platform &pt) const
+	Schedule::tasksSharedMemoryIsland(const set<unsigned int>& islands) const
 	{
 		set<const Task*> tasks;
 
-		for(set<int>::const_iterator i = islands.begin(); i != islands.end(); i++)
+		for(set<unsigned int>::const_iterator i = islands.begin(); i != islands.end(); i++)
 		{
-			Platform::islands::const_iterator ii = pt.getSharedMemoryIslands().begin();
+			Platform::islands::const_iterator ii = this->getPlatform().getSharedMemoryIslands().begin();
 			std::advance(ii, *i - 1);
 
 			for(Platform::island::const_iterator j = ii->begin(); j != ii->end(); j++)
 			{
-				size_t core_id = std::distance(pt.getCores().begin(), pt.getCores().find(*j)) + 1;
-				for(set<const Task*>::const_iterator k = this->getTasks((int)core_id).begin(); k !=  this->getTasks((int)core_id).end(); k++)
+				size_t core_id = std::distance(this->getPlatform().getCores().begin(), this->getPlatform().getCores().find(*j)) + 1;
+				for(set<ExecTask>::const_iterator k = this->getTasks((unsigned int)core_id).begin(); k != this->getTasks((int)core_id).end(); k++)
 				{
-					tasks.insert(*k);
+					tasks.insert(&k->getTask());
 				}
 			}
 		}
@@ -369,49 +348,51 @@ namespace pelib
 	}
 
 	multiset<const Task*>
-	Schedule::getRemoteSharedMemoryIslandProducers(const set<int> &islands, const Taskgraph &tg, const Platform &pt) const
+	Schedule::remoteSharedMemoryIslandProducers(const set<unsigned int> &islands) const
 	{
+		const Taskgraph &tg = this->getTaskgraph();
+		const Platform &pt = this->getPlatform();
 		multiset<const Task*> producers;
-		for(set<int>::const_iterator i = islands.begin(); i != islands.end(); i++)
+		for(set<unsigned int>::const_iterator i = islands.begin(); i != islands.end(); i++)
 		{
-			if(*i > (int)pt.getSharedMemoryIslands().size())
+			if(*i > pt.getSharedMemoryIslands().size())
 			{
 				throw CastException("Requested shared memory islands not existing in platform.");
 			}
 		}
 
-		set<const Task*> tasks_in_islands = this->getTasksSharedMemoryIsland(islands, pt);
+		set<const Task*> tasks_in_islands = this->tasksSharedMemoryIsland(islands);
 		for(set<const Task*>::const_iterator i = tasks_in_islands.begin(); i != tasks_in_islands.end(); i++)
 		{
-			const Task *task_p = *i;
-			if(tg.getTasks().find(*task_p) == tg.getTasks().end())
+			const Task &task_p = **i;
+			if(tg.getTasks().find(task_p) == tg.getTasks().end())
 			{
 				stringstream ss;
-				ss << "Cannot find task \"" << task_p->getName() << "\" in taskgraph.";
+				ss << "Cannot find task \"" << task_p.getName() << "\" in taskgraph.";
 				throw CastException(ss.str());
 			}
-			const Task &task_tg = *tg.getTasks().find(*task_p);
-			set<int> consumer_cores = this->getCores(task_tg);
-			set<int>::const_iterator j = consumer_cores.begin();
-			Platform::islands consumer_core_islands = pt.getSharedMemoryIslands(*j);
+			const Task &task_tg = task_p;
+			set<unsigned int> consumer_cores = this->cores(task_tg);
+			set<unsigned int>::const_iterator j = consumer_cores.begin();
+			Platform::islands consumer_core_islands = pt.sharedMemoryIslands(*j);
 			for(; j != consumer_cores.end(); j++)
 			{
-				if(pt.getSharedMemoryIslands(*j) != consumer_core_islands)
+				if(pt.sharedMemoryIslands(*j) != consumer_core_islands)
 				{
 					throw CastException("Task mapped to cores that belong to different shared memory islands.");
 				}	
 			}
 			
-			for(set<const Link*>::const_iterator j = task_tg.getProducers().begin(); j != task_tg.getProducers().end(); j++)
+			for(set<const AbstractLink*>::const_iterator j = task_tg.getProducers().begin(); j != task_tg.getProducers().end(); j++)
 			{
-				const Link *l = *j;
-				const Task *producer = l->getProducer();
-				set<int> producer_cores = this->getCores(*producer);
-				set<int>::const_iterator k = producer_cores.begin();
-				Platform::islands producer_core_islands = pt.getSharedMemoryIslands(*k);
+				const AbstractLink &l = **j;
+				const Task &producer = *l.getProducer();
+				set<unsigned int> producer_cores = this->cores(producer);
+				set<unsigned int>::const_iterator k = producer_cores.begin();
+				Platform::islands producer_core_islands = pt.sharedMemoryIslands(*k);
 				for(; k != producer_cores.end(); k++)
 				{
-					if(pt.getSharedMemoryIslands(*k) != producer_core_islands)
+					if(pt.sharedMemoryIslands(*k) != producer_core_islands)
 					{
 						throw CastException("Task mapped to cores that belong to different shared memory islands.");
 					}	
@@ -419,7 +400,7 @@ namespace pelib
 
 				if(consumer_core_islands != producer_core_islands)
 				{
-					producers.insert(producer);
+					producers.insert(&producer);
 				}
 			}
 		}
@@ -428,10 +409,12 @@ namespace pelib
 	}
 
 	multiset<const Task*>
-	Schedule::getRemoteSharedMemoryIslandTaskProducers(const Task &t, const Taskgraph &tg, const Platform &pt) const
+	Schedule::remoteSharedMemoryIslandTaskProducers(const Task &t) const
 	{
+		const Taskgraph &tg = this->getTaskgraph();
+		const Platform &pt = this->getPlatform();
 		multiset<const Task*> producers;
-		if(this->getUniqueTasks().find(t) == this->getUniqueTasks().end())
+		if(this->getTaskgraph().getTasks().find(t) == this->getTaskgraph().getTasks().end())
 		{
 			stringstream ss;
 			ss << "Task \"" << t.getName() << "\" does not figure in schedule.";
@@ -446,28 +429,28 @@ namespace pelib
 		}
 
 		const Task &task_tg = *tg.getTasks().find(t);
-		set<int> consumer_cores = this->getCores(task_tg);
-		set<int>::const_iterator j = consumer_cores.begin();
-		Platform::islands consumer_core_islands = pt.getSharedMemoryIslands(*j);
+		set<unsigned int> consumer_cores = this->cores(task_tg);
+		set<unsigned int>::const_iterator j = consumer_cores.begin();
+		Platform::islands consumer_core_islands = pt.sharedMemoryIslands(*j);
 		for(; j != consumer_cores.end(); j++)
 		{
-			if(pt.getSharedMemoryIslands(*j) != consumer_core_islands)
+			if(pt.sharedMemoryIslands(*j) != consumer_core_islands)
 			{
 				throw CastException("Task mapped to cores that belong to different shared memory islands.");
 			}	
 		}
 	
-		for(set<const Link*>::const_iterator j = task_tg.getProducers().begin(); j != task_tg.getProducers().end(); j++)
+		for(set<const AbstractLink*>::const_iterator j = task_tg.getProducers().begin(); j != task_tg.getProducers().end(); j++)
 		{
-			const Link *l = *j;
-			const Task *producer = l->getProducer();
-			set<int> producer_cores = this->getCores(*producer);
-			set<int>::const_iterator k = producer_cores.begin();
+			const AbstractLink &l = **j;
+			const Task &producer = *l.getProducer();
+			set<unsigned int> producer_cores = this->cores(producer);
+			set<unsigned int>::const_iterator k = producer_cores.begin();
 
-			Platform::islands producer_core_islands = pt.getSharedMemoryIslands(*k);
+			Platform::islands producer_core_islands = pt.sharedMemoryIslands(*k);
 			for(; k != producer_cores.end(); k++)
 			{
-				if(pt.getSharedMemoryIslands(*k) != producer_core_islands)
+				if(pt.sharedMemoryIslands(*k) != producer_core_islands)
 				{
 					throw CastException("Task mapped to cores that belong to different shared memory islands.");
 				}	
@@ -475,7 +458,7 @@ namespace pelib
 
 			if(consumer_core_islands != producer_core_islands)
 			{
-				producers.insert(producer);
+				producers.insert(&producer);
 			}
 		}
 
@@ -483,8 +466,10 @@ namespace pelib
 	}
 
 	multiset<const Task*>
-	Schedule::getRemoteTaskConsumers(const Task &t, const Taskgraph &tg, const Platform &pt) const
+	Schedule::remoteTaskConsumers(const Task &t) const
 	{
+		const Taskgraph &tg = this->getTaskgraph();
+
 		set<Task>::const_iterator iter = tg.getTasks().find(t);
 		if(iter == tg.getTasks().end())
 		{
@@ -493,12 +478,12 @@ namespace pelib
 		const Task &task = *iter;	
 
 		multiset<const Task*> consumers;
-		for(set<const Link*>::const_iterator j = task.getConsumers().begin(); j != task.getConsumers().end(); j++)
+		for(set<const AbstractLink*>::const_iterator j = task.getConsumers().begin(); j != task.getConsumers().end(); j++)
 		{
-			const Task *consumer = (*j)->getConsumer();
-			if(this->getCores(t) != this->getCores(*consumer))
+			const Task &consumer = *(*j)->getConsumer();
+			if(this->cores(t) != this->cores(consumer))
 			{
-				consumers.insert(consumer);
+				consumers.insert(&consumer);
 			}
 		}
 	
@@ -506,22 +491,24 @@ namespace pelib
 	}
 
 	multiset<const Task*>
-	Schedule::getRemoteTaskProducers(const Task &t, const Taskgraph &tg, const Platform &pt) const
+	Schedule::remoteTaskProducers(const Task &t) const
 	{
+		const Taskgraph &tg = this->getTaskgraph();
+
 		set<Task>::const_iterator iter = tg.getTasks().find(t);
-		if(iter == tg.getTasks().end())
+		if(iter == tg.getTasks().cend())
 		{
 			throw PelibException("Task in schedule does not exist in taskgraph.");
 		}
 		const Task &task = *iter;	
 
 		multiset<const Task*> producers;
-		for(set<const Link*>::const_iterator j = task.getProducers().begin(); j != task.getProducers().end(); j++)
+		for(set<const AbstractLink*>::const_iterator j = task.getProducers().begin(); j != task.getProducers().end(); j++)
 		{
-			const Task *producer = (*j)->getProducer();
-			if(this->getCores(t) != this->getCores(*producer))
+			const Task &producer = *(*j)->getProducer();
+			if(this->cores(t) != this->cores(producer))
 			{
-				producers.insert(producer);
+				producers.insert(&producer);
 			}
 		}
 	
@@ -529,44 +516,46 @@ namespace pelib
 	}
 
 	multiset<const Task*>
-	Schedule::getRemoteConsumers(int core, const Taskgraph &tg, const Platform &pt) const
+	Schedule::remoteConsumers(unsigned int core) const
 	{
-		multiset<const Link*> links = getRemoteConsumersLink(core, tg, pt);
+		multiset<const AbstractLink*> links = remoteConsumersAbstractLink(core);
 		multiset<const Task*> tasks;
-		for(multiset<const Link*>::iterator i = links.begin(); i != links.end(); i++)
+		for(multiset<const AbstractLink*>::iterator i = links.begin(); i != links.end(); i++)
 		{
-			const Link* link = *i;
-			tasks.insert(link->getConsumer());
+			const AbstractLink &link = **i;
+			tasks.insert(link.getConsumer());
 		}
 
 		return tasks;
 	}
 
-	multiset<const Link*>
-	Schedule::getRemoteConsumersLink(int core, const Taskgraph &tg, const Platform &pt) const
+	multiset<const AbstractLink*>
+	Schedule::remoteConsumersAbstractLink(unsigned int core) const
 	{
-		table::const_iterator iter = this->getSchedule().find(core);
+		const Taskgraph &tg = this->getTaskgraph();
+
+		Table::const_iterator iter = this->getSchedule().find(core);
 		if(iter == this->getSchedule().end())
 		{
 			throw PelibException("Cannot find requested core in schedule");
 		}
 
-		const sequence &seq = iter->second;
+		const set<ExecTask> &seq = iter->second;
 
-		multiset<const Link*> consumers;
-		for(sequence::const_iterator i = seq.begin(); i != seq.end(); i++)
+		multiset<const AbstractLink*> consumers;
+		for(set<ExecTask>::const_iterator i = seq.begin(); i != seq.end(); i++)
 		{
-			set<Task>::const_iterator iter = tg.getTasks().find(*i->second.first);
+			set<Task>::const_iterator iter = tg.getTasks().find(i->getTask());
 			if(iter == tg.getTasks().end())
 			{
 				throw PelibException("Task in schedule does not exist in taskgraph.");
 			}
 			const Task &task = *iter;	
 
-			for(set<const Link*>::const_iterator j = task.getConsumers().begin(); j != task.getConsumers().end(); j++)
+			for(set<const AbstractLink*>::const_iterator j = task.getConsumers().begin(); j != task.getConsumers().end(); j++)
 			{
-				const Task *consumer = (*j)->getConsumer();
-				if(this->getCores(*i->second.first) != this->getCores(*consumer))
+				const Task &consumer = *(*j)->getConsumer();
+				if(this->cores(i->getTask()) != this->cores(consumer))
 				{
 					consumers.insert(*j);
 				}
@@ -576,59 +565,61 @@ namespace pelib
 		return consumers;
 	}
 
-	multimap<const Task*, const Link*>
-	Schedule::getRemoteConsumersTaskLink(int core, const Taskgraph &tg, const Platform &pt) const
+	multimap<const Task*, const AbstractLink*>
+	Schedule::remoteConsumersTaskAbstractLink(unsigned int core) const
 	{
-		multiset<const Link*> links = getRemoteConsumersLink(core, tg, pt);
-		multimap<const Task*, const Link*> tasklink;
-		for(multiset<const Link*>::iterator i = links.begin(); i != links.end(); i++)
+		multiset<const AbstractLink*> links = remoteConsumersAbstractLink(core);
+		multimap<const Task*, const AbstractLink*> tasklink;
+		for(multiset<const AbstractLink*>::iterator i = links.begin(); i != links.end(); i++)
 		{
-			const Link* link = *i;
-			tasklink.insert(pair<const Task*, const Link*>(link->getConsumer(), *i));
+			const AbstractLink &link = **i;
+			tasklink.insert(pair<const Task*, const AbstractLink*>(link.getConsumer(), *i));
 		}
 
 		return tasklink;
 	}
 
 	multiset<const Task*>
-	Schedule::getRemoteProducers(int core, const Taskgraph &tg, const Platform &pt) const
+	Schedule::remoteProducers(unsigned int core) const
 	{
-		multiset<const Link*> links = getRemoteProducersLink(core, tg, pt);
+		multiset<const AbstractLink*> links = remoteProducersAbstractLink(core);
 		multiset<const Task*> tasks;
-		for(multiset<const Link*>::iterator i = links.begin(); i != links.end(); i++)
+		for(multiset<const AbstractLink*>::iterator i = links.begin(); i != links.end(); i++)
 		{
-			const Link* link = *i;
-			tasks.insert(link->getProducer());
+			const AbstractLink &link = **i;
+			tasks.insert(link.getProducer());
 		}
 
 		return tasks;
 	}
 
-	multiset<const Link*>
-	Schedule::getRemoteProducersLink(int core, const Taskgraph &tg, const Platform &pt) const
+	multiset<const AbstractLink*>
+	Schedule::remoteProducersAbstractLink(unsigned int core) const
 	{
-		table::const_iterator iter = this->getSchedule().find(core);
+		const Taskgraph &tg = this->getTaskgraph();
+
+		Table::const_iterator iter = this->getSchedule().find(core);
 		if(iter == this->getSchedule().end())
 		{
 			throw PelibException("Cannot find requested core in schedule");
 		}
 
-		const sequence &seq = iter->second;
+		const set<ExecTask> &seq = iter->second;
 
-		multiset<const Link*> producers;
-		for(sequence::const_iterator i = seq.begin(); i != seq.end(); i++)
+		multiset<const AbstractLink*> producers;
+		for(set<ExecTask>::const_iterator i = seq.begin(); i != seq.end(); i++)
 		{
-			set<Task>::const_iterator iter = tg.getTasks().find(*i->second.first);
+			set<Task>::const_iterator iter = tg.getTasks().find(i->getTask());
 			if(iter == tg.getTasks().end())
 			{
 				throw PelibException("Task in schedule does not exist in taskgraph.");
 			}
-			const Task &task = *iter;	
+			const Task &task = *iter;
 
-			for(set<const Link*>::const_iterator j = task.getProducers().begin(); j != task.getProducers().end(); j++)
+			for(set<const AbstractLink*>::const_iterator j = task.getProducers().begin(); j != task.getProducers().end(); j++)
 			{
-				const Task *producer = (*j)->getProducer();
-				if(this->getCores(*i->second.first) != this->getCores(*producer))
+				const Task &producer = *(*j)->getProducer();
+				if(this->cores(i->getTask()) != this->cores(producer))
 				{
 					producers.insert(*j);
 				}
@@ -638,65 +629,68 @@ namespace pelib
 		return producers;
 	}
 
-	multimap<const Task*, const Link*>
-	Schedule::getRemoteProducersTaskLink(int core, const Taskgraph &tg, const Platform &pt) const
+	multimap<const Task*, const AbstractLink*>
+	Schedule::remoteProducersTaskAbstractLink(unsigned int core) const
 	{
-		multiset<const Link*> links = getRemoteProducersLink(core, tg, pt);
-		multimap<const Task*, const Link*> tasklink;
-		for(multiset<const Link*>::iterator i = links.begin(); i != links.end(); i++)
+		multiset<const AbstractLink*> links = remoteProducersAbstractLink(core);
+		multimap<const Task*, const AbstractLink*> tasklink;
+		for(multiset<const AbstractLink*>::iterator i = links.begin(); i != links.end(); i++)
 		{
-			const Link* link = *i;
-			tasklink.insert(pair<const Task*, const Link*>(link->getProducer(), *i));
+			const AbstractLink &link = **i;
+			tasklink.insert(pair<const Task*, const AbstractLink*>(link.getProducer(), *i));
 		}
 
 		return tasklink;
 	}
 
 	multiset<const Task*>
-	Schedule::getRemoteSharedMemoryIslandConsumers(const set<int> &islands, const Taskgraph &tg, const Platform &pt) const
+	Schedule::remoteSharedMemoryIslandConsumers(const set<unsigned int> &islands) const
 	{
+		const Taskgraph &tg = this->getTaskgraph();
+		const Platform &pt = this->getPlatform();
+
 		multiset<const Task*> consumers;
-		for(set<int>::const_iterator i = islands.begin(); i != islands.end(); i++)
+		for(set<unsigned int>::const_iterator i = islands.begin(); i != islands.end(); i++)
 		{
-			if(*i > (int)pt.getSharedMemoryIslands().size())
+			if(*i > pt.getSharedMemoryIslands().size())
 			{
 				throw CastException("Requested shared memory islands not existing in platform.");
 			}
 		}
 
-		set<const Task*> tasks_in_islands = this->getTasksSharedMemoryIsland(islands, pt);
+		set<const Task*> tasks_in_islands = this->tasksSharedMemoryIsland(islands);
 		for(set<const Task*>::const_iterator i = tasks_in_islands.begin(); i != tasks_in_islands.end(); i++)
 		{
-			const Task *task_p = *i;
-			if(tg.getTasks().find(*task_p) == tg.getTasks().end())
+			const Task &task_p = **i;
+			if(tg.getTasks().find(task_p) == tg.getTasks().end())
 			{
 				stringstream ss;
-				ss << "Trying to schedule task \"" << task_p->getName() << "\" that does not exist in taskgraph.";
+				ss << "Trying to schedule task \"" << task_p.getName() << "\" that does not exist in taskgraph.";
 				throw CastException(ss.str());
 			}
-			const Task &task_tg = *tg.getTasks().find(*task_p);
-			set<int> producer_cores = this->getCores(task_tg);
-			set<int>::const_iterator j = producer_cores.begin();
-			Platform::islands producer_core_islands = pt.getSharedMemoryIslands(*j);
+			const Task &task_tg = *tg.getTasks().find(task_p);
+			set<unsigned int> producer_cores = this->cores(task_tg);
+			set<unsigned int>::const_iterator j = producer_cores.begin();
+			Platform::islands producer_core_islands = pt.sharedMemoryIslands(*j);
 			for(; j != producer_cores.end(); j++)
 			{
-				if(pt.getSharedMemoryIslands(*j) != producer_core_islands)
+				if(pt.sharedMemoryIslands(*j) != producer_core_islands)
 				{
 					throw CastException("Task mapped to cores that belong to different shared memory islands.");
 				}	
 			}
 			
-			for(set<const Link*>::const_iterator j = task_tg.getConsumers().begin(); j != task_tg.getConsumers().end(); j++)
+			for(set<const AbstractLink*>::const_iterator j = task_tg.getConsumers().begin(); j != task_tg.getConsumers().end(); j++)
 			{
-				const Link *l = *j;
-				const Task *consumer = l->getConsumer();
-				set<int> consumer_cores = this->getCores(*consumer);
-				set<int>::const_iterator k = consumer_cores.begin();
+				const AbstractLink &l = **j;
+				const Task &consumer = *l.getConsumer();
+				set<unsigned int> consumer_cores = this->cores(consumer);
+				set<unsigned int>::const_iterator k = consumer_cores.begin();
 
-				Platform::islands consumer_core_islands = pt.getSharedMemoryIslands(*k);
+				Platform::islands consumer_core_islands = pt.sharedMemoryIslands(*k);
 				for(; k != consumer_cores.end(); k++)
 				{
-					if(pt.getSharedMemoryIslands(*k) != consumer_core_islands)
+					if(pt.sharedMemoryIslands(*k) != consumer_core_islands)
 					{
 						throw CastException("Task mapped to cores that belong to different shared memory islands.");
 					}	
@@ -704,7 +698,7 @@ namespace pelib
 
 				if(producer_core_islands != consumer_core_islands)
 				{
-					consumers.insert(consumer);
+					consumers.insert(&consumer);
 				}
 			}
 		}
@@ -713,10 +707,13 @@ namespace pelib
 	}
 
 	multiset<const Task*>
-	Schedule::getRemoteSharedMemoryIslandTaskConsumers(const Task &t, const Taskgraph &tg, const Platform &pt) const
+	Schedule::remoteSharedMemoryIslandTaskConsumers(const Task &t) const
 	{
+		const Taskgraph &tg = this->getTaskgraph();
+		const Platform &pt = this->getPlatform();
+
 		multiset<const Task*> consumers;
-		if(this->getUniqueTasks().find(t) == this->getUniqueTasks().end())
+		if(this->getTaskgraph().getTasks().find(t) == this->getTaskgraph().getTasks().end())
 		{
 			stringstream ss;
 			ss << "Task \"" << t.getName() << "\" does not figure in schedule.";
@@ -731,28 +728,28 @@ namespace pelib
 		}
 
 		const Task &task_tg = *tg.getTasks().find(t);
-		set<int> producer_cores = this->getCores(task_tg);
-		set<int>::const_iterator j = producer_cores.begin();
-		Platform::islands producer_core_islands = pt.getSharedMemoryIslands(*j);
+		set<unsigned int> producer_cores = this->cores(task_tg);
+		set<unsigned int>::const_iterator j = producer_cores.begin();
+		Platform::islands producer_core_islands = pt.sharedMemoryIslands(*j);
 		for(; j != producer_cores.end(); j++)
 		{
-			if(pt.getSharedMemoryIslands(*j) != producer_core_islands)
+			if(pt.sharedMemoryIslands(*j) != producer_core_islands)
 			{
 				throw CastException("Task mapped to cores that belong to different shared memory islands.");
 			}	
 		}
 		
-		for(set<const Link*>::const_iterator j = task_tg.getConsumers().begin(); j != task_tg.getConsumers().end(); j++)
+		for(set<const AbstractLink*>::const_iterator j = task_tg.getConsumers().begin(); j != task_tg.getConsumers().end(); j++)
 		{
-			const Link *l = *j;
-			const Task *consumer = l->getConsumer();
-			set<int> consumer_cores = this->getCores(*this->getUniqueTasks().find(*consumer));
-			set<int>::const_iterator k = consumer_cores.begin();
+			const AbstractLink &l = **j;
+			const Task &consumer = *l.getConsumer();
+			set<unsigned int> consumer_cores = this->cores(*this->getTaskgraph().getTasks().find(consumer));
+			set<unsigned int>::const_iterator k = consumer_cores.begin();
 
-			Platform::islands consumer_core_islands = pt.getSharedMemoryIslands(*k);
+			Platform::islands consumer_core_islands = pt.sharedMemoryIslands(*k);
 			for(; k != consumer_cores.end(); k++)
 			{
-				if(pt.getSharedMemoryIslands(*k) != consumer_core_islands)
+				if(pt.sharedMemoryIslands(*k) != consumer_core_islands)
 				{
 					throw CastException("Task mapped to cores that belong to different shared memory islands.");
 				}	
@@ -760,30 +757,30 @@ namespace pelib
 
 			if(producer_core_islands != consumer_core_islands)
 			{
-				consumers.insert(consumer);
+				consumers.insert(&consumer);
 			}
 		}
 
 		return consumers;
 	}
 
-	const set<int>
-	Schedule::getCores(const Task &t) const
+	const set<unsigned int>
+	Schedule::cores(const Task &t) const
 	{
-		if(this->getUniqueTasks().find(t) == this->getUniqueTasks().end())
+		if(this->getTaskgraph().getTasks().find(t) == this->getTaskgraph().getTasks().end())
 		{
 			stringstream ss;
 			ss << "Task \"" << t.getName() << "\" does not figure in schedule.";
 			throw PelibException(ss.str());
 		}
-		const Task &tt = *this->getUniqueTasks().find(t);
+		const Task &tt = *this->getTaskgraph().getTasks().find(t);
 
-		set<int> cores;
-		for(table::const_iterator i = this->getSchedule().begin(); i != this->getSchedule().end(); i++)
+		set<unsigned int> cores;
+		for(Table::const_iterator i = this->getSchedule().begin(); i != this->getSchedule().end(); i++)
 		{
-			for(sequence::const_iterator j = i->second.begin(); j != i->second.end(); j++)
+			for(set<ExecTask>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 			{
-				if(*(j->second.first) == tt)
+				if(j->getTask() == tt)
 				{
 					cores.insert(i->first);
 				}

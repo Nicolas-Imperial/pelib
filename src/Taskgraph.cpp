@@ -49,7 +49,7 @@ namespace pelib
 	{
 	}
 
-	Taskgraph::Taskgraph(const set<Task> &tasks, const set<Link> &links)
+	Taskgraph::Taskgraph(const set<Task> &tasks, const set<AbstractLink> &links)
 	{
 		// Check if all tasks have a unique string ID
 		set<string> task_ids;
@@ -74,17 +74,16 @@ namespace pelib
 	}
 
 	void
-	Taskgraph::setLinks(const set<Link> &links)
+	Taskgraph::setLinks(const set<AbstractLink> &links)
 	{
 		// Add all links so their endpoints point to tasks in the local collection
 		this->links.clear();
-		for(set<Link>::const_iterator i = links.begin(); i != links.end(); i++)
+		for(set<AbstractLink>::const_iterator i = links.begin(); i != links.end(); i++)
 		{
 			const Task &producer = *this->tasks.find(*i->getProducer());
 			const Task &consumer = *this->tasks.find(*i->getConsumer());
 
-			//Link link(producer, consumer, i->getProducerName(), i->getConsumerName(), 0, 0, Link::MemoryType::undefined, i->getDataType(), i->getProducerRate(), i->getConsumerRate());
-			Link link(producer, consumer, i->getProducerName(), i->getConsumerName(), i->getQueueBuffer(), i->getProducerBuffer(), i->getConsumerBuffer(), i->getProducerRate(), i->getConsumerRate());
+			AbstractLink link(producer, consumer, i->getProducerName(), i->getConsumerName(), i->getProducerRate(), i->getConsumerRate());
 			this->links.insert(link);
 		}
 
@@ -94,30 +93,30 @@ namespace pelib
 			Task &t = (Task&)*i;
 
 			// Keep a copy of the link lists
-			set<const Link*> producers = t.getProducers();
-			set<const Link*> consumers = t.getConsumers();
+			set<const AbstractLink*> producers = t.getProducers();
+			set<const AbstractLink*> consumers = t.getConsumers();
 
 			// Clear the link lists
 			t.getProducers().clear();
 			t.getConsumers().clear();
 		
 			// Reconstruct all links so they point to local tasks
-			for(set<const Link*>::iterator j = producers.begin(); j != producers.end(); j++)
+			for(set<const AbstractLink*>::iterator j = producers.begin(); j != producers.end(); j++)
 			{
-				Task *producer = (*j)->getProducer();
-				Task *consumer = (*j)->getConsumer();
-				Link newLink(*this->tasks.find(*producer), *this->tasks.find(*consumer), (*j)->getProducerName(), (*j)->getConsumerName(), (*j)->getQueueBuffer(), (*j)->getProducerBuffer(), (*j)->getConsumerBuffer(), (*j)->getProducerRate(), (*j)->getConsumerRate());
-				const Link &link = *this->links.find(newLink);
+				const Task *producer = (*j)->getProducer();
+				const Task *consumer = (*j)->getConsumer();
+				AbstractLink newAbstractLink(*this->tasks.find(*producer), *this->tasks.find(*consumer), (*j)->getProducerName(), (*j)->getConsumerName(), (*j)->getProducerRate(), (*j)->getConsumerRate());
+				const AbstractLink &link = *this->links.find(newAbstractLink);
 				t.getProducers().insert(&link);
 			}
 			
 			// Reconstruct all links so they point to local tasks
-			for(set<const Link*>::iterator j = consumers.begin(); j != consumers.end(); j++)
+			for(set<const AbstractLink*>::iterator j = consumers.begin(); j != consumers.end(); j++)
 			{
-				Task *producer = (*j)->getProducer();
-				Task *consumer = (*j)->getConsumer();
-				Link newLink(*this->tasks.find(*producer), *this->tasks.find(*consumer), (*j)->getProducerName(), (*j)->getConsumerName(), (*j)->getQueueBuffer(), (*j)->getProducerBuffer(), (*j)->getConsumerBuffer(), (*j)->getProducerRate(), (*j)->getConsumerRate());
-				const Link &link = *this->links.find(newLink);
+				const Task *producer = (*j)->getProducer();
+				const Task *consumer = (*j)->getConsumer();
+				AbstractLink newAbstractLink(*this->tasks.find(*producer), *this->tasks.find(*consumer), (*j)->getProducerName(), (*j)->getConsumerName(), (*j)->getProducerRate(), (*j)->getConsumerRate());
+				const AbstractLink &link = *this->links.find(newAbstractLink);
 				t.getConsumers().insert(&link);
 			}
 		}
@@ -145,7 +144,6 @@ namespace pelib
 		const Scalar<float> *M = algebra.find<Scalar<float> >("M");
 		const Scalar<float> *n = algebra.find<Scalar<float> >("n");
 		const Vector<int, float> *tau = algebra.find<Vector<int, float> >("Tau");
-		const Vector<int, float> *streaming_task = algebra.find<Vector<int, float> >("stream");
 		const Vector<int, float> *Wi = algebra.find<Vector<int, float> >("Wi");
 		const Matrix<int, int, float> *e = algebra.find<Matrix<int, int, float> >("e");
 		const Matrix<int, int, float> *c = algebra.find<Matrix<int, int, float> >("c");
@@ -153,7 +151,6 @@ namespace pelib
 		
 		if(M == NULL || n == NULL || tau == NULL || Wi == NULL || e == NULL || task_name == NULL)
 		{
-			//throw CastException("Missing parameter. Need float scalar M, integer scalar n, integer vectors tau and Wi (of size n), and float matrix e of n lines.");
 			throw PelibException("Missing parameter. Need float scalar M, integer scalar n, integer vectors tau and Wi (of size n), float matrix e of n lines and vector name for tasks' names.");
 		}
 		else
@@ -167,11 +164,6 @@ namespace pelib
 		{
 			float id = i->first;
 			float work = i->second;
-			bool streaming = true;
-			if(streaming_task != NULL)
-			{
-				streaming = streaming_task->getValues().find((int)id)->second;
-			}
 			float max_wi = Wi->getValues().find((int)id)->second;
 
 			stringstream ss;
@@ -180,17 +172,12 @@ namespace pelib
 				ss << j->second << " ";
 			}
 	
-			/*	
-			stringstream estr;
-			estr << "task_" << id;	
-			Task t(estr.str());
-			*/
 			if(task_name->getValues().find(id) == task_name->getValues().end())
 			{
 				throw PelibException("Missing task name in Algebra record when building a Taskgraph instance");
 			}
 
-			Task t(task_name->getValues().find(id)->second, streaming);
+			Task t(task_name->getValues().find(id)->second);
 			t.setWorkload(work);
 			t.setMaxWidth(max_wi);
 			t.setEfficiencyString(ss.str());
@@ -209,7 +196,7 @@ namespace pelib
 						set<Task>::const_iterator from = this->getTasks().begin(), to = this->getTasks().begin();
 						std::advance(from, (size_t)i->first - 1);
 						std::advance(to, (size_t)j->first - 1);
-						this->links.insert(Link(*from, *to, from->getName(), to->getName(), Buffer::nullBuffer(), Buffer::nullBuffer(), Buffer::nullBuffer()));
+						this->links.insert(AbstractLink(*from, *to, from->getName(), to->getName()));
 					}
 				}
 			}
@@ -255,7 +242,6 @@ namespace pelib
 		for(set<Task>::const_iterator i = getTasks().begin(); i != getTasks().end(); i++)
 		{
 			map_tau.insert(pair<int, float>(std::distance(this->getTasks().begin(), i) + 1, i->getWorkload()));
-			map_streaming.insert(pair<int, float>(std::distance(this->getTasks().begin(), i) + 1, i->isStreaming()));
 			map_name.insert(pair<int, string>(std::distance(this->getTasks().begin(), i) + 1, i->getName()));
 			float max_width = 0;
 			if(i->getMaxWidth() > arch.getCores().size())
@@ -279,11 +265,10 @@ namespace pelib
 			map<int, float> task_c;
 			for(set<Task>::const_iterator j = getTasks().begin(); j != getTasks().end(); j++)
 			{
-				set<Link>::const_iterator k;
+				set<AbstractLink>::const_iterator k;
 				for(k = this->getLinks().begin(); k != this->getLinks().end(); k++)
 				{
 					if(*k->getProducer() == *i && *k->getConsumer() == *j)
-					//if(this->this->getLinks().find(Link(*i, *j)) != this->getLinks().end())
 					{
 						task_c.insert(pair<int, float>((int)std::distance(this->getTasks().begin(), j) + 1, 1));
 						break;
@@ -299,7 +284,6 @@ namespace pelib
 		}
 
 		Vector<int, float> tau("Tau", map_tau);
-		Vector<int, float> streaming("streaming", map_streaming);
 		Vector<int, float> Wi("Wi", map_Wi);
 		Vector<int, string> name("name", map_name);
 		Matrix<int, int, float> e("e", map_e);
@@ -310,7 +294,6 @@ namespace pelib
 		out.insert(&n);
 		out.insert(&name);
 		out.insert(&tau);
-		out.insert(&streaming);
 		out.insert(&Wi);
 		out.insert(&e);
 		out.insert(&c);
@@ -354,7 +337,6 @@ namespace pelib
 	double
 	Taskgraph::getDeadline(const Platform &arch) const
 	{
-		//cerr << "[" << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__ << "] getTasks().size() = " << getTasks().size() << endl;
 		DeadlineCalculator *calculator = DeadlineCalculator::getDeadlineCalculator(this->getDeadlineCalculator());
 		double time = calculator->calculate(*this, arch);
 		delete calculator;
@@ -388,13 +370,13 @@ namespace pelib
 		throw ParseException("No task \"" + taskId + "\" exists in this taskgraph.");
 	}
 
-	const set<Link>&
+	const set<AbstractLink>&
 	Taskgraph::getLinks() const
 	{
 		return this->links;
 	}
 
-	set<Link>&
+	set<AbstractLink>&
 	Taskgraph::getLinks()
 	{
 		return this->links;

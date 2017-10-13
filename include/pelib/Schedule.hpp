@@ -21,8 +21,10 @@
 #include <set>
 
 #include <pelib/Algebra.hpp>
-#include <pelib/Link.hpp>
+#include <pelib/AbstractLink.hpp>
+#include <pelib/AbstractLink.hpp>
 #include <pelib/Task.hpp>
+#include <pelib/ExecTask.hpp>
 #include <pelib/Taskgraph.hpp>
 #include <pelib/Platform.hpp>
 
@@ -35,19 +37,13 @@ namespace pelib
 	class Schedule : public Record
 	{
 		public:
-			/** Models the workload portion of a task computed in a portion of time of a schedule **/
-			typedef std::pair<const Task*, double> work;
-			/** Sequence of tasks to run for a processor **/
-			typedef std::map<float, work> sequence;
-			/** Collection to task sequences, one element per core **/
-			typedef std::map<int, sequence> table;
-
+			typedef std::map<unsigned int, std::set<ExecTask> > Table;
 			/** Constructor
 				@param name name of the schedule. This is only for human-redability purpose
 				@param appName name of the application this schedule is designed for
 				@param schedule collection of task sequences to run by each processor in the schedule
 			**/
-			Schedule(const std::string &name, const std::string &appName, const table &schedule, const std::set<Task> &tasks, const std::set<Link> &links);
+			Schedule(const std::string &name, const std::string &appName, const Table &schedule, const set<AllotedLink> &links, const Taskgraph &application, const Platform &platform);
 			/** Constructor 
 				@param algebra Collection of AlgebraData descendant class instances that describes a schedule in an algebraic form, used as basis to build the Schedule class instance
 			**/
@@ -75,24 +71,20 @@ namespace pelib
 			getAppName() const;
 
 			/** Returns a C++ standard collection that hold processors' task sequences **/
-			virtual const table&
+			virtual const Table&
 			getSchedule() const;
 
-			/** Return the set of tasks scheduled in this class instance **/
-			virtual const set<Task>&
-			getUniqueTasks() const;
+			const Taskgraph&
+			getTaskgraph() const;
+
+			const Platform&
+			getPlatform() const;
 
 			/** Flushes this schedule instance and copies an instance of Schedule in this instance **/
 			virtual Schedule&
 			operator=(const Schedule &);
 
-			/** Returns the set of tasks run by a core identified by its number
-				@param core Core number, starting from 1
-			**/
-			virtual const set<const Task*>&
-			getTasks(int core) const;
-
-			virtual const set<Link>&
+			virtual const set<AllotedLink>&
 			getLinks() const;
 
 			/** Returns the ith task in the Schedule tasks collection
@@ -101,21 +93,24 @@ namespace pelib
 			virtual const Task&
 			getTask(int id) const;
 
-			multiset<const Task*> getRemoteProducers(int core, const Taskgraph &tg, const Platform &pt) const;
-			multiset<const Task*> getRemoteConsumers(int core, const Taskgraph &tg, const Platform &pt) const;
-			multiset<const Task*> getRemoteTaskProducers(const Task&, const Taskgraph &tg, const Platform &pt) const;
-			multiset<const Task*> getRemoteTaskConsumers(const Task&, const Taskgraph &tg, const Platform &pt) const;
+			virtual const set<ExecTask>&
+			getTasks(unsigned int core) const;
+
+			multiset<const Task*> remoteProducers(unsigned int core) const;
+			multiset<const Task*> remoteConsumers(unsigned int core) const;
+			multiset<const Task*> remoteTaskProducers(const Task&) const;
+			multiset<const Task*> remoteTaskConsumers(const Task&) const;
 			
-			multiset<const Link*> getRemoteProducersLink(int core, const Taskgraph &tg, const Platform &pt) const;
-			multiset<const Link*> getRemoteConsumersLink(int core, const Taskgraph &tg, const Platform &pt) const;
-			multimap<const Task*, const Link*> getRemoteProducersTaskLink(int core, const Taskgraph &tg, const Platform &pt) const;
-			multimap<const Task*, const Link*> getRemoteConsumersTaskLink(int core, const Taskgraph &tg, const Platform &pt) const;
+			multiset<const AbstractLink*> remoteProducersAbstractLink(unsigned int core) const;
+			multiset<const AbstractLink*> remoteConsumersAbstractLink(unsigned int core) const;
+			multimap<const Task*, const AbstractLink*> remoteProducersTaskAbstractLink(unsigned int core) const;
+			multimap<const Task*, const AbstractLink*> remoteConsumersTaskAbstractLink(unsigned int core) const;
 			/** Returns the tasks contained in a shared memory island, identified by the set of cores that forms this island.
 				@param islands Set of core id (starting from 1) that form a shared memory island 
 				@param pt Execution platform that corresponds to this schedule
 			**/
 			virtual set<const Task*>
-			getTasksSharedMemoryIsland(const set<int>& islands, const Platform &pt) const;
+			tasksSharedMemoryIsland(const set<unsigned int>& islands) const;
 
 			/** Returns the set of Task that are mapped to other shared memory islands than the island collection given as parameter, and produce data consumed by tasks mapped in the set of islands given as parameters
 				@param islands Set of islands
@@ -123,7 +118,7 @@ namespace pelib
 				@param pt Platform description that defines shared memory islands
 			**/
 			virtual multiset<const Task*>
-			getRemoteSharedMemoryIslandProducers(const set<int> &islands, const Taskgraph &tg, const Platform &pt) const;
+			remoteSharedMemoryIslandProducers(const set<unsigned int> &islands) const;
 
 			/** Returns the set of Task that are mapped to another shared memory island than Task t, and produce data that Task t consumes
 				@param t Task for which this function computes the set of remote tasks that produce data for it.
@@ -131,7 +126,7 @@ namespace pelib
 				@param pt Platform that defines the core shared memory islands
 			**/
 			virtual multiset<const Task*>
-			getRemoteSharedMemoryIslandTaskProducers(const Task &t, const Taskgraph &tg, const Platform &pt) const;
+			remoteSharedMemoryIslandTaskProducers(const Task &t) const;
 
 			/** Returns the set of Task that are mapped to other shared memory islands than the island collection given as parameter, and consume data produced by tasks mapped in the set of islands given as parameters
 				@param islands Set of islands
@@ -139,7 +134,7 @@ namespace pelib
 				@param pt Platform description that defines shared memory islands
 			**/
 			virtual multiset<const Task*>
-			getRemoteSharedMemoryIslandConsumers(const set<int> &islands, const Taskgraph &tg, const Platform &pt) const;
+			remoteSharedMemoryIslandConsumers(const set<unsigned int> &islands) const;
 
 			/** Returns the set of Task that are mapped to another shared memory island than Task t, and consume data that Task t produces
 				@param t Task for which this function computes the set of remote tasks that consume data from it
@@ -147,13 +142,13 @@ namespace pelib
 				@param pt Platform that defines the core shared memory islands
 			**/
 			virtual multiset<const Task*>
-			getRemoteSharedMemoryIslandTaskConsumers(const Task &t, const Taskgraph &tg, const Platform &pt) const;
+			remoteSharedMemoryIslandTaskConsumers(const Task &t) const;
 
 			/** Returns the set of cores that execute a Task
 				@param t Task that is run by the set of cores returned by the function
 			**/
-			virtual const set<int>
-			getCores(const Task &t) const;
+			virtual const set<unsigned int>
+			cores(const Task &t) const;
 
 			/** Computes the starting time of each task in a schedule and add this starting time to a copy of the algebraic form schedule
 				@param data Schedule in algebraic form that lacks the starting time of tasks
@@ -166,15 +161,15 @@ namespace pelib
 
 		protected:
 			std::string name, appName;
-			table schedule;
-			set<Task> tasks;
-			std::map<int, set<const Task*> > core_tasks;
-			set<Link> links;
+			Table schedule;
+			Taskgraph taskgraph;
+			Platform platform;
+			std::set<AllotedLink> links;
 
 			/** Set the schedule of this class instance from a collection of task sequences. This method duplicates the tasks so the Schedule instance owns all instances of Tasks that the schedule refers to
 			**/
 			virtual void
-			setSchedule(const table&, const std::set<Task>&, const std::set<Link>&);
+			setSchedule(const Table&, const std::set<AllotedLink> &links, const Taskgraph &application, const Platform &platform);
 		private:
 			void buildFromAlgebra(const string &name, const string &appName, const Algebra &data);
 	};

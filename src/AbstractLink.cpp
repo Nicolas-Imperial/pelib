@@ -22,7 +22,7 @@
 #include <sstream>
 #include <string.h>
 
-#include <pelib/Link.hpp>
+#include <pelib/AbstractLink.hpp>
 #include <pelib/PelibException.hpp>
 
 #ifdef debug
@@ -35,7 +35,7 @@ using namespace std;
 
 namespace pelib
 {
-	Link::Link(const Task &producer, const Task &consumer, const std::string &producerName, const std::string &consumerName, const Buffer &queue_buffer, const Buffer &producer_buffer, const Buffer &consumer_buffer, size_t producer_rate, size_t consumer_rate): queueBuffer(queue_buffer), producerBuffer(producer_buffer), consumerBuffer(consumer_buffer)
+	AbstractLink::AbstractLink(const Task &producer, const Task &consumer, const std::string &producerName, const std::string &consumerName, size_t producer_rate, size_t consumer_rate) 
 	{
 		this->producerName = producerName;
 		this->consumerName = consumerName;
@@ -43,85 +43,87 @@ namespace pelib
 		this->consumer = (Task*)&consumer;
 		this->producer_rate = producer_rate;
 		this->consumer_rate = consumer_rate;
-		this->queueBuffer = queue_buffer;
-		this->producerBuffer = producer_buffer;
-		this->consumerBuffer = consumer_buffer;
 	}
 
-	Task*
-	Link::getProducer() const
+	AbstractLink::AbstractLink(const AbstractLink& link)
+	{
+		this->producer = link.getProducer();
+		this->consumer = link.getConsumer();
+		this->producerName = link.getProducerName();
+		this->consumerName = link.getConsumerName();
+		this->producer_rate = link.getProducerRate();
+		this->consumer_rate = link.getConsumerRate();
+		this->dataType = link.getDataType();
+		this->header = link.getHeader();
+	}
+
+	AbstractLink::~AbstractLink()
+	{
+		// Do nothing
+	}
+
+	const Task*
+	AbstractLink::getProducer() const
 	{
 		return this->producer;
 	}
 
-	Task*
-	Link::getConsumer() const
+	const Task*
+	AbstractLink::getConsumer() const
 	{
 		return this->consumer;
 	}
 
-	std::string
-	Link::getDataType() const
+	const std::string&
+	AbstractLink::getDataType() const
 	{
-		return this->queueBuffer.getType();
+		return this->dataType;
 	}
 
 	void
-	Link::setProducer(Task* producer)
+	AbstractLink::setProducer(Task* producer)
 	{
 		this->producer = producer;
 	}
 
 	void
-	Link::setConsumer(Task* consumer)
+	AbstractLink::setConsumer(Task* consumer)
 	{
 		this->consumer = consumer;
 	}
 
 	size_t
-	Link::getProducerRate() const
+	AbstractLink::getProducerRate() const
 	{
 		return this->producer_rate;
 	}
 
 	size_t
-	Link::getConsumerRate() const
+	AbstractLink::getConsumerRate() const
 	{
 		return this->consumer_rate;
 	}
 
-	std::string
-	Link::getProducerName() const
+	const std::string&
+	AbstractLink::getHeader() const
+	{
+		return this->header;
+	}
+
+	const std::string&
+	AbstractLink::getProducerName() const
 	{
 		return this->producerName;
 	}
 
-	std::string
-	Link::getConsumerName() const
+	const std::string&
+	AbstractLink::getConsumerName() const
 	{
 		return this->consumerName;
 	}
 
-	const Buffer&
-	Link::getQueueBuffer() const
-	{
-		return this->queueBuffer;
-	}
-
-	const Buffer&
-	Link::getProducerBuffer() const
-	{
-		return this->producerBuffer;
-	}
-
-	const Buffer&
-	Link::getConsumerBuffer() const
-	{
-		return this->consumerBuffer;
-	}
-
 	bool
-	Link::operator<(const Link &other) const
+	AbstractLink::operator<(const AbstractLink &other) const
 	{
 		Task thisProducer = *this->getProducer();
 		Task otherProducer = *other.getProducer();
@@ -151,8 +153,9 @@ namespace pelib
 	}
 
 	bool
-	Link::operator==(const Link &other) const
+	AbstractLink::operator==(const AbstractLink &other) const
 	{	
-		return (*this->getProducer() == *other.getProducer()) && (*this->getConsumer() == *other.getConsumer()) && (this->getProducerName().compare(other.getProducerName()) == 0) && (this->getConsumerName().compare(other.getConsumerName()) == 0);
+		bool res = (*this->getProducer() == *other.getProducer()) && (*this->getConsumer() == *other.getConsumer()) && (this->getProducerName().compare(other.getProducerName()) == 0) && (this->getConsumerName().compare(other.getConsumerName()) == 0);
+		return res;
 	}
 }

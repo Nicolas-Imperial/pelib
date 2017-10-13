@@ -19,49 +19,55 @@
 
 #include <string>
 
-#include <pelib/Memory.hpp>
-
-#ifndef PELIB_BUFFER
-#define PELIB_BUFFER
+#ifndef PELIB_MEMORY
+#define PELIB_MEMORY
 
 namespace pelib
 {
 	/** Model a link between tasks of a streaming application **/
-	class Buffer
+	class Memory
 	{
 		public:
+			enum class Feature: int { undefined = 0, exclusive = 1, shared = 2, distributed = 3, smallAndCheap = 4, largeAndCostly = 8 };
+			static const std::string undefined, exclusive, shared, distributed, smallAndCheap, largeAndCostly;
+			static const unsigned int memoryAccessMask;
+			static const unsigned int memoryCostMask;
 			/** Constructor. Takes the producer and consumer tasks at both ends of the link **/
-			Buffer(size_t size, const std::string &type, const std::string &header, const Memory &memory);
-			Buffer();
+			Memory();
+			Memory(Feature feature, unsigned int level, const unsigned int core);
 
-			size_t
-			getSize() const;
+			unsigned int
+			getCore() const;
 
-			const Memory&
-			getMemory() const;
+			Feature
+			getFeature() const;
 
-			const std::string&
-			getHeader() const;
-		
-			const std::string&
-			getType() const;
+			std::string
+			getFeatureAsString() const;
 
-			static Buffer
-			nullBuffer();
+			unsigned int
+			getLevel() const;
 
-			//virtual bool
-			//operator<(const Buffer &buffer) const;
+			static std::string
+			featureToString(Feature memory);
 
-			virtual bool
-			operator==(const Buffer &buffer) const;
+			static Feature
+			stringToFeature(const std::string &str);
+
+			static Memory
+			nullMemory();
+
+			bool
+			operator==(const Memory &mem) const;
+
 		protected:
 			/** Producer and consumer task pointers **/
-			std::string type;
-			size_t size;
-			std::string header;
-			Memory memory;
+			Feature feature;
+			unsigned int core, level;
 
-		private:		
+		private:
+			void
+			setAsNull();
 	};
 }
 

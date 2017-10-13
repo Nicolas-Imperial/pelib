@@ -33,7 +33,7 @@ namespace pelib
 			/** Read the content of input stream and produces an instance of pelib::Schedule **/
 			virtual
 			Schedule*
-			parse(std::istream &in) const = 0;
+			parse(std::istream &in, const Taskgraph &tg, const Platform &pt) const = 0;
 
 			/** Returns a pointer to a copy of this Schedule parser **/
 			virtual ScheduleParser* clone() const = 0;

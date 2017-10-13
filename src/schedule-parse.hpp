@@ -1,5 +1,5 @@
 /*
- Copyright 2015 Nicolas Melot
+ Copyright 2017 Nicolas Melot
 
  This file is part of Pelib.
 
@@ -17,26 +17,35 @@
  along with Pelib. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <string>
 
-#include <iostream>
 #include <pelib/Record.hpp>
+#include <pelib/Taskgraph.hpp>
+#include <pelib/Platform.hpp>
+#include <pelib/parser.h>
+
+#ifndef SCHEDULE_PARSE
+#define SCHEDULE_PARSE 1
+
+typedef struct
+{
+	std::string taskgraph, platform;
+} schedule_parse_args_t;
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
-
-#ifndef PELIB_PARSER
-#define PELIB_PARSER
-
-// /!\ the content of argv is freed after this function is run
-/** Parses the content of an input stream with string options and produces a class instance derived from pelib::Record. Used for dynamic library parsers **/
-std::map<std::string, pelib::Record*> pelib_process(const std::map<std::string, pelib::Record*> &records, size_t argc, char** argv);
-
-/** Deletes a Record produced by pelib_parse **/
-void pelib_delete(pelib::Record*);
-
-#endif
-
+schedule_parse_args_t
+parse_arguments(size_t argc, char** argv);
 #ifdef __cplusplus
 }
+#endif
+
+pelib::Taskgraph&
+getTaskgraph(const std::string &name, const std::map<std::string, pelib::Record*> &inputs);
+
+pelib::Platform&
+getPlatform(const std::string &name, const std::map<std::string, pelib::Record*> &inputs);
+
 #endif

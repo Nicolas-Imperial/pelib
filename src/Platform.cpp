@@ -120,7 +120,7 @@ namespace pelib
 			island isl;
 			for(island::const_iterator j = i->begin(); j != i->end(); j++)
 			{
-				isl.insert(this->getCore(arch->getCoreId(*arch->getCores().find(*j))));
+				isl.insert(&this->getCore(arch->getCoreId(*arch->getCores().find(*j))));
 			}
 
 			this->shared.insert(isl);
@@ -131,7 +131,7 @@ namespace pelib
 			island isl;
 			for(island::const_iterator j = i->begin(); j != i->end(); j++)
 			{
-				isl.insert(this->getCore(arch->getCoreId(*arch->getCores().find(*j))));
+				isl.insert(&this->getCore(arch->getCoreId(*arch->getCores().find(*j))));
 			}
 
 			this->main.insert(isl);
@@ -142,7 +142,7 @@ namespace pelib
 			island isl;
 			for(island::const_iterator j = i->begin(); j != i->end(); j++)
 			{
-				isl.insert(this->getCore(arch->getCoreId(*arch->getCores().find(*j))));
+				isl.insert(&this->getCore(arch->getCoreId(*arch->getCores().find(*j))));
 			}
 
 			this->priv.insert(isl);
@@ -153,7 +153,7 @@ namespace pelib
 			island isl;
 			for(island::const_iterator j = i->begin(); j != i->end(); j++)
 			{
-				isl.insert(this->getCore(arch->getCoreId(*arch->getCores().find(*j))));
+				isl.insert(&this->getCore(arch->getCoreId(*arch->getCores().find(*j))));
 			}
 
 			this->voltage.insert(isl);
@@ -164,7 +164,7 @@ namespace pelib
 			island isl;
 			for(island::const_iterator j = i->begin(); j != i->end(); j++)
 			{
-				isl.insert(this->getCore(arch->getCoreId(*arch->getCores().find(*j))));
+				isl.insert(&this->getCore(arch->getCoreId(*arch->getCores().find(*j))));
 			}
 
 			this->freq.insert(isl);
@@ -392,7 +392,7 @@ namespace pelib
 		return record;
 	}
 
-	const Core*
+	const Core&
 	Platform::getCore(size_t id) const
 	{
 		if(id > this->getCores().size())
@@ -401,7 +401,7 @@ namespace pelib
 		}
 		island::iterator it = this->cores.begin();
 		std::advance(it, id - 1);
-		return *it;
+		return **it;
 	}
 
 	size_t
@@ -422,17 +422,17 @@ namespace pelib
 	}
 
 	const Platform::islands
-	Platform::getSharedMemoryIslands(size_t id) const
+	Platform::sharedMemoryIslands(size_t id) const
 	{
 		if(id > this->getCores().size())
 		{
 			throw CastException("Requesting shared memory island beyond the number of islands in the platform.");
 		}
 		islands isls;
-		const Core* core = this->getCore(id);
+		const Core &core = this->getCore(id);
 		for(islands::const_iterator i = this->getSharedMemoryIslands().begin(); i != this->getSharedMemoryIslands().end(); i++)
 		{
-			if(i->find(core) != i->end())
+			if(i->find(&core) != i->end())
 			{
 				isls.insert(*i);
 			}
@@ -441,15 +441,15 @@ namespace pelib
 		return isls;
 	}
 
-	const std::set<int>
-	Platform::getSharedMemoryIslands(const islands& isls) const
+	const std::set<unsigned int>
+	Platform::sharedMemoryIslands(const islands& isls) const
 	{
-		set<int> indexes;
+		set<unsigned int> indexes;
 		for(Platform::islands::const_iterator i = isls.begin(); i != isls.end(); i++)
 		{
 			if(this->getSharedMemoryIslands().find(*i) != this->getSharedMemoryIslands().end())
 			{
-				indexes.insert((int)std::distance(this->getSharedMemoryIslands().begin(), this->getSharedMemoryIslands().find(*i)) + 1);
+				indexes.insert((unsigned int)std::distance(this->getSharedMemoryIslands().begin(), this->getSharedMemoryIslands().find(*i)) + 1);
 			}
 			else
 			{
@@ -461,7 +461,7 @@ namespace pelib
 	}
 
 	const Platform::islands
-	Platform::getSharedMemoryIslands(const std::set<int>& isls) const
+	Platform::sharedMemoryIslands(const std::set<int>& isls) const
 	{
 		Platform::islands out;
 		for(std::set<int>::const_iterator i = isls.begin(); i != isls.end(); i++)
@@ -485,13 +485,13 @@ namespace pelib
 	}
 
 	const Platform::islands
-	Platform::getMainMemoryIslands(size_t id) const
+	Platform::mainMemoryIslands(size_t id) const
 	{
 		islands isls;
-		const Core* core = this->getCore(id);
+		const Core &core = this->getCore(id);
 		for(Platform::islands::const_iterator i = this->getMainMemoryIslands().begin(); i != this->getMainMemoryIslands().end(); i++)
 		{
-			if(i->find(core) != i->end())
+			if(i->find(&core) != i->end())
 			{
 				isls.insert(*i);
 			}
@@ -507,13 +507,13 @@ namespace pelib
 	}
 
 	const Platform::islands
-	Platform::getPrivateMemoryIslands(size_t id) const
+	Platform::privateMemoryIslands(size_t id) const
 	{
 		Platform::islands isls;
-		const Core* core = this->getCore(id);
+		const Core &core = this->getCore(id);
 		for(Platform::islands::const_iterator i = this->getPrivateMemoryIslands().begin(); i != this->getPrivateMemoryIslands().end(); i++)
 		{
-			if(i->find(core) != i->end())
+			if(i->find(&core) != i->end())
 			{
 				isls.insert(*i);
 			}
@@ -531,10 +531,10 @@ namespace pelib
 	const Platform::island&
 	Platform::getVoltageIsland(size_t id) const
 	{
-		const Core* core = this->getCore(id);
+		const Core &core = this->getCore(id);
 		for(Platform::islands::const_iterator i = this->getVoltageIslands().begin(); i != this->getVoltageIslands().end(); i++)
 		{
-			if(i->find(core) != i->end())
+			if(i->find(&core) != i->end())
 			{
 				return *i;
 			}
@@ -552,10 +552,10 @@ namespace pelib
 	const Platform::island&
 	Platform::getFrequencyIsland(size_t id) const
 	{
-		const Core* core = this->getCore(id);
+		const Core &core = this->getCore(id);
 		for(Platform::islands::const_iterator i = this->getFrequencyIslands().begin(); i != this->getFrequencyIslands().end(); i++)
 		{
-			if(i->find(core) != i->end())
+			if(i->find(&core) != i->end())
 			{
 				return *i;
 			}

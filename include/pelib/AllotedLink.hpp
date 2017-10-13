@@ -17,49 +17,50 @@
  along with Pelib. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <string>
-
+#include <pelib/AbstractLink.hpp>
+#include <pelib/Buffer.hpp>
 #include <pelib/Memory.hpp>
 
-#ifndef PELIB_BUFFER
-#define PELIB_BUFFER
+#ifndef PELIB_ALLOTED_LINK
+#define PELIB_ALLOTED_LINK
 
 namespace pelib
 {
 	/** Model a link between tasks of a streaming application **/
-	class Buffer
+	class AllotedLink
 	{
 		public:
 			/** Constructor. Takes the producer and consumer tasks at both ends of the link **/
-			Buffer(size_t size, const std::string &type, const std::string &header, const Memory &memory);
-			Buffer();
+			AllotedLink(const AbstractLink &link, const Buffer &queue, const Memory &producer_buffer, const Memory &consumer_buffer);
 
-			size_t
-			getSize() const;
-
-			const Memory&
-			getMemory() const;
-
-			const std::string&
-			getHeader() const;
-		
-			const std::string&
-			getType() const;
-
-			static Buffer
-			nullBuffer();
-
-			//virtual bool
-			//operator<(const Buffer &buffer) const;
+			AllotedLink(const AllotedLink &link);
+			virtual ~AllotedLink();
 
 			virtual bool
-			operator==(const Buffer &buffer) const;
+			operator<(const AllotedLink &other) const;
+
+			/** Returns true if this instance is considered equivalent to another link
+				@param other Other link to be compared
+			**/
+	    		virtual bool
+			operator==(const AllotedLink &other) const;
+
+			const AbstractLink&
+			getLink() const;
+
+			const Buffer&
+			getQueueBuffer() const;
+
+			const Memory&
+			getProducerMemory() const;
+
+			const Memory&
+			getConsumerMemory() const;
+
 		protected:
-			/** Producer and consumer task pointers **/
-			std::string type;
-			size_t size;
-			std::string header;
-			Memory memory;
+			const AbstractLink &link;
+			Buffer queueBuffer;
+			Memory producerMemory, consumerMemory;
 
 		private:		
 	};

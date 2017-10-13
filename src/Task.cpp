@@ -37,33 +37,33 @@ using namespace std;
 
 namespace pelib
 {
-	const float Task::very_small = 1e-6;
+	const float Task::minEfficiency = 1e-6;
 
-	Task::Task(const std::string &name, bool is_streaming)
+	Task::Task()
+	{
+		this->name = "dummy";
+		this->module = "dummy";
+		this->maxWidth = 1;
+		this->workload = 1;
+		this->efficiencyString = "exprtk:p <= 1 ? 1 : 1e-6";
+	}
+
+	Task::Task(const std::string &name)
 	{
 		this->name = name;
 		this->module = "dummy";
-		this->frequency = 1;
-		this->width = 1;
 		this->maxWidth = 1;
 		this->workload = 1;
-		this->streaming = is_streaming;
 		this->efficiencyString = "exprtk:p <= 1 ? 1 : 1e-6";
-		//this->start_time = 0;
-		this->instance = 0;
 	}
 
 	Task::Task(const Task &task)
 	{
 		this->name = task.getName();
 		this->module = task.getModule();
-		this->frequency = task.getFrequency();
-		this->width = task.getWidth();
 		this->maxWidth = task.getMaxWidth();
 		this->workload = task.getWorkload();
-		this->streaming = task.isStreaming();
 		this->efficiencyString = task.getEfficiencyString();
-		//this->start_time = task.getStartTime();
 
 		this->consumers = task.getConsumers();
 		this->producers = task.getProducers();
@@ -74,44 +74,13 @@ namespace pelib
 		/* Do nothing */
 	}
 	
-	double
-	Task::getFrequency() const
-	{
-		return frequency;
-	}
-
-	void
-	Task::setFrequency(double frequency)
-	{
-		this->frequency = frequency; 
-	}
-
-	double
-	Task::getWidth() const
-	{
-		return width;
-	}
-
-	void
-	Task::setWidth(double width)
-	{
-		this->width = width; 
-	}
-
-	std::string
+	const std::string&
 	Task::getName() const
 	{
 		return this->name;
 	}
 
-	/*
-	int
-	Task::getName() const
-	{
-		return this->id;
-	}*/
-	
-	std::string
+	const std::string&
 	Task::getEfficiencyString() const
 	{
 		return this->efficiencyString;
@@ -120,11 +89,7 @@ namespace pelib
 	void
 	Task::setEfficiencyString(const std::string &efficiencyString)
 	{
-		//std::string old = getEfficiencyString();
-		
 		this->efficiencyString = string(efficiencyString);
-		
-		// Attemps to compute an efficiency
 		/*
 		try
 		{
@@ -154,9 +119,9 @@ namespace pelib
 				throw new ParseException("Could not parse efficiency formula \"" + getEfficiencyString() + "\"");
 			}
 
-			if(output < very_small)
+			if(output < minEfficiency)
 			{
-				output = very_small;
+				output = minEfficiency;
 			}
 
 			return output;		
@@ -204,12 +169,6 @@ namespace pelib
 	Task::setMaxWidth(double maxWidth)
 	{
 		this->maxWidth = maxWidth;
-	}
-
-	bool
-	Task::isStreaming() const
-	{
-		return this->streaming;
 	}
 
 	// Write in *number the address of the first character of the number found, or the end of the string str if no number was found.
@@ -321,10 +280,9 @@ namespace pelib
 	{
 		string Me(this->getName());
 		string Ot(other.getName());
-		const char* me = Me.c_str(); //string(this->getName()).c_str();
-		const char* ot = Ot.c_str(); //string(other.getName()).c_str();
+		const char* me = Me.c_str();
+		const char* ot = Ot.c_str();
 		
-		//if(string(me).compare(string(ot)) == 0)
 		if(this->getName().compare(other.getName()) == 0)
 		{
 			return false;
@@ -376,7 +334,7 @@ namespace pelib
 		return getName().compare(other.getName()) == 0;
 	}
 
-	std::string
+	const std::string&
 	Task::getModule() const
 	{
 		return this->module;
@@ -388,19 +346,6 @@ namespace pelib
 		this->module = module;
 	}
 
-	/*
-	double
-	Task::getStartTime() const
-	{
-		return this->start_time;
-	}
-
-	void
-	Task::setStartTime(double startTime)
-	{
-		this->start_time = startTime;
-	}*/
-
 	double
 	Task::runtime(double width, double frequency) const
 	{
@@ -411,25 +356,25 @@ namespace pelib
 		return work; 
 	}
 	
-	const set<const Link*>&
+	const set<const AbstractLink*>&
 	Task::getProducers() const
 	{
 		return this->producers;
 	}
 
-	const set<const Link*>&
+	const set<const AbstractLink*>&
 	Task::getConsumers() const
 	{
 		return this->consumers;
 	}
 
-	set<const Link*>&
+	set<const AbstractLink*>&
 	Task::getProducers()
 	{
 		return this->producers;
 	}
 
-	set<const Link*>&
+	set<const AbstractLink*>&
 	Task::getConsumers()
 	{
 		return this->consumers;

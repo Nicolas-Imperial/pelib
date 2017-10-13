@@ -106,24 +106,24 @@ namespace pelib
 			virtual const islands& getSharedMemoryIslands() const;
 
 			/** Returns the shared memory island corresponding to the core_id-th core of the platform, starting with 1 **/
-			virtual const islands getSharedMemoryIslands(size_t core_id) const;
+			virtual const islands sharedMemoryIslands(size_t core_id) const;
 
 			/** Returns the shared memory islands a set of cores belongs to
 				@param islands Set of core id the shared memory islands' are requested
 			**/
-			virtual const islands getSharedMemoryIslands(const std::set<int>& islands) const;
+			virtual const islands sharedMemoryIslands(const std::set<int>& islands) const;
 			/** Returns the core ids contained in a shared memory island
 				@param islands Shared memory islands that contains the cores to be returned
 			**/
-			virtual const std::set<int> getSharedMemoryIslands(const islands& isls) const;
+			virtual const std::set<unsigned int> sharedMemoryIslands(const islands& isls) const;
 			/** Returns all main memory islands **/
 			virtual const islands& getMainMemoryIslands() const;
 			/** Returns the main memory island corresponding to the core_id-th core of the platform, starting with 1 **/
-			virtual const islands getMainMemoryIslands(size_t core_id) const;
+			virtual const islands mainMemoryIslands(size_t core_id) const;
 			/** Returns all private memory islands **/
 			virtual const islands& getPrivateMemoryIslands() const;
 			/** Returns the private memory island corresponding to the core_id-th core of the platform, starting with 1 **/
-			virtual const islands getPrivateMemoryIslands(size_t core_id) const;
+			virtual const islands privateMemoryIslands(size_t core_id) const;
 			/** Returns all voltage memory islands **/
 			virtual const islands& getVoltageIslands() const;
 			/** Returns the voltage memory island corresponding to the core_id-th core of the platform, starting with 1 **/
@@ -134,7 +134,7 @@ namespace pelib
 			virtual const island& getFrequencyIsland(size_t core_id) const;
 
 			/** Returns a pointer to core corresponding to its number id in the platform **/
-			virtual const Core* getCore(size_t id) const;
+			virtual const Core& getCore(size_t id) const;
 
 			/** Returns the core id in the platform that corresponds to a pointer to core; throws a CastException if the core doesn't belong to this plaform **/
 			virtual size_t getCoreId(const Core*) const;

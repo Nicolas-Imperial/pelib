@@ -39,7 +39,7 @@ extern "C"{
 #include <pelib/Matrix.hpp>
 #include <pelib/Set.hpp>
 #include <pelib/Task.hpp>
-#include <pelib/Link.hpp>
+#include <pelib/AbstractLink.hpp>
 #include <pelib/Buffer.hpp>
 
 #include <pelib/CastException.hpp>
@@ -160,7 +160,6 @@ GraphML::dump(ostream& os, const Taskgraph *data, const Platform *arch) const
 		SETVAS(graph, "name", counter, task.getName().c_str());
 		SETVAS(graph, "module", counter, task.getModule().c_str());
 		SETVAN(graph, "workload", counter, task.getWorkload());
-		SETVAN(graph, "streaming", counter, task.isStreaming());
 		stringstream max_width;
 
 		// If no platform is provided, just dump efficiency and max width as is.
@@ -194,7 +193,7 @@ GraphML::dump(ostream& os, const Taskgraph *data, const Platform *arch) const
 	}
 
 	counter = 0;
-	for(set<Link>::const_iterator i = tg->getLinks().begin(); i != tg->getLinks().end(); i++, counter++)
+	for(set<AbstractLink>::const_iterator i = tg->getLinks().begin(); i != tg->getLinks().end(); i++, counter++)
 	{
 		int ret = igraph_add_edge(graph, std::distance(tg->getTasks().begin(), tg->getTasks().find(*i->getProducer())), std::distance(tg->getTasks().begin(), tg->getTasks().find(*i->getConsumer())));
 		if(ret == IGRAPH_EINVAL) throw CastException("Could not add vertices to igraph.");
@@ -307,12 +306,7 @@ GraphML::parse(istream &is) const
 	{
 		stringstream estr;
 		estr << "task_" << id;
-		bool streaming = true;
-		if(igraph_cattribute_has_attr(the_graph, IGRAPH_ATTRIBUTE_VERTEX, "streaming"))
-		{
-			streaming = (bool)VAN(the_graph, "streaming", id);
-		}
-		Task task(strcmp(VAS(the_graph, "name", id), "") != 0 ? VAS(the_graph, "name", id) : estr.str(), streaming);
+		Task task(strcmp(VAS(the_graph, "name", id), "") != 0 ? VAS(the_graph, "name", id) : estr.str());
 		task.setModule(strcmp(VAS(the_graph, "module", id),"") != 0 ? VAS(the_graph, "module", id) : "dummy");
 		task.setWorkload(!isnan((float)VAN(the_graph, "workload", id)) ? VAN(the_graph, "workload", id): 1.0);
 
@@ -361,7 +355,7 @@ GraphML::parse(istream &is) const
 	}
 
 	// Add edges between tasks
-	set<Link> links;
+	set<AbstractLink> links;
 	for(int i = 0; i < igraph_ecount(the_graph); i++)
 	{
 		//printf("[%s:%s:%d] Edge number %d.\n", __FILE__, __FUNCTION__, __LINE__, i);
@@ -388,10 +382,10 @@ GraphML::parse(istream &is) const
 		}
 
 		Buffer nullBuffer = Buffer::nullBuffer();
-		Link link(*tasks.find(producer), *tasks.find(consumer), producerName, consumerName, nullBuffer, nullBuffer, nullBuffer, producer_rate, consumer_rate);
+		AbstractLink link(*tasks.find(producer), *tasks.find(consumer), producerName, consumerName, producer_rate, consumer_rate);
 		links.insert(link);
 
-		const Link &link_ref = *links.find(link);
+		const AbstractLink &link_ref = *links.find(link);
 
 		// Add the link as producer and consumer links of both endpoint tasks
 		Task &producer_ref = (Task&)*tasks.find(producer);
