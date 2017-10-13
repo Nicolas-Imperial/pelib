@@ -40,13 +40,13 @@ using namespace std;
 
 namespace pelib
 {
-	Schedule::Schedule(const std::string &name, const std::string &appName, const std::map<unsigned int, std::set<ExecTask> > &schedule, const std::set<AllotedLink> &links, const Taskgraph &application, const Platform &platform)
+	Schedule::Schedule(const std::string &name, const std::string &appName, const Table &schedule, const set<AllotedLink> &links, const std::map<BarrierId, Memory> &barriers, const Taskgraph &application, const Platform &platform)
 	{
 		this->name = name;
 		this->appName = appName;
 	
 		// Copy taskgraph	
-		this->setSchedule(schedule, links, application, platform);
+		this->setSchedule(schedule, links, barriers, application, platform);
 	}
 
 	Schedule::~Schedule()
@@ -55,7 +55,7 @@ namespace pelib
 	}
 
 	void
-	Schedule::setSchedule(const Table &schedule, const std::set<AllotedLink> &links, const Taskgraph &application, const Platform &platform)
+	Schedule::setSchedule(const Table &schedule, const std::set<AllotedLink> &links, const std::map<BarrierId, Memory> &barriers, const Taskgraph &application, const Platform &platform)
 	{
 		// First copy taskgraph and platform
 		this->taskgraph = application;
@@ -63,6 +63,7 @@ namespace pelib
 
 		this->schedule = Schedule::Table();
 		this->links = set<AllotedLink>();
+		this->barriers = map<BarrierId, Memory>();
 
 		for(set<AllotedLink>::iterator i = links.begin(); i != links.end(); i++)
 		{
@@ -74,6 +75,7 @@ namespace pelib
 			AllotedLink allotedLink(*link, i->getQueueBuffer(), i->getProducerMemory(), i->getConsumerMemory());
 
 			this->links.insert(allotedLink);
+		}
 
 		// Copy schedule with all exec task refering to tasks within internal copy of taskgraph
 		for(Table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
@@ -94,7 +96,21 @@ namespace pelib
 			this->schedule.insert(pair<unsigned int, set<ExecTask> >(i->first, core_schedule));
 		}
 
+		for(map<Schedule::BarrierId, Memory>::const_iterator i = barriers.begin(); i != barriers.end(); i++)
+		{
+			set<Task>::const_iterator search = this->getTaskgraph().getTasks().find(*i->first.first);
+			if(search == this->getTaskgraph().getTasks().end())
+			{
+				throw PelibException("Schedule contains a barrier gating a task that does not exist in taskgraph");
+			}
+			this->barriers.insert(pair<BarrierId, Memory>(BarrierId(&*search, i->first.second), i->second));
 		}
+	}
+
+	const std::map<Schedule::BarrierId, Memory>&
+	Schedule::getBarriers() const
+	{
+		return this->barriers;
 	}
 
 	Schedule::Schedule(const std::string &name, const Algebra &algebra)
@@ -111,7 +127,7 @@ namespace pelib
 	{
 		this->name = src.getName();
 		this->appName = src.getName();
-		this->setSchedule(src.getSchedule(), src.getLinks(), src.getTaskgraph(), src.getPlatform());
+		this->setSchedule(src.getSchedule(), src.getLinks(), src.getBarriers(), src.getTaskgraph(), src.getPlatform());
 	}
 
 	void
@@ -179,13 +195,13 @@ namespace pelib
 			}
 		}
 
-		this->setSchedule(schedule, set<AllotedLink>(), taskgraph, platform);
+		this->setSchedule(schedule, set<AllotedLink>(), map<BarrierId, Memory>(), taskgraph, platform);
 	}
 	
 	Schedule*
 	Schedule::clone() const
 	{
-		Schedule *clone = new Schedule(this->getName(), this->getName(), this->getSchedule(), this->getLinks(), this->getTaskgraph(), this->getPlatform());
+		Schedule *clone = new Schedule(this->getName(), this->getName(), this->getSchedule(), this->getLinks(), this->getBarriers(), this->getTaskgraph(), this->getPlatform());
 
 		return clone;
 	}
@@ -302,7 +318,7 @@ namespace pelib
 		this->appName = appName;
 	
 		// Copy taskgraph	
-		this->setSchedule(schedule, copy.getLinks(), copy.getTaskgraph(), copy.getPlatform());
+		this->setSchedule(schedule, copy.getLinks(), copy.getBarriers(), copy.getTaskgraph(), copy.getPlatform());
 
 		return *this;
 	}

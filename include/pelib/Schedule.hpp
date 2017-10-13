@@ -38,12 +38,13 @@ namespace pelib
 	{
 		public:
 			typedef std::map<unsigned int, std::set<ExecTask> > Table;
+			typedef std::pair<const Task*, unsigned int> BarrierId; // Task, instance, core
 			/** Constructor
 				@param name name of the schedule. This is only for human-redability purpose
 				@param appName name of the application this schedule is designed for
 				@param schedule collection of task sequences to run by each processor in the schedule
 			**/
-			Schedule(const std::string &name, const std::string &appName, const Table &schedule, const set<AllotedLink> &links, const Taskgraph &application, const Platform &platform);
+			Schedule(const std::string &name, const std::string &appName, const Table &schedule, const set<AllotedLink> &links, const std::map<BarrierId, Memory> &barriers, const Taskgraph &application, const Platform &platform);
 			/** Constructor 
 				@param algebra Collection of AlgebraData descendant class instances that describes a schedule in an algebraic form, used as basis to build the Schedule class instance
 			**/
@@ -86,6 +87,9 @@ namespace pelib
 
 			virtual const set<AllotedLink>&
 			getLinks() const;
+
+			virtual const map<BarrierId, Memory>&
+			getBarriers() const;
 
 			/** Returns the ith task in the Schedule tasks collection
 				@param id Index of the task, starting from 1, to be read from the Schedule's internal collection of Task
@@ -165,11 +169,12 @@ namespace pelib
 			Taskgraph taskgraph;
 			Platform platform;
 			std::set<AllotedLink> links;
+			std::map<BarrierId, Memory> barriers;
 
 			/** Set the schedule of this class instance from a collection of task sequences. This method duplicates the tasks so the Schedule instance owns all instances of Tasks that the schedule refers to
 			**/
 			virtual void
-			setSchedule(const Table&, const std::set<AllotedLink> &links, const Taskgraph &application, const Platform &platform);
+			setSchedule(const Table&, const std::set<AllotedLink> &links, const std::map<BarrierId, Memory> &barriers, const Taskgraph &application, const Platform &platform);
 		private:
 			void buildFromAlgebra(const string &name, const string &appName, const Algebra &data);
 	};

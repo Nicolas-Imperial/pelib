@@ -67,6 +67,7 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 {
 	Schedule::Table schedule = sched->getSchedule();
 	const set<AllotedLink> &links = sched->getLinks();
+	const map<Schedule::BarrierId, Memory> &barriers = sched->getBarriers();
 	set<string> task_ids;
 	
 	for(Schedule::Table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
@@ -195,11 +196,22 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 		os << "level=\"" << link.getQueueBuffer().getMemory().getLevel() << "\"";
 		os << "/>" << endl;
 		os << "  </buffer>" << endl;
-		
-
 		os << " </link>" << endl;
 
 	}
+
+	for(map<Schedule::BarrierId, Memory>::const_iterator i = barriers.begin(); i != barriers.end(); i++)
+	{
+		os << " <barrier task=\"" << i->first.first->getName();
+		os << "\" instance=\"" << i->first.second << "\">" << endl;
+		os << "   <memory core=\"" << i->second.getCore() + 1 << "\" ";
+		os << "feature=\"" << Memory::featureToString(i->second.getFeature()) << "\" ";
+		os << "level=\"" << i->second.getLevel() << "\"";
+		os << "/>" << endl;
+		os << "  </buffer>" << endl;
+		os << " </link>" << endl;
+	}
+		
 	os << setprecision(old_precision);
 
 	os << "</schedule>" << endl;
@@ -229,6 +241,7 @@ XMLSchedule::parse(istream &is, const Taskgraph &tg, const Platform &pt) const
 		Schedule::Table schedule;
 		map<pair<Task, unsigned int>, unsigned int> task_width;
 		set<AllotedLink> links;
+		map<Schedule::BarrierId, Memory> barriers;
 		for(xmlpp::Node::NodeList::iterator piter = processors.begin(); piter != processors.end(); ++piter) //for each core
 		{
 			if((*piter)->get_name().compare("core") == 0) //skip indentation characters et cetera
@@ -360,6 +373,35 @@ XMLSchedule::parse(istream &is, const Taskgraph &tg, const Platform &pt) const
 				AllotedLink link(actualLink, Buffer(queueSize, queueType, queueHeader, Memory(queueMemory, queueLevel, queueCore)), Memory(producer_type, producer_level, producer_core), Memory(consumer_type, consumer_level, consumer_core));
 				links.insert(link);
 			}
+			else if((*piter)->get_name().compare("barrier") == 0) //skip indentation characters et cetera
+			{
+				Element *alloc = dynamic_cast<Element*>(*piter);
+				string task_name = alloc->get_attribute_value("task");
+				unsigned int instance = atoi(alloc->get_attribute_value("instance").c_str());
+				Memory::Feature feature = Memory::Feature::undefined;
+				unsigned int core = 0;
+				unsigned int level = 0;
+
+				std::list<xmlpp::Node*> allocs = (*piter)->get_children();
+				for(std::list<xmlpp::Node*>::iterator aiter = allocs.begin(); aiter != allocs.end(); ++aiter)
+				{
+					if((*aiter)->get_name().compare("memory") == 0)
+					{
+						Element *memory = dynamic_cast<Element*>(*aiter);
+						core = atoi(memory->get_attribute_value("core").c_str()) - 1;
+						string memoryStr = memory->get_attribute_value("feature").c_str();
+						feature = Memory::stringToFeature(memoryStr.c_str());
+						level = atoi(memory->get_attribute_value("level").c_str());
+					}
+				}
+
+				set<Task>::const_iterator search = tg.getTasks().find(Task(task_name));
+				if(search == tg.getTasks().end())
+				{
+					throw PelibException("Barrier guards a task that does not exist in taskgraph");
+				}
+				barriers.insert(pair<Schedule::BarrierId, Memory>(Schedule::BarrierId(&*search, instance), Memory(feature, level, core)));
+			}
 		}
 	
 		// Now rebuild task set with the actual link set
@@ -375,7 +417,7 @@ XMLSchedule::parse(istream &is, const Taskgraph &tg, const Platform &pt) const
 			finalSchedule.insert(pair<unsigned int, set<ExecTask>>(i->first, core_schedule));
 		}
 	
-		Schedule *sched = new Schedule(name, aut_name, finalSchedule, links, tg, pt);
+		Schedule *sched = new Schedule(name, aut_name, finalSchedule, links, barriers, tg, pt);
 
 		return sched;
 	}
