@@ -42,8 +42,6 @@ void
 pelib_dump(std::ostream& cout, const std::map<string, Record*> &records, size_t argc, char **argv)
 {
 	Schedule *sc = (Schedule*)records.find(typeid(Schedule).name())->second;
-	Taskgraph *tg = (Taskgraph*)records.find(typeid(Taskgraph).name())->second;
-	Platform *pt = (Platform*)records.find(typeid(Platform).name())->second;
 
 	if(argv[0] != NULL)
 	{
@@ -137,11 +135,11 @@ pelib_dump(std::ostream& cout, const std::map<string, Record*> &records, size_t 
 			}
 		}
 
-		TetrisSchedule(ratio, showFrequencies, showTaskId, useTaskName, colors, stroke_size).dump(cout, sc, tg, pt);
+		TetrisSchedule(ratio, showFrequencies, showTaskId, useTaskName, colors, stroke_size).dump(cout, sc);
 	}
 	else	
 	{
-		TetrisSchedule().dump(cout, sc, tg, pt);
+		TetrisSchedule().dump(cout, sc);
 	}
 }
 

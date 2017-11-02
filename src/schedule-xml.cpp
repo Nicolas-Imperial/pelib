@@ -56,8 +56,6 @@ void
 pelib_dump(std::ostream& cout, const std::map<string, Record*> &records, size_t argc, char **argv)
 {
 	Schedule *sc;
-	Taskgraph *tg;
-	Platform *pt;
 
 	if(records.find(typeid(Schedule).name()) != records.end())
 	{
@@ -67,26 +65,8 @@ pelib_dump(std::ostream& cout, const std::map<string, Record*> &records, size_t 
 	{
 		throw PelibException("Missing schedule instance to output in data set.");
 	}
-	if(records.find(typeid(Taskgraph).name()) != records.end())
-	{
-		tg = (Taskgraph*)records.find(typeid(Taskgraph).name())->second;
-	}
-	else
-	{
-		throw PelibException("Missing taskgraph instance in data set, required to output a schedule.");
-	}
-	if(records.find(typeid(Platform).name()) != records.end())
-	{
-		pt = (Platform*)records.find(typeid(Platform).name())->second;
-	}
-	else
-	{
-		throw PelibException("Missing platform instance in data set, required to output a schedule.");
-	}
 #define check(var, core, task) { Schedule::table::iterator ii = ((Schedule::table&)var).begin(); std::advance(ii, core); Schedule::sequence::iterator jj = ii->second.begin(); std::advance(jj, task); debug(jj->second.first->getName()); }
-	//check(((Schedule*)sc)->getSchedule(), 1, 0);
-	//check(((Schedule*)sc)->getSchedule(), 2, 0);
-	XMLSchedule().dump(cout, sc, tg, pt);
+	XMLSchedule().dump(cout, sc);
 }
 
 void

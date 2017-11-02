@@ -330,9 +330,9 @@ TetrisSchedule::~TetrisSchedule()
 }
 
 void
-TetrisSchedule::dump(ostream& os, const Schedule &data, const Taskgraph &tg, const Platform &pt) const
+TetrisSchedule::dump(ostream& os, const Schedule &data) const
 {
-	dump(os, &data, &tg, &pt);
+	dump(os, &data);
 }
 
 // sigc callback class initialized with an output stream
@@ -381,8 +381,9 @@ class Canvas
 		}
 		
 		void
-		dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const Platform *pt, bool show_task_id, bool useTaskName, float strokeSize)
+		dump(ostream& os, const Schedule *sched, bool show_task_id, bool useTaskName, float strokeSize)
 		{
+			const Platform *pt = &sched->getPlatform();
 #ifdef CAIRO_HAS_SVG_SURFACE
 			// Compute canvas size, taking thickness and magnification into account
 			this->magnify = height >= magnify ? magnify : magnify / height;
@@ -810,8 +811,10 @@ class Canvas
 };
 
 void
-TetrisSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const Platform *pt) const
+TetrisSchedule::dump(ostream& os, const Schedule *sched) const
 {
+	const Platform *pt = &sched->getPlatform();
+	const Taskgraph *tg = &sched->getTaskgraph();
 	set<float> frequencies;
 	for(set<const Core*>::iterator i = pt->getCores().begin(); i != pt->getCores().end(); i++)
 	{
@@ -845,7 +848,7 @@ TetrisSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, co
 	double deadline = tg->getDeadline(pt);
 	bool drawDeadline = deadline > 0;
 	deadline = deadline > 0 ? deadline : max_stop_time;
-	Canvas(deadline, deadline * ratio, thickness, magnify, makeGradient(colors, frequencies), drawDeadline, this->showFrequencies).dump(os, sched, tg, pt, showTaskId, useTaskName, strokeSize);
+	Canvas(deadline, deadline * ratio, thickness, magnify, makeGradient(colors, frequencies), drawDeadline, this->showFrequencies).dump(os, sched, showTaskId, useTaskName, strokeSize);
 }
 
 TetrisSchedule*

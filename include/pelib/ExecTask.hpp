@@ -22,6 +22,7 @@
 #include <set>
 
 #include <pelib/Task.hpp>
+#include <pelib/Memory.hpp>
 #include <pelib/AllotedLink.hpp>
 
 #ifndef PELIB_EXECTASK
@@ -41,7 +42,8 @@ namespace pelib
 				@param id Identifier of the task
 			**/
 			ExecTask(const Task& task);
-			ExecTask(const Task& task, const std::set<AllotedLink> &links, double frequency, double width, double start, unsigned int instance);
+			ExecTask(const Task& task, const std::set<AllotedLink> &links, double frequency, double width, double start, unsigned int instance, unsigned int master, const Memory &sync);
+			ExecTask(const Task& task, const std::set<const AllotedLink*> &links, double frequency, double width, double start, unsigned int instance, unsigned int master, const Memory &sync);
 			/** Copy constructor **/
 			ExecTask(const ExecTask&);
 
@@ -82,13 +84,23 @@ namespace pelib
 	    		virtual bool
 			operator==(const ExecTask &other) const;
 
+			std::set<const AllotedLink*>
+			allLinks() const;
+
+			const Memory&
+			getMemory() const;
+
+			unsigned int
+			getMasterCore() const;
+
 		protected:
 			void importLinks(const std::set<AllotedLink> &links);
 			void importLinks(const std::set<const AllotedLink*> &links);
 			const Task &task;
 			/** Frequency and width allocated to this task **/
 			double frequency, width, start;
-			unsigned int instance;
+			unsigned int instance, master;
+			Memory sync;
 			/** Sets of producers and consumers linked to this task **/
 			std::set<const AllotedLink*> consumers, producers;
 			

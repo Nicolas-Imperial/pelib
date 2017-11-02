@@ -26,8 +26,8 @@
 extern "C" {
 #endif
 
-#ifndef PELIB_OUTPUT
-#define PELIB_OUTPUT
+#ifndef PELIB_LIBOUTPUT
+#define PELIB_LIBOUTPUT
 
 // /!\ the content of argv is freed after this function is run
 /** Writes objects contained in records to output stream. Options can be passed using the string array argv and the number of arguments in argc. Note that call elements of argv and argv itself are freed after this function terminates.

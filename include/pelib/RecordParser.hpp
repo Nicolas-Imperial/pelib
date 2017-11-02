@@ -17,8 +17,7 @@
  along with Pelib. If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-#include <sstream>
+#include <pelib/Parser.hpp>
 
 #ifndef PELIB_RECORDPARSER
 #define PELIB_RECORDPARSER
@@ -26,17 +25,11 @@
 namespace pelib
 {
 	/** Ancestor class of all parsers of data collections **/
-	class RecordParser
+	class RecordParser : public Parser
 	{
 		public:
-			/** Returns an empty input stream **/
-			std::istream& getEmptyStream();
 			/** Virtual destructor **/
 			virtual ~RecordParser();
-		protected:
-			/** Empty stream returned by the getEmptyStream method **/
-			std::istringstream emptyStream;
-		private:
 	};
 }
 

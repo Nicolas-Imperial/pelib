@@ -39,7 +39,7 @@ namespace pelib
 				@param tg Additional data from the taskgraph associated to this schedule
 				@parame pt Additional data from the platform associated to this schedule
 			**/
-			virtual	void dump(std::ostream &os, const Schedule *data, const Taskgraph *tg, const Platform *pt) const = 0;
+			virtual	void dump(std::ostream &os, const Schedule *data) const = 0;
 
 			/** Writes a schedule into output stream with support from associated taskgraph and execution platform, depending on details required
 				@param os Output stream where the schedule is written
@@ -47,7 +47,7 @@ namespace pelib
 				@param tg Additional data from the taskgraph associated to this schedule
 				@parame pt Additional data from the platform associated to this schedule
 			**/
-			virtual	void dump(std::ostream &os, const Schedule &data, const Taskgraph &tg, const Platform &pt) const = 0;
+			virtual	void dump(std::ostream &os, const Schedule &data) const = 0;
 
 		protected:
 		private:		

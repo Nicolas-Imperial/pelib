@@ -19,7 +19,7 @@
 
 package = pelib
 version = 5
-minor = 0
+minor = 1
 release = 0
 
 attach = COPYING.txt

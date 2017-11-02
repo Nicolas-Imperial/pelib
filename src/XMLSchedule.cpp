@@ -57,17 +57,16 @@ XMLSchedule::~XMLSchedule()
 }
 
 void
-XMLSchedule::dump(ostream& os, const Schedule &data, const Taskgraph &tg, const Platform &pt) const
+XMLSchedule::dump(ostream& os, const Schedule &data) const
 {
-	dump(os, &data, &tg, &pt);
+	dump(os, &data);
 }
 
 void
-XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const Platform *pt) const
+XMLSchedule::dump(ostream& os, const Schedule *sched) const
 {
 	Schedule::Table schedule = sched->getSchedule();
 	const set<AllotedLink> &links = sched->getLinks();
-	const map<Schedule::BarrierId, Memory> &barriers = sched->getBarriers();
 	set<string> task_ids;
 	
 	for(Schedule::Table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
@@ -135,7 +134,7 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 	for(Schedule::Table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 	{
 		int p = i->first;
-		os << " <core coreid=\"" << p + 1 << "\">" << endl;
+		os << " <core id=\"" << p + 1 << "\">" << endl;
 		set<ExecTask> core_schedule = i->second;
 		int order = 0;
 
@@ -150,7 +149,11 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 			os << "instance=\"" << std::fixed << t.getInstance() << "\" ";
 			os << "start=\"" << std::fixed << start << "\" ";
 			os << setprecision(old_precision);
-			os << "frequency=\"" << (float)t.getFrequency() << "\" ";
+			os << "frequency=\"" << (float)t.getFrequency() << "\"";
+			if(i->first == j->getMasterCore() && j->getWidth() > 1)
+			{
+				os << " role=\"master\"";
+			}
 			os << "/>" << endl;
 
 			start += t.getTask().runtime(t.getWidth(), t.getFrequency());
@@ -197,19 +200,29 @@ XMLSchedule::dump(ostream& os, const Schedule *sched, const Taskgraph *tg, const
 		os << "/>" << endl;
 		os << "  </buffer>" << endl;
 		os << " </link>" << endl;
-
 	}
 
-	for(map<Schedule::BarrierId, Memory>::const_iterator i = barriers.begin(); i != barriers.end(); i++)
+	set<ExecTask> allExecTasks;
+	for(Schedule::Table::const_iterator i = schedule.begin(); i != schedule.end(); i++)
 	{
-		os << " <barrier task=\"" << i->first.first->getName();
-		os << "\" instance=\"" << i->first.second << "\">" << endl;
-		os << "   <memory core=\"" << i->second.getCore() + 1 << "\" ";
-		os << "feature=\"" << Memory::featureToString(i->second.getFeature()) << "\" ";
-		os << "level=\"" << i->second.getLevel() << "\"";
-		os << "/>" << endl;
-		os << "  </buffer>" << endl;
-		os << " </link>" << endl;
+		for(set<ExecTask>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
+		{
+			allExecTasks.insert(*j);
+		}
+	}
+
+	for(set<ExecTask>::const_iterator i = allExecTasks.begin(); i != allExecTasks.end(); i++)
+	{
+		if(i->getMemory().getFeature() != Memory::Feature::undefined)
+		{
+			os << " <sync task=\"" << i->getTask().getName();
+			os << "\" instance=\"" << i->getInstance();
+			os << "  <memory core=\"" << i->getMemory().getCore() + 1 << "\" ";
+			os << "feature=\"" << Memory::featureToString(i->getMemory().getFeature()) << "\" ";
+			os << "level=\"" << i->getMemory().getLevel() << "\"";
+			os << "/>" << endl;
+			os << " </sync>" << endl;
+		}
 	}
 		
 	os << setprecision(old_precision);
@@ -241,7 +254,8 @@ XMLSchedule::parse(istream &is, const Taskgraph &tg, const Platform &pt) const
 		Schedule::Table schedule;
 		map<pair<Task, unsigned int>, unsigned int> task_width;
 		set<AllotedLink> links;
-		map<Schedule::BarrierId, Memory> barriers;
+		map<pair<Task, unsigned int>, Memory> sync;
+		map<pair<Task, unsigned int>, unsigned int> master;
 		for(xmlpp::Node::NodeList::iterator piter = processors.begin(); piter != processors.end(); ++piter) //for each core
 		{
 			if((*piter)->get_name().compare("core") == 0) //skip indentation characters et cetera
@@ -266,12 +280,22 @@ XMLSchedule::parse(istream &is, const Taskgraph &tg, const Platform &pt) const
 						throw PelibException("Found task in schedule that does not exist in taskgraph");
 					}
 
+					string role = task->get_attribute_value("role");
+					unsigned int instance = atoi(task->get_attribute_value("instance").c_str());
+					if(role.compare(string("master")) == 0)
+					{
+						debug(core_id);
+						master.insert(pair<pair<Task, unsigned int>, unsigned int>(pair<Task, unsigned int>(search, instance), core_id));
+					}
+
 					ExecTask etask(*task_search, 
 						set<AllotedLink>(), // First consider there are no links, will add them later
 						atof(task->get_attribute_value("frequency").c_str()),
 						0,
 						atof(task->get_attribute_value("start").c_str()),
-						atoi(task->get_attribute_value("instance").c_str())
+						atoi(task->get_attribute_value("instance").c_str()),
+						0,
+						Memory()
 					);
 
 					map<pair<Task, unsigned int>, unsigned int>::iterator i = task_width.find(pair<Task, unsigned int>(search, etask.getInstance()));
@@ -313,7 +337,9 @@ XMLSchedule::parse(istream &is, const Taskgraph &tg, const Platform &pt) const
 						set<Task>::iterator i = tg.getTasks().find(Task(task_name));
 						if(i == tg.getTasks().end())
 						{
-							throw PelibException("Could not find producer task in task set");
+							stringstream ss;
+							ss << "Could not find producer task \"" << task_name << "\" in task set" << endl;
+							throw PelibException(ss.str());
 						}
 						producer = &*i;
 						const Task &myTaskRef = *i;
@@ -331,7 +357,9 @@ XMLSchedule::parse(istream &is, const Taskgraph &tg, const Platform &pt) const
 						set<Task>::iterator i = tg.getTasks().find(Task(task_name));
 						if(i == tg.getTasks().end())
 						{
-							throw PelibException("Could not find consumer task in task set");
+							stringstream ss;
+							ss << "Could not find consumer task \"" << task_name << "\" in task set" << endl;
+							throw PelibException(ss.str());
 						}
 						consumer = &*i;
 					}
@@ -367,13 +395,15 @@ XMLSchedule::parse(istream &is, const Taskgraph &tg, const Platform &pt) const
 				set<AbstractLink>::const_iterator linkIter = allLinks.find(linkKey);
 				if(linkIter == allLinks.end())
 				{
-					throw PelibException("Link in schedule does not exist in taskgraph");
+					stringstream ss;
+					ss << "Link from " << producer->getName() << " (\"" << producer_name << "\") to " << consumer->getName() << " (\"" << consumer_name << "\") does not exist in taskgraph" << endl;
+					throw PelibException(ss.str());
 				}
 				const AbstractLink &actualLink = *linkIter;
 				AllotedLink link(actualLink, Buffer(queueSize, queueType, queueHeader, Memory(queueMemory, queueLevel, queueCore)), Memory(producer_type, producer_level, producer_core), Memory(consumer_type, consumer_level, consumer_core));
 				links.insert(link);
 			}
-			else if((*piter)->get_name().compare("barrier") == 0) //skip indentation characters et cetera
+			else if((*piter)->get_name().compare("sync") == 0) //skip indentation characters et cetera
 			{
 				Element *alloc = dynamic_cast<Element*>(*piter);
 				string task_name = alloc->get_attribute_value("task");
@@ -398,9 +428,9 @@ XMLSchedule::parse(istream &is, const Taskgraph &tg, const Platform &pt) const
 				set<Task>::const_iterator search = tg.getTasks().find(Task(task_name));
 				if(search == tg.getTasks().end())
 				{
-					throw PelibException("Barrier guards a task that does not exist in taskgraph");
+					throw PelibException("Synchronisation guards a task that does not exist in taskgraph");
 				}
-				barriers.insert(pair<Schedule::BarrierId, Memory>(Schedule::BarrierId(&*search, instance), Memory(feature, level, core)));
+				sync.insert(pair<pair<Task, unsigned int>, Memory>(pair<Task, unsigned int>(Task(task_name), instance), Memory(feature, level, core)));
 			}
 		}
 	
@@ -411,13 +441,36 @@ XMLSchedule::parse(istream &is, const Taskgraph &tg, const Platform &pt) const
 			set<ExecTask> core_schedule;
 			for(set<ExecTask>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
 			{
-				ExecTask task(j->getTask(), links, j->getFrequency(), task_width.find(pair<Task, unsigned int>(j->getTask(), j->getInstance()))->second, j->getStart(), j->getInstance());
+				unsigned int master_core;
+				map<pair<Task, unsigned int>, unsigned int>::const_iterator master_search = master.find(pair<Task, unsigned int>(j->getTask(), j->getInstance()));
+				if(master_search == master.end())
+				{
+					master_core = i->first;
+					master.insert(pair<pair<Task, unsigned int>, unsigned int>(pair<Task, unsigned int>(Task(j->getTask().getName()), j->getInstance()), master_core));
+				}
+				else
+				{
+					master_core = master_search->second;
+				}
+	
+				Memory task_sync;
+				map<pair<Task, unsigned int>, Memory>::const_iterator sync_search = sync.find(pair<Task, unsigned int>(j->getTask(), j->getInstance()));
+				if(sync_search == sync.end())
+				{
+					task_sync = Memory();
+				}
+				else
+				{
+					task_sync = sync_search->second;
+				}
+				
+				ExecTask task(j->getTask(), links, j->getFrequency(), task_width.find(pair<Task, unsigned int>(j->getTask(), j->getInstance()))->second, j->getStart(), j->getInstance(), master_core, task_sync);
 				core_schedule.insert(task);
 			}
 			finalSchedule.insert(pair<unsigned int, set<ExecTask>>(i->first, core_schedule));
 		}
 	
-		Schedule *sched = new Schedule(name, aut_name, finalSchedule, links, barriers, tg, pt);
+		Schedule *sched = new Schedule(name, aut_name, finalSchedule, links, tg, pt);
 
 		return sched;
 	}

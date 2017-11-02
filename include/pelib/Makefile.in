@@ -24,7 +24,7 @@ Data.hpp AlgebraData.hpp Algebra.hpp \
 AlgebraParser.hpp DataParser.hpp \
 AlgebraOutput.hpp DataOutput.hpp \
 Scalar.hpp Vector.hpp Matrix.hpp Set.hpp\
-Task.hpp AbstractLink.hpp AllotedLink.hpp Buffer.hpp Memory.hpp ExecTask.hpp Taskgraph.hpp Schedule.hpp \
+Task.hpp AbstractLink.hpp AllotedLink.hpp Buffer.hpp Memory.hpp ExecTask.hpp TaskSync.hpp Taskgraph.hpp Schedule.hpp \
 Platform.hpp Core.hpp DummyCore.hpp \
 DeadlineConstant.hpp DeadlineFormula.hpp DeadlineCalculator.hpp \
 AmplDataParser.hpp AmplDataOutput.hpp GraphML.hpp \
@@ -46,7 +46,8 @@ Solver.hpp AlgebraSolver.hpp AmplSolver.hpp \
 Scheduler.hpp generate.hpp \
 calculus.h \
 \
-exprtk.hpp pelib_exprtk.hpp
+exprtk.hpp pelib_exprtk.hpp \
+Parser.hpp Output.hpp MathProgModelParser.hpp MixedIntegerModelParser.hpp MixedIntegerModel.hpp CPLEXLP.hpp MixedIntegerProblem.hpp MIPSolver.hpp MIPOutput.hpp Gurobi.hpp SOLParser.hpp
 
 cstruct = array.h fifo_array.h char.h integer.h float.h pelib_string.h monitor.h sort.h structure.h complex.h fifo.h size_t.h stack.h template.h array.c fifo.c fifo_array.c stack.c malloc.h iterator.h iterator.c set.h set.c pair.h pair.c map.h map.c string.h const_string.h string_integer.h
 

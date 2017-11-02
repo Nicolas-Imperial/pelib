@@ -18,25 +18,22 @@
 */
 
 
-#include <iostream>
-#include <pelib/Record.hpp>
+#include <pelib/Parser.hpp>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+using namespace std;
 
-#ifndef PELIB_LIBPARSER
-#define PELIB_LIBPARSER
+namespace pelib
+{
+	istream&
+	Parser::getEmptyStream()
+	{
+		istringstream &local = emptyStream;
+		return local;
+	}
 
-// /!\ the content of argv is freed after this function is run
-/** Parses the content of an input stream with string options and produces a class instance derived from pelib::Record. Used for dynamic library parsers **/
-pelib::Record* pelib_parse(std::istream& cin, size_t argc, char** argv, const std::map<std::string, pelib::Record*> &inputs);
-
-/** Deletes a Record produced by pelib_parse **/
-void pelib_delete(pelib::Record*);
-
-#endif
-
-#ifdef __cplusplus
+	Parser::~Parser()
+	{
+		/* Do nothing */
+	}
 }
-#endif
+

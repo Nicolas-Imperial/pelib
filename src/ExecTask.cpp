@@ -43,29 +43,45 @@ namespace pelib
 		this->width = 1;
 		this->start = 0;
 		this->instance = 0;
+		this->master = 0;
 
 		this->producers.clear();
 		this->consumers.clear();
 	}
 
-	ExecTask::ExecTask(const Task& task, const std::set<AllotedLink> &links, double frequency, double width, double start, unsigned int instance) : task(task)
+	ExecTask::ExecTask(const Task& task, const std::set<AllotedLink> &links, double frequency, double width, double start, unsigned int instance, unsigned int master, const Memory &sync) : task(task), sync(sync)
 	{
 		this->frequency = frequency;
 		this->width = width;
 		this->start = start;
 		this->instance = instance;
+		this->master = master;
 
 		this->producers.clear();
 		this->consumers.clear();
 		this->importLinks(links);
 	}
 
-	ExecTask::ExecTask(const ExecTask &task) : task(task.getTask())
+	ExecTask::ExecTask(const Task& task, const std::set<const AllotedLink*> &links, double frequency, double width, double start, unsigned int instance, unsigned int master, const Memory &sync) : task(task), sync(sync)
+	{
+		this->frequency = frequency;
+		this->width = width;
+		this->start = start;
+		this->instance = instance;
+		this->master = master;
+
+		this->producers.clear();
+		this->consumers.clear();
+		this->importLinks(links);
+	}
+
+	ExecTask::ExecTask(const ExecTask &task) : task(task.getTask()), sync(task.getMemory())
 	{
 		this->frequency = task.getFrequency();
 		this->width = task.getWidth();
 		this->start = task.getStart();
 		this->instance = task.getInstance();
+		this->master = task.getMasterCore();
 
 		this->producers.clear();
 		this->consumers.clear();
@@ -163,7 +179,14 @@ namespace pelib
 	{
 		if(this->getStart() == other.getStart())
 		{
-			return this->getTask() < other.getTask();
+			if(this->getInstance() == other.getInstance())
+			{
+				return this->getTask() < other.getTask();
+			}
+			else
+			{
+				return this->getInstance() < other.getInstance();
+			}
 		}
 		else
 		{
@@ -174,7 +197,28 @@ namespace pelib
 	bool
 	ExecTask::operator==(const ExecTask &other) const
 	{
-		return this->getStart() == other.getStart() && this->getTask() == other.getTask();
+		return this->getStart() == other.getStart() && this->getTask() == other.getTask() && this->getInstance() == other.getInstance();
+	}
+
+	set<const AllotedLink*>
+	ExecTask::allLinks() const
+	{
+		std::set<const AllotedLink*> output;
+		std::set_union(this->getProducers().cbegin(), this->getProducers().cend(), this->getConsumers().begin(), this->getConsumers().cend(), std::inserter(output, output.begin()));
+//<std::set<const AllotedLink*>::const_iterator, std::set<const AllotedLink*>::const_iterator, std::set<const AllotedLink*>::iterator>
+		return output;
+	}
+
+	const Memory&
+	ExecTask::getMemory() const
+	{
+		return this->sync;
+	}
+
+	unsigned int
+	ExecTask::getMasterCore() const
+	{
+		return this->master;
 	}
 }
 

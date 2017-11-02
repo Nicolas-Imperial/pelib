@@ -1,5 +1,5 @@
 /*
- Copyright 2015 Nicolas Melot
+ Copyright 2017 Nicolas Melot
 
  This file is part of Pelib.
 
@@ -19,24 +19,30 @@
 
 
 #include <iostream>
-#include <pelib/Record.hpp>
+#include <cstdlib>
+#include <fstream>
+#include <string>
+#include <boost/regex.hpp>
+#include <iomanip>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <pelib/RecordParser.hpp>
+#include <pelib/Algebra.hpp>
 
-#ifndef PELIB_LIBPARSER
-#define PELIB_LIBPARSER
+#ifndef PELIB_MIXEDINTEGERMODELPARSER
+#define PELIB_MIXEDINTEGERMODELPARSER
 
-// /!\ the content of argv is freed after this function is run
-/** Parses the content of an input stream with string options and produces a class instance derived from pelib::Record. Used for dynamic library parsers **/
-pelib::Record* pelib_parse(std::istream& cin, size_t argc, char** argv, const std::map<std::string, pelib::Record*> &inputs);
-
-/** Deletes a Record produced by pelib_parse **/
-void pelib_delete(pelib::Record*);
-
-#endif
-
-#ifdef __cplusplus
+namespace pelib
+{
+	/** Base class of any class that takes data from an input stream and procudes an instance of Algebra. Derive this class before use. **/
+	class MixedIntegerModelParser : public ModelParser
+	{
+		public:
+			/** Produces an instance of Algebra from data found in input stream data. **/
+			virtual
+			MixedIntegerModel
+			parse(std::istream &data) const = 0;
+	};
 }
+
 #endif
+
