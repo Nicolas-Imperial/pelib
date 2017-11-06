@@ -34,7 +34,7 @@ namespace pelib
 			static const unsigned int memoryCostMask;
 			/** Constructor. Takes the producer and consumer tasks at both ends of the link **/
 			Memory();
-			Memory(Feature feature, unsigned int level, const unsigned int core);
+			Memory(Feature feature, unsigned int level, const unsigned int core, const unsigned int instance = 0);
 
 			unsigned int
 			getCore() const;
@@ -60,10 +60,14 @@ namespace pelib
 			bool
 			operator==(const Memory &mem) const;
 
+			unsigned int
+			getInstance() const;
+
 		protected:
 			/** Producer and consumer task pointers **/
 			Feature feature;
 			unsigned int core, level;
+			unsigned int instance;
 
 		private:
 			void

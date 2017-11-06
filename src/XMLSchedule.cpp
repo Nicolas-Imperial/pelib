@@ -215,11 +215,12 @@ XMLSchedule::dump(ostream& os, const Schedule *sched) const
 	{
 		if(i->getMemory().getFeature() != Memory::Feature::undefined)
 		{
-			os << " <sync task=\"" << i->getTask().getName();
-			os << "\" instance=\"" << i->getInstance();
+			os << " <sync " << i->getTask().getName();
+			os << "\" id" << i->getInstance();
 			os << "  <memory core=\"" << i->getMemory().getCore() + 1 << "\" ";
 			os << "feature=\"" << Memory::featureToString(i->getMemory().getFeature()) << "\" ";
-			os << "level=\"" << i->getMemory().getLevel() << "\"";
+			os << "level=\"" << i->getMemory().getLevel() << "\" ";
+			os << "instance=\"" << i->getInstance() << "\"";
 			os << "/>" << endl;
 			os << " </sync>" << endl;
 		}
@@ -252,9 +253,9 @@ XMLSchedule::parse(istream &is, const Taskgraph &tg, const Platform &pt) const
 		std::string aut_name = root->get_attribute_value("application");
 
 		Schedule::Table schedule;
-		map<pair<Task, unsigned int>, unsigned int> task_width;
+		map<pair<Task, unsigned int>, unsigned int> task_width, task_sync;
 		set<AllotedLink> links;
-		map<pair<Task, unsigned int>, Memory> sync;
+		map<unsigned int, Memory> sync;
 		map<pair<Task, unsigned int>, unsigned int> master;
 		for(xmlpp::Node::NodeList::iterator piter = processors.begin(); piter != processors.end(); ++piter) //for each core
 		{
@@ -274,6 +275,7 @@ XMLSchedule::parse(istream &is, const Taskgraph &tg, const Platform &pt) const
 					Element *task = dynamic_cast<Element*>(*titer);
 
 					Task search(task->get_attribute_value("name"));
+					string sync(task->get_attribute_value("sync"));
 					set<Task>::const_iterator task_search = tg.getTasks().find(search);
 					if(task_search == tg.getTasks().end())
 					{
@@ -304,6 +306,24 @@ XMLSchedule::parse(istream &is, const Taskgraph &tg, const Platform &pt) const
 						i = task_width.insert(pair<pair<Task, unsigned int>, unsigned int>(pair<Task, unsigned int>(search, etask.getInstance()), 0)).first;
 					}
 					i->second++;
+
+					if(sync.compare(string()) != 0)
+					{
+						map<pair<Task, unsigned int>, unsigned int>::iterator j = task_sync.find(pair<Task, unsigned int>(search, etask.getInstance()));
+						if(j != task_sync.end() && j->second != (unsigned int)atoi(sync.c_str()))
+						{
+							if(j->second != (unsigned int)atoi(sync.c_str()))
+							{
+								stringstream ss;
+								ss << "Parallel task \"" << search.getName() << "\" uses inconsistent synchronization buffers" << endl;
+								throw PelibException(ss.str());
+							}
+						}
+						else
+						{
+							task_sync.insert(pair<pair<Task, unsigned int>, unsigned int>(pair<Task, unsigned int>(search, etask.getInstance()), atoi(sync.c_str())));
+						}
+					}
 					core_schedule_map.insert(etask);
 				}
 
@@ -406,8 +426,7 @@ XMLSchedule::parse(istream &is, const Taskgraph &tg, const Platform &pt) const
 			else if((*piter)->get_name().compare("sync") == 0) //skip indentation characters et cetera
 			{
 				Element *alloc = dynamic_cast<Element*>(*piter);
-				string task_name = alloc->get_attribute_value("task");
-				unsigned int instance = atoi(alloc->get_attribute_value("instance").c_str());
+				unsigned int instance = atoi(alloc->get_attribute_value("id").c_str());
 				Memory::Feature feature = Memory::Feature::undefined;
 				unsigned int core = 0;
 				unsigned int level = 0;
@@ -425,12 +444,7 @@ XMLSchedule::parse(istream &is, const Taskgraph &tg, const Platform &pt) const
 					}
 				}
 
-				set<Task>::const_iterator search = tg.getTasks().find(Task(task_name));
-				if(search == tg.getTasks().end())
-				{
-					throw PelibException("Synchronisation guards a task that does not exist in taskgraph");
-				}
-				sync.insert(pair<pair<Task, unsigned int>, Memory>(pair<Task, unsigned int>(Task(task_name), instance), Memory(feature, level, core)));
+				sync.insert(pair<unsigned int, Memory>(instance, Memory(feature, level, core, instance)));
 			}
 		}
 	
@@ -453,18 +467,36 @@ XMLSchedule::parse(istream &is, const Taskgraph &tg, const Platform &pt) const
 					master_core = master_search->second;
 				}
 	
-				Memory task_sync;
-				map<pair<Task, unsigned int>, Memory>::const_iterator sync_search = sync.find(pair<Task, unsigned int>(j->getTask(), j->getInstance()));
+				Memory mem_sync;
+				map<pair<Task, unsigned int>, unsigned int>::const_iterator task_sync_search = task_sync.find(pair<Task, unsigned int>(j->getTask(), j->getInstance()));
+				if(task_sync_search == task_sync.end() && j->getWidth() > 1)
+				{
+					stringstream ss;
+					ss << "Parallel task \"" << j->getTask().getName() << "\" instance " << j->getInstance() << " refers to no synchronization data structure on core " << i->first << endl;
+					throw PelibException(ss.str());
+				}
+				
+				map<unsigned int, Memory>::const_iterator sync_search = sync.find(task_sync_search->second);
+
 				if(sync_search == sync.end())
 				{
-					task_sync = Memory();
+					if(j->getWidth() <= 1)
+					{
+						mem_sync = Memory();
+					}
+					else
+					{
+						stringstream ss;
+						ss << "Parallel task \"" << j->getTask().getName() << "\" instance " << j->getInstance() << " refers to inexistant synchronization data structure" << task_sync_search->second << " on core " << i->first << endl;
+						throw PelibException(ss.str());
+					}
 				}
 				else
 				{
-					task_sync = sync_search->second;
+					mem_sync = sync_search->second;
 				}
 				
-				ExecTask task(j->getTask(), links, j->getFrequency(), task_width.find(pair<Task, unsigned int>(j->getTask(), j->getInstance()))->second, j->getStart(), j->getInstance(), master_core, task_sync);
+				ExecTask task(j->getTask(), links, j->getFrequency(), task_width.find(pair<Task, unsigned int>(j->getTask(), j->getInstance()))->second, j->getStart(), j->getInstance(), master_core, mem_sync);
 				core_schedule.insert(task);
 			}
 			finalSchedule.insert(pair<unsigned int, set<ExecTask>>(i->first, core_schedule));

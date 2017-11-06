@@ -40,11 +40,12 @@ namespace pelib
 		this->setAsNull();
 	}
 
-	Memory::Memory(Feature feature, unsigned int level, const unsigned int core)
+	Memory::Memory(Feature feature, unsigned int level, const unsigned int core, const unsigned int instance)
 	{
 		this->core = core;
 		this->feature = feature;
 		this->level = level;
+		this->instance = instance;
 	}
 
 	unsigned int
@@ -140,6 +141,12 @@ namespace pelib
 	Memory::nullMemory()
 	{
 		return Memory(); 
+	}
+
+	unsigned int
+	Memory::getInstance() const
+	{
+		return this->instance;
 	}
 
 	Memory::Feature
