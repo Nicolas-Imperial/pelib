@@ -27,7 +27,7 @@
 #include <pelib/AmplInput.hpp>
 #include <pelib/Matrix.hpp>
 #include <pelib/Task.hpp>
-#include <pelib/Link.hpp>
+#include <pelib/AbstractLink.hpp>
 #include <pelib/Taskgraph.hpp>
 
 using namespace std;
