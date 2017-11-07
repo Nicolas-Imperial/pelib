@@ -28,7 +28,7 @@
 
 #include <pelib/ParseException.hpp>
 #include <pelib/NoDecimalFloatException.hpp>
-#include <pelib/Algebra.hpp>
+//#include <pelib/Algebra.hpp>
 #include <pelib/Data.hpp>
 
 #ifndef PELIB_DATAPARSER
