@@ -142,7 +142,7 @@ main(int argc, char **argv)
 
 		/* Link function handles to function pointers */
 		Record* (*parse)(istream&, size_t, char**, const map<string, Record*>&) = (Record* (*)(istream&, size_t, char**, const map<string, Record*>&))load_function(libParser, "pelib_parse");
-		void (*del)(Record*) = (void (*)(Record*))load_function(libParser, "pelib_delete");
+		void (*del)(Record*) = (void (*)(Record*))load_function(libParser, "pelib_delete_record");
 
 		switch(i->stream)
 		{
@@ -230,7 +230,7 @@ main(int argc, char **argv)
 
 		// Replace function pointers
 		freelist.clear();
-		void (*del)(Record*) = (void (*)(Record*))load_function(libProcess, "pelib_delete");
+		void (*del)(Record*) = (void (*)(Record*))load_function(libProcess, "pelib_delete_process");
 		for(map<string, Record*>::iterator i = inputs.begin(); i != inputs.end(); i++)
 		{
 			freelist.insert(pair<const char*, void (*)(Record*)>(i->first.c_str(), del));

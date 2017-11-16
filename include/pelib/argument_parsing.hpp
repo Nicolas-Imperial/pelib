@@ -21,6 +21,9 @@
 #ifndef PELIB_ARGUMENT_PARSING_H
 #define PELIB_ARGUMENT_PARSING_H
 
+#define BRACKET_OPEN "["
+#define BRACKET_CLOSE "]"
+
 enum stream {STREAM_NOTHING, STREAM_STDIN, STREAM_STDOUT, STREAM_STDERR, STREAM_FILE};
 
 /** Input or output argument model for pelib-convert **/

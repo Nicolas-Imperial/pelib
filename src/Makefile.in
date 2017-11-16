@@ -94,7 +94,7 @@ shared_pelib-core++_libs = -lboost_regex -lboost_graph -lexpat -ldl -lm $(asan_l
 shared_pelib-core++_ldflags = -pthread
 shared_pelib-core++_cxxflags = -fPIC -std=c++11
 shared_pelib-core++_deps =
-shared_pelib-core++_pkg = igraph libxml++-2.6 cairomm-1.0
+shared_pelib-core++_pkg = 
 shared_pelib-core++_pkg_url = http://www.ida.liu.se/~nicme26
 shared_pelib-core++_pkg_ld = 
 shared_pelib-core++_pkg_libs = $(shared_pelib-core++_libs)

@@ -33,7 +33,7 @@ extern "C" {
 pelib::Record* pelib_parse(std::istream& cin, size_t argc, char** argv, const std::map<std::string, pelib::Record*> &inputs);
 
 /** Deletes a Record produced by pelib_parse **/
-void pelib_delete(pelib::Record*);
+void pelib_delete_record(pelib::Record*);
 
 #endif
 

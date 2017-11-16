@@ -83,23 +83,23 @@ is_reserved(char* str)
 static void
 add_argument(pelib_argument_stream *stream, char *argv)
 {
-			// Make room for another argument
-			char **stuff = (char**)malloc(sizeof(char*) * (stream->argc + 2));
-			memcpy(stuff, stream->argv, (stream->argc + 1) * sizeof(char*));
-			free(stream->argv);
-			stream->argv = stuff;
+	// Make room for another argument
+	char **stuff = (char**)malloc(sizeof(char*) * (stream->argc + 2));
+	memcpy(stuff, stream->argv, (stream->argc + 1) * sizeof(char*));
+	free(stream->argv);
+	stream->argv = stuff;
 
-			stream->argv[stream->argc] = (char*)malloc(sizeof(char) * (strlen(argv) + 1));
-			strcpy(stream->argv[stream->argc], argv);
-			stream->argc++;
-			stream->argv[stream->argc] = NULL;
+	stream->argv[stream->argc] = (char*)malloc(sizeof(char) * (strlen(argv) + 1));
+	strcpy(stream->argv[stream->argc], argv);
+	stream->argc++;
+	stream->argv[stream->argc] = NULL;
 }
 
 unsigned int
 pelib_argument_stream_parse(char **argv, pelib_argument_stream_t* stream)
 {
 	unsigned int parsed = 0;
-	while((void*)argv[0] != NULL && string(argv[0]).compare("--") != 0)
+	while((void*)argv[0] != NULL)
 	{
 		if(string(*argv).compare("--library") == 0 || string(*argv).compare("-l") == 0)
 		{
@@ -226,37 +226,52 @@ pelib_argument_stream_parse(char **argv, pelib_argument_stream_t* stream)
 		{
 			argv++;
 			parsed++;
-	
-			size_t args_counter = 1;
-			while(*argv != NULL)
+
+			if(*argv != NULL && string(*argv).compare(BRACKET_OPEN) == 0)
 			{
- 				if(string(*argv).compare("--args") == 0)
+				argv++;
+				parsed++;
+	
+				size_t args_counter = 1;
+				while(*argv != NULL)
 				{
-					args_counter++;
-				}	
-				
- 				if(string(*argv).compare("--") == 0)
-				{
-					args_counter--;
-					if(args_counter == 0)
+ 					if(string(*argv).compare(BRACKET_OPEN) == 0)
 					{
-						break;
+						args_counter++;
+					}	
+					
+ 					if(string(*argv).compare(BRACKET_CLOSE) == 0)
+					{
+						args_counter--;
+						if(args_counter == 0)
+						{
+							argv++;
+							parsed++;
+							// Add a final NULL to argument list
+							break;
+						}
+					}
+
+					add_argument(stream, *argv);
+					argv++;
+					parsed++;
+				}
+			
+				// Skip the last BRACKET_CLOSE
+				if(*argv != NULL)
+				{
+					if(string(*argv).compare(BRACKET_CLOSE) == 0)
+					{
+						argv++;
+						parsed++;	
 					}
 				}
-
+			}
+			else if(*argv != NULL)
+			{
 				add_argument(stream, *argv);
 				argv++;
 				parsed++;
-			}
-			
-			// Skip the last "--"
-			if(*argv != NULL)
-			{
-				if(string(*argv).compare("--") == 0)
-				{
-					argv++;
-					parsed++;	
-				}
 			}
 
 			continue;

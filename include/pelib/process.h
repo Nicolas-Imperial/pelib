@@ -33,7 +33,7 @@ extern "C" {
 std::map<std::string, pelib::Record*> pelib_process(const std::map<std::string, pelib::Record*> &records, size_t argc, char** argv);
 
 /** Deletes a Record produced by pelib_parse **/
-void pelib_delete(pelib::Record*);
+void pelib_delete_process(pelib::Record*);
 
 #endif
 
